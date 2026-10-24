@@ -1,0 +1,82 @@
+"use client";
+
+import "../app/globals.css";
+import { DisableDarkReader } from "@components/DisableDarkReader";
+import { TooltipProvider } from "@components/Tooltip";
+import { cn } from "@utils/helpers";
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
+import { Viewport } from "next";
+import localFont from "next/font/local";
+import React, { Suspense } from "react";
+import { Toaster } from "sonner";
+import OIDCProvider from "@/auth/OIDCProvider";
+import { useAWSMarketplace } from "@/cloud/aws/useAWSMarketplace";
+import FullScreenLoading from "@/components/ui/FullScreenLoading";
+import AnalyticsProvider, {
+  GoogleTagManagerHeadScript,
+} from "@/contexts/AnalyticsProvider";
+import DialogProvider from "@/contexts/DialogProvider";
+import ErrorBoundaryProvider from "@/contexts/ErrorBoundary";
+import InstanceSetupProvider from "@/contexts/InstanceSetupProvider";
+import { NavigationEvents } from "@/contexts/NavigationEvents";
+import { ThemeProvider } from "@/contexts/ThemeProvider";
+import { useSignupSource } from "@/hooks/useSignupSource";
+
+const inter = localFont({
+  src: "../assets/fonts/Inter.ttf",
+  display: "swap",
+});
+
+// Extend dayjs with relativeTime plugin
+dayjs.extend(relativeTime);
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+};
+
+export default function AppLayout({
+  children,
+}: Readonly<{ children: React.ReactNode }>) {
+  useAWSMarketplace();
+  useSignupSource();
+
+  return (
+    <html lang="en" className="dark" style={{ colorScheme: "dark" }}>
+      <head>
+        <GoogleTagManagerHeadScript />
+      </head>
+      <body className={cn(inter.className)}>
+        <Suspense fallback={<FullScreenLoading />}>
+          <AnalyticsProvider>
+            <DialogProvider>
+              <ThemeProvider>
+                <ErrorBoundaryProvider>
+                  <InstanceSetupProvider>
+                    <OIDCProvider>
+                      <TooltipProvider delayDuration={0}>
+                        {children}
+                      </TooltipProvider>
+                    </OIDCProvider>
+                  </InstanceSetupProvider>
+                </ErrorBoundaryProvider>
+              </ThemeProvider>
+            </DialogProvider>
+            <Toaster
+              position="top-center"
+              duration={3000}
+              toastOptions={{ unstyled: true }}
+              style={{ "--width": "28rem" } as React.CSSProperties}
+              gap={0}
+              visibleToasts={5}
+              offset="12px"
+            />
+            <NavigationEvents />
+            <DisableDarkReader />
+          </AnalyticsProvider>
+        </Suspense>
+      </body>
+    </html>
+  );
+}

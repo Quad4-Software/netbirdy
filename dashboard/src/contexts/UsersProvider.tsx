@@ -1,0 +1,223 @@
+import { useOidc } from "@axa-fr/react-oidc";
+import FullScreenLoading from "@components/ui/FullScreenLoading";
+import useFetchApi, { type ErrorResponse } from "@utils/api";
+import loadConfig from "@utils/config";
+import { useRouter } from "next/navigation";
+import React, { useEffect, useMemo } from "react";
+import { useApplicationContext } from "@/contexts/ApplicationProvider";
+import PermissionsProvider from "@/contexts/PermissionsProvider";
+import { Role, User } from "@/interfaces/User";
+import { PendingApproval } from "@/modules/users/PendingApproval";
+
+const config = loadConfig();
+
+type Props = {
+  children: React.ReactNode;
+};
+
+export enum RefusalKind {
+  PendingApproval = "pending_approval",
+  Blocked = "blocked",
+}
+
+export const resolveRefusedUser = ({
+  currentError,
+  listError,
+  isCurrentLoading,
+  isListLoading,
+}: {
+  currentError?: ErrorResponse;
+  listError?: ErrorResponse;
+  isCurrentLoading: boolean;
+  isListLoading: boolean;
+}): { kind: RefusalKind; error: ErrorResponse } | undefined => {
+  const readError = (error?: ErrorResponse) => {
+    const message = error?.message?.toLowerCase();
+    if (!error || !message) return undefined;
+    if (message.includes("pending approval"))
+      return { kind: RefusalKind.PendingApproval, error };
+    if (message.includes("blocked"))
+      return { kind: RefusalKind.Blocked, error };
+    return undefined;
+  };
+
+  const currentUserError = readError(currentError);
+  if (currentUserError?.kind === RefusalKind.PendingApproval)
+    return currentUserError;
+  if (isCurrentLoading) return undefined;
+
+  const listUserError = readError(listError);
+  if (listUserError?.kind === RefusalKind.PendingApproval) return listUserError;
+  if (isListLoading) return undefined;
+
+  return currentUserError ?? listUserError;
+};
+
+const UsersContext = React.createContext(
+  {} as {
+    users: User[] | undefined;
+    refresh: () => void;
+    isLoading: boolean;
+    // Older management reports a pending user as merely blocked on
+    // /users/current; this call still says pending, so it is the fallback.
+    usersError?: ErrorResponse;
+  },
+);
+
+const UserProfileContext = React.createContext(
+  {} as {
+    loggedInUser: User | undefined;
+  },
+);
+
+export default function UsersProvider({ children }: Readonly<Props>) {
+  // Mounted on every dashboard page, above PermissionsProvider — so the
+  // caller's grants aren't known here and the request goes out for roles
+  // that can't list users (agent_network_admin, usage_viewer). Errors are
+  // ignored so their 403 leaves the list undefined, which every consumer
+  // already handles, instead of raising the red toast on every page load.
+  const {
+    data: users,
+    mutate,
+    isLoading,
+    error: usersError,
+  } = useFetchApi<User[]>("/users?service_user=false", true);
+  const {
+    data: serviceUsers,
+    mutate: mutateServiceUsers,
+    isLoading: isLoadingServiceUsers,
+  } = useFetchApi<User[]>("/users?service_user=true", true);
+
+  const refresh = () => {
+    mutate().then();
+    mutateServiceUsers().then();
+  };
+
+  const allUsers = useMemo(() => {
+    return [...(users ?? []), ...(serviceUsers ?? [])];
+  }, [users, serviceUsers]);
+
+  return (
+    <UsersContext.Provider
+      value={{
+        users: allUsers,
+        usersError,
+        refresh,
+        isLoading: isLoading || isLoadingServiceUsers,
+      }}
+    >
+      <UserProfileProvider>{children}</UserProfileProvider>
+    </UsersContext.Provider>
+  );
+}
+
+export const useUsers = () => React.useContext(UsersContext);
+
+// The logged-in user is cached under this SWR key, so refreshing it takes
+// mutate(LOGGED_IN_USER_KEY) rather than mutate("/users/current").
+const USER_PROFILE_KEY = "user-profile";
+export const LOGGED_IN_USER_KEY = ["/users/current", USER_PROFILE_KEY];
+
+const UserProfileProvider = ({ children }: Props) => {
+  const { logout } = useOidc();
+  const router = useRouter();
+  const { users, usersError, isLoading: isAllUsersLoading } = useUsers();
+  const {
+    data: user,
+    error,
+    isLoading,
+  } = useFetchApi<User>("/users/current", true, true, true, {
+    key: USER_PROFILE_KEY,
+  });
+
+  const loggedInUser = useMemo(() => {
+    if (isLoading) return undefined;
+    if (user) return user;
+    if (isAllUsersLoading) return undefined;
+    if (!user || error) {
+      return users?.find((u) => u?.is_current);
+    }
+  }, [user, error, users, isLoading, isAllUsersLoading]);
+
+  const data = useMemo(() => {
+    return {
+      loggedInUser,
+    };
+  }, [loggedInUser]);
+
+  const refusal = resolveRefusedUser({
+    currentError: error,
+    listError: usersError,
+    isCurrentLoading: isLoading,
+    isListLoading: isAllUsersLoading,
+  });
+
+  const blockedUrl =
+    refusal?.kind === RefusalKind.Blocked
+      ? `/error?${new URLSearchParams({
+          code: String(refusal.error.code),
+          message: encodeURIComponent(refusal.error.message),
+          type: "user-status",
+        }).toString()}`
+      : undefined;
+
+  // Blocked is a dead end rather than a wait, so it keeps the error page. The
+  // navigation is an effect: calling it while rendering updates the router
+  // mid-render, which React warns about and can run twice.
+  useEffect(() => {
+    if (blockedUrl) router.replace(blockedUrl);
+  }, [blockedUrl, router]);
+
+  if (refusal?.kind === RefusalKind.PendingApproval) {
+    return (
+      <PendingApproval
+        error={refusal.error}
+        onRefresh={() => router.push("/")}
+        onLogout={() => logout("/", { client_id: config.clientId })}
+      />
+    );
+  }
+
+  if (blockedUrl) return <FullScreenLoading />;
+
+  // Show loading only when we're still loading and don't have user data
+  if (isLoading || !loggedInUser) {
+    return <FullScreenLoading />;
+  }
+
+  // For blocked or pending approval users, we still need to provide the context
+  // so they can access their user data on the blocked page
+  return (
+    <UserProfileContext.Provider value={data}>
+      <PermissionsProvider user={loggedInUser}>{children}</PermissionsProvider>
+    </UserProfileContext.Provider>
+  );
+};
+
+export const useUserProfile = () => React.useContext(UserProfileContext);
+
+export const useLoggedInUser = () => {
+  const { loggedInUser } = useUserProfile();
+  const { logout: oidcLogout } = useOidc();
+  const { setGlobalApiParams } = useApplicationContext();
+  const isOwner = loggedInUser ? loggedInUser?.role === Role.Owner : false;
+  const isAdmin = loggedInUser ? loggedInUser?.role === Role.Admin : false;
+
+  const isUser = !isOwner && !isAdmin;
+  const isOwnerOrAdmin = isOwner || isAdmin;
+
+  const logout = async () => {
+    return oidcLogout("/", { client_id: config.clientId }).then(() => {
+      setGlobalApiParams?.({});
+    });
+  };
+
+  return {
+    loggedInUser,
+    isOwner,
+    isAdmin,
+    isUser,
+    isOwnerOrAdmin,
+    logout,
+  } as const;
+};

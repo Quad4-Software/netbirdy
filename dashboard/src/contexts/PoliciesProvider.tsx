@@ -1,0 +1,252 @@
+import { Modal } from "@components/modal/Modal";
+import { notify } from "@components/Notification";
+import useFetchApi, { useApiCall } from "@utils/api";
+import { cloneDeep } from "@utils/helpers";
+import React, { useState } from "react";
+import { useSWRConfig } from "swr";
+import { useGroups } from "@/contexts/GroupsProvider";
+import { usePermissions } from "@/contexts/PermissionsProvider";
+import { Group } from "@/interfaces/Group";
+import { NetworkResource } from "@/interfaces/Network";
+import { Policy } from "@/interfaces/Policy";
+import { AccessControlModalContent } from "@/modules/access-control/AccessControlModal";
+import { duplicatePolicy } from "@/modules/access-control/policyDuplicate";
+
+type Props = {
+  children: React.ReactNode;
+};
+
+const PoliciesContext = React.createContext(
+  {} as {
+    updatePolicy: (
+      policy: Policy,
+      toUpdate: Partial<Policy>,
+      onSuccess?: (p: Policy) => void,
+      message?: string,
+    ) => void;
+    createPolicy: (policy: Policy) => Promise<Policy>;
+    createPoliciesForResource: (
+      policies: Policy[],
+      resource: NetworkResource,
+      knownGroups?: Group[],
+    ) => Promise<void>;
+    openEditPolicyModal: (policy: Policy, tab?: string) => void;
+    // Opens the create modal seeded with a duplicate of the policy.
+    openDuplicatePolicyModal: (policy: Policy) => void;
+    deletePolicy: (policy: Policy, onSuccess?: () => void) => Promise<void>;
+    serializeRules: (
+      rules: Policy["rules"],
+      enabled?: boolean,
+    ) => Policy["rules"];
+  },
+);
+
+export default function PoliciesProvider({ children }: Props) {
+  const { mutate } = useSWRConfig();
+  const request = useApiCall<Policy>("/policies");
+  const { createOrUpdate: createOrUpdateGroup, groups } = useGroups();
+  const [policyModal, setPolicyModal] = useState(false);
+  const [currentPolicy, setCurrentPolicy] = useState<Policy>();
+  const [initialPolicyTab, setInitialPolicyTab] = useState("");
+  const [isDuplicate, setIsDuplicate] = useState(false);
+
+  // Every policy name in the account, so a duplicate gets a name not already in
+  // use, even where the table only lists some policies (group details).
+  const { permission } = usePermissions();
+  const { data: allPolicies } = useFetchApi<Policy[]>(
+    "/policies",
+    true,
+    true,
+    !!permission?.policies?.read,
+  );
+
+  const createPolicy = async (policy: Policy) => request.post(policy);
+
+  const createPolicyForResource = async (
+    policy: Policy,
+    resource: NetworkResource,
+    knownGroups?: Group[],
+  ) => {
+    const rule = policy.rules[0];
+
+    const allGroups = [...(knownGroups || []), ...(groups || [])];
+    const resolveGroup = async (g: Group | string): Promise<string> => {
+      if (typeof g === "string") return g;
+      if (g.id) return g.id;
+      const existing = allGroups.find((eg) => eg.name === g.name);
+      if (existing?.id) return existing.id;
+      const created = await createOrUpdateGroup(g);
+      return created.id!;
+    };
+
+    const sources = rule.sourceResource
+      ? undefined
+      : await Promise.all(
+          (rule.sources ?? []).map(resolveGroup),
+        ).then((ids) => ids.filter(Boolean) as string[]);
+
+    const destinations = rule.destinationResource
+      ? undefined
+      : await Promise.all(
+          (rule.destinations ?? []).map(resolveGroup),
+        ).then((ids) => ids.filter(Boolean) as string[]);
+
+    const destinationResource = rule.destinationResource
+      ? { id: resource.id, type: resource.type }
+      : undefined;
+
+    return createPolicy({
+      ...policy,
+      source_posture_checks: (policy.source_posture_checks ?? []).map((c) =>
+        typeof c === "string" ? c : c.id,
+      ),
+      rules: [
+        {
+          ...rule,
+          sources,
+          destinations,
+          destinationResource,
+        },
+      ],
+    } as Policy);
+  };
+
+  const createPoliciesForResource = async (
+    newPolicies: Policy[],
+    resource: NetworkResource,
+    knownGroups?: Group[],
+  ) => {
+    const policiesToCreate = newPolicies.filter((p) => !p.id);
+    if (policiesToCreate.length === 0) return;
+
+    await Promise.all(
+      policiesToCreate.map((p) =>
+        createPolicyForResource(p, resource, knownGroups),
+      ),
+    );
+    await mutate("/policies");
+  };
+
+  const serializeRules = (rules: Policy["rules"], enabled?: boolean) => {
+    rules = cloneDeep(rules);
+    rules.forEach((rule) => {
+      if (enabled !== undefined) rule.enabled = enabled;
+      rule.sources = rule.sources
+        ? (rule.sources.map((s) => {
+            const group = s as Group;
+            return group.id ?? s;
+          }) as string[])
+        : [];
+      rule.destinations = rule.destinations
+        ? (rule.destinations.map((d) => {
+            const group = d as Group;
+            return group.id ?? d;
+          }) as string[])
+        : [];
+      if (rule.destinationResource) rule.destinations = null;
+      if (rule.sourceResource) rule.sources = null;
+    });
+    return rules;
+  };
+
+  const updatePolicy = async (
+    policy: Policy,
+    toUpdate: Partial<Policy>,
+    onSuccess?: (p: Policy) => void,
+    message?: string,
+  ) => {
+    notify({
+      title: "Access Control Policy " + policy.name,
+      description:
+        message || "The access control policy was successfully updated",
+      promise: request
+        .put(
+          {
+            name: toUpdate.name ?? policy.name ?? "",
+            description: toUpdate.description ?? policy.description ?? "",
+            enabled: toUpdate.enabled ?? policy.enabled,
+            query: toUpdate.query ?? policy.query ?? "",
+            rules: toUpdate.rules ?? policy.rules ?? [],
+            source_posture_checks:
+              toUpdate.source_posture_checks ??
+              policy.source_posture_checks ??
+              [],
+          },
+          `/${policy.id}`,
+        )
+        .then((p) => {
+          onSuccess && onSuccess(p);
+        }),
+      loadingMessage: "Updating policy...",
+    });
+  };
+
+  const deletePolicy = async (policy: Policy, onSuccess?: () => void) => {
+    const promise = request.del("", `/${policy.id}`).then(() => {
+      mutate("/policies");
+      onSuccess?.();
+    });
+    notify({
+      title: "Access Control Policy " + policy.name,
+      description: "The policy was successfully deleted.",
+      promise,
+      loadingMessage: "Deleting policy...",
+    });
+    return promise;
+  };
+
+  const openEditPolicyModal = (policy: Policy, tab?: string) => {
+    setCurrentPolicy(policy);
+    setIsDuplicate(false);
+    tab && setInitialPolicyTab(tab);
+    setPolicyModal(true);
+  };
+
+  const openDuplicatePolicyModal = (policy: Policy) => {
+    const takenNames = (allPolicies ?? []).map((p) => p.name);
+    setCurrentPolicy(duplicatePolicy(policy, takenNames));
+    setIsDuplicate(true);
+    setInitialPolicyTab("");
+    setPolicyModal(true);
+  };
+
+  return (
+    <PoliciesContext.Provider
+      value={{
+        updatePolicy,
+        createPolicy,
+        createPoliciesForResource,
+        openEditPolicyModal,
+        openDuplicatePolicyModal,
+        deletePolicy,
+        serializeRules,
+      }}
+    >
+      {children}
+      <Modal
+        open={policyModal}
+        onOpenChange={(state) => {
+          setPolicyModal(state);
+          setCurrentPolicy(undefined);
+          setIsDuplicate(false);
+        }}
+      >
+        <AccessControlModalContent
+          key={policyModal ? "1" : "0"}
+          policy={currentPolicy}
+          initialTab={initialPolicyTab}
+          isDuplicate={isDuplicate}
+          onSuccess={async (p) => {
+            setPolicyModal(false);
+            setCurrentPolicy(undefined);
+            setIsDuplicate(false);
+          }}
+        />
+      </Modal>
+    </PoliciesContext.Provider>
+  );
+}
+
+export const usePolicies = () => {
+  return React.useContext(PoliciesContext);
+};

@@ -1,0 +1,113 @@
+import HelpText from "@components/HelpText";
+import { Label } from "@components/Label";
+import { ToggleSwitch } from "@components/ToggleSwitch";
+import { cn } from "@utils/helpers";
+import { cva, VariantProps } from "class-variance-authority";
+import React from "react";
+
+export const fancyToggleSwitchVariants = cva([], {
+  variants: {
+    variant: {
+      default: ["px-5 py-4 border rounded-md"],
+      blank: null,
+    },
+    state: {
+      true: null,
+      false: null,
+    },
+  },
+  compoundVariants: [
+    {
+      variant: "default",
+      state: true,
+      className: ["border-nb-gray-800 bg-nb-gray-900/70"],
+    },
+    {
+      variant: "default",
+      state: false,
+      className: [
+        "border-nb-gray-910 bg-nb-gray-900/30 hover:bg-nb-gray-900/40",
+      ],
+    },
+  ],
+});
+
+export type FancyToggleSwitchVariants = VariantProps<
+  typeof fancyToggleSwitchVariants
+>;
+
+interface Props extends FancyToggleSwitchVariants {
+  value: boolean;
+  onChange: (value: boolean) => void;
+  helpText?: React.ReactNode;
+  label?: React.ReactNode;
+  children?: React.ReactNode;
+  disabled?: boolean;
+  "data-testid"?: string;
+  className?: string;
+  labelClassName?: string;
+  textWrapperClassName?: string;
+}
+
+export default function FancyToggleSwitch({
+  value,
+  onChange,
+  helpText,
+  label,
+  children,
+  disabled = false,
+  "data-testid": dataTestId,
+  className,
+  variant = "default",
+  labelClassName,
+  textWrapperClassName = "max-w-sm",
+}: Readonly<Props>) {
+  const handleToggle = () => {
+    if (disabled) return;
+    onChange(!value);
+  };
+
+  const handleKeyDown = (event: React.KeyboardEvent) => {
+    if (disabled) return;
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      handleToggle();
+    }
+  };
+
+  return (
+    <div
+      onClick={handleToggle}
+      onKeyDown={handleKeyDown}
+      tabIndex={-1}
+      role={"switch"}
+      aria-checked={value}
+      className={cn(
+        "cursor-pointer transition-all duration-300 relative z-[1]",
+        "inline-block text-left w-full",
+        disabled && "opacity-50 pointer-events-none",
+        fancyToggleSwitchVariants({ variant, state: value }),
+        className,
+      )}
+    >
+      <div className={"flex justify-between gap-10"}>
+        <div className={cn(textWrapperClassName)}>
+          <Label className={labelClassName}>{label}</Label>
+          <HelpText margin={false}>{helpText}</HelpText>
+        </div>
+        <div className={"mt-2 pr-1"}>
+          <ToggleSwitch
+            checked={value}
+            onCheckedChange={onChange}
+            data-testid={dataTestId}
+          />
+        </div>
+      </div>
+      {children && value ? (
+        <div className="mt-4" onClick={(e) => e.stopPropagation()}>
+          {children}
+        </div>
+      ) : null}
+    </div>
+  );
+}

@@ -1,0 +1,128 @@
+import { StringMap } from "@axa-fr/react-oidc";
+import { validator } from "@utils/helpers";
+
+interface Config {
+  auth0Auth: boolean;
+  authority: string;
+  clientId: string;
+  clientSecret: string;
+  scopesSupported: string;
+  apiOrigin: string;
+  grpcApiOrigin: string;
+  audience: string;
+  redirectURI: string;
+  silentRedirectURI: string;
+  tokenSource: string;
+  dragQueryParams: boolean;
+  hotjarTrackID?: number;
+  googleAnalyticsID?: string;
+  googleTagManagerID?: string;
+  authServiceUrl?: string;
+  wasmPath: string;
+  licensed: boolean;
+  cloud: boolean;
+  // agentNetworkOnly: dedicated Agent Network surface — the regular UI
+  // (network routing, DNS, reverse proxy, activity) is hidden, no Beta badge.
+  // agentNetworkEnabled: the regular UI plus the Agent Network menu item (Beta).
+  agentNetworkOnly: boolean;
+  agentNetworkEnabled: boolean;
+  hubspotPortalId?: string;
+  hubspotSignupFormId?: string;
+  hubspotOnboardingFormId?: string;
+  hubspotSurveyFormId?: string;
+  analyticsExcludedEmails: string[];
+  // announcement: text the operator wants every user of this deployment to
+  // see in a permanent banner (NETBIRD_ANNOUNCEMENT), e.g. which environment
+  // or backend instance a dashboard belongs to. Unset for none.
+  announcement?: string;
+}
+
+/**
+ * Load the config from the config.json file
+ */
+const loadConfig = (): Config => {
+  let configJson: any;
+  let redirectURI = "/#callback";
+  let silentRedirectURI = "/#silent-callback";
+  let tokenSource = "accessToken";
+
+  if (process.env.APP_ENV === "test") {
+    configJson = require("@/config/test");
+  } else if (process.env.NODE_ENV === "development") {
+    configJson = require("@/config/local");
+  } else if (process.env.NODE_ENV === "production") {
+    configJson = require("@/config/production");
+  }
+
+  configJson = configJson ?? {};
+
+  if (configJson.redirectURI) {
+    redirectURI = configJson.redirectURI;
+  }
+
+  if (configJson.silentRedirectURI) {
+    silentRedirectURI = configJson.silentRedirectURI;
+  }
+
+  if (configJson.tokenSource) {
+    tokenSource = configJson.tokenSource;
+  }
+
+  const authority = (configJson.authAuthority ?? "").replace(/\/+$/, "");
+
+  return {
+    auth0Auth: configJson.auth0Auth == "true", // Due to substitution we can't use boolean in the config
+    authority: validator.isValidUrl(authority) ? authority : "http://localhost",
+    clientId: configJson.authClientId,
+    clientSecret: configJson.authClientSecret,
+    scopesSupported: configJson.authScopesSupported,
+    apiOrigin: configJson.apiOrigin,
+    grpcApiOrigin: configJson.grpcApiOrigin,
+    audience: configJson.authAudience,
+    redirectURI: redirectURI,
+    silentRedirectURI: silentRedirectURI,
+    tokenSource: tokenSource,
+    dragQueryParams: configJson.dragQueryParams == "true", // Drags all the query params to the auth layer specified in the URL when accessing dashboard.
+    hotjarTrackID: configJson?.hotjarTrackID || undefined,
+    googleAnalyticsID: configJson?.googleAnalyticsID || undefined,
+    googleTagManagerID: configJson?.googleTagManagerID || undefined,
+    authServiceUrl: configJson?.authServiceUrl ?? undefined,
+    wasmPath:
+      configJson?.wasmPath || "https://pkgs.netbird.io/wasm/client/v0.81.3",
+    licensed: configJson?.licensed === "true",
+    cloud: configJson?.cloud === "true",
+    agentNetworkOnly: configJson?.agentNetworkOnly === "true",
+    agentNetworkEnabled: configJson?.agentNetworkEnabled === "true",
+    hubspotPortalId: configJson?.hubspotPortalId || undefined,
+    hubspotSignupFormId: configJson?.hubspotSignupFormId || undefined,
+    hubspotOnboardingFormId: configJson?.hubspotOnboardingFormId || undefined,
+    hubspotSurveyFormId: configJson?.hubspotSurveyFormId || undefined,
+    analyticsExcludedEmails: (configJson?.analyticsExcludedEmails || "")
+      .split(",")
+      .map((email: string) => email.trim())
+      .filter(Boolean),
+    announcement: configJson?.announcement || undefined,
+  } as Config;
+};
+
+/**
+ * Build the extras object that will be passed to the auth layer
+ */
+export const buildExtras = () => {
+  const extras: StringMap = {};
+  const config = loadConfig();
+
+  if (config.dragQueryParams) {
+    const searchParams = new URLSearchParams(window.location.search);
+    searchParams.forEach((value, key) => {
+      extras[key] = value;
+    });
+  }
+
+  if (config.audience) {
+    extras.audience = config.audience;
+  }
+  return extras;
+};
+
+export default loadConfig;

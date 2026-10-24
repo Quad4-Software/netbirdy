@@ -1,0 +1,87 @@
+import { Input } from "@components/Input";
+import Kbd from "@components/Kbd";
+import { useDebounce } from "@hooks/useDebounce";
+import { Search } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import { useHotkeys } from "react-hotkeys-hook";
+import { isMac } from "@hooks/useOperatingSystem";
+
+interface Props extends React.InputHTMLAttributes<HTMLInputElement> {
+  setGlobalSearch: (value: string) => void;
+  globalSearch?: string;
+  className?: string;
+  isLoading?: boolean;
+  onClick?: () => void;
+}
+
+export default function DataTableGlobalSearch({
+  setGlobalSearch,
+  globalSearch,
+  className = "min-w-[300px] max-w-[400px] grow",
+  isLoading,
+  onClick,
+  ...props
+}: Readonly<Props>) {
+  const ref = React.useRef<HTMLInputElement>(null);
+  const [inputValue, setInputValue] = useState(globalSearch || "");
+  const debouncedValue = useDebounce(inputValue, 800);
+
+  useEffect(() => {
+    setGlobalSearch(debouncedValue);
+  }, [debouncedValue]);
+
+  useEffect(() => {
+    // Coalesce undefined → "" so a reset also clears the visible input text.
+    const next = globalSearch ?? "";
+    if (next !== inputValue) {
+      setInputValue(next);
+    }
+  }, [globalSearch]);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setInputValue(e.target.value);
+  };
+
+  useHotkeys(
+    "mod+k",
+    () => {
+      if (onClick) {
+        onClick?.();
+      } else {
+        ref.current?.focus();
+      }
+    },
+    [],
+  );
+
+  return (
+    <Input
+      {...props}
+      data-testid="table-search-input"
+      ref={ref}
+      onFocus={(e) => {
+        if (onClick) {
+          e.preventDefault();
+          e.stopPropagation();
+          onClick?.();
+        }
+      }}
+      icon={<Search size={15} />}
+      value={inputValue}
+      onChange={handleChange}
+      maxWidthClass={className}
+      customSuffix={
+        <Kbd>
+          {isMac ? (
+            "⌘ K"
+          ) : (
+            <span className="flex items-center gap-0.5">
+              Ctrl<span>+</span>K
+            </span>
+          )}
+        </Kbd>
+      }
+      disabled={false}
+    />
+  );
+}

@@ -1,0 +1,210 @@
+import { Edge, Node } from "@xyflow/react";
+
+interface SimulationNode extends Node {
+  x: number;
+  y: number;
+}
+
+export const DEFAULT_MAX_ZOOM = 1.6;
+export const DEFAULT_MIN_ZOOM = 0.2;
+export const EMPTY_STATE_ZOOM = 0.65;
+
+export const POLICY_COLUMN_Y_OFFSET = 18;
+
+const NODE_Y_NUDGE: Record<string, number> = {
+  peerNode: 2,
+  sourcePeerNode: 2,
+  expandedGroupPeer: 2,
+  selectPeerNode: 2,
+  selectUserNode: 2,
+};
+
+export const nodeYNudge = (type?: string) => (type && NODE_Y_NUDGE[type]) || 0;
+
+export const applyD3HierarchicalLayout = (
+  nodes: Node[],
+  edges: Edge[],
+  width = 280,
+  spacing = 100,
+  view?: string,
+  options?: {
+    policy?: { width: number; spacing: number };
+    destinationGroup?: { width: number; spacing: number };
+    peersAndResources?: { width: number; spacing: number };
+  },
+) => {
+  const simulationNodes: SimulationNode[] = nodes.map((node) => ({
+    ...node,
+    x: node.position?.x || 0,
+    y: node.position?.y || 0,
+  }));
+
+  const columnWidth = width;
+  const nodeSpacing = spacing;
+  const startX = 0;
+  const centerY = 0;
+
+  const sourcePeerNodes = simulationNodes.filter(
+    (n) => n.type === "sourcePeerNode",
+  );
+  const groupNodes = simulationNodes.filter((n) => n.type === "groupNode");
+  const sourceGroupNodes = simulationNodes.filter(
+    (n) => n.type === "sourceGroupNode",
+  );
+  const destinationGroupNodes = simulationNodes.filter(
+    (n) => n.type === "destinationGroupNode",
+  );
+  const destinationResourceNodes = simulationNodes.filter(
+    (n) => n.type === "destinationResourceNode",
+  );
+  // The single-group view mirrors policies that target the selected group to
+  // the left, stamping those policy nodes with data.side === "left".
+  const policyNodes = simulationNodes.filter(
+    (n) =>
+      (n.type === "policyNode" || n.type === "agentPolicyNode") &&
+      n.data?.side !== "left",
+  );
+  const leftPolicyNodes = simulationNodes.filter(
+    (n) => n.type === "policyNode" && n.data?.side === "left",
+  );
+  const networkNodes = simulationNodes.filter((n) => n.type === "networkNode");
+  const resourceNodes = simulationNodes.filter(
+    (n) => n.type === "resourceNode",
+  );
+  // Providers are destinations, so they share the destination column.
+  const providerNodes = simulationNodes.filter(
+    (n) => n.type === "providerNode",
+  );
+  const peerNodes = simulationNodes.filter((n) => n.type === "peerNode");
+  const expandedGroupPeers = simulationNodes.filter(
+    (n) => n.type === "expandedGroupPeer",
+  );
+
+  let networkAndResourceNodes = [...networkNodes, ...resourceNodes];
+
+  if (view === "group") {
+    networkAndResourceNodes = [...networkAndResourceNodes, ...peerNodes];
+  }
+
+  if (view === "peer") {
+    networkAndResourceNodes = [
+      ...networkAndResourceNodes,
+      ...expandedGroupPeers,
+    ];
+  }
+
+  centerNodesVertically(
+    sourcePeerNodes,
+    startX - 100,
+    options?.destinationGroup?.spacing ?? nodeSpacing,
+    centerY,
+  );
+
+  if (peerNodes.length > 0 && view !== "group") {
+    centerNodesVertically(
+      peerNodes,
+      startX + (view === "group" ? columnWidth * 4 : 0),
+      nodeSpacing,
+      centerY,
+    );
+  }
+
+  // Outside the drilled network view the source column shares the destination
+  // column's pitch, and the draft rebuild mirrors it.
+  centerNodesVertically(
+    groupNodes,
+    startX,
+    view === "network"
+      ? nodeSpacing
+      : options?.destinationGroup?.spacing ?? nodeSpacing,
+    centerY,
+  );
+  if (view === "group") {
+    // Sources of policies targeting the selected group sit on the far left.
+    centerNodesVertically(
+      sourceGroupNodes,
+      startX - (options?.destinationGroup?.width ?? columnWidth),
+      options?.destinationGroup?.spacing ?? nodeSpacing,
+      centerY,
+    );
+  } else {
+    centerNodesVertically(
+      sourceGroupNodes,
+      startX + columnWidth,
+      nodeSpacing,
+      centerY,
+    );
+  }
+
+  centerNodesVertically(
+    policyNodes,
+    startX + (options?.policy?.width ?? columnWidth),
+    options?.policy?.spacing ?? nodeSpacing,
+    centerY + POLICY_COLUMN_Y_OFFSET,
+  );
+  centerNodesVertically(
+    leftPolicyNodes,
+    startX - (options?.policy?.width ?? columnWidth),
+    options?.policy?.spacing ?? nodeSpacing,
+    centerY + POLICY_COLUMN_Y_OFFSET,
+  );
+
+  centerNodesVertically(
+    [...destinationGroupNodes, ...destinationResourceNodes, ...providerNodes],
+    startX + (options?.destinationGroup?.width ?? columnWidth),
+    options?.destinationGroup?.spacing ?? nodeSpacing,
+    centerY,
+  );
+
+  centerNodesVertically(
+    networkAndResourceNodes,
+    startX + (options?.peersAndResources?.width ?? columnWidth),
+    options?.peersAndResources?.spacing ?? nodeSpacing,
+    centerY + 5,
+  );
+
+  const updatedNodes: Node[] = simulationNodes.map((node) => ({
+    ...node,
+    position: { x: node.x, y: node.y },
+  }));
+
+  const nodeById = new Map(simulationNodes.map((n) => [n.id, n]));
+  const updatedEdges: Edge[] = edges.map((edge) => {
+    const sourceNode = nodeById.get(edge.source);
+    const targetNode = nodeById.get(edge.target);
+
+    return {
+      ...edge,
+      data: {
+        ...edge.data,
+        points:
+          sourceNode && targetNode
+            ? [
+                { x: sourceNode.x, y: sourceNode.y },
+                { x: targetNode.x, y: targetNode.y },
+              ]
+            : undefined,
+      },
+    };
+  });
+
+  return { updatedNodes, updatedEdges };
+};
+
+const centerNodesVertically = (
+  nodesList: SimulationNode[],
+  x: number,
+  nodeSpacing: number,
+  centerY: number,
+  enable = true,
+) => {
+  if (nodesList.length === 0) return;
+
+  const totalHeight = (nodesList.length - 1) * nodeSpacing;
+  const startY = centerY - totalHeight / 2;
+  nodesList.forEach((node, index) => {
+    node.x = x;
+    node.y =
+      (enable ? startY : 0) + index * nodeSpacing + nodeYNudge(node.type);
+  });
+};
