@@ -1,0 +1,1 @@
+{"ts":"2026-10-25T12:00:00Z","type":"shield","severity":"medium","src_ip":"203.0.113.9","host":"mgmt.example.com","method":"GET","path":"/login","action":"challenge","score":20,"reasons":["reputation"],"mode":"enforce"}

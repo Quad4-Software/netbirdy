@@ -1,0 +1,130 @@
+<!-- NetBirdy rules: anomaly detection, audit and shield events.
+     User rule ids 100100-100199 security, 100200-100249 shield,
+     100300-100349 audit. Wazuh 4.x only. -->
+
+<group name="netbirdy,security,">
+
+  <!-- peer connects from an IP outside its learned baseline -->
+  <rule id="100100" level="7">
+    <field name="rule">peer_new_ip</field>
+    <description>NetBirdy peer connected from a new IP</description>
+    <mitre><id>T1078</id></mitre>
+  </rule>
+
+  <!-- same key live from two different IPs: strongest stolen-key signal -->
+  <rule id="100101" level="10">
+    <field name="rule">concurrent_connections</field>
+    <description>NetBirdy concurrent connections for one peer key</description>
+    <mitre><id>T1078</id><id>T1557</id></mitre>
+  </rule>
+
+  <rule id="100102" level="6">
+    <field name="rule">peer_ip_flap</field>
+    <description>NetBirdy peer source IP flapping</description>
+    <mitre><id>T1078</id></mitre>
+  </rule>
+
+  <rule id="100103" level="8">
+    <field name="rule">peer_meta_mismatch</field>
+    <description>NetBirdy peer machine metadata changed for one key</description>
+    <mitre><id>T1078</id><id>T1036</id></mitre>
+  </rule>
+
+  <rule id="100104" level="10">
+    <field name="rule">auth_failure_burst</field>
+    <description>NetBirdy authentication failure burst</description>
+    <mitre><id>T1110</id></mitre>
+  </rule>
+
+  <!-- correlation: repeated failure bursts escalate -->
+  <rule id="100105" level="12" frequency="3" timeframe="300">
+    <if_matched_sid>100104</if_matched_sid>
+    <same_field>src_ip</same_field>
+    <description>NetBirdy repeated auth failure bursts from the same IP</description>
+    <mitre><id>T1110</id></mitre>
+  </rule>
+
+  <rule id="100106" level="11">
+    <field name="rule">auth_success_after_failures</field>
+    <description>NetBirdy successful auth after a failure burst</description>
+    <mitre><id>T1110</id><id>T1078</id></mitre>
+  </rule>
+
+  <rule id="100107" level="9">
+    <field name="rule">setup_key_misuse</field>
+    <description>NetBirdy setup key used unusually</description>
+    <mitre><id>T1133</id><id>T1078</id></mitre>
+  </rule>
+
+  <rule id="100108" level="7">
+    <field name="rule">user_new_country</field>
+    <description>NetBirdy dashboard login from a new country</description>
+    <mitre><id>T1078</id></mitre>
+  </rule>
+
+  <rule id="100109" level="8">
+    <field name="rule">pat_new_ip</field>
+    <description>NetBirdy access token used from a new IP</description>
+    <mitre><id>T1552</id><id>T1078</id></mitre>
+  </rule>
+
+  <rule id="100110" level="8">
+    <field name="rule">peer_impossible_travel</field>
+    <description>NetBirdy impossible travel for a peer</description>
+    <mitre><id>T1078</id></mitre>
+  </rule>
+</group>
+
+<group name="netbirdy,shield,">
+  <rule id="100200" level="8">
+    <field name="type">shield</field>
+    <regex type="pcre2">"action":"(block|drop)"</regex>
+    <description>NetBirdy proxy shield blocked a request</description>
+    <mitre><id>T1190</id></mitre>
+  </rule>
+  <rule id="100201" level="6">
+    <field name="type">shield</field>
+    <regex type="pcre2">"action":"challenge"</regex>
+    <description>NetBirdy proxy shield issued a challenge</description>
+  </rule>
+  <rule id="100202" level="9">
+    <field name="type">shield</field>
+    <regex type="pcre2">honeypot</regex>
+    <description>NetBirdy honeypot path hit</description>
+    <mitre><id>T1595</id></mitre>
+  </rule>
+  <rule id="100203" level="7">
+    <field name="type">shield</field>
+    <regex type="pcre2">"action":"tarpit"</regex>
+    <description>NetBirdy proxy shield tarpit engaged</description>
+  </rule>
+  <rule id="100204" level="12" frequency="5" timeframe="600">
+    <if_matched_sid>100200</if_matched_sid>
+    <same_field>src_ip</same_field>
+    <description>NetBirdy shield repeatedly blocking one IP</description>
+    <mitre><id>T1595</id></mitre>
+  </rule>
+</group>
+
+<group name="netbirdy,audit,">
+  <rule id="100300" level="5">
+    <field name="type">user.add|setupkey.add|peer.approve|pat.add</field>
+    <field name="source">audit</field>
+    <description>NetBirdy admin created a user, setup key, PAT or approved a peer</description>
+  </rule>
+  <rule id="100301" level="8">
+    <field name="type" type="pcre2">account\.setting\.</field>
+    <field name="source">audit</field>
+    <description>NetBirdy account security settings changed</description>
+  </rule>
+  <rule id="100302" level="7">
+    <field name="type" type="pcre2">policy\.|rule\.</field>
+    <field name="source">audit</field>
+    <description>NetBirdy policy or rule changed</description>
+  </rule>
+  <rule id="100303" level="9">
+    <field name="type">user.delete|peer.delete|setupkey.revoke</field>
+    <field name="source">audit</field>
+    <description>NetBirdy admin deleted a user, peer or setup key</description>
+  </rule>
+</group>

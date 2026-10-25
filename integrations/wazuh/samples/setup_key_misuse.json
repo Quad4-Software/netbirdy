@@ -1,0 +1,1 @@
+{"ts":"2026-10-25T12:00:00Z","type":"setup_key","account_id":"a1","peer_id":"p1","src_ip":"203.0.113.9","rule":"setup_key_misuse","score":60,"severity":"medium","mode":"observe","reason":"setup key used from 6 distinct IPs"}

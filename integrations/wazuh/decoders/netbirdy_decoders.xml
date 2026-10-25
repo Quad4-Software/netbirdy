@@ -1,0 +1,12 @@
+<!-- NetBirdy decoders: jsonl events carry their own field names, the
+     built-in json decoder parses them; these only tag our program so
+     syslog delivery is also attributable. Wazuh 4.x only. -->
+
+<decoder name="netbirdy">
+  <program_name>netbirdy</program_name>
+</decoder>
+
+<decoder name="netbirdy-child">
+  <parent>netbirdy</parent>
+  <prematch>{"ts"</prematch>
+</decoder>

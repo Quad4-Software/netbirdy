@@ -1,0 +1,1 @@
+{"ts":"2026-10-25T12:00:00Z","type":"account.setting.peer.approval.enable","type_id":63,"severity":"info","account_id":"a1","initiator_id":"admin","target_id":"a1","message":"Peer approval enabled","source":"audit"}

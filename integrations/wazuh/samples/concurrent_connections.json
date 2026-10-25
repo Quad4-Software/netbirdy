@@ -1,0 +1,1 @@
+{"ts":"2026-10-25T12:00:00Z","type":"peer","account_id":"a1","peer_id":"p1","peer_name":"laptop-1","src_ip":"203.0.113.9","country":"US","asn":64500,"score":75,"action_taken":"alert","mode":"observe","severity":"high","rule":"concurrent_connections","previous_ips":["198.51.100.4"],"reason":"same peer key live from 198.51.100.4 and 203.0.113.9"}
