@@ -1,0 +1,19 @@
+#!/bin/sh
+
+LOG_DIR=/var/log/netbird
+LOG_FILE=$LOG_DIR/client_pre_install.log
+AGENT=/usr/local/bin/netbirdy
+
+mkdir -p "$LOG_DIR"
+
+{
+    if brew list --formula 2> /dev/null | grep -q '^netbirdy$'; then
+        echo "NetBirdy has been installed with Brew. Please use Brew to update the package."
+        exit 1
+    fi
+    if [ -x "$AGENT" ]; then
+        "$AGENT" service stop || true
+    fi
+    echo "Preinstall complete"
+    exit 0
+} > "$LOG_FILE" 2>&1

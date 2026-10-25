@@ -61,10 +61,12 @@ ShowInstDetails Show
     !define ARCH "amd64"
 !endif
 
+!ifdef WITH_UI
 !if ${ARCH} == "amd64"
     !define MUI_FINISHPAGE_RUN
     !define MUI_FINISHPAGE_RUN_TEXT "Start ${UI_APP_NAME}"
     !define MUI_FINISHPAGE_RUN_FUNCTION "LaunchLink"
+!endif
 !endif
 ######################################################################
 
@@ -218,7 +220,9 @@ Section -MainProgram
     !else
         File /r "..\\dist\\netbird_windows_amd64\\"
     !endif
+    !ifdef WITH_UI
     File "..\\client\\ui\\assets\\netbirdy.png"
+    !endif
 SectionEnd
 ######################################################################
 
@@ -233,14 +237,18 @@ WriteRegStr ${REG_ROOT} "${UNINSTALL_PATH}"  "DisplayIcon" "$INSTDIR\${MAIN_APP_
 WriteRegStr ${REG_ROOT} "${UNINSTALL_PATH}"  "DisplayVersion" "${VERSION}"
 WriteRegStr ${REG_ROOT} "${UNINSTALL_PATH}"  "Publisher" "${COMP_NAME}"
 
+!ifdef WITH_UI
 WriteRegStr ${REG_ROOT} "${UI_REG_APP_PATH}" "" "$INSTDIR\${UI_APP_EXE}"
+!endif
 
 EnVar::SetHKLM
 EnVar::AddValueEx "path" "$INSTDIR"
 
+!ifdef WITH_UI
 SetShellVarContext all
 CreateShortCut "$SMPROGRAMS\${APP_NAME}.lnk" "$INSTDIR\${UI_APP_EXE}"
 CreateShortCut "$DESKTOP\${APP_NAME}.lnk" "$INSTDIR\${UI_APP_EXE}"
+!endif
 SectionEnd
 
 # Install the Microsoft Edge WebView2 runtime if it isn't already present.
@@ -276,9 +284,11 @@ SectionEnd
     webview2_ok:
 !macroend
 
+!ifdef WITH_UI
 Section -WebView2
     !insertmacro nb.webview2runtime
 SectionEnd
+!endif
 
 Section -Post
 ExecWait '"$INSTDIR\${MAIN_APP_EXE}" service install'
@@ -345,10 +355,12 @@ DetailPrint "Uninstallation finished."
 SectionEnd
 
 
+!ifdef WITH_UI
 !if ${ARCH} == "amd64"
 Function LaunchLink
 SetShellVarContext all
    SetOutPath $INSTDIR
    ShellExecAsUser::ShellExecAsUser "" "$DESKTOP\${APP_NAME}.lnk"
 FunctionEnd
+!endif
 !endif

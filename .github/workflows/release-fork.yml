@@ -4,11 +4,6 @@ on:
   push:
     tags: ["v*"]
   workflow_dispatch:
-    inputs:
-      publish:
-        description: Publish release and images (false = dry run, artifacts only)
-        type: boolean
-        default: false
 
 permissions:
   contents: read
@@ -18,19 +13,72 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  REGISTRY: ghcr.io
-  IMAGE_OWNER: sudo-ivan
+  IMAGE_PREFIX: ghcr.io/sudo-ivan/netbirdy-
 
 jobs:
-  build:
+  meta:
     if: github.repository == 'Sudo-Ivan/netbirdy'
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: read
+    outputs:
+      tag: ${{ steps.derive.outputs.tag }}
+      version: ${{ steps.derive.outputs.version }}
+      appver: ${{ steps.derive.outputs.appver }}
+      pkgver: ${{ steps.derive.outputs.pkgver }}
+      stable: ${{ steps.derive.outputs.stable }}
+      publish: ${{ steps.derive.outputs.publish }}
     steps:
       - name: Checkout
         uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
         with:
+          persist-credentials: false
+
+      - name: Derive release metadata
+        id: derive
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          REF_NAME: ${{ github.ref_name }}
+        run: |
+          if [ "$EVENT_NAME" = "push" ]; then
+            tag="$REF_NAME"
+            publish=true
+          else
+            tag="v0.0.0-dryrun"
+            publish=false
+          fi
+          case "$tag" in
+            v[0-9]*.[0-9]*.[0-9]*) ;;
+            *) echo "tag $tag is not a version tag" >&2; exit 1 ;;
+          esac
+          version="${tag#v}"
+          appver=$(sh scripts/release/version.sh "$tag")
+          pkgver="${appver%.0}"
+          stable=true
+          case "$version" in *-*) stable=false ;; esac
+          {
+            echo "tag=$tag"
+            echo "version=$version"
+            echo "appver=$appver"
+            echo "pkgver=$pkgver"
+            echo "stable=$stable"
+            echo "publish=$publish"
+          } >> "$GITHUB_OUTPUT"
+
+  goreleaser:
+    needs: [meta]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+    env:
+      PUBLISH: ${{ needs.meta.outputs.publish }}
+      STABLE: ${{ needs.meta.outputs.stable }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
+        with:
+          fetch-depth: 0
           persist-credentials: false
 
       - name: Set up Go
@@ -38,33 +86,72 @@ jobs:
         with:
           go-version-file: "go.mod"
 
+      - name: Set up QEMU
+        if: needs.meta.outputs.publish == 'true'
+        uses: docker/setup-qemu-action@06116385d9baf250c9f4dcb4858b16962ea869c3 # v4.1.0
+
+      - name: Set up Docker Buildx
+        if: needs.meta.outputs.publish == 'true'
+        uses: docker/setup-buildx-action@d7f5e7f509e45cec5c76c4d5afdd7de93d0b3df5 # v4.1.0
+
       - name: Login to GHCR
-        if: github.event.inputs.publish == 'true' || github.event_name == 'push'
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GH_USER: ${{ github.actor }}
-        run: echo "$GH_TOKEN" | docker login ghcr.io -u "$GH_USER" --password-stdin
+        if: needs.meta.outputs.publish == 'true'
+        uses: docker/login-action@650006c6eb7dba73a995cc03b0b2d7f5ca915bee # v4.2.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Select goreleaser mode
+        id: mode
+        run: |
+          if [ "$PUBLISH" = "true" ]; then
+            echo "args=release --clean --skip=sign" >> "$GITHUB_OUTPUT"
+            echo "skip_docker=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "args=release --snapshot --clean --skip=publish,sign" >> "$GITHUB_OUTPUT"
+            echo "skip_docker=true" >> "$GITHUB_OUTPUT"
+          fi
+          if [ "$PUBLISH" = "true" ] && [ "$STABLE" = "true" ]; then
+            echo "skip_publish=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "skip_publish=true" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: GoReleaser
         uses: goreleaser/goreleaser-action@e435ccd777264be153ace6237001ef4d979d3a7a # v6.4.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GORELEASER_SNAPSHOT: ${{ github.event.inputs.publish == 'true' && '' || 'true' }}
+          SKIP_DOCKER_PUSH: ${{ steps.mode.outputs.skip_docker }}
+          SKIP_PUBLISH: ${{ steps.mode.outputs.skip_publish }}
         with:
-          args: ${{ github.event.inputs.publish == 'true' && 'release --clean' || 'release --snapshot --clean --skip=publish' }}
+          version: "~> v2"
+          args: ${{ steps.mode.outputs.args }}
 
-      - name: Upload dist artifacts
+      - name: Collect release files
+        run: |
+          mkdir -p assets
+          find dist -maxdepth 1 -type f \( -name '*.tar.gz' -o -name '*.zip' -o -name '*.deb' -o -name '*.rpm' -o -name '*_checksums.txt' \) -exec cp {} assets/ \;
+          ls -l assets
+
+      - name: Upload release files
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
-          name: dist
-          path: dist/*.tar.gz
-          retention-days: 7
+          name: goreleaser-assets
+          path: assets/
+          if-no-files-found: error
 
-  windows-installers:
-    if: github.repository == 'Sudo-Ivan/netbirdy'
-    runs-on: windows-latest
+  windows-installer:
+    needs: [meta]
+    runs-on: windows-2022
     permissions:
       contents: read
+    defaults:
+      run:
+        shell: pwsh
+    env:
+      VERSION: ${{ needs.meta.outputs.version }}
+      APPVER: ${{ needs.meta.outputs.appver }}
     steps:
       - name: Checkout
         uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
@@ -76,24 +163,70 @@ jobs:
         with:
           go-version-file: "go.mod"
 
-      - name: Build Windows installer (NSIS)
+      - name: Build the client
         run: |
-          go build -o netbirdy.exe ./client/cmd
-          makensis client/installer.nsis
+          $dir = "dist/netbird_windows_amd64"
+          New-Item -ItemType Directory -Force -Path $dir | Out-Null
+          $date = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
+          $ld = "-s -w -X github.com/netbirdio/netbird/version.version=$env:VERSION -X main.commit=$env:GITHUB_SHA -X main.date=$date -X main.builtBy=github-actions"
+          $env:CGO_ENABLED = "0"
+          $env:GOOS = "windows"
+          $env:GOARCH = "amd64"
+          go build -trimpath -ldflags $ld -o "$dir/netbirdy.exe" ./client
+          if ($LASTEXITCODE -ne 0) { throw "go build failed" }
 
-      - name: Upload Windows artifacts
+      - name: Fetch wintun
+        run: |
+          $zip = Join-Path $env:RUNNER_TEMP "wintun.zip"
+          Invoke-WebRequest -Uri "https://www.wintun.net/builds/wintun-0.14.1.zip" -OutFile $zip
+          $hash = (Get-FileHash -Path $zip -Algorithm SHA256).Hash.ToLower()
+          if ($hash -ne "07c256185d6ee3652e09fa55c0b673e2624b565e02c4b9091c79ca7d2f24ef51") { throw "wintun checksum mismatch: $hash" }
+          $out = Join-Path $env:RUNNER_TEMP "wintun"
+          Expand-Archive -Path $zip -DestinationPath $out
+          Copy-Item "$out/wintun/bin/amd64/wintun.dll" "dist/netbird_windows_amd64/wintun.dll"
+
+      - name: Install the EnVar NSIS plugin
+        run: |
+          $zip = Join-Path $env:RUNNER_TEMP "envar.zip"
+          Invoke-WebRequest -Uri "https://nsis.sourceforge.io/mediawiki/images/7/7f/EnVar_plugin.zip" -OutFile $zip
+          $hash = (Get-FileHash -Path $zip -Algorithm SHA256).Hash.ToLower()
+          if ($hash -ne "e9aa92de351345ed82795251d838f1ae9041ba35af9d381a5780c7843b01f56a") { throw "EnVar plugin checksum mismatch: $hash" }
+          $out = Join-Path $env:RUNNER_TEMP "envar"
+          Expand-Archive -Path $zip -DestinationPath $out
+          $nsis = "C:\Program Files (x86)\NSIS"
+          if (-not (Test-Path "$nsis\makensis.exe")) {
+            choco install nsis -y --no-progress
+            if ($LASTEXITCODE -ne 0) { throw "NSIS install failed" }
+          }
+          Copy-Item "$out\Plugins\x86-unicode\EnVar.dll" "$nsis\Plugins\x86-unicode\EnVar.dll" -Force
+
+      - name: Build the installer
+        run: |
+          & "C:\Program Files (x86)\NSIS\makensis.exe" /V3 "/DARCH=amd64" client\installer.nsis
+          if ($LASTEXITCODE -ne 0) { throw "makensis failed with exit code $LASTEXITCODE" }
+          New-Item -ItemType Directory -Force -Path out | Out-Null
+          Move-Item netbirdy-installer.exe "out/netbirdy_installer_${env:VERSION}_windows_amd64.exe"
+
+      - name: Upload installer
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
-          name: windows
-          path: |
-            *.exe
-            *.msi
+          name: windows-installer
+          path: out/*.exe
+          if-no-files-found: error
 
   macos-pkg:
-    if: github.repository == 'Sudo-Ivan/netbirdy'
+    needs: [meta]
     runs-on: macos-latest
     permissions:
       contents: read
+    strategy:
+      fail-fast: true
+      matrix:
+        arch: [amd64, arm64]
+    env:
+      VERSION: ${{ needs.meta.outputs.version }}
+      PKGVER: ${{ needs.meta.outputs.pkgver }}
+      ARCH: ${{ matrix.arch }}
     steps:
       - name: Checkout
         uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
@@ -105,23 +238,107 @@ jobs:
         with:
           go-version-file: "go.mod"
 
-      - name: Build macOS pkg
+      - name: Build the package
         run: |
-          go build -o netbirdy ./client/cmd
-          pkgbuild --root . --identifier io.netbirdy.client --version "${GITHUB_REF_NAME#v}" out.pkg
+          root="$RUNNER_TEMP/pkgroot"
+          mkdir -p "$root/usr/local/bin" out
+          date=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+          CGO_ENABLED=0 GOOS=darwin GOARCH="$ARCH" go build -trimpath \
+            -ldflags "-s -w -X github.com/netbirdio/netbird/version.version=$VERSION -X main.commit=$GITHUB_SHA -X main.date=$date -X main.builtBy=github-actions" \
+            -o "$root/usr/local/bin/netbirdy" ./client
+          pkgbuild --root "$root" \
+            --scripts release_files/darwin_pkg_cli \
+            --identifier io.netbirdy.client \
+            --version "$PKGVER" \
+            --install-location / \
+            "out/netbirdy_${VERSION}_darwin_${ARCH}.pkg"
+          pkgutil --payload-files "out/netbirdy_${VERSION}_darwin_${ARCH}.pkg" | grep -q 'usr/local/bin/netbirdy'
 
-      - name: Upload macOS artifacts
+      - name: Upload package
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
-          name: macos
-          path: "*.pkg"
+          name: macos-pkg-${{ matrix.arch }}
+          path: out/*.pkg
+          if-no-files-found: error
 
-  sign:
-    if: github.repository == 'Sudo-Ivan/netbirdy'
-    needs: [build, windows-installers, macos-pkg]
+  images:
+    needs: [meta, goreleaser]
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: read
+      packages: write
+    env:
+      VERSION: ${{ needs.meta.outputs.version }}
+      STABLE: ${{ needs.meta.outputs.stable }}
+      PUBLISH: ${{ needs.meta.outputs.publish }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up QEMU
+        if: needs.meta.outputs.publish == 'true'
+        uses: docker/setup-qemu-action@06116385d9baf250c9f4dcb4858b16962ea869c3 # v4.1.0
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@d7f5e7f509e45cec5c76c4d5afdd7de93d0b3df5 # v4.1.0
+
+      - name: Login to GHCR
+        if: needs.meta.outputs.publish == 'true'
+        uses: docker/login-action@650006c6eb7dba73a995cc03b0b2d7f5ca915bee # v4.2.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push dashboard and updater images
+        run: |
+          zero="sha256:$(printf '0%.0s' $(seq 64))"
+          if [ "$PUBLISH" = "true" ]; then
+            for svc in dashboard updater; do
+              tags="-t ${IMAGE_PREFIX}${svc}:${VERSION}"
+              [ "$STABLE" = "true" ] && tags="$tags -t ${IMAGE_PREFIX}${svc}:latest"
+              # shellcheck disable=SC2086
+              docker buildx build --platform linux/amd64,linux/arm64 --push \
+                --metadata-file "meta-${svc}.json" -f "podman/Containerfile.${svc}" $tags .
+              digest=$(jq -r '."containerimage.digest"' "meta-${svc}.json")
+              echo "${svc}_digest=${digest}" >> "$GITHUB_ENV"
+            done
+            server_digest=$(docker buildx imagetools inspect "${IMAGE_PREFIX}server:${VERSION}" --format '{{json .Manifest}}' | jq -r '.digest')
+            echo "server_digest=${server_digest}" >> "$GITHUB_ENV"
+          else
+            for svc in dashboard updater; do
+              docker buildx build --platform linux/amd64 --load -t "dryrun-${svc}:test" -f "podman/Containerfile.${svc}" .
+            done
+            {
+              echo "dashboard_digest=${zero}"
+              echo "updater_digest=${zero}"
+              echo "server_digest=${zero}"
+            } >> "$GITHUB_ENV"
+          fi
+
+      - name: Write the image list
+        run: |
+          mkdir -p out
+          sh scripts/release/images-list.sh "out/netbirdy_${VERSION}_images.txt" "$IMAGE_PREFIX" \
+            "$server_digest" "$dashboard_digest" "$updater_digest"
+          cat "out/netbirdy_${VERSION}_images.txt"
+
+      - name: Upload image list
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        with:
+          name: images-list
+          path: out/*_images.txt
+          if-no-files-found: error
+
+  sign:
+    needs: [meta, goreleaser, windows-installer, macos-pkg, images]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      VERSION: ${{ needs.meta.outputs.version }}
     steps:
       - name: Checkout
         uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
@@ -133,58 +350,125 @@ jobs:
         with:
           go-version-file: "go.mod"
 
-      - name: Download artifacts
+      - name: Download release files
         uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
         with:
-          path: artifacts
+          path: inputs
+          merge-multiple: true
 
-      - name: Sign artifacts
+      - name: Sign and verify
         env:
           ARTIFACT_KEY: ${{ secrets.NETBIRDY_ARTIFACT_KEY }}
         run: |
           umask 077
-          KEY_FILE="$(mktemp)"
-          trap 'shred -f "$KEY_FILE" 2>/dev/null; rm -f "$KEY_FILE"' EXIT
-          printf '%s' "$ARTIFACT_KEY" > "$KEY_FILE"
-          for f in artifacts/*; do
-            go run ./client/cmd/signer sign-artifact --key "$KEY_FILE" --artifact "$f" --signature "${f}.sig"
+          key_file="$RUNNER_TEMP/artifact.key"
+          trap 'shred -f "$key_file" 2>/dev/null || true; rm -f "$key_file"' EXIT
+          printf '%s' "$ARTIFACT_KEY" > "$key_file"
+          go build -o "$RUNNER_TEMP/signer" ./client/cmd/signer
+          export SIGNER="$RUNNER_TEMP/signer"
+          sh scripts/release/test.sh
+          merge=""
+          for f in inputs/*_checksums.txt; do
+            [ -f "$f" ] || continue
+            merge="$RUNNER_TEMP/goreleaser_checksums.txt"
+            mv "$f" "$merge"
           done
-          find artifacts -name "*.sig" | sort > checksums.txt
-          sha256sum artifacts/* >> checksums.txt
+          sh scripts/release/sign.sh inputs "$VERSION" "$key_file" publickeys/artifact-signatures/keys/artifact-key-pub.pem "$merge"
+          ls -l inputs
 
-      - name: Upload signed artifacts
+      - name: Upload signed release files
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
-          name: signed
-          path: artifacts/
+          name: release-assets
+          path: inputs/
+          if-no-files-found: error
 
   publish:
-    if: github.repository == 'Sudo-Ivan/netbirdy' && (github.event.inputs.publish == 'true' || github.event_name == 'push')
-    needs: [sign]
+    if: needs.meta.outputs.publish == 'true'
+    needs: [meta, sign]
     runs-on: ubuntu-latest
     permissions:
       contents: write
       id-token: write
       attestations: write
       packages: write
+    env:
+      TAG: ${{ needs.meta.outputs.tag }}
+      VERSION: ${{ needs.meta.outputs.version }}
+      STABLE: ${{ needs.meta.outputs.stable }}
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GH_REPO: ${{ github.repository }}
     steps:
-      - name: Checkout
-        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
-        with:
-          persist-credentials: false
-
-      - name: Download signed artifacts
+      - name: Download signed release files
         uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
         with:
-          path: artifacts
+          name: release-assets
+          path: assets
 
       - name: Install cosign
         uses: sigstore/cosign-installer@ba7bc0a3fef59531c69a25acd34668d6d3fe6f22 # v4.1.0
 
-      - name: Sign checksums
-        run: cosign sign-blob --yes artifacts/checksums.txt > checksums.sig
+      - name: Login to GHCR
+        uses: docker/login-action@650006c6eb7dba73a995cc03b0b2d7f5ca915bee # v4.2.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Attest build provenance
+      - name: Sign with cosign
+        run: |
+          for f in "assets/netbirdy_${VERSION}_checksums.txt" "assets/netbirdy_${VERSION}_images.txt"; do
+            cosign sign-blob --yes --bundle "${f}.cosign.bundle" "$f"
+          done
+          while IFS= read -r image; do
+            cosign sign --yes "$image"
+          done < "assets/netbirdy_${VERSION}_images.txt"
+
+      - name: Read image digests
+        id: digests
+        run: |
+          list="assets/netbirdy_${VERSION}_images.txt"
+          for svc in server dashboard updater; do
+            line=$(grep "netbirdy-${svc}@" "$list")
+            echo "${svc}_name=${line%@*}" >> "$GITHUB_OUTPUT"
+            echo "${svc}_digest=${line#*@}" >> "$GITHUB_OUTPUT"
+          done
+
+      - name: Attest release files
         uses: actions/attest-build-provenance@977bb373ede98d70efdf65b84cb5f73e068dcc2a # v3.0.0
         with:
-          subject-path: artifacts/*
+          subject-checksums: assets/netbirdy_${{ needs.meta.outputs.version }}_checksums.txt
+
+      - name: Attest server image
+        uses: actions/attest-build-provenance@977bb373ede98d70efdf65b84cb5f73e068dcc2a # v3.0.0
+        with:
+          subject-name: ${{ steps.digests.outputs.server_name }}
+          subject-digest: ${{ steps.digests.outputs.server_digest }}
+          push-to-registry: true
+
+      - name: Attest dashboard image
+        uses: actions/attest-build-provenance@977bb373ede98d70efdf65b84cb5f73e068dcc2a # v3.0.0
+        with:
+          subject-name: ${{ steps.digests.outputs.dashboard_name }}
+          subject-digest: ${{ steps.digests.outputs.dashboard_digest }}
+          push-to-registry: true
+
+      - name: Attest updater image
+        uses: actions/attest-build-provenance@977bb373ede98d70efdf65b84cb5f73e068dcc2a # v3.0.0
+        with:
+          subject-name: ${{ steps.digests.outputs.updater_name }}
+          subject-digest: ${{ steps.digests.outputs.updater_digest }}
+          push-to-registry: true
+
+      - name: Upload signed assets to the release
+        run: |
+          find assets -maxdepth 1 -type f \( -name '*.sig' -o -name '*.exe' -o -name '*.pkg' -o -name '*_images.txt' -o -name '*_checksums.txt' -o -name '*.cosign.bundle' \) -print0 \
+            | xargs -0 gh release upload "$TAG" --clobber
+
+      - name: Mark the release latest
+        run: |
+          if [ "$STABLE" = "true" ]; then
+            gh release edit "$TAG" --latest --draft=false
+          else
+            gh release edit "$TAG" --prerelease --draft=false
+          fi

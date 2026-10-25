@@ -1,0 +1,18 @@
+#!/bin/sh
+
+LOG_DIR=/var/log/netbird
+LOG_FILE=$LOG_DIR/client_post_install.log
+AGENT=/usr/local/bin/netbirdy
+
+mkdir -p "$LOG_DIR"
+
+{
+    if [ ! -x "$AGENT" ]; then
+        echo "NetBirdy binary is missing at $AGENT"
+        exit 1
+    fi
+    "$AGENT" service install || true
+    "$AGENT" service start || true
+    echo "Finished NetBirdy installation"
+    exit 0
+} > "$LOG_FILE" 2>&1
