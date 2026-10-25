@@ -95,7 +95,7 @@ func FromSqlTypesToSharedTypes(src reflect.Value, dst reflect.Value) error {
 			if s.Valid {
 				dstField.SetInt(s.Int64)
 			}
-		case "json.RawMessage":
+		case "json.RawMessage", "jsontext.Value":
 			s := srcField.Interface().(json.RawMessage)
 			if len(s) == 0 {
 				continue

@@ -1,1 +1,4 @@
 *.go text eol=lf
+*.pem -text
+*.sig -text
+publickeys/** -text
