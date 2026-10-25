@@ -1,38 +1,190 @@
-name: release-fork
+name: Release NetBirdy
+
 on:
   push:
-    tags:
-      - "v*"
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: Publish release and images (false = dry run, artifacts only)
+        type: boolean
+        default: false
+
 permissions:
-  contents: write
-  packages: write
+  contents: read
+
+concurrency:
+  group: release-fork-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_OWNER: sudo-ivan
+
 jobs:
-  release:
+  build:
     if: github.repository == 'Sudo-Ivan/netbirdy'
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
-      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - name: Checkout
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
         with:
-          fetch-depth: 0
-      - uses: actions/setup-go@7a3fe6cf838d3739f89a15a8f2abfab9e8fc2d94 # v6.4.0
+          persist-credentials: false
+
+      - name: Set up Go
+        uses: actions/setup-go@44694675825211faa026b3c33043df3e48a5fa00 # v6.0.0
         with:
-          go-version-file: go.mod
-      - name: goreleaser
-        uses: goreleaser/goreleaser-action@e662f24e7597a420428fc7bb8bc800d5e487bf43 # v6.4.0
-        with:
-          args: release --clean --skip sign
+          go-version-file: "go.mod"
+
+      - name: Login to GHCR
+        if: github.event.inputs.publish == 'true' || github.event_name == 'push'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_USER: ${{ github.actor }}
+        run: echo "$GH_TOKEN" | docker login ghcr.io -u "$GH_USER" --password-stdin
+
+      - name: GoReleaser
+        uses: goreleaser/goreleaser-action@e435ccd777264be153ace6237001ef4d979d3a7a # v6.4.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SKIP_DOCKER_PUSH: "false"
-      - name: login ghcr
-        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-      - name: server image
+          GORELEASER_SNAPSHOT: ${{ github.event.inputs.publish == 'true' && '' || 'true' }}
+        with:
+          args: ${{ github.event.inputs.publish == 'true' && 'release --clean' || 'release --snapshot --clean --skip=publish' }}
+
+      - name: Upload dist artifacts
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        with:
+          name: dist
+          path: dist/*.tar.gz
+          retention-days: 7
+
+  windows-installers:
+    if: github.repository == 'Sudo-Ivan/netbirdy'
+    runs-on: windows-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Go
+        uses: actions/setup-go@44694675825211faa026b3c33043df3e48a5fa00 # v6.0.0
+        with:
+          go-version-file: "go.mod"
+
+      - name: Build Windows installer (NSIS)
         run: |
-          docker build -f podman/Containerfile.server -t ghcr.io/sudo-ivan/netbirdy-server:${{ github.ref_name }} -t ghcr.io/sudo-ivan/netbirdy-server:latest .
-          docker push ghcr.io/sudo-ivan/netbirdy-server:${{ github.ref_name }}
-          docker push ghcr.io/sudo-ivan/netbirdy-server:latest
-      - name: dashboard image
+          go build -o netbirdy.exe ./client/cmd
+          makensis client/installer.nsis
+
+      - name: Upload Windows artifacts
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        with:
+          name: windows
+          path: |
+            *.exe
+            *.msi
+
+  macos-pkg:
+    if: github.repository == 'Sudo-Ivan/netbirdy'
+    runs-on: macos-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Go
+        uses: actions/setup-go@44694675825211faa026b3c33043df3e48a5fa00 # v6.0.0
+        with:
+          go-version-file: "go.mod"
+
+      - name: Build macOS pkg
         run: |
-          docker build -f podman/Containerfile.dashboard -t ghcr.io/sudo-ivan/netbirdy-dashboard:${{ github.ref_name }} -t ghcr.io/sudo-ivan/netbirdy-dashboard:latest .
-          docker push ghcr.io/sudo-ivan/netbirdy-dashboard:${{ github.ref_name }}
-          docker push ghcr.io/sudo-ivan/netbirdy-dashboard:latest
+          go build -o netbirdy ./client/cmd
+          pkgbuild --root . --identifier io.netbirdy.client --version "${GITHUB_REF_NAME#v}" out.pkg
+
+      - name: Upload macOS artifacts
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        with:
+          name: macos
+          path: "*.pkg"
+
+  sign:
+    if: github.repository == 'Sudo-Ivan/netbirdy'
+    needs: [build, windows-installers, macos-pkg]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Go
+        uses: actions/setup-go@44694675825211faa026b3c33043df3e48a5fa00 # v6.0.0
+        with:
+          go-version-file: "go.mod"
+
+      - name: Download artifacts
+        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
+        with:
+          path: artifacts
+
+      - name: Sign artifacts
+        env:
+          ARTIFACT_KEY: ${{ secrets.NETBIRDY_ARTIFACT_KEY }}
+        run: |
+          umask 077
+          KEY_FILE="$(mktemp)"
+          trap 'shred -f "$KEY_FILE" 2>/dev/null; rm -f "$KEY_FILE"' EXIT
+          printf '%s' "$ARTIFACT_KEY" > "$KEY_FILE"
+          for f in artifacts/*; do
+            go run ./client/cmd/signer sign-artifact --key "$KEY_FILE" --artifact "$f" --signature "${f}.sig"
+          done
+          find artifacts -name "*.sig" | sort > checksums.txt
+          sha256sum artifacts/* >> checksums.txt
+
+      - name: Upload signed artifacts
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        with:
+          name: signed
+          path: artifacts/
+
+  publish:
+    if: github.repository == 'Sudo-Ivan/netbirdy' && (github.event.inputs.publish == 'true' || github.event_name == 'push')
+    needs: [sign]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+      attestations: write
+      packages: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
+        with:
+          persist-credentials: false
+
+      - name: Download signed artifacts
+        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
+        with:
+          path: artifacts
+
+      - name: Install cosign
+        uses: sigstore/cosign-installer@ba7bc0a3fef59531c69a25acd34668d6d3fe6f22 # v4.1.0
+
+      - name: Sign checksums
+        run: cosign sign-blob --yes artifacts/checksums.txt > checksums.sig
+
+      - name: Attest build provenance
+        uses: actions/attest-build-provenance@977bb373ede98d70efdf65b84cb5f73e068dcc2a # v3.0.0
+        with:
+          subject-path: artifacts/*

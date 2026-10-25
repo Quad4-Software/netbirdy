@@ -43,3 +43,18 @@ dashboard on :8080, combined server on :8081.
 `ghcr.io/sudo-ivan/netbirdy-*` images. The job is gated behind the repository
 variable `NETBIRDY_PUBLISHED_IMAGES=true`; set it after the first image
 release so the job runs again.
+
+## Release procedure
+
+Tagging `v*` triggers `.github/workflows/release-fork.yml` (fork only).
+A dry run that builds and signs everything without publishing is
+available via workflow_dispatch with `publish` set to false; outputs are
+uploaded as workflow artifacts.
+
+Required secret: `NETBIRDY_ARTIFACT_KEY` (the artifact private key,
+ed25519). The root private key never leaves `~/.config/netbirdy-signing/`
+on the maintainer machine.
+
+Artifacts are signed by the signer tool (reposign), checksums are
+cosign-signed keylessly, and build provenance is attested. Prerelease
+tags never move the `latest` image tag.

@@ -4,6 +4,8 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+    cooldown:
+      default-days: 7
     open-pull-requests-limit: 3
     groups:
       actions:
@@ -23,6 +25,8 @@ updates:
       - "/"
     schedule:
       interval: "weekly"
+    cooldown:
+      default-days: 7
     open-pull-requests-limit: 15
     groups:
       golang-x-packages:
@@ -55,6 +59,8 @@ updates:
       - "/upload-server"
     schedule:
       interval: "weekly"
+    cooldown:
+      default-days: 7
     open-pull-requests-limit: 3
     groups:
       base-images:
@@ -68,3 +74,29 @@ updates:
         update-types:
           - "version-update:semver-minor"
           - "version-update:semver-major"
+
+  - package-ecosystem: "npm"
+    directories:
+      - "/dashboard"
+      - "/proxy/web"
+      - "/client/ui/frontend"
+    schedule:
+      interval: "weekly"
+    cooldown:
+      default-days: 7
+    open-pull-requests-limit: 5
+    groups:
+      minor-patch:
+        update-types:
+          - "minor"
+          - "patch"
+
+  - package-ecosystem: "docker"
+    directories:
+      - "/podman"
+      - "/infrastructure_files"
+    schedule:
+      interval: "weekly"
+    cooldown:
+      default-days: 7
+    open-pull-requests-limit: 3

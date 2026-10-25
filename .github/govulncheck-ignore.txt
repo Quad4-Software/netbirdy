@@ -1,0 +1,2 @@
+GO-2026-6809 # stdlib httpconn, fix pending upstream, review 2026-11-01
+GO-2026-4479 # pion/dtls, waiting on upstream release, review 2026-11-01
