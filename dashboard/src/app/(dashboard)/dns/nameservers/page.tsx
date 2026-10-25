@@ -13,6 +13,7 @@ import DNSIcon from "@/assets/icons/DNSIcon";
 import { usePermissions } from "@/contexts/PermissionsProvider";
 import { NameserverGroup } from "@/interfaces/Nameserver";
 import PageContainer from "@/layouts/PageContainer";
+import { docsLink } from "@/modules/docs/links";
 
 const NameserverGroupTable = lazy(
   () => import("@/modules/dns/nameservers/table/NameserverGroupTable"),
@@ -45,9 +46,9 @@ export default function NameServers() {
         </Breadcrumbs>
         <h1 ref={headingRef}>Nameservers</h1>
         <Paragraph>
-          Add nameservers for domain name resolution in your NetBird network.{" "}
+          Add nameservers for domain name resolution in your NetBirdy network.{" "}
           <InlineLink
-            href={"https://docs.netbird.io/how-to/manage-dns-in-your-network"}
+            href={docsLink("https://docs.netbird.io/how-to/manage-dns-in-your-network")}
             target={"_blank"}
           >
             Learn more

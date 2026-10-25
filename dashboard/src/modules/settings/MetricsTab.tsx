@@ -11,6 +11,7 @@ import { useSWRConfig } from "swr";
 import SettingsIcon from "@/assets/icons/SettingsIcon";
 import { usePermissions } from "@/contexts/PermissionsProvider";
 import { Account } from "@/interfaces/Account";
+import { docsLink } from "@/modules/docs/links";
 
 type Props = {
   account: Account;
@@ -66,9 +67,9 @@ export default function MetricsTab({ account }: Readonly<Props>) {
         <div>
           <h1>Metrics</h1>
           <Paragraph className={"block"}>
-            Share client performance metrics to help us improve NetBird.{" "}
+            Share client performance metrics to help us improve NetBirdy.{" "}
             <InlineLink
-              href={"https://docs.netbird.io/manage/client-metrics"}
+              href={docsLink("https://docs.netbird.io/manage/client-metrics")}
               target={"_blank"}
             >
               Learn more

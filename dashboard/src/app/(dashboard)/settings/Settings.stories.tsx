@@ -52,7 +52,7 @@ export const Permissions = shows("permissions", "Permissions");
 export const Networks = shows("networks", "Networks");
 export const Clients = shows("clients", "Clients");
 export const Metrics = shows("metrics", "Metrics");
-export const DangerZone = shows("danger-zone", "Delete NetBird account");
+export const DangerZone = shows("danger-zone", "Delete NetBirdy account");
 
 export const IdentityProviders: Story = {
   parameters: { ...tab("identity-providers"), api: embeddedApi },

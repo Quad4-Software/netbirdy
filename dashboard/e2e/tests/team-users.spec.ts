@@ -1,7 +1,7 @@
-import { test, expect } from "../helpers/fixtures";
-import { navigateTo } from "../helpers/auth";
-import { generateRandomName } from "../helpers/utils";
 import { deleteGroupsByPrefix } from "../helpers/api";
+import { navigateTo } from "../helpers/auth";
+import { expect,test } from "../helpers/fixtures";
+import { generateRandomName } from "../helpers/utils";
 
 let createdGroupName = "";
 
@@ -31,7 +31,7 @@ test.describe.serial("Team - Users @team", () => {
     await expect(page.getByText("View all peers registered by this user.")).toBeVisible();
 
     await page.getByTestId("user-tab-access-tokens").click();
-    await expect(page.getByText("Access tokens give access to NetBird API.")).toBeVisible();
+    await expect(page.getByText("Access tokens give access to NetBirdy API.")).toBeVisible();
   });
 
   test("Should add an auto-assigned group, save, and verify persistence", async ({

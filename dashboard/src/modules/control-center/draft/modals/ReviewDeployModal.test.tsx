@@ -1,7 +1,7 @@
 import { cleanup, render, screen } from "@testing-library/react";
+import React from "react";
 import { act } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import React from "react";
 
 // A group deletion can strip a DRAFT policy bare. Its create-policy change is KEPT
 // rather than dropped, so it needs a blocking issue — and that badge has to lead

@@ -127,7 +127,7 @@ export const GroupPeersSection = ({ peers, isLoading = true }: Props) => {
             className={"py-4"}
             title={"This group has no assigned peers yet"}
             description={
-              "Install NetBird and assign existing peers to this group to see them listed here."
+              "Install NetBirdy and assign existing peers to this group to see them listed here."
             }
             icon={<PeerIcon size={20} className={"fill-nb-gray-300"} />}
           >

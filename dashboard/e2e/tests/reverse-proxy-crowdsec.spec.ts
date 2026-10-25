@@ -1,16 +1,16 @@
-import { test, expect } from "../helpers/fixtures";
-import { navigateTo } from "../helpers/auth";
-import { generateRandomName } from "../helpers/utils";
 import { deleteNetworksByPrefix, deleteServicesByPrefix } from "../helpers/api";
+import { navigateTo } from "../helpers/auth";
+import { expect,test } from "../helpers/fixtures";
 import {
+  CUSTOM_PORTS_DOMAIN,
+  deleteService,
   gotoReverseProxyPage,
+  openServiceEdit,
+  resetServiceFilters,
   selectL4Resource,
   selectProxyDomain,
-  openServiceEdit,
-  deleteService,
-  resetServiceFilters,
-  CUSTOM_PORTS_DOMAIN,
 } from "../helpers/reverse-proxy-l4";
+import { generateRandomName } from "../helpers/utils";
 
 const DOMAINS_GLOB = "**/reverse-proxies/domains";
 

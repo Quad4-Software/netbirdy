@@ -27,12 +27,12 @@ import {
 import React, { useMemo, useState } from "react";
 import { useSWRConfig } from "swr";
 import integrationImage from "@/assets/integrations/generic-http.png";
-import { useDialog } from "@/contexts/DialogProvider";
-import { EventStream } from "@/interfaces/EventStream";
-import { IntegrationModalHeader } from "@/modules/integrations/IntegrationModalHeader";
 import { useWebhookConfig } from "@/cloud/webhooks/useWebhookConfig";
 import { WebhookGeneralTabContent } from "@/cloud/webhooks/WebhookGeneralTabContent";
 import { WebhookHeadersTabContent } from "@/cloud/webhooks/WebhookHeadersTabContent";
+import { useDialog } from "@/contexts/DialogProvider";
+import { EventStream } from "@/interfaces/EventStream";
+import { IntegrationModalHeader } from "@/modules/integrations/IntegrationModalHeader";
 
 type Props = {
   open: boolean;
@@ -224,9 +224,9 @@ export function GenericHTTPModalContent({
         title={
           stream
             ? "Generic HTTP Configuration"
-            : "Connect NetBird with Generic HTTP"
+            : "Connect NetBirdy with Generic HTTP"
         }
-        description={`Start streaming your NetBird audit & traffic events to a Generic HTTP endpoint. ${
+        description={`Start streaming your NetBirdy audit & traffic events to a Generic HTTP endpoint. ${
           stream ? "" : "Follow the steps to get started."
         }`}
       />
@@ -242,7 +242,7 @@ export function GenericHTTPModalContent({
             <CogIcon
               size={16}
               className={
-                "text-nb-gray-500 group-data-[state=active]/trigger:text-netbird transition-all"
+                "text-nb-gray-500 group-data-[state=active]/trigger:text-netbirdy transition-all"
               }
             />
             General
@@ -251,7 +251,7 @@ export function GenericHTTPModalContent({
             <FileCode2Icon
               size={16}
               className={
-                "text-nb-gray-500 group-data-[state=active]/trigger:text-netbird transition-all"
+                "text-nb-gray-500 group-data-[state=active]/trigger:text-netbirdy transition-all"
               }
             />
             Headers
@@ -263,7 +263,7 @@ export function GenericHTTPModalContent({
             <BracesIcon
               size={16}
               className={
-                "text-nb-gray-500 group-data-[state=active]/trigger:text-netbird transition-all"
+                "text-nb-gray-500 group-data-[state=active]/trigger:text-netbirdy transition-all"
               }
             />
             Body Template
@@ -273,7 +273,7 @@ export function GenericHTTPModalContent({
               <AlertOctagon
                 size={16}
                 className={
-                  "text-nb-gray-500 group-data-[state=active]/trigger:text-netbird transition-all"
+                  "text-nb-gray-500 group-data-[state=active]/trigger:text-netbirdy transition-all"
                 }
               />
               Danger Zone

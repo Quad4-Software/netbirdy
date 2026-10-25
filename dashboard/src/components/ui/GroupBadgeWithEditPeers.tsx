@@ -93,13 +93,13 @@ export default function GroupBadgeWithEditPeers({
           </div>
           <span
             className={
-              "text-[0.7rem] relative leading-none mt-[2px] text-nb-gray-300 mb-[1px] font-normal flex gap-1.5 items-center group-hover/badge:text-netbird transition-all"
+              "text-[0.7rem] relative leading-none mt-[2px] text-nb-gray-300 mb-[1px] font-normal flex gap-1.5 items-center group-hover/badge:text-netbirdy transition-all"
             }
           >
             <span>
               <span
                 className={
-                  "font-medium text-nb-gray-200 group-hover/badge:text-netbird transition-all"
+                  "font-medium text-nb-gray-200 group-hover/badge:text-netbirdy transition-all"
                 }
               >
                 {peerCount}
@@ -112,7 +112,7 @@ export default function GroupBadgeWithEditPeers({
               <SquarePen
                 size={11}
                 className={
-                  "shrink-0 transition-all relative z-10 group-hover/badge:text-netbird text-netbird-400/80"
+                  "shrink-0 transition-all relative z-10 group-hover/badge:text-netbirdy text-netbirdy-400/80"
                 }
               />
             )}

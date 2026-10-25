@@ -58,38 +58,38 @@ export const OnboardingIntent = ({onSelect, useCases, isBusiness}: Props) => {
     return (
         <div className={"relative flex flex-col h-full justify-between"}>
             <div>
-                <h1 className={"text-xl text-center"}>Get started with NetBird</h1>
+                <h1 className={"text-xl text-center"}>Get started with NetBirdy</h1>
                 <div
                     className={
                         "text-sm text-nb-gray-300 font-light mt-2 block text-center sm:px-4"
                     }
                 >
-                    NetBird provides the flexibility of both a peer-to-peer overlay network and a remote network access
+                    NetBirdy provides the flexibility of both a peer-to-peer overlay network and a remote network access
                     solution.
                     Choose what fits your needs, you can always combine both.
                 </div>
                 <div
                     className={cn(
                         "grid grid-cols-1 mt-8",
-                        "border border-nb-gray-900 rounded-lg flex items-start flex-col relative bg-nb-gray-930/60 transition-all ",
+                        "nb-reticle nb-reticle-border border border-nb-gray-900 rounded-lg flex items-start flex-col relative bg-nb-gray-930/60 transition-all ",
                     )}
                 >
                     <IntentCard
                         title={"Peer-to-Peer Network"}
                         description={
-                        isBusiness ? "Install NetBird on two or more devices to create secure, direct WireGuard connections, like laptop to server or server to database. Add at least two machines to get started." :"Install NetBird on two or more devices in your homelab, such as your laptop, NAS, or Raspberry Pi, to create secure, direct WireGuard connections."
+                        isBusiness ? "Install NetBirdy on two or more devices to create secure, direct WireGuard connections, like laptop to server or server to database. Add at least two machines to get started." :"Install NetBirdy on two or more devices in your homelab, such as your laptop, NAS, or Raspberry Pi, to create secure, direct WireGuard connections."
                         }
                         recommended={isP2PRecommended}
-                        icon={<PeerIcon size={18} className={"fill-netbird"}/>}
+                        icon={<PeerIcon size={18} className={"fill-netbirdy"}/>}
                         onClick={() => onSelect(Intent.P2P)}
                     />
                     <IntentCard
                         title={"Remote Network Access"}
                         description={
-                        isBusiness ? "Enable employee remote access to VMs, Kubernetes clusters, and cloud or on-prem resources without installing NetBird on every machine." : "Securely access your homelab remotely from anywhere without installing NetBird on every device."
+                        isBusiness ? "Enable employee remote access to VMs, Kubernetes clusters, and cloud or on-prem resources without installing NetBirdy on every machine." : "Securely access your homelab remotely from anywhere without installing NetBirdy on every device."
                         }
                         recommended={isNetworksRecommended}
-                        icon={<NetworkRoutesIcon size={18} className={"fill-netbird"}/>}
+                        icon={<NetworkRoutesIcon size={18} className={"fill-netbirdy"}/>}
                         onClick={() => onSelect(Intent.NETWORKS)}
                     />
                 </div>
@@ -136,7 +136,7 @@ export const IntentCard = ({
                     <div className={"text-left"}>
                         <h2
                             className={
-                                "text-base font-medium mb-.5 group-hover:text-netbird transition-all inline-flex gap-x-2 gap-y-1 flex-wrap"
+                                "text-base font-medium mb-.5 group-hover:text-netbirdy transition-all inline-flex gap-x-2 gap-y-1 flex-wrap"
                             }
                         >
                             {title}
@@ -152,8 +152,8 @@ export const IntentCard = ({
                   <span
                       className={cn(
                           "relative",
-                          "inline-flex text-[0.7rem] font-light bg-netbird/10 border border-netbird-400/30 text-netbird-400 rounded-full px-2 py-1 pb-0.5 leading-none",
-                          "hover:bg-netbird/20 cursor-help transition-all self-center",
+                          "inline-flex text-[0.7rem] font-light bg-netbirdy/10 border border-netbirdy-400/30 text-netbirdy-400 rounded-full px-2 py-1 pb-0.5 leading-none",
+                          "hover:bg-netbirdy/20 cursor-help transition-all self-center",
                       )}
                   >
                     Recommended
@@ -169,7 +169,7 @@ export const IntentCard = ({
                     >
                         <IconArrowRight
                             size={24}
-                            className={"shrink-0 group-hover:text-netbird"}
+                            className={"shrink-0 group-hover:text-netbirdy"}
                         />
                     </div>
                 </div>

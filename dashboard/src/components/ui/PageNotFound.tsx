@@ -56,7 +56,7 @@ export const PageNotFound = ({
                         {" "}
                         <SquareIcon
                           icon={<CircleAlertIcon size={20} />}
-                          color={"netbird"}
+                          color={"netbirdy"}
                           size={"large"}
                         />
                       </div>

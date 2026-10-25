@@ -11,8 +11,8 @@ import {
 import ModalHeader from "@components/modal/ModalHeader";
 import { trim } from "lodash";
 import { Globe } from "lucide-react";
-import { useMemo, useState } from "react";
 import { toASCII } from "punycode";
+import { useMemo, useState } from "react";
 import { Peer } from "@/interfaces/Peer";
 
 interface Props {
@@ -74,7 +74,7 @@ export function EditPeerNameModal({
               If the domain name already exists, we add an increment number
               suffix to it.
             </HelpText>
-            <div className={"text-netbird text-sm break-all whitespace-normal"}>
+            <div className={"text-netbirdy text-sm break-all whitespace-normal"}>
               {domainNamePreview}
             </div>
           </Card>

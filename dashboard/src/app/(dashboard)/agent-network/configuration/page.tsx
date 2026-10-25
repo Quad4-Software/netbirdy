@@ -16,10 +16,10 @@ import PeersProvider from "@/contexts/PeersProvider";
 import { usePermissions } from "@/contexts/PermissionsProvider";
 import { REVERSE_PROXY_CLUSTERS_DOCS_LINK } from "@/interfaces/ReverseProxy";
 import PageContainer from "@/layouts/PageContainer";
-import { useAgentNetworkMode } from "@/modules/agent-network/useAgentNetworkMode";
 import AgentAccountControlsCard from "@/modules/agent-network/AgentAccountControlsCard";
 import AgentBudgetRulesTable from "@/modules/agent-network/AgentBudgetRulesTable";
 import AIProvidersProvider from "@/modules/agent-network/AIProvidersProvider";
+import { useAgentNetworkMode } from "@/modules/agent-network/useAgentNetworkMode";
 
 const ClustersTable = lazy(
   () => import("@/modules/reverse-proxy/clusters/ClustersTable"),

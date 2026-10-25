@@ -88,7 +88,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
 
     return (
       <>
-        <div className={cn("flex relative h-[42px]", maxWidthClass)}>
+        <div className={cn("nb-focus-wrap flex relative h-[42px] rounded-md", maxWidthClass)}>
           {customPrefix && (
             <div
               className={cn(
@@ -116,6 +116,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
 
           <input
             type={inputType}
+            data-no-focus-ring
             ref={ref}
             {...props}
             className={cn(

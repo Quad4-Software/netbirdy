@@ -391,7 +391,7 @@ export function RouteModalContent({
           exitNode ? (
             <IconDirectionSign size={20} />
           ) : (
-            <NetworkRoutesIcon className={"fill-netbird"} />
+            <NetworkRoutesIcon className={"fill-netbirdy"} />
           )
         }
         title={
@@ -409,7 +409,7 @@ export function RouteModalContent({
               : "Route all internet traffic through a peer"
             : "Access LANs and VPC by adding a network route."
         }
-        color={exitNode ? "yellow" : "netbird"}
+        color={exitNode ? "yellow" : "netbirdy"}
       />
 
       <Tabs defaultValue={tab} onValueChange={(v) => setTab(v)} value={tab}>
@@ -422,7 +422,7 @@ export function RouteModalContent({
               <RouteIcon
                 size={16}
                 className={
-                  "text-nb-gray-500 group-data-[state=active]/trigger:text-netbird transition-all"
+                  "text-nb-gray-500 group-data-[state=active]/trigger:text-netbirdy transition-all"
                 }
               />
               Route
@@ -433,7 +433,7 @@ export function RouteModalContent({
             <FolderGit2
               size={16}
               className={
-                "text-nb-gray-500 group-data-[state=active]/trigger:text-netbird transition-all"
+                "text-nb-gray-500 group-data-[state=active]/trigger:text-netbirdy transition-all"
               }
             />
             Groups
@@ -446,7 +446,7 @@ export function RouteModalContent({
             <Text
               size={16}
               className={
-                "text-nb-gray-500 group-data-[state=active]/trigger:text-netbird transition-all"
+                "text-nb-gray-500 group-data-[state=active]/trigger:text-netbirdy transition-all"
               }
             />
             Name & Description
@@ -458,7 +458,7 @@ export function RouteModalContent({
             <Settings2
               size={16}
               className={
-                "text-nb-gray-500 group-data-[state=active]/trigger:text-netbird transition-all"
+                "text-nb-gray-500 group-data-[state=active]/trigger:text-netbirdy transition-all"
               }
             />
             Additional Settings
@@ -754,7 +754,7 @@ export function RouteModalContent({
                   </>
                 }
                 helpText={
-                  "Automatically apply this exit node to your distribution groups. This requires NetBird client v0.55.0 or higher."
+                  "Automatically apply this exit node to your distribution groups. This requires NetBirdy client v0.55.0 or higher."
                 }
               />
             )}

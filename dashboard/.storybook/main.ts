@@ -33,7 +33,7 @@ function tsconfigAliases() {
 /* src/utils/config.ts loads its config with CommonJS require(), which Vite
    leaves untouched, so the calls are rewritten to import the mock config. */
 const mockConfigPlugin = {
-  name: "netbird-mock-config",
+  name: "netbirdy-mock-config",
   enforce: "pre" as const,
   transform(code: string, id: string) {
     if (!id.endsWith("src/utils/config.ts")) return;
@@ -54,7 +54,7 @@ const mockConfigPlugin = {
    renders above all decorators, so it's patched here.
    Remove once Storybook provides parentRenderTree itself. */
 const layoutRouterPlugin = {
-  name: "netbird-layout-router-render-tree",
+  name: "netbirdy-layout-router-render-tree",
   enforce: "pre" as const,
   transform(code: string, id: string) {
     if (!id.includes("@storybook/nextjs-vite/dist/")) return;

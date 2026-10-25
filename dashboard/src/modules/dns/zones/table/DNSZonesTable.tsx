@@ -27,9 +27,12 @@ import { ExternalLinkIcon, PlusCircle } from "lucide-react";
 import { usePathname } from "next/navigation";
 import React, { useMemo } from "react";
 import { useSWRConfig } from "swr";
+import DNSZoneIcon from "@/assets/icons/DNSZoneIcon";
+import { useGroups } from "@/contexts/GroupsProvider";
 import { usePermissions } from "@/contexts/PermissionsProvider";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { DNS_ZONE_DOCS_LINK, DNSZone } from "@/interfaces/DNS";
+import { Group } from "@/interfaces/Group";
 import { useDNSZones } from "@/modules/dns/zones/DNSZonesProvider";
 import DNSRecordsTable from "@/modules/dns/zones/records/DNSRecordsTable";
 import { DNSZonesActionCell } from "@/modules/dns/zones/table/DNSZonesActionCell";
@@ -37,9 +40,6 @@ import { DNSZonesGroupCell } from "@/modules/dns/zones/table/DNSZonesGroupCell";
 import { DNSZonesNameCell } from "@/modules/dns/zones/table/DNSZonesNameCell";
 import { DNSZonesRecordsCell } from "@/modules/dns/zones/table/DNSZonesRecordsCell";
 import { DNSZonesSearchDomainCell } from "@/modules/dns/zones/table/DNSZonesSearchDomainCell";
-import { Group } from "@/interfaces/Group";
-import DNSZoneIcon from "@/assets/icons/DNSZoneIcon";
-import { useGroups } from "@/contexts/GroupsProvider";
 
 export const DNSZonesColumns: ColumnDef<DNSZone>[] = [
   {
@@ -122,7 +122,7 @@ export default function DNSZonesTable({
 
   // Default sorting state of the table
   const [sorting, setSorting] = useLocalStorage<SortingState>(
-    "netbird-table-sort" + path,
+    "netbirdy-table-sort" + path,
     [
       {
         id: "domain",

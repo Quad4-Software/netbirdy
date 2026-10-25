@@ -1,9 +1,9 @@
-// Spins up a real NetBird peer in docker, registering via a setup key. In the
+// Spins up a real NetBirdy peer in docker, registering via a setup key. In the
 // local test env the client MUST reach management directly over its compose
 // network (http://management:80), since caddy breaks h2c, and it stays offline
 // for lack of signal/TURN. A deployed target is reached at its public URL.
-import { execFileSync } from "child_process";
 import { expect, type Page } from "@playwright/test";
+import { execFileSync } from "child_process";
 import {
   createSetupKey,
   deletePeersByPrefix,
@@ -13,7 +13,7 @@ import {
 import { deployedBaseURL, isDeployedTarget } from "./target";
 
 const NETWORK = isDeployedTarget ? undefined : "environment_netbird";
-const IMAGE = process.env.NETBIRD_E2E_PEER_IMAGE || "netbirdio/netbird:latest";
+const IMAGE = process.env.NETBIRD_E2E_PEER_IMAGE || "ghcr.io/sudo-ivan/netbirdy:latest";
 const MGMT_URL = deployedBaseURL ?? "http://management:80";
 
 type RegisteredPeer = {

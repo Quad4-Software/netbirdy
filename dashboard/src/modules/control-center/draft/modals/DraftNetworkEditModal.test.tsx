@@ -1,6 +1,6 @@
 import { cleanup, render, screen } from "@testing-library/react";
-import { act } from "react";
 import React from "react";
+import { act } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { Network } from "@/interfaces/Network";
 

@@ -9,7 +9,7 @@ import {
 
 const MANAGED_PROXY_PATH = "/integrations/agent-network/managed-proxy";
 
-// useManagedProxy reads the account's NetBird-managed gateway and starts one.
+// useManagedProxy reads the account's NetBirdy-managed gateway and starts one.
 // A 404 on the read is the expected "no deployment" answer, so read errors are
 // neither toasted nor retried. Once a deployment is known it is polled by its
 // state until it is ready.

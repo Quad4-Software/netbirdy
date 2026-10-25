@@ -45,7 +45,7 @@ export default defineConfig({
   webServer: isDeployedTarget
     ? undefined
     : {
-        command: "npx serve@latest out -p 1337 --no-request-logging",
+        command: "pnpm exec serve out -p 1337 --no-request-logging",
         port: 1337,
         reuseExistingServer: true,
         cwd: path.resolve(__dirname, ".."),

@@ -126,7 +126,7 @@ export default function OktaSSOSetup({ open, onOpenChange }: Props) {
                   key={index}
                   className={cn(
                     "w-8 h-1 rounded-full bg-nb-gray-800",
-                    step >= index + 1 && "bg-netbird",
+                    step >= index + 1 && "bg-netbirdy",
                   )}
                 />
               ))}
@@ -135,7 +135,7 @@ export default function OktaSSOSetup({ open, onOpenChange }: Props) {
 
           <IntegrationModalHeader
             image={integrationImage}
-            title={"Connect NetBird with Okta SSO"}
+            title={"Connect NetBirdy with Okta SSO"}
             description={
               "Use Okta as a Single Sign-On provider to authenticate users. Follow the steps below to get started."
             }
@@ -198,7 +198,7 @@ export default function OktaSSOSetup({ open, onOpenChange }: Props) {
             <div className={"px-8 py-3 flex flex-col gap-0 mt-4"}>
               <p className={"font-medium flex gap-3 items-center text-base"}>
                 <Box size={20} />
-                Install NetBird application for Okta
+                Install NetBirdy application for Okta
               </p>
               <Steps>
                 <Steps.Step step={1}>
@@ -207,7 +207,7 @@ export default function OktaSSOSetup({ open, onOpenChange }: Props) {
                     <InlineLink
                       className={"inline"}
                       target={"_blank"}
-                      href={"https://www.okta.com/integrations/netbird"}
+                      href={"https://www.okta.com/integrations/netbirdy"}
                     >
                       Okta Integration Network
                     </InlineLink>
@@ -278,7 +278,7 @@ export default function OktaSSOSetup({ open, onOpenChange }: Props) {
                   <p className={"font-normal"}>
                     Enter your
                     <Mark>Primary E-Mail Domain</Mark> which will later be used
-                    to log in to NetBird.
+                    to log in to NetBirdy.
                   </p>
                   <Input
                     customPrefix={<GlobeIcon size={16} />}

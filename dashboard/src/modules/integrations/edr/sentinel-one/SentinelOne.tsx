@@ -17,11 +17,11 @@ import {
   SentinelOneIntegration,
   SentinelOneMatchAttributes,
 } from "@/interfaces/EDR";
+import { Group } from "@/interfaces/Group";
 import SentinelOneConfiguration from "@/modules/integrations/edr/sentinel-one/SentinelOneConfiguration";
 import SentinelOneSetup from "@/modules/integrations/edr/sentinel-one/SentinelOneSetup";
 import { useIntegrations } from "@/modules/integrations/edr/useIntegrations";
 import { IntegrationCard } from "@/modules/integrations/IntegrationCard";
-import { Group } from "@/interfaces/Group";
 
 type Props = {
   account: Account;

@@ -9,9 +9,9 @@
  * route and its resulting toast never bleed into another test through the
  * worker-scoped page.
  */
-import { test, expect, type Browser, type Page } from "@playwright/test";
-import { loginToApp, navigateTo } from "../helpers/auth";
+import { type Browser, expect, type Page,test } from "@playwright/test";
 import * as path from "path";
+import { loginToApp, navigateTo } from "../helpers/auth";
 
 const SCREENSHOTS_DIR = path.resolve(__dirname, "..", "screenshots");
 const REQUEST_ID = "9m4e2mr0ui3e8a215n4g";

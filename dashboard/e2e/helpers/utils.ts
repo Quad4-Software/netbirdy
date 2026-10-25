@@ -79,7 +79,7 @@ export async function setTestEdition(
 ) {
   await page.evaluate((ed) => {
     try {
-      window.localStorage.setItem("netbird-test-edition", ed);
+      window.localStorage.setItem("netbirdy-test-edition", ed);
     } catch (e) {
       /* storage unavailable */
     }

@@ -4,9 +4,9 @@ import { SmallBadge } from "@components/ui/SmallBadge";
 import TruncatedText from "@components/ui/TruncatedText";
 import { cn } from "@utils/helpers";
 import { XIcon } from "lucide-react";
+import { useRouter } from "next/navigation";
 import * as React from "react";
 import { Group } from "@/interfaces/Group";
-import { useRouter } from "next/navigation";
 
 type Props = {
   group: Group;

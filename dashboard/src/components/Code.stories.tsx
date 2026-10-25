@@ -16,7 +16,7 @@ export const Blocks: StoryObj = {
       <Row label={"default"} className={"w-[520px]"}>
         <div className={"w-full"} data-capture={""}>
           <Code>
-            <Code.Comment># Install NetBird</Code.Comment>
+            <Code.Comment># Install NetBirdy</Code.Comment>
             <Code.Line>
               curl -fsSL https://pkgs.netbird.io/install.sh | sh
             </Code.Line>
@@ -27,7 +27,7 @@ export const Blocks: StoryObj = {
         <div className={"w-full"}>
           <Code dark>
             <Code.Line>
-              netbird up --setup-key 4F0E7A1C-9B2D-4E3F-8A6B-1C2D3E4F5A6B
+              netbirdy up --setup-key 4F0E7A1C-9B2D-4E3F-8A6B-1C2D3E4F5A6B
             </Code.Line>
           </Code>
         </div>
@@ -51,9 +51,9 @@ export const StepList: StoryObj = {
           <p className={"text-sm"}>Download and install the client</p>
         </Steps.Step>
         <Steps.Step step={2}>
-          <p className={"text-sm"}>Run netbird up</p>
+          <p className={"text-sm"}>Run netbirdy up</p>
           <Code>
-            <Code.Line>netbird up</Code.Line>
+            <Code.Line>netbirdy up</Code.Line>
           </Code>
         </Steps.Step>
         <Steps.Step step={3} line={false}>

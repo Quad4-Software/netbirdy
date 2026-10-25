@@ -14,7 +14,7 @@ export default function NotFound() {
   const [tempQueryParams, setTempQueryParams] = useLocalStorage<{
     path: string;
     params: string;
-  } | null>("netbird-query-params", null);
+  } | null>("netbirdy-query-params", null);
   const [queryParams, setQueryParams] = useState("");
 
   useEffect(() => {

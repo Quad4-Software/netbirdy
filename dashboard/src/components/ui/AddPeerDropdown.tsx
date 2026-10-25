@@ -12,7 +12,7 @@ import { ChevronDown, PlusCircle } from "lucide-react";
 import React, { memo, useState } from "react";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { Peer } from "@/interfaces/Peer";
-import SetupModal from "@/modules/setup-netbird-modal/SetupModal";
+import SetupModal from "@/modules/setup-netbirdy-modal/SetupModal";
 
 // What the operator chose to add. The setup flow only distinguishes user
 // devices (SSO login) from no-user peers (setup key). Autonomous agents are
@@ -22,13 +22,13 @@ type AddMode = "user" | "server" | "agent";
 
 // AddPeerDropdown replaces the single "Add Peer" button on the merged peers
 // table: the operator picks what to add (User Device / Server / Autonomous
-// Agent) and the matching Install NetBird flow opens.
+// Agent) and the matching Install NetBirdy flow opens.
 function AddPeerDropdown() {
   const { data: peers } = useFetchApi<Peer[]>("/peers");
   const { oidcUser: user } = useOidcUser();
 
   const [isFirstRun, setIsFirstRun] = useLocalStorage<boolean>(
-    "netbird-first-run",
+    "netbirdy-first-run",
     !(peers && peers.length > 0),
   );
 

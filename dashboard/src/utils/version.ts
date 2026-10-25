@@ -16,9 +16,9 @@ export const getLatestNetbirdRelease = async (
       dayjs().subtract(LATEST_RELEASE_CHECK_INTERVAL_IN_MINUTES, "minute"),
     );
 
-  if (runFetch) {
+  if (runFetch && typeof window !== "undefined" && localStorage.getItem("netbirdy-update-check") === "true") {
     const data = (await fetch(
-      `${GITHUB_API_ENDPOINT}/repos/netbirdio/netbird/releases/latest`,
+      `${GITHUB_API_ENDPOINT}/repos/Sudo-Ivan/netbirdy/releases/latest`,
     ).then((response) => response.json())) as any;
 
     try {
@@ -39,7 +39,7 @@ export const getLatestNetbirdRelease = async (
 /**
  * Split a version string into its numeric release components.
  *
- * Handles every shape NetBird components report: an optional "v" prefix, semver
+ * Handles every shape NetBirdy components report: an optional "v" prefix, semver
  * build metadata ("0.77.0+enterprise.1" on enterprise management builds), a CI
  * build suffix ("0.76.3-31256681241"), and pre-release labels ("0.60.0-rc.1").
  * Everything after the release itself is dropped — build metadata carries no
@@ -132,7 +132,7 @@ export const isNewerVersion = (current: string, latest: string): boolean => {
 
 /**
  * Check if peer as routing peer is supported by the provided version and operating system.
- * Routing peers are supported on Windows, macOS, iOS & Android starting from NetBird v0.36.6+.
+ * Routing peers are supported on Windows, macOS, iOS & Android starting from NetBirdy v0.36.6+.
  * @param version
  * @param os
  */
@@ -145,7 +145,7 @@ export const isRoutingPeerSupported = (version: string, os: string) => {
 
 /**
  * Check if native SSH is supported.
- * Supported starting from NetBird v0.60.0+.
+ * Supported starting from NetBirdy v0.60.0+.
  * @param version
  */
 export const isNativeSSHSupported = (version: string) => {
@@ -154,11 +154,28 @@ export const isNativeSSHSupported = (version: string) => {
 };
 
 /**
- * Check if NetBird SSH protocol is supported.
- * Supported starting from NetBird v0.61.0+.
+ * Check if NetBirdy SSH protocol is supported.
+ * Supported starting from NetBirdy v0.61.0+.
  * @param version
  */
 export const isNetbirdSSHProtocolSupported = (version: string) => {
   if (version == "development") return true;
   return compareVersions(version, "0.61.0");
+};
+
+const RELEASE_VERSION = /^(v?\d+(?:\.\d+)*)(?:-[\w.-]+)?(?:\+[\w.-]+)?$/;
+
+/**
+ * True when current is a release version strictly below available. Development
+ * and other non-release builds never report an update.
+ */
+export const isUpdateAvailable = (
+  current: string | undefined,
+  available: string | undefined,
+): boolean => {
+  if (!current || !available) return false;
+  if (!RELEASE_VERSION.test(current) || !RELEASE_VERSION.test(available)) {
+    return false;
+  }
+  return isNewerVersion(current, available);
 };

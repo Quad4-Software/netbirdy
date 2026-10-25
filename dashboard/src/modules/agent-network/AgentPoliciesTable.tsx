@@ -65,6 +65,7 @@ import {
 } from "@/modules/agent-network/data/mockData";
 import ActiveInactiveRow from "@/modules/common-table-rows/ActiveInactiveRow";
 import EmptyRow from "@/modules/common-table-rows/EmptyRow";
+import { docsLink } from "@/modules/docs/links";
 
 function NameCell({ policy }: { policy: AgentPolicy }) {
   return (
@@ -431,7 +432,7 @@ export default function AgentPoliciesTable({ headingTarget }: Readonly<Props>) {
   const { groups: realGroups } = useGroups();
 
   const [sorting, setSorting] = useLocalStorage<SortingState>(
-    "netbird-table-sort" + path,
+    "netbirdy-table-sort" + path,
     [{ id: "name", desc: false }],
   );
 
@@ -660,7 +661,7 @@ export default function AgentPoliciesTable({ headingTarget }: Readonly<Props>) {
               <>
                 Learn more about
                 <InlineLink
-                  href={"https://docs.netbird.io/agent-network"}
+                  href={docsLink("https://docs.netbird.io/agent-network")}
                   target={"_blank"}
                 >
                   Agent Network

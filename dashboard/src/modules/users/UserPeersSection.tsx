@@ -1,16 +1,16 @@
-import * as React from "react";
-import { Suspense, useMemo } from "react";
-import { usePortalElement } from "@hooks/usePortalElement";
+import Paragraph from "@components/Paragraph";
 import SkeletonTable, {
   SkeletonTableHeader,
 } from "@components/skeletons/SkeletonTable";
-import { User } from "@/interfaces/User";
-import useFetchApi from "@utils/api";
-import { Peer } from "@/interfaces/Peer";
-import MinimalPeersTable from "@/modules/peer/MinimalPeersTable";
 import NoResults from "@components/ui/NoResults";
+import { usePortalElement } from "@hooks/usePortalElement";
+import useFetchApi from "@utils/api";
+import * as React from "react";
+import { Suspense, useMemo } from "react";
 import PeerIcon from "@/assets/icons/PeerIcon";
-import Paragraph from "@components/Paragraph";
+import { Peer } from "@/interfaces/Peer";
+import { User } from "@/interfaces/User";
+import MinimalPeersTable from "@/modules/peer/MinimalPeersTable";
 
 type Props = {
   user: User;
@@ -60,7 +60,7 @@ export const UserPeersSection = ({ user }: Props) => {
                 className={"py-4"}
                 title={"This user has no registered peers"}
                 description={
-                  "Install NetBird and sign in as this user to register peers."
+                  "Install NetBirdy and sign in as this user to register peers."
                 }
                 icon={<PeerIcon size={20} className={"fill-nb-gray-300"} />}
               />

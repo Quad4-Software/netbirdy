@@ -1,16 +1,12 @@
 import useFetchApi from "@utils/api";
-import { isAgentNetworkEnabled, isAgentNetworkOnly } from "@utils/netbird";
+import { isAgentNetworkEnabled, isAgentNetworkOnly } from "@utils/netbirdy";
 import { useMemo } from "react";
 import { usePermissions } from "@/contexts/PermissionsProvider";
-import {
-  AGENT_NETWORK_SIGNUP_SOURCE,
-  SIGNUP_SOURCE_LOCAL_STORAGE_KEY,
-} from "@/hooks/useSignupSource";
 import { Account } from "@/interfaces/Account";
 import { useMyAgentNetworkSetup } from "@/modules/agent-network/useMyAgentNetworkSetup";
 
 /**
- * Report whether a new account arrived from the netbird.ai signup source and
+ * Report whether a new account arrived from the netbirdy.ai signup source and
  * has not been marked yet. The focused view then applies immediately instead
  * of flashing the regular onboarding while `agent_network_only` is persisted.
  */
@@ -22,8 +18,8 @@ const isAgentNetworkSignupPending = (account?: Account) => {
   try {
     return (
       typeof window !== "undefined" &&
-      localStorage.getItem(SIGNUP_SOURCE_LOCAL_STORAGE_KEY) ===
-        AGENT_NETWORK_SIGNUP_SOURCE
+      localStorage.getItem("nb-signup-source") ===
+        "agent_network"
     );
   } catch (e) {
     return false;

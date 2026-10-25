@@ -15,7 +15,6 @@ import {
 } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import React, { useEffect, useMemo, useState } from "react";
-import { useMSP } from "@/cloud/msp/contexts/MSPProvider";
 import { usePermissions } from "@/contexts/PermissionsProvider";
 import { useLoggedInUser } from "@/contexts/UsersProvider";
 import PageContainer from "@/layouts/PageContainer";
@@ -23,16 +22,12 @@ import { useAccount } from "@/modules/account/useAccount";
 import AuthenticationTab from "@/modules/settings/AuthenticationTab";
 import ClientSettingsTab from "@/modules/settings/ClientSettingsTab";
 import DangerZoneTab from "@/modules/settings/DangerZoneTab";
+import GroupsSettings from "@/modules/settings/GroupsSettings";
 import IdentityProvidersTab from "@/modules/settings/IdentityProvidersTab";
+import MetricsTab from "@/modules/settings/MetricsTab";
 import NetworkSettingsTab from "@/modules/settings/NetworkSettingsTab";
 import PermissionsTab from "@/modules/settings/PermissionsTab";
 import SetupKeysTab from "@/modules/settings/SetupKeysTab";
-import GroupsSettings from "@/modules/settings/GroupsSettings";
-import MetricsTab from "@/modules/settings/MetricsTab";
-import {
-  CloudSettingsTabContent,
-  CloudSettingsTabTrigger,
-} from "@/cloud/settings/CloudSettings";
 
 export default function NetBirdSettings() {
   const queryParams = useSearchParams();
@@ -115,7 +110,6 @@ export default function NetBirdSettings() {
               </VerticalTabs.Trigger>
             </>
           )}
-          <CloudSettingsTabTrigger />
           <DangerZoneTabTrigger />
         </VerticalTabs.List>
         <RestrictedAccess
@@ -133,7 +127,6 @@ export default function NetBirdSettings() {
             {account && <ClientSettingsTab account={account} />}
             {account && <MetricsTab account={account} />}
             {account && <DangerZoneTab account={account} />}
-            <CloudSettingsTabContent />
           </div>
         </RestrictedAccess>
       </VerticalTabs>
@@ -144,8 +137,8 @@ export default function NetBirdSettings() {
 const DangerZoneTabTrigger = () => {
   const { isOwner } = useLoggedInUser();
 
-  const { isAccountWithMSPParent } = useMSP();
-  if (isAccountWithMSPParent) return;
+  
+  if (false) return;
 
   return (
     isOwner && (

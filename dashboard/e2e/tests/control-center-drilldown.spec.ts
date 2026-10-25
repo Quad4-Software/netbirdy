@@ -1,5 +1,4 @@
 import { expect } from "@playwright/test";
-import { test } from "../helpers/fixtures";
 import {
   createGroup,
   createNetwork,
@@ -7,7 +6,6 @@ import {
   deleteGroupsByPrefix,
   deleteNetworksByPrefix,
 } from "../helpers/api";
-import { generateRandomName } from "../helpers/utils";
 import {
   canvasNode,
   createViaCanvasMenu,
@@ -16,6 +14,8 @@ import {
   openControlCenter,
   resetDraftState,
 } from "../helpers/control-center";
+import { test } from "../helpers/fixtures";
+import { generateRandomName } from "../helpers/utils";
 
 test.describe.serial("Control Center Drill-down @control-center", () => {
   const PREFIX = "cc-drill-";

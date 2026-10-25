@@ -2,6 +2,10 @@
 
 import { PageNotFound } from "@components/ui/PageNotFound";
 import useFetchApi, { ErrorResponse } from "@utils/api";
+import {
+  isNativeSSHSupported,
+  isNetbirdSSHProtocolSupported,
+} from "@utils/version";
 import { CircleXIcon, InfoIcon, Loader2Icon } from "lucide-react";
 import React, { useEffect, useRef } from "react";
 import type { Peer } from "@/interfaces/Peer";
@@ -12,10 +16,6 @@ import {
   NetBirdStatus,
   useNetBirdClient,
 } from "@/modules/remote-access/useNetBirdClient";
-import {
-  isNativeSSHSupported,
-  isNetbirdSSHProtocolSupported,
-} from "@utils/version";
 
 export default function SSHPage() {
   const { peerId, username, port, ipVersion } = useSSHQueryParams();
@@ -97,7 +97,7 @@ function SSHTerminal({ username, port, peer, ipVersion }: Props) {
     try {
       const aclPort = isNativeSSHSupported(peer.version) ? "22022" : port;
       const protocol = isNetbirdSSHProtocolSupported(peer.version)
-        ? "netbird-ssh"
+        ? "netbirdy-ssh"
         : "tcp";
       const rules = [`${protocol}/${aclPort}`];
       await client?.connectTemporary(peer.id, rules);
@@ -124,7 +124,7 @@ function SSHTerminal({ username, port, peer, ipVersion }: Props) {
       try {
         const aclPort = isNativeSSHSupported(peer.version) ? "22022" : port;
         const protocol = isNetbirdSSHProtocolSupported(peer.version)
-          ? "netbird-ssh"
+          ? "netbirdy-ssh"
           : "tcp";
         const rules = [`${protocol}/${aclPort}`];
         await client?.connectTemporary(peer.id, rules);
@@ -241,7 +241,7 @@ const DisconnectedMessage = ({
         Disconnected from {username}@{peerIp}
         <button
           className={
-            "underline-offset-4 items-center transition-all duration-200 inline-flex texts-inherit gap-1 text-netbird hover:underline font-normal"
+            "underline-offset-4 items-center transition-all duration-200 inline-flex texts-inherit gap-1 text-netbirdy hover:underline font-normal"
           }
           onClick={onReconnect}
         >

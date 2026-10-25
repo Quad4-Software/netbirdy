@@ -1,7 +1,7 @@
-import { test, expect } from "../helpers/fixtures";
-import { navigateTo } from "../helpers/auth";
-import { generateRandomName } from "../helpers/utils";
 import { deleteGroupsByPrefix, deleteRoutesByNetworkIdPrefix } from "../helpers/api";
+import { navigateTo } from "../helpers/auth";
+import { expect,test } from "../helpers/fixtures";
+import { generateRandomName } from "../helpers/utils";
 
 const networkRoutes: string[] = [];
 let networkRoutesCreatedGroups: string[] = [];

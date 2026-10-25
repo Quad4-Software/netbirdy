@@ -67,7 +67,7 @@ for (const { title, file } of staticTerms) {
 }
 
 process.stdout.write(
-  "Third-party terms for the NetBird dashboard static export.\n" +
+  "Third-party terms for the NetBirdy dashboard static export.\n" +
     "Generated from package-lock.json at build time.\n\n\n" +
     sections.join("\n\n\n") +
     "\n",

@@ -1,13 +1,13 @@
+import Badge from "@components/Badge";
 import Button from "@components/Button";
 import { Modal, ModalClose, ModalContent } from "@components/modal/Modal";
 import ModalHeader from "@components/modal/ModalHeader";
 import { PeerGroupSelector } from "@components/PeerGroupSelector";
 import { GradientFadedBackground } from "@components/ui/GradientFadedBackground";
-import React, { useState } from "react";
-import { Group } from "@/interfaces/Group";
-import { useUsers } from "@/contexts/UsersProvider";
-import Badge from "@components/Badge";
 import { CircleUser } from "lucide-react";
+import React, { useState } from "react";
+import { useUsers } from "@/contexts/UsersProvider";
+import { Group } from "@/interfaces/Group";
 
 type Props = {
   open: boolean;
@@ -45,7 +45,7 @@ export default function AuthNetBirdOnlyModal({
     <Modal open={open} onOpenChange={onOpenChange}>
       <ModalContent maxWidthClass="max-w-xl">
         <ModalHeader
-          title="NetBird-Only Access"
+          title="NetBirdy-Only Access"
           description="Reachable from peers in selected groups only."
         />
 

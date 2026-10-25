@@ -2,7 +2,7 @@ enum ActionStatus {
   SUCCESS = "green",
   ERROR = "red",
   INFO = "blue-darker",
-  WARNING = "netbird",
+  WARNING = "netbirdy",
 }
 
 const ACTION_COLOR_MAPPING: Record<string, ActionStatus> = {

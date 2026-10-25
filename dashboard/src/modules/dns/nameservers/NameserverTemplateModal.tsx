@@ -99,7 +99,7 @@ export function NameserverTemplateModalContent({
           />
           <NameserverTemplate
             onClick={() => onePresetSelection(NameserverPresets.Default)}
-            icon={<GlobeIcon size={30} className={"text-netbird"} />}
+            icon={<GlobeIcon size={30} className={"text-netbirdy"} />}
             title={"Custom DNS"}
             description={
               "Use custom nameservers to resolve domains in your network. You can either use a public DNS or your own nameservers."

@@ -1,3 +1,4 @@
+import { HelpTooltip } from "@components/HelpTooltip";
 import { Input } from "@components/Input";
 import { Label } from "@components/Label";
 import { ArrowRight } from "lucide-react";
@@ -10,7 +11,6 @@ import ReverseProxyAddressInput, {
 import ReverseProxyTargetSelector, {
   type Target,
 } from "@/modules/reverse-proxy/targets/ReverseProxyTargetSelector";
-import { HelpTooltip } from "@components/HelpTooltip";
 
 type Props = {
   l4Target: Target | undefined;

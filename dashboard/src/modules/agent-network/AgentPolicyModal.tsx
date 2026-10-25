@@ -56,6 +56,7 @@ import {
   PolicyLimits,
 } from "@/modules/agent-network/data/mockData";
 import useGroupHelper from "@/modules/groups/useGroupHelper";
+import { docsLink } from "@/modules/docs/links";
 
 type Props = {
   open: boolean;
@@ -289,12 +290,12 @@ function AgentPolicyModalContent({
   return (
     <ModalContent maxWidthClass={"max-w-3xl"}>
       <ModalHeader
-        icon={<AccessControlIcon className={"fill-netbird"} />}
+        icon={<AccessControlIcon className={"fill-netbirdy"} />}
         title={policy ? "Update Agent Policy" : "Create Agent Policy"}
         description={
           "Govern which groups can call which AI providers and under what guardrails."
         }
-        color={"netbird"}
+        color={"netbirdy"}
       />
 
       <Tabs defaultValue={tab} onValueChange={setTab} value={tab}>
@@ -405,7 +406,7 @@ function AgentPolicyModalContent({
           <Paragraph className={"text-sm mt-auto"}>
             Learn more about
             <InlineLink
-              href={"https://docs.netbird.io/agent-network"}
+              href={docsLink("https://docs.netbird.io/agent-network")}
               target={"_blank"}
             >
               Agent Network

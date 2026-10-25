@@ -1,5 +1,5 @@
-import { test, expect } from "../helpers/fixtures";
 import { navigateTo } from "../helpers/auth";
+import { expect,test } from "../helpers/fixtures";
 
 test.describe.serial("Settings - Permissions @settings", () => {
   test("Should toggle restrict dashboard for regular users", async ({

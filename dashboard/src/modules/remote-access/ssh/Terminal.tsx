@@ -6,9 +6,9 @@ import { useCallback, useEffect, useRef } from "react";
 
 const TERMINAL_OPTIONS = {
   theme: {
-    background: "#181a1d",
-    foreground: "#e4e7e9",
-    cursor: "#e4e7e9",
+    background: "#0a0a0a",
+    foreground: "#e8e8e8",
+    cursor: "#e8e8e8",
   },
   fontFamily: 'Monaco, Menlo, "Ubuntu Mono", monospace',
   fontSize: 13,

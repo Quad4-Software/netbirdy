@@ -7,16 +7,16 @@ import SkeletonTable from "@components/skeletons/SkeletonTable";
 import { RestrictedAccess } from "@components/ui/RestrictedAccess";
 import { usePortalElement } from "@hooks/usePortalElement";
 import useFetchApi from "@utils/api";
-import { isNetBirdCloud } from "@utils/netbird";
+import { isNetBirdCloud } from "@utils/netbirdy";
 import { ExternalLinkIcon, User2 } from "lucide-react";
 import React, { lazy, Suspense } from "react";
 import TeamIcon from "@/assets/icons/TeamIcon";
-import { AccountMfaCard } from "@/cloud/mfa/AccountMFACard";
 import { useGroups } from "@/contexts/GroupsProvider";
 import { usePermissions } from "@/contexts/PermissionsProvider";
 import { User } from "@/interfaces/User";
 import PageContainer from "@/layouts/PageContainer";
 import { IdentityProviderCard } from "@/modules/integrations/idp-sync/IdentityProviderCard";
+import { docsLink } from "@/modules/docs/links";
 
 const UsersTable = lazy(() => import("@/modules/users/UsersTable"));
 
@@ -51,7 +51,7 @@ export default function TeamUsers() {
           Manage users and their permissions. Same-domain email users are added
           automatically on first sign-in.{" "}
           <InlineLink
-            href={"https://docs.netbird.io/how-to/add-users-to-your-network"}
+            href={docsLink("https://docs.netbird.io/how-to/add-users-to-your-network")}
             target={"_blank"}
           >
             Learn more
@@ -66,7 +66,7 @@ export default function TeamUsers() {
               {(permission?.idp?.read || !isNetBirdCloud()) && (
                 <IdentityProviderCard />
               )}
-              <AccountMfaCard />
+              
             </div>
           )}
           <UsersTable

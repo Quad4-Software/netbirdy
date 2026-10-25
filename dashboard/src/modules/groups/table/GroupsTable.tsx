@@ -350,7 +350,7 @@ export default function GroupsTable({ headingTarget }: Readonly<Props>) {
 
   // Default sorting state of the table
   const [sorting, setSorting] = useLocalStorage<SortingState>(
-    "netbird-table-sort" + path,
+    "netbirdy-table-sort" + path,
     [
       {
         id: "in_use",

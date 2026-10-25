@@ -172,7 +172,7 @@ export function ConfigurationContent({ onSuccess, config }: ModalProps) {
       <IntegrationModalHeader
         image={integrationImage}
         title={"Entra ID (API) Configuration"}
-        description={"Sync your users and groups from Entra ID to NetBird."}
+        description={"Sync your users and groups from Entra ID to NetBirdy."}
       />
 
       <Tabs
@@ -185,7 +185,7 @@ export function ConfigurationContent({ onSuccess, config }: ModalProps) {
             <Cog
               size={16}
               className={
-                "text-nb-gray-500 group-data-[state=active]/trigger:text-netbird transition-all"
+                "text-nb-gray-500 group-data-[state=active]/trigger:text-netbirdy transition-all"
               }
             />
             Settings
@@ -194,7 +194,7 @@ export function ConfigurationContent({ onSuccess, config }: ModalProps) {
             <FolderGit2
               size={16}
               className={
-                "text-nb-gray-500 group-data-[state=active]/trigger:text-netbird transition-all"
+                "text-nb-gray-500 group-data-[state=active]/trigger:text-netbirdy transition-all"
               }
             />
             Group Sync
@@ -203,7 +203,7 @@ export function ConfigurationContent({ onSuccess, config }: ModalProps) {
             <UserCircle
               size={16}
               className={
-                "text-nb-gray-500 group-data-[state=active]/trigger:text-netbird transition-all"
+                "text-nb-gray-500 group-data-[state=active]/trigger:text-netbirdy transition-all"
               }
             />
             User Sync
@@ -212,7 +212,7 @@ export function ConfigurationContent({ onSuccess, config }: ModalProps) {
             <AlertOctagon
               size={16}
               className={
-                "text-nb-gray-500 group-data-[state=active]/trigger:text-netbird transition-all"
+                "text-nb-gray-500 group-data-[state=active]/trigger:text-netbirdy transition-all"
               }
             />
             Danger Zone
@@ -337,7 +337,7 @@ export function ConfigurationContent({ onSuccess, config }: ModalProps) {
             </Label>
             <HelpText className={"max-w-lg mt-2"}>
               Deleting this integration will remove the ability to sync users
-              and groups from your IdP to NetBird. If you delete the integration
+              and groups from your IdP to NetBirdy. If you delete the integration
               you will need to reconfigure it again to enable the
               synchronization.
             </HelpText>

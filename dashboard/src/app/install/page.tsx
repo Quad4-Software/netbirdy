@@ -1,19 +1,15 @@
 "use client";
 
 import { Modal } from "@components/modal/Modal";
-import { AnnouncementBanner } from "@components/ui/AnnouncementBanner";
 import { useIsMd } from "@utils/responsive";
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import AnnouncementProvider, {
-  useAnnouncement,
-} from "@/contexts/AnnouncementProvider";
-import SetupModal from "@/modules/setup-netbird-modal/SetupModal";
+import SetupModal from "@/modules/setup-netbirdy-modal/SetupModal";
 
 function InstallContent() {
   const [open, setOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
-  const { bannerHeight } = useAnnouncement();
+  const bannerHeight = 0;
   const isMd = useIsMd();
 
   useEffect(() => {
@@ -30,7 +26,7 @@ function InstallContent() {
               "fixed top-0 left-0 right-0 z-[60] w-full pointer-events-auto"
             }
           >
-            <AnnouncementBanner />
+            
           </div>,
           document.body,
         )}
@@ -46,8 +42,8 @@ function InstallContent() {
 
 export default function UnauthenticatedInstallModal() {
   return (
-    <AnnouncementProvider>
+    
       <InstallContent />
-    </AnnouncementProvider>
+    
   );
 }

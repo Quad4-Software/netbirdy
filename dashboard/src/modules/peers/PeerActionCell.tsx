@@ -1,3 +1,4 @@
+import * as bypass from "@utils/bypass";
 import Button from "@components/Button";
 import {
   DropdownMenu,
@@ -7,6 +8,7 @@ import {
   DropdownMenuTrigger,
 } from "@components/DropdownMenu";
 import FullTooltip from "@components/FullTooltip";
+import InlineLink from "@components/InlineLink";
 import { notify } from "@components/Notification";
 import { getOperatingSystem } from "@hooks/useOperatingSystem";
 import { IconInfoCircle } from "@tabler/icons-react";
@@ -24,7 +26,7 @@ import {
 import { useRouter } from "next/navigation";
 import React, { useMemo } from "react";
 import { useSWRConfig } from "swr";
-import { useBypass, useBypassedPeers } from "@/cloud/edr/useBypass";
+import { useDialog } from "@/contexts/DialogProvider";
 import { usePeer } from "@/contexts/PeerProvider";
 import { usePermissions } from "@/contexts/PermissionsProvider";
 import { OperatingSystem } from "@/interfaces/OperatingSystem";
@@ -32,8 +34,7 @@ import { ExitNodeDropdownButton } from "@/modules/exit-node/ExitNodeDropdownButt
 import { useIntegrations } from "@/modules/integrations/edr/useIntegrations";
 import { RDPButton } from "@/modules/remote-access/rdp/RDPButton";
 import { SSHButton } from "@/modules/remote-access/ssh/SSHButton";
-import InlineLink from "@components/InlineLink";
-import { useDialog } from "@/contexts/DialogProvider";
+import { docsLink } from "@/modules/docs/links";
 
 export default function PeerActionCell() {
   const { peer, deletePeer, update, toggleSSH, setSSHInstructionsModal } =
@@ -47,9 +48,7 @@ export default function PeerActionCell() {
   // menu can offer Approve / Bypass / Revoke without the inline badges
   // that used to live in PeerStatusCell.
   const { isAnyIntegrationEnabled, activeIntegrationName } = useIntegrations();
-  const { bypassCompliance, revokeBypass, canBypass } = useBypass();
-  const { isBypassed: checkBypassed } = useBypassedPeers();
-  const isBypassed = peer.id ? checkBypassed(peer.id) : false;
+  const isBypassed = (_id?: string) => false;
   const canApprove = permission.peers.update;
   const needsApproval = peer.approval_required;
 
@@ -92,7 +91,7 @@ export default function PeerActionCell() {
     notify({
       title: `Compliance bypassed for ${peer.name}`,
       description: `This peer can now connect to other peers.`,
-      promise: bypassCompliance(peer.id),
+      promise: bypass.bypassCompliance(peer.id),
       loadingMessage: "Bypassing compliance...",
     });
   };
@@ -111,7 +110,7 @@ export default function PeerActionCell() {
     notify({
       title: `Compliance bypass revoked`,
       description: `Peer ${peer.name} is now subject to normal compliance validation.`,
-      promise: revokeBypass(peer.id),
+      promise: bypass.revokeBypass(peer.id),
       loadingMessage: "Revoking compliance bypass...",
     });
   };
@@ -122,8 +121,8 @@ export default function PeerActionCell() {
   //   • Revoke   — currently bypassed AND user can revoke
   const showApprove = needsApproval && !isAnyIntegrationEnabled && canApprove;
   const showBypass =
-    needsApproval && isAnyIntegrationEnabled && canBypass && !isBypassed;
-  const showRevokeBypass = isBypassed && canBypass;
+    needsApproval && isAnyIntegrationEnabled && false && !bypass.isBypassed(peer?.id);
+  const showRevokeBypass = bypass.isBypassed(peer?.id) && false;
   const showApprovalGroup = showApprove || showBypass || showRevokeBypass;
 
   const showSSHButton = useMemo(() => {
@@ -166,12 +165,12 @@ export default function PeerActionCell() {
       title: `Disable SSH Access?`,
       description: (
         <div>
-          Starting from NetBird v0.61.0, once SSH access is disabled, you cannot
+          Starting from NetBirdy v0.61.0, once SSH access is disabled, you cannot
           re-enable it again from the dashboard. You&apos;ll need to create an
-          explicit access control policy and update your NetBird client to
+          explicit access control policy and update your NetBirdy client to
           restore SSH functionality.{" "}
           <InlineLink
-            href={"https://docs.netbird.io/manage/peers/ssh"}
+            href={docsLink("https://docs.netbird.io/manage/peers/ssh")}
             target={"_blank"}
             onClick={(e) => e.stopPropagation()}
           >

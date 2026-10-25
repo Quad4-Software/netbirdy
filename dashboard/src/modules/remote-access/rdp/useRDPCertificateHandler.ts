@@ -38,7 +38,7 @@ export interface CertificateValidationResult {
   promptInfo?: CertificatePromptInfo;
 }
 
-const STORAGE_KEY = "netbird-rdp-trusted-certs";
+const STORAGE_KEY = "netbirdy-rdp-trusted-certs";
 
 export const useRDPCertificateHandler = () => {
   const [isValidating, setIsValidating] = useState(false);

@@ -158,7 +158,7 @@ export default function ReverseProxyHTTPTargets({
           }
         >
           There are currently no resources in your network{" "}
-          <span className={"text-netbird-100 font-medium"}>
+          <span className={"text-netbirdy-100 font-medium"}>
             {initialNetwork?.name}
           </span>
           . Add resources to your network before exposing it as a service.{" "}

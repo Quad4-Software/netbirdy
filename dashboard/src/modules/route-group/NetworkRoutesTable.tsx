@@ -154,7 +154,7 @@ export default function NetworkRoutesTable({
 
   // Default sorting state of the table
   const [sorting, setSorting] = useLocalStorage<SortingState>(
-    "netbird-table-sort" + path,
+    "netbirdy-table-sort" + path,
     [
       {
         id: "network_id",

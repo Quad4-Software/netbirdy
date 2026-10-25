@@ -1,10 +1,10 @@
 import { useMemo, useState } from "react";
+import { useReverseProxies } from "@/contexts/ReverseProxiesProvider";
 import {
   ReverseProxy,
   ReverseProxyDomain,
   ReverseProxyDomainType,
 } from "@/interfaces/ReverseProxy";
-import { useReverseProxies } from "@/contexts/ReverseProxiesProvider";
 
 // Helper to parse domain into subdomain and base domain.
 // When availableDomains is provided, matches against them first (longest match wins)

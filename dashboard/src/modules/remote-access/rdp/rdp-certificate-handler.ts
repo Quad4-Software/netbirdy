@@ -34,7 +34,7 @@ export interface CertificateHandler {
 }
 
 export class RDPCertificateHandler implements CertificateHandler {
-  private readonly STORAGE_KEY = "netbird-rdp-trusted-certs";
+  private readonly STORAGE_KEY = "netbirdy-rdp-trusted-certs";
   private modalElement: HTMLElement | null = null;
   /**
    * Handle RDCleanPath response containing server certificates

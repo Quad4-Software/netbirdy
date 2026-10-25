@@ -37,6 +37,7 @@ import { NetworkPolicyCell } from "@/modules/networks/table/NetworkPolicyCell";
 import { NetworkResourceCell } from "@/modules/networks/table/NetworkResourceCell";
 import NetworkRoutingPeerCell from "@/modules/networks/table/NetworkRoutingPeerCell";
 import { GlobalSearchModal } from "@/modules/search/GlobalSearchModal";
+import { docsLink } from "@/modules/docs/links";
 
 export const NetworkTableColumns: ColumnDef<Network>[] = [
   {
@@ -102,7 +103,7 @@ export default function NetworksTable({
 
   // Default sorting state of the table
   const [sorting, setSorting] = useLocalStorage<SortingState>(
-    "netbird-table-sort" + path,
+    "netbirdy-table-sort" + path,
     [
       {
         id: "name",
@@ -191,7 +192,7 @@ export default function NetworksTable({
                   <>
                     Learn more about
                     <InlineLink
-                      href={"https://docs.netbird.io/how-to/networks"}
+                      href={docsLink("https://docs.netbird.io/how-to/networks")}
                       target={"_blank"}
                     >
                       Networks

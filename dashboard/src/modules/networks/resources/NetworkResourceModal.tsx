@@ -1,8 +1,15 @@
 "use client";
 
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@components/Accordion";
 import Button from "@components/Button";
 import { Callout } from "@components/Callout";
 import HelpText from "@components/HelpText";
+import { HelpTooltip } from "@components/HelpTooltip";
 import InlineLink, { InlineButtonLink } from "@components/InlineLink";
 import { Input } from "@components/Input";
 import { Label } from "@components/Label";
@@ -15,33 +22,27 @@ import {
 import ModalHeader from "@components/modal/ModalHeader";
 import { notify } from "@components/Notification";
 import Paragraph from "@components/Paragraph";
-import { HelpTooltip } from "@components/HelpTooltip";
 import { PeerGroupSelector } from "@components/PeerGroupSelector";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@components/Tabs";
 import { useApiCall } from "@utils/api";
 import { normalizeHostCIDR } from "@utils/ip";
-import { useDialog } from "@/contexts/DialogProvider";
-import { usePolicies } from "@/contexts/PoliciesProvider";
-import { useNetworksContext } from "@/modules/networks/NetworkProvider";
 import {
   ExternalLinkIcon,
   PlusCircle,
   ShieldCheck,
   WorkflowIcon,
 } from "lucide-react";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@components/Accordion";
 import React, { useMemo, useRef, useState } from "react";
+import { useDialog } from "@/contexts/DialogProvider";
+import { usePolicies } from "@/contexts/PoliciesProvider";
 import { Group } from "@/interfaces/Group";
 import { Network, NetworkResource } from "@/interfaces/Network";
 import { Policy } from "@/interfaces/Policy";
 import useGroupHelper from "@/modules/groups/useGroupHelper";
+import { useNetworksContext } from "@/modules/networks/NetworkProvider";
 import NetworkResourceAccessControl from "@/modules/networks/resources/NetworkResourceAccessControl";
 import { ResourceSingleAddressInput } from "@/modules/networks/resources/ResourceSingleAddressInput";
+import { docsLink } from "@/modules/docs/links";
 
 type Props = {
   open?: boolean;
@@ -443,7 +444,7 @@ export function ResourceModalContent({
           <Paragraph className={"text-sm mt-auto"}>
             Learn more about
             <InlineLink
-              href={"https://docs.netbird.io/how-to/networks#resources"}
+              href={docsLink("https://docs.netbird.io/how-to/networks#resources")}
               target={"_blank"}
             >
               Resources

@@ -10,6 +10,7 @@ import Breadcrumbs from "@/components/Breadcrumbs";
 import InlineLink from "@/components/InlineLink";
 import { usePermissions } from "@/contexts/PermissionsProvider";
 import PageContainer from "@/layouts/PageContainer";
+import { docsLink } from "@/modules/docs/links";
 
 const GroupsTable = lazy(() => import("@/modules/groups/table/GroupsTable"));
 
@@ -33,7 +34,7 @@ export default function GroupsPage() {
         <Paragraph>
           Organize peers, users and resources into groups to manage access.{" "}
           <InlineLink
-            href={"https://docs.netbird.io/how-to/manage-network-access"}
+            href={docsLink("https://docs.netbird.io/how-to/manage-network-access")}
             target={"_blank"}
           >
             Learn more

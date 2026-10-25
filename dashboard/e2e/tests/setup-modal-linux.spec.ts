@@ -12,7 +12,7 @@ import { expect, test } from "@playwright/test";
 
 async function openLinuxManualInstall(page: import("@playwright/test").Page) {
   await page.goto("/install");
-  await page.getByTestId("setup-netbird-modal").waitFor();
+  await page.getByTestId("setup-netbirdy-modal").waitFor();
   await page.getByRole("tab", { name: /linux/i }).click();
   await page.getByText("Install manually with a package manager").click();
   await page.getByTestId("linux-distro-select").waitFor();
@@ -32,32 +32,32 @@ test.describe("Setup modal Linux distro instructions", () => {
   }) => {
     await openLinuxManualInstall(page);
 
-    const modal = page.getByTestId("setup-netbird-modal");
+    const modal = page.getByTestId("setup-netbirdy-modal");
     await expect(modal.getByTestId("linux-distro-select")).toContainText(
       "Debian / Ubuntu (APT)",
     );
     await expect(modal).toContainText(
       "https://pkgs.netbird.io/debian stable main",
     );
-    await expect(modal).toContainText("sudo apt-get install netbird");
+    await expect(modal).toContainText("sudo apt-get install netbirdy");
     await expect(modal).toContainText(
-      "sudo apt-get install netbird-ui libgtk-4-1 libwebkitgtk-6.0-4 xdg-utils",
+      "sudo apt-get install netbirdy-ui libgtk-4-1 libwebkitgtk-6.0-4 xdg-utils",
     );
     // The run step stays present alongside the distro-specific steps
-    await expect(modal.getByText("netbird up")).toHaveCount(2);
+    await expect(modal.getByText("netbirdy up")).toHaveCount(2);
   });
 
   test("switches repository and install commands per distro", async ({
     page,
   }) => {
     await openLinuxManualInstall(page);
-    const modal = page.getByTestId("setup-netbird-modal");
+    const modal = page.getByTestId("setup-netbirdy-modal");
 
     await selectDistro(page, "Fedora (DNF)");
-    await expect(modal).toContainText("/etc/yum.repos.d/netbird.repo");
-    await expect(modal).toContainText("sudo dnf install netbird");
+    await expect(modal).toContainText("/etc/yum.repos.d/netbirdy.repo");
+    await expect(modal).toContainText("sudo dnf install netbirdy");
     await expect(modal).toContainText(
-      "sudo dnf install netbird-ui gtk4 webkitgtk6.0 xdg-utils",
+      "sudo dnf install netbirdy-ui gtk4 webkitgtk6.0 xdg-utils",
     );
     await expect(modal).not.toContainText("apt-get");
     await expect(modal).not.toContainText("epel-release");
@@ -65,36 +65,36 @@ test.describe("Setup modal Linux distro instructions", () => {
     await selectDistro(page, "RHEL / AlmaLinux / Rocky (DNF)");
     await expect(modal).toContainText("sudo dnf install epel-release -y");
     await expect(modal).toContainText(
-      "sudo dnf install netbird-ui gtk4 webkitgtk6.0 xdg-utils",
+      "sudo dnf install netbirdy-ui gtk4 webkitgtk6.0 xdg-utils",
     );
   });
 
   test("imports the repository GPG key on openSUSE", async ({ page }) => {
     await openLinuxManualInstall(page);
-    const modal = page.getByTestId("setup-netbird-modal");
+    const modal = page.getByTestId("setup-netbirdy-modal");
 
     await selectDistro(page, "openSUSE (Zypper)");
     await expect(modal).toContainText(
-      "sudo zypper --non-interactive addrepo -f -g https://pkgs.netbird.io/yum/ netbird",
+      "sudo zypper --non-interactive addrepo -f -g https://pkgs.netbird.io/yum/ netbirdy",
     );
     await expect(modal).toContainText(
-      "sudo zypper --gpg-auto-import-keys refresh netbird",
+      "sudo zypper --gpg-auto-import-keys refresh netbirdy",
     );
-    await expect(modal).toContainText("sudo zypper install netbird");
+    await expect(modal).toContainText("sudo zypper install netbirdy");
     await expect(modal).toContainText(
-      "sudo zypper install netbird-ui libgtk-4-1 libwebkitgtk-6_0-4 xdg-utils",
+      "sudo zypper install netbirdy-ui libgtk-4-1 libwebkitgtk-6_0-4 xdg-utils",
     );
     // Zypper ignores gpgkey= in a .repo file, so that snippet must not appear
-    await expect(modal).not.toContainText("/etc/yum.repos.d/netbird.repo");
+    await expect(modal).not.toContainText("/etc/yum.repos.d/netbirdy.repo");
   });
 
   test("offers CLI only on Amazon Linux", async ({ page }) => {
     await openLinuxManualInstall(page);
-    const modal = page.getByTestId("setup-netbird-modal");
+    const modal = page.getByTestId("setup-netbirdy-modal");
 
     await selectDistro(page, "Amazon Linux (YUM)");
-    await expect(modal).toContainText("sudo yum install netbird");
-    await expect(modal).not.toContainText("netbird-ui");
+    await expect(modal).toContainText("sudo yum install netbirdy");
+    await expect(modal).not.toContainText("netbirdy-ui");
     await expect(modal).not.toContainText("for CLI only");
     await expect(modal).toContainText("only the CLI is available");
   });
@@ -105,7 +105,7 @@ test.describe("Setup modal Linux distro instructions", () => {
   }) => {
     await context.grantPermissions(["clipboard-read", "clipboard-write"]);
     await openLinuxManualInstall(page);
-    const modal = page.getByTestId("setup-netbird-modal");
+    const modal = page.getByTestId("setup-netbirdy-modal");
 
     // Copy buttons in DOM order: install script, run command, repository,
     // install step, run command (accordion).
@@ -114,8 +114,8 @@ test.describe("Setup modal Linux distro instructions", () => {
     expect(copied, "clipboard should hold runnable commands only").toBe(
       [
         "sudo apt-get update",
-        "sudo apt-get install netbird",
-        "sudo apt-get install netbird-ui libgtk-4-1 libwebkitgtk-6.0-4 xdg-utils",
+        "sudo apt-get install netbirdy",
+        "sudo apt-get install netbirdy-ui libgtk-4-1 libwebkitgtk-6.0-4 xdg-utils",
       ].join("\n"),
     );
   });

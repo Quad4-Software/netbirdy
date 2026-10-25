@@ -1,6 +1,7 @@
 import Badge from "@components/Badge";
 import Button from "@components/Button";
 import FullTooltip from "@components/FullTooltip";
+import { cn } from "@utils/helpers";
 import { Settings, ShieldIcon, ShieldOff, SquarePenIcon } from "lucide-react";
 import * as React from "react";
 import { useState } from "react";
@@ -10,7 +11,6 @@ import { usePermissions } from "@/contexts/PermissionsProvider";
 import { NetworkResource } from "@/interfaces/Network";
 import { Policy } from "@/interfaces/Policy";
 import { useNetworksContext } from "@/modules/networks/NetworkProvider";
-import { cn } from "@utils/helpers";
 
 type Props = {
   resource?: NetworkResource;

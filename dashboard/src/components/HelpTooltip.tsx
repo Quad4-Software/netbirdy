@@ -1,8 +1,8 @@
-import * as React from "react";
 import FullTooltip from "@components/FullTooltip";
-import { HelpCircle } from "lucide-react";
-import { cn } from "@utils/helpers";
 import { TooltipVariants } from "@components/Tooltip";
+import { cn } from "@utils/helpers";
+import { HelpCircle } from "lucide-react";
+import * as React from "react";
 
 type Props = {
   content: React.ReactNode;

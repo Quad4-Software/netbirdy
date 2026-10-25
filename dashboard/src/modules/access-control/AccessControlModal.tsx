@@ -57,6 +57,7 @@ import { SSHAuthorizedGroups } from "@/modules/access-control/ssh/SSHAuthorizedG
 import { useAccessControl } from "@/modules/access-control/useAccessControl";
 import { PostureCheckTab } from "@/modules/posture-checks/ui/PostureCheckTab";
 import { PostureCheckTabTrigger } from "@/modules/posture-checks/ui/PostureCheckTabTrigger";
+import { docsLink } from "@/modules/docs/links";
 
 type Props = {
   children?: React.ReactNode;
@@ -288,7 +289,7 @@ export function AccessControlModalContent({
   return (
     <ModalContent maxWidthClass={"max-w-3xl"}>
       <ModalHeader
-        icon={<AccessControlIcon className={"fill-netbird"} />}
+        icon={<AccessControlIcon className={"fill-netbirdy"} />}
         title={
           <span
             data-testid={
@@ -303,7 +304,7 @@ export function AccessControlModalContent({
         description={
           "Use this policy to restrict access to groups of resources."
         }
-        color={"netbird"}
+        color={"netbirdy"}
       />
 
       <Tabs defaultValue={tab} onValueChange={(v) => setTab(v)} value={tab}>
@@ -317,7 +318,7 @@ export function AccessControlModalContent({
             <Text
               size={16}
               className={
-                "text-nb-gray-500 group-data-[state=active]/trigger:text-netbird transition-all"
+                "text-nb-gray-500 group-data-[state=active]/trigger:text-netbirdy transition-all"
               }
             />
             Name & Description
@@ -335,8 +336,8 @@ export function AccessControlModalContent({
                 <HelpText className={"max-w-sm"}>
                   Allow only specified network protocols. To change traffic
                   direction and ports, select{" "}
-                  <b className={"text-white"}>TCP</b> or{" "}
-                  <b className={"text-white"}>UDP</b> protocol.
+                  <b className={"text-gray-900 dark:text-white"}>TCP</b> or{" "}
+                  <b className={"text-gray-900 dark:text-white"}>UDP</b> protocol.
                 </HelpText>
               </div>
               <Select
@@ -361,7 +362,7 @@ export function AccessControlModalContent({
                   <SelectItem value="udp">UDP</SelectItem>
                   <SelectItem value="icmp">ICMP</SelectItem>
                   <SelectItem
-                    value="netbird-ssh"
+                    value="netbirdy-ssh"
                     extra={
                       <HelpTooltip
                         triggerClassName={"ml-[0.01rem]"}
@@ -369,7 +370,7 @@ export function AccessControlModalContent({
                         side={"right"}
                         content={
                           <>
-                            Select NetBird SSH for SSH-specific policies with
+                            Select NetBirdy SSH for SSH-specific policies with
                             fine-grained access control, or use TCP with port 22
                             for basic network-level SSH access
                           </>
@@ -377,7 +378,7 @@ export function AccessControlModalContent({
                       />
                     }
                   >
-                    NetBird SSH
+                    NetBirdy SSH
                   </SelectItem>
                 </SelectContent>
               </Select>
@@ -402,15 +403,15 @@ export function AccessControlModalContent({
                   data-testid={"source-group-selector"}
                   popoverWidth={500}
                   placeholder={"Select source(s)..."}
-                  showRoutes={protocol !== "netbird-ssh"}
+                  showRoutes={protocol !== "netbirdy-ssh"}
                   showResources={false}
-                  showPeers={protocol !== "netbird-ssh"}
+                  showPeers={protocol !== "netbirdy-ssh"}
                   showResourceCounter={false}
                   showPeerCount={allowEditPeers}
                   disableInlineRemoveGroup={false}
                   values={sourceGroups}
                   onChange={setSourceGroups}
-                  users={protocol === "netbird-ssh" ? users : undefined}
+                  users={protocol === "netbirdy-ssh" ? users : undefined}
                   resource={sourceResource}
                   onResourceChange={setSourceResource}
                   additionalPeers={additionalPeers}
@@ -447,7 +448,7 @@ export function AccessControlModalContent({
                   popoverWidth={500}
                   placeholder={"Select destination(s)..."}
                   showRoutes={true}
-                  showResources={protocol !== "netbird-ssh"}
+                  showResources={protocol !== "netbirdy-ssh"}
                   showPeers={!destinationScope}
                   resourceIds={destinationScope?.resourceIds}
                   groupIds={destinationScope?.groupIds}
@@ -479,7 +480,7 @@ export function AccessControlModalContent({
                   icon={
                     <AlertCircleIcon
                       size={14}
-                      className={"shrink-0 relative top-[3px] text-netbird"}
+                      className={"shrink-0 relative top-[3px] text-netbirdy"}
                     />
                   }
                   className="mb-4"
@@ -489,7 +490,7 @@ export function AccessControlModalContent({
                 </Callout>
               )}
 
-            {protocol === "netbird-ssh" ? (
+            {protocol === "netbirdy-ssh" ? (
               <div>
                 {destinationHasResources && (
                   <Callout
@@ -497,7 +498,7 @@ export function AccessControlModalContent({
                     icon={
                       <AlertCircleIcon
                         size={14}
-                        className={"shrink-0 relative top-[3px] text-netbird"}
+                        className={"shrink-0 relative top-[3px] text-netbirdy"}
                       />
                     }
                     className="mb-6"
@@ -630,7 +631,7 @@ export function AccessControlModalContent({
           <Paragraph className={"text-sm mt-auto"}>
             Learn more about
             <InlineLink
-              href={"https://docs.netbird.io/how-to/manage-network-access"}
+              href={docsLink("https://docs.netbird.io/how-to/manage-network-access")}
               target={"_blank"}
             >
               Access Controls

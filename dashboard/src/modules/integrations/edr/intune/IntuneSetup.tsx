@@ -121,7 +121,7 @@ export function SetupContent({ onSuccess, account }: Readonly<ModalProps>) {
 
     notify({
       title: "Intune Integration",
-      description: `Intune was successfully connected to NetBird.`,
+      description: `Intune was successfully connected to NetBirdy.`,
       promise: intuneRequest
         .post({
           secret: clientSecret,
@@ -157,7 +157,7 @@ export function SetupContent({ onSuccess, account }: Readonly<ModalProps>) {
               key={index}
               className={cn(
                 "w-8 h-1 rounded-full bg-nb-gray-800",
-                step >= index + 1 && "bg-netbird",
+                step >= index + 1 && "bg-netbirdy",
               )}
             />
           ))}
@@ -166,7 +166,7 @@ export function SetupContent({ onSuccess, account }: Readonly<ModalProps>) {
 
       <IntegrationModalHeader
         image={integrationImage}
-        title={"Connect NetBird with Intune"}
+        title={"Connect NetBirdy with Intune"}
         description={
           "Restrict network access to IT-managed devices marked Compliant in Intune. Follow the steps below to get started."
         }
@@ -265,7 +265,7 @@ export function SetupContent({ onSuccess, account }: Readonly<ModalProps>) {
             data={[
               {
                 label: "Name",
-                value: "NetBird",
+                value: "NetBirdy",
               },
               {
                 label: "Account Types",
@@ -334,7 +334,7 @@ export function SetupContent({ onSuccess, account }: Readonly<ModalProps>) {
             </Steps.Step>
             <Steps.Step step={3}>
               <p className={"font-normal"}>
-                Add <Mark copy>NetBird</Mark> as the description and click{" "}
+                Add <Mark copy>NetBirdy</Mark> as the description and click{" "}
                 <Mark>Add</Mark>
               </p>
             </Steps.Step>
@@ -384,7 +384,7 @@ export function SetupContent({ onSuccess, account }: Readonly<ModalProps>) {
             </Steps.Step>
             <Steps.Step step={2} line={false}>
               <p className={"font-normal"}>
-                Select <Mark>NetBird</Mark> application in overview page and
+                Select <Mark>NetBirdy</Mark> application in overview page and
                 enter your <Mark>Application (client) ID</Mark> and{" "}
                 <Mark>Directory (tenant) ID</Mark>
               </p>

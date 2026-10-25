@@ -94,7 +94,7 @@ async function loginAndSave(
   // - the app directly (redirect to localhost:1337)
   const skipButton = page.locator("button[name=skip]");
   const appNav = page.getByTestId("left-navigation-item").first();
-  const modal = page.getByTestId("setup-netbird-modal");
+  const modal = page.getByTestId("setup-netbirdy-modal");
   const approval = page.getByTestId("pending-approval");
 
   let after_login: "2fa" | "app" | "modal" | "approval";

@@ -8,7 +8,7 @@ import { useProviderCatalog } from "@/modules/agent-network/useProviderCatalog";
 
 type Props = {
   // Catalog provider id to badge. Undefined renders the neutral "?" badge —
-  // for requests NetBird can't attribute to any provider (e.g. rejected
+  // for requests NetBirdy can't attribute to any provider (e.g. rejected
   // before the router picked one).
   providerId?: AIProviderId;
   size?: number;

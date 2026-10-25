@@ -8,13 +8,13 @@ import {
 import ModalHeader from "@components/modal/ModalHeader";
 import { notify } from "@components/Notification";
 import { PeerGroupSelector } from "@components/PeerGroupSelector";
+import Separator from "@components/Separator";
 import { useApiCall } from "@utils/api";
+import { FolderGit2 } from "lucide-react";
 import * as React from "react";
 import { Network, NetworkResource } from "@/interfaces/Network";
 import useGroupHelper from "@/modules/groups/useGroupHelper";
 import { useNetworksContext } from "@/modules/networks/NetworkProvider";
-import { FolderGit2 } from "lucide-react";
-import Separator from "@components/Separator";
 
 type ResourceGroupModalProps = {
   resource?: NetworkResource;

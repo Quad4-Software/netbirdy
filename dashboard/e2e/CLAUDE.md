@@ -1,6 +1,6 @@
 # Playwright E2E Testing Guide
 
-Complete reference for writing, running, and debugging Playwright E2E tests in the NetBird Dashboard.
+Complete reference for writing, running, and debugging Playwright E2E tests in the NetBirdy Dashboard.
 
 ## Philosophy
 
@@ -31,7 +31,7 @@ Config: `e2e/playwright.config.ts` (baseURL: `http://localhost:1337`). Auth: `e2
 ### Running against a deployed dashboard
 
 Set `NETBIRD_E2E_BASE_URL` to run the suite against an already-deployed dashboard
-(the pre-release tests do this against a self-hosted `netbird-server`):
+(the pre-release tests do this against a self-hosted `netbirdy-server`):
 
 ```bash
 NETBIRD_E2E_BASE_URL=https://nb.example.com \
@@ -47,15 +47,15 @@ test by what it needs from the environment, and the config skips it on a deploye
 
 | Tag | Needs |
 | --- | --- |
-| `@test-build` | `netbird-test-*` localStorage hooks or other `APP_ENV=test` code |
+| `@test-build` | `netbirdy-test-*` localStorage hooks or other `APP_ENV=test` code |
 | `@test-env` | the local docker environment: docker peers, proxy clusters, the second Zitadel user |
-| `@cloud` | a NetBird Cloud management API |
+| `@cloud` | a NetBirdy Cloud management API |
 | `@docker` | a local docker daemon to run a peer (not skipped; set `NETBIRD_E2E_PEER_IMAGE` to test a specific client) |
 | `@enterprise` | an Enterprise dashboard (skipped with `NETBIRD_E2E_EDITION=community`) |
 
 State that only lives in React (the Control Center draft changeset and canvas) is mirrored onto
 `window` when `e2eHooksEnabled()` is true: always in test builds, and in production builds once
-`openControlCenter()` sets the `netbird-e2e-hooks` localStorage flag. Prefer that over a `@test-build`
+`openControlCenter()` sets the `netbirdy-e2e-hooks` localStorage flag. Prefer that over a `@test-build`
 tag for new hooks. `readDraftChanges()` and `readDraftCanvas()` skip the test on older dashboards
 that do not expose them.
 

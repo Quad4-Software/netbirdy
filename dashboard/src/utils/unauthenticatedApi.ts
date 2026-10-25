@@ -5,7 +5,7 @@ import {
   SetupRequest,
   SetupResponse,
 } from "@/interfaces/Instance";
-import { UserInviteInfo, UserInviteAcceptResponse } from "@/interfaces/User";
+import { UserInviteAcceptResponse,UserInviteInfo } from "@/interfaces/User";
 
 const config = loadConfig();
 

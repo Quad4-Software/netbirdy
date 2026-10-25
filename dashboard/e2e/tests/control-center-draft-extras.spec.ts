@@ -1,11 +1,11 @@
 import { expect } from "@playwright/test";
-import { test } from "../helpers/fixtures";
 import {
   canvasNode,
   createViaCanvasMenu,
   enterDraft,
   resetDraftState,
 } from "../helpers/control-center";
+import { test } from "../helpers/fixtures";
 
 test.describe.serial("Control Center Draft Extras @control-center", () => {
   test.beforeEach(async ({ dashboardAsOwner: page }) => {

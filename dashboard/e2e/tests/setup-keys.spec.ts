@@ -1,7 +1,7 @@
-import { test, expect } from "../helpers/fixtures";
-import { navigateTo } from "../helpers/auth";
-import { clearScrollLock, generateRandomName } from "../helpers/utils";
 import { deleteGroupsByPrefix, deleteSetupKeysByPrefix } from "../helpers/api";
+import { navigateTo } from "../helpers/auth";
+import { expect,test } from "../helpers/fixtures";
+import { clearScrollLock, generateRandomName } from "../helpers/utils";
 
 let setupKeys: string[] = [];
 let setupKeysCreatedGroups: string[] = [];

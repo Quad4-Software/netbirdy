@@ -4,10 +4,7 @@ import { Trash2Icon } from "lucide-react";
 import * as React from "react";
 import { useState } from "react";
 import Skeleton from "react-loading-skeleton";
-import { useIsFeatureLocked } from "@/cloud/cloud-hooks/useIsFeatureLocked";
 import { PostureCheck } from "@/interfaces/PostureCheck";
-import { LockedFeatureBadge } from "@/modules/billing/locked-feature/LockedFeatureBadge";
-import { LockedFeatureOverlay } from "@/modules/billing/locked-feature/LockedFeatureOverlay";
 import { PostureCheckBrowseModal } from "@/modules/posture-checks/modal/PostureCheckBrowseModal";
 import PostureCheckModal from "@/modules/posture-checks/modal/PostureCheckModal";
 import PostureCheckMinimalTable from "@/modules/posture-checks/table/PostureCheckMinimalTable";
@@ -48,7 +45,7 @@ export const PostureCheckTab = ({
   const [browseModal, setBrowseModal] = useState(false);
   const [currentEditCheck, setCurrentEditCheck] = useState<PostureCheck>();
 
-  const isLocked = useIsFeatureLocked("POSTURE_CHECKS");
+  const isLocked = { isLocked: false, isChecking: false };
 
   const removeAllChecks = () => {
     setPostureChecks([]);
@@ -74,12 +71,7 @@ export const PostureCheckTab = ({
           )}
         >
           <div className={"flex items-center flex-col"}>
-            <LockedFeatureBadge
-              position={"relative"}
-              side={"bottom"}
-              featureText={"Posture Checks"}
-              feature={"POSTURE_CHECKS"}
-            />
+            
             {postureChecks.length > 0 && (
               <button
                 onClick={removeAllChecks}
@@ -95,51 +87,6 @@ export const PostureCheckTab = ({
         </div>
       )}
 
-      {!isLoading && (
-        <LockedFeatureOverlay
-          opacity={postureChecks.length > 0 ? 35 : 60}
-          feature={"POSTURE_CHECKS"}
-        >
-          {checkModal && (
-            <PostureCheckModal
-              open={checkModal}
-              onOpenChange={setCheckModal}
-              onSuccess={(check) => {
-                addPostureChecks([check]);
-                setCheckModal(false);
-              }}
-              postureCheck={currentEditCheck}
-            />
-          )}
-
-          {browseModal && (
-            <PostureCheckBrowseModal
-              open={browseModal}
-              onOpenChange={setBrowseModal}
-              onSuccess={(check) => addPostureChecks(check)}
-            />
-          )}
-
-          <div className={"flex flex-col gap-3"}>
-            <PostureCheckMinimalTable
-              data={postureChecks}
-              onEditClick={(check) => {
-                setCurrentEditCheck(check);
-                setCheckModal(true);
-              }}
-              onAddClick={() => {
-                setCurrentEditCheck(undefined);
-                setCheckModal(true);
-              }}
-              onBrowseClick={() => {
-                setCurrentEditCheck(undefined);
-                setBrowseModal(true);
-              }}
-              onRemoveClick={removePostureCheck}
-            />
-          </div>
-        </LockedFeatureOverlay>
-      )}
     </TabsContent>
   );
 };

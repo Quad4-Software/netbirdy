@@ -139,7 +139,7 @@ export const Sliding: StoryObj = {
             title={"Routing peer"}
             description={"Route traffic through one peer."}
             icon={<MonitorSmartphoneIcon size={16} />}
-            iconClass={"bg-gradient-to-tr from-netbird-500 to-netbird-400"}
+            iconClass={"bg-gradient-to-tr from-netbirdy-500 to-netbirdy-400"}
           />
           <SlidingTabsTrigger
             value={"group"}

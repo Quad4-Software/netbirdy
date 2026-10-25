@@ -16,11 +16,11 @@ import {
   FleetDMIntegration,
   FleetDMMatchAttributes,
 } from "@/interfaces/EDR";
+import { Group } from "@/interfaces/Group";
 import FleetDMConfiguration from "@/modules/integrations/edr/fleetdm/FleetDMConfiguration";
 import FleetDMSetup from "@/modules/integrations/edr/fleetdm/FleetDMSetup";
 import { useIntegrations } from "@/modules/integrations/edr/useIntegrations";
 import { IntegrationCard } from "@/modules/integrations/IntegrationCard";
-import { Group } from "@/interfaces/Group";
 
 type Props = {
   account: Account;

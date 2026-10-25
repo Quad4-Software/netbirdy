@@ -31,14 +31,14 @@ const badgeVariants = [
   "grayer",
   "gray-ghost",
   "green",
-  "netbird",
+  "netbirdy",
 ] as const;
 const smallBadgeVariants = [
   "green",
   "blue",
   "white",
   "sky",
-  "netbird",
+  "netbirdy",
   "yellow",
 ] as const;
 

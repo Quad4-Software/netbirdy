@@ -16,11 +16,11 @@ import {
   IdentityProviderLog,
   ScimIntegration,
 } from "@/interfaces/IdentityProvider";
+import EntraSCIMSetup from "@/modules/integrations/idp-sync/entra-scim/EntraSCIMSetup";
 import GenericSCIMConfiguration from "@/modules/integrations/idp-sync/generic-scim/GenericSCIMConfiguration";
 import GenericSCIMSetup from "@/modules/integrations/idp-sync/generic-scim/GenericSCIMSetup";
 import { useIntegrations } from "@/modules/integrations/idp-sync/useIntegrations";
 import { IntegrationCard } from "@/modules/integrations/IntegrationCard";
-import EntraSCIMSetup from "@/modules/integrations/idp-sync/entra-scim/EntraSCIMSetup";
 
 export interface GenericSCIMProps {
   name?: string;

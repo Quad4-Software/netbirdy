@@ -126,7 +126,7 @@ export const AddServiceDomainSelector: Story = {
 /* Only the shared EU cluster supports custom ports, which unlocks the TCP/UDP/TLS modes. */
 async function addServiceOnSharedCluster() {
   await AddServiceDomainSelector.play!({} as never);
-  await clickTextIn(popover(), /^\.?eu\.proxy\.netbird\.io$/);
+  await clickTextIn(popover(), /^\.?eu\.proxy\.netbirdy\.io$/);
   await type(
     (await dialog()).querySelector("[data-testid=proxy-subdomain-input]"),
     "myapp",
@@ -244,7 +244,7 @@ export const EditAuthSSO = authStory("sso");
 export const EditAuthPassword = authStory("password", "svc-wiki");
 export const EditAuthPin = authStory("pin", "svc-wiki");
 export const EditAuthHeader = authStory("header", "svc-long");
-export const EditAuthNetBirdOnly = authStory("netbird-only");
+export const EditAuthNetBirdOnly = authStory("netbirdy-only");
 
 export const EditAccessControl: Story = {
   play: async () => {

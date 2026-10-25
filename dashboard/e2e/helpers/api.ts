@@ -30,7 +30,7 @@ export async function getApiContext(
           resp.status() === 200 &&
           !!req.headers()["authorization"];
         if (debugApi) {
-          // eslint-disable-next-line no-console
+           
           console.log(
             `[api-context] ${req.method()} ${resp.status()} ${resp.url()} ${
               isMatch ? "← MATCH" : "(skipped)"
@@ -474,7 +474,7 @@ export async function waitForProxyClustersOnline(
   let last: ReverseProxyCluster[] = [];
   while (Date.now() < deadline) {
     last = await listReverseProxyClusters(page).catch((err) => {
-      // eslint-disable-next-line no-console
+       
       console.warn(
         `[clusters-gate] list call failed: ${(err as Error).message}`,
       );

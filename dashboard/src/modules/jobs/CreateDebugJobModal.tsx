@@ -110,7 +110,7 @@ export function CreateDebugJobModalContent({ peerID, onSuccess }: Props) {
         icon={<BugPlay size={20} />}
         title="Debug Bundle"
         description="Generate a debug bundle on this peer with logs and diagnostics. Useful for troubleshooting without CLI access."
-        color="netbird"
+        color="netbirdy"
       />
 
       <Separator />

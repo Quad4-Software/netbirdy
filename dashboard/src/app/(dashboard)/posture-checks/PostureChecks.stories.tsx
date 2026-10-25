@@ -66,7 +66,7 @@ export const CreateModal: Story = {
   play: async () => {
     await ready();
     await clickText("Add Posture Check");
-    await findText("NetBird Client Version");
+    await findText("NetBirdy Client Version");
   },
 };
 
@@ -81,7 +81,7 @@ export const EditModalNameTab: Story = {
 };
 
 export const NetBirdVersionCheck: Story = {
-  play: openCheck("NetBird Client Version"),
+  play: openCheck("NetBirdy Client Version"),
 };
 
 export const CountryRegionCheck: Story = {

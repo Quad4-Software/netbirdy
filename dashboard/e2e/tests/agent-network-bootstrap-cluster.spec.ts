@@ -19,7 +19,7 @@
 import { type Browser, expect, type Page, test } from "@playwright/test";
 import { loginToApp } from "../helpers/auth";
 
-const AGENT_NETWORK_CONFIG_KEY = "netbird-test-agent-network";
+const AGENT_NETWORK_CONFIG_KEY = "netbirdy-test-agent-network";
 
 // Listed first, and unusable: a centralised proxy cluster. Picking it is the
 // bug this spec guards against.

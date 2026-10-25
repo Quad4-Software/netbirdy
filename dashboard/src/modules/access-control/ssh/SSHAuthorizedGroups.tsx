@@ -1,13 +1,13 @@
+import { Callout } from "@components/Callout";
+import GroupBadge from "@components/ui/GroupBadge";
+import { cn } from "@utils/helpers";
 import { InfoIcon } from "lucide-react";
 import React, { useCallback, useEffect, useMemo } from "react";
+import { useUsers } from "@/contexts/UsersProvider";
 import { Group } from "@/interfaces/Group";
 import { AuthorizedGroups } from "@/interfaces/Policy";
-import GroupBadge from "@components/ui/GroupBadge";
-import { HorizontalUsersStack } from "@/modules/users/HorizontalUsersStack";
-import { useUsers } from "@/contexts/UsersProvider";
-import { cn } from "@utils/helpers";
-import { Callout } from "@components/Callout";
 import { SSHUsernameSelector } from "@/modules/access-control/ssh/SSHUsernameSelector";
+import { HorizontalUsersStack } from "@/modules/users/HorizontalUsersStack";
 
 type Props = {
   sourceGroups?: Group[];

@@ -1,16 +1,16 @@
-# NetBird Dashboard
+# NetBirdy Dashboard
 
-This project is the UI for NetBird's Management service.
+This project is the UI for NetBirdy's Management service.
 
 **Hosted version:** https://app.netbird.io/
 
-See [NetBird repo](https://github.com/netbirdio/netbird)
+See [NetBirdy repo](https://github.com/netbirdio/netbird)
 
 ## Reporting bugs and requesting features
 
-NetBird uses a discussion-first workflow across all its repositories. Bug reports and
+NetBirdy uses a discussion-first workflow across all its repositories. Bug reports and
 feature requests for the dashboard start in
-[netbird Discussions](https://github.com/netbirdio/netbird/discussions), not as issues here.
+[netbirdy Discussions](https://github.com/netbirdio/netbird/discussions), not as issues here.
 
 | What you want to do | Where to go |
 | --- | --- |
@@ -26,7 +26,7 @@ for the full workflow.
 
 ## Why?
 
-The purpose of this project is simple - make it easy to manage VPN built with [NetBird](https://github.com/netbirdio/netbird).
+The purpose of this project is simple - make it easy to manage VPN built with [NetBirdy](https://github.com/netbirdio/netbird).
 The dashboard makes it possible to:
 
 - track the status of your peers
@@ -59,13 +59,13 @@ Auth0 so far is the only 3rd party dependency that can't be really self-hosted.
 
 1. Install [Docker](https://docs.docker.com/get-docker/)
 2. Register [Auth0](https://auth0.com/) account
-3. Running NetBird UI Dashboard requires the following Auth0 environmental variables to be set (see docker command below):
+3. Running NetBirdy UI Dashboard requires the following Auth0 environmental variables to be set (see docker command below):
 
    `AUTH0_DOMAIN` `AUTH0_CLIENT_ID` `AUTH0_AUDIENCE`
 
    To obtain these, please use [Auth0 React SDK Guide](https://auth0.com/docs/quickstart/spa/react) up until "Configure Allowed Web Origins"
 
-4. NetBird UI Dashboard uses NetBird's Management Service HTTP API, so setting `NETBIRD_MGMT_API_ENDPOINT` is required. Most likely it will be `http://localhost:33071` if you are hosting Management API on the same server.
+4. NetBirdy UI Dashboard uses NetBirdy's Management Service HTTP API, so setting `NETBIRD_MGMT_API_ENDPOINT` is required. Most likely it will be `http://localhost:33071` if you are hosting Management API on the same server.
 5. Run docker container without SSL (Let's Encrypt):
 
    ```shell
@@ -97,8 +97,8 @@ Auth0 so far is the only 3rd party dependency that can't be really self-hosted.
 
 1. Install [Node](https://nodejs.org/)
 2. Create and update the `.local-config.json` file. This file should contain values to be replaced from `config.json`
-3. Run `npm install` to install dependencies
-4. Run `npm run dev` to start the development server
+3. Install dependencies from the repo root with `pnpm install --frozen-lockfile` (pnpm 12.14.0: `npm install -g pnpm@12.14.0` or corepack)
+4. Run `pnpm --filter netbirdy-dashboard dev` to start the development server
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 

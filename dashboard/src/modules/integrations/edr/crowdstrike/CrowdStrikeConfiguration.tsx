@@ -190,7 +190,7 @@ export function ConfigurationContent({ onSuccess, config }: ModalProps) {
             <IconDevicesCheck
               size={16}
               className={
-                "text-nb-gray-500 group-data-[state=active]/trigger:text-netbird transition-all"
+                "text-nb-gray-500 group-data-[state=active]/trigger:text-netbirdy transition-all"
               }
             />
             Peer Approval
@@ -199,7 +199,7 @@ export function ConfigurationContent({ onSuccess, config }: ModalProps) {
             <Cog
               size={16}
               className={
-                "text-nb-gray-500 group-data-[state=active]/trigger:text-netbird transition-all"
+                "text-nb-gray-500 group-data-[state=active]/trigger:text-netbirdy transition-all"
               }
             />
             Settings
@@ -208,7 +208,7 @@ export function ConfigurationContent({ onSuccess, config }: ModalProps) {
             <AlertOctagon
               size={16}
               className={
-                "text-nb-gray-500 group-data-[state=active]/trigger:text-netbird transition-all"
+                "text-nb-gray-500 group-data-[state=active]/trigger:text-netbirdy transition-all"
               }
             />
             Danger Zone

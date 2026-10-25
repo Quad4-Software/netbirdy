@@ -12,13 +12,13 @@ import ActivityDescription from "@/modules/activity/ActivityDescription";
 import ActivityTypeIcon from "@/modules/activity/ActivityTypeIcon";
 import { getColorFromCode } from "@/modules/activity/utils";
 
-export type ActionColor = "green" | "red" | "blue-darker" | "netbird";
+export type ActionColor = "green" | "red" | "blue-darker" | "netbirdy";
 
 const ActionIcons: Record<ActionColor, React.ReactNode> = {
   green: <PlusIcon size={12} />,
   red: <XIcon size={12} />,
   "blue-darker": <ArrowUpRight size={12} />,
-  netbird: <AlertCircle size={12} />,
+  netbirdy: <AlertCircle size={12} />,
 };
 
 export const ActivityEntryRow = ({ event }: { event: ActivityEvent }) => {
@@ -70,7 +70,7 @@ export const ActivityEntryRow = ({ event }: { event: ActivityEvent }) => {
             color == "red" && "bg-red-950 text-red-500 ",
             color == "green" && "bg-green-950 text-green-400 ",
             color == "blue-darker" && "bg-sky-950 text-sky-500 ",
-            color == "netbird" && "bg-netbird-950 text-netbird-500",
+            color == "netbirdy" && "bg-netbirdy-950 text-netbirdy-500",
           )}
         >
           {color && ActionIcons[color as ActionColor]}

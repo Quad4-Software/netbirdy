@@ -38,10 +38,10 @@ export default function AgentGuardrailChecksCell({
             >
               <div
                 className={
-                  "bg-gradient-to-tr from-netbird-200 to-netbird-100 h-8 w-8 rounded-full flex items-center justify-center relative z-[10] hover:scale-[1.1] transition-all"
+                  "bg-gradient-to-tr from-netbirdy-200 to-netbirdy-100 h-8 w-8 rounded-full flex items-center justify-center relative z-[10] hover:scale-[1.1] transition-all"
                 }
               >
-                <Boxes size={14} className={"text-netbird-950"} />
+                <Boxes size={14} className={"text-netbirdy-950"} />
               </div>
             </FullTooltip>
           )}

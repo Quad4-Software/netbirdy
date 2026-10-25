@@ -130,7 +130,7 @@ export const DisabledPolicy: Story = {
 
 export const NetBirdSSHPolicy: Story = {
   play: async () => {
-    await openPolicy("NetBird SSH for DevOps");
+    await openPolicy("NetBirdy SSH for DevOps");
   },
 };
 
@@ -162,7 +162,7 @@ export const NewPostureCheckFromPolicy: Story = {
     await openPolicy("Developers to Servers");
     await clickTab(/Posture Checks/);
     await clickText("New Posture Check");
-    await findText("NetBird Client Version");
+    await findText("NetBirdy Client Version");
   },
 };
 

@@ -1,21 +1,23 @@
 import Button from "@components/Button";
 import { Callout } from "@components/Callout";
-import { notify } from "@components/Notification";
 import CardTable from "@components/CardTable";
 import Code from "@components/Code";
 import HelpText from "@components/HelpText";
+import InlineLink from "@components/InlineLink";
 import { Input } from "@components/Input";
 import { Label } from "@components/Label";
-import InlineLink from "@components/InlineLink";
 import {
   Modal,
   ModalClose,
   ModalContent,
   ModalFooter,
 } from "@components/modal/Modal";
-import Paragraph from "@components/Paragraph";
 import ModalHeader from "@components/modal/ModalHeader";
+import { notify } from "@components/Notification";
+import Paragraph from "@components/Paragraph";
+import { SelectDropdown } from "@components/select/SelectDropdown";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@components/Tabs";
+import { cn, validator } from "@utils/helpers";
 import {
   ExternalLinkIcon,
   GlobeIcon,
@@ -26,10 +28,12 @@ import {
 } from "lucide-react";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useSWRConfig } from "swr";
-import { useApiCall } from "@/utils/api";
-import { cn, validator } from "@utils/helpers";
-import { GRPC_API_ORIGIN, isNetBirdCloud } from "@/utils/netbird";
-import { SelectDropdown } from "@components/select/SelectDropdown";
+import AWSIcon from "@/assets/icons/AWSIcon";
+import DigitalOceanIcon from "@/assets/icons/DigitalOceanIcon";
+import DockerIcon from "@/assets/icons/DockerIcon";
+import HetznerIcon from "@/assets/icons/HetznerIcon";
+import { IconProps } from "@/assets/icons/IconProperties";
+import KubernetesIcon from "@/assets/icons/KubernetesIcon";
 import {
   REVERSE_PROXY_CLUSTERS_DOCS_LINK,
   REVERSE_PROXY_ENV_REFERENCE_DOCS_LINK,
@@ -37,15 +41,11 @@ import {
   ReverseProxyClusterToken,
 } from "@/interfaces/ReverseProxy";
 import {
-  ClusterCloudDeploy,
   CloudProvider,
+  ClusterCloudDeploy,
 } from "@/modules/reverse-proxy/clusters/ClusterCloudDeploy";
-import AWSIcon from "@/assets/icons/AWSIcon";
-import DigitalOceanIcon from "@/assets/icons/DigitalOceanIcon";
-import DockerIcon from "@/assets/icons/DockerIcon";
-import HetznerIcon from "@/assets/icons/HetznerIcon";
-import KubernetesIcon from "@/assets/icons/KubernetesIcon";
-import { IconProps } from "@/assets/icons/IconProperties";
+import { useApiCall } from "@/utils/api";
+import { GRPC_API_ORIGIN, isNetBirdCloud } from "@/utils/netbirdy";
 
 type Props = {
   open: boolean;
@@ -84,7 +84,7 @@ const renderHighlightedCommand = (command: string, highlights: string[]) => {
       {pattern
         ? line.split(pattern).map((part, partIndex) =>
             valid.includes(part) ? (
-              <span key={partIndex} className={"text-netbird"}>
+              <span key={partIndex} className={"text-netbirdy"}>
                 {part}
               </span>
             ) : (
@@ -141,11 +141,11 @@ export const ClustersModal = ({ open, onOpenChange, onFinish }: Props) => {
  -e NB_PROXY_PRIVATE=true \\
  -e NB_PROXY_ADDRESS=:443 \\
  -p 80:80 -p 443:443 \\
- netbirdio/reverse-proxy:latest`;
+ ghcr.io/sudo-ivan/netbirdy-reverse-proxy:latest`;
 
   const composeCommand = `services:
   reverse-proxy:
-    image: netbirdio/reverse-proxy:latest
+    image: ghcr.io/sudo-ivan/netbirdy-reverse-proxy:latest
     restart: unless-stopped
     ports:
       - "80:80"
@@ -168,22 +168,22 @@ volumes:
   const kubernetesCommand = `apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: netbird-reverse-proxy
+  name: netbirdy-reverse-proxy
   labels:
-    app: netbird-reverse-proxy
+    app: netbirdy-reverse-proxy
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: netbird-reverse-proxy
+      app: netbirdy-reverse-proxy
   template:
     metadata:
       labels:
-        app: netbird-reverse-proxy
+        app: netbirdy-reverse-proxy
     spec:
       containers:
         - name: reverse-proxy
-          image: netbirdio/reverse-proxy:latest
+          image: ghcr.io/sudo-ivan/netbirdy-reverse-proxy:latest
           ports:
             - containerPort: 80
             - containerPort: 443
@@ -216,11 +216,11 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: netbird-reverse-proxy
+  name: netbirdy-reverse-proxy
 spec:
   type: LoadBalancer
   selector:
-    app: netbird-reverse-proxy
+    app: netbirdy-reverse-proxy
   ports:
     - name: http
       port: 80
@@ -333,7 +333,7 @@ spec:
           icon={<ServerIcon size={16} />}
           title={"Setup Cluster"}
           description={"Setup a proxy cluster on infra you own"}
-          color={"netbird"}
+          color={"netbirdy"}
         />
 
         <Tabs
@@ -491,7 +491,7 @@ spec:
               {!isNetBirdCloud() && (
                 <Callout variant={"warning"}>
                   For self-hosted deployments, make sure the proxy service
-                  routes are configured on your NetBird management server before
+                  routes are configured on your NetBirdy management server before
                   starting the proxy.&nbsp;
                   <InlineLink
                     href={REVERSE_PROXY_SELFHOSTED_ROUTING_DOCS_LINK}

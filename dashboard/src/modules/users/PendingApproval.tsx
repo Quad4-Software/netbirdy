@@ -14,6 +14,7 @@ import {
   UserCircleIcon,
 } from "lucide-react";
 import * as React from "react";
+import { docsLink } from "@/modules/docs/links";
 
 const parseApproverEmail = (message?: string): string =>
   message?.match(/[^\s@]+@[a-z0-9.-]+\.[a-z]{2,}/i)?.[0] ?? "";
@@ -27,7 +28,7 @@ const steps = [
   {
     label: "Waiting for Approval",
     status: "current",
-    icon: <Loader2Icon size={16} className={"animate-spin text-netbird"} />,
+    icon: <Loader2Icon size={16} className={"animate-spin text-netbirdy"} />,
   },
   {
     label: "Join Account",
@@ -112,14 +113,14 @@ export const PendingApproval = ({ error, onRefresh, onLogout }: Props) => {
       <Paragraph className={"text-sm"}>
         Need help?
         <InlineLink
-          href={"https://docs.netbird.io/manage/team/approve-users"}
+          href={docsLink("https://docs.netbird.io/manage/team/approve-users")}
           target={"_blank"}
         >
           Read the Docs
         </InlineLink>
         or
         <InlineLink
-          href={"https://docs.netbird.io/help/netbird-support"}
+          href={docsLink("https://docs.netbird.io/help/netbirdy-support")}
           target={"_blank"}
         >
           Contact Support

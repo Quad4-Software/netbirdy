@@ -1,6 +1,6 @@
-# NetBird Dashboard
+# NetBirdy Dashboard
 
-NetBird Dashboard is NetBird's management server UI.
+NetBirdy Dashboard is NetBirdy's management server UI.
 
 ## Tags
 

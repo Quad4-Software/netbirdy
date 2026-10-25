@@ -7,6 +7,7 @@ import SkeletonTable, {
 } from "@/components/skeletons/SkeletonTable";
 import { Job } from "@/interfaces/Job";
 import useFetchApi from "@/utils/api";
+import { docsLink } from "@/modules/docs/links";
 
 const PeerRemoteJobsTable = lazy(
   () => import("@/modules/jobs/table/PeerRemoteJobsTable"),
@@ -27,7 +28,7 @@ export const PeerRemoteJobsSection = ({ peerID }: Props) => {
               Remotely trigger actions such as debug bundles or other tasks on
               this peer, without requiring CLI access.{" "}
               <InlineLink
-                href={"https://docs.netbird.io/manage/peers/remote-jobs"}
+                href={docsLink("https://docs.netbird.io/manage/peers/remote-jobs")}
                 target={"_blank"}
               >
                 Learn more

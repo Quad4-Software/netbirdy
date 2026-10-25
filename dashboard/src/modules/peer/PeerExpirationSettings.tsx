@@ -1,13 +1,13 @@
+import { notify } from "@components/Notification";
+import { cn } from "@utils/helpers";
+import { TimerResetIcon } from "lucide-react";
 import * as React from "react";
 import { useState } from "react";
-import { PeerExpirationToggle } from "@/modules/peer/PeerExpirationToggle";
-import { usePeer } from "@/contexts/PeerProvider";
-import { TimerResetIcon } from "lucide-react";
-import { usePermissions } from "@/contexts/PermissionsProvider";
-import { notify } from "@components/Notification";
 import { useSWRConfig } from "swr";
-import { cn } from "@utils/helpers";
+import { usePeer } from "@/contexts/PeerProvider";
+import { usePermissions } from "@/contexts/PermissionsProvider";
 import { useAccount } from "@/modules/account/useAccount";
+import { PeerExpirationToggle } from "@/modules/peer/PeerExpirationToggle";
 
 export const PeerExpirationSettings = () => {
   const { peer, update } = usePeer();

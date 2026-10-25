@@ -9,7 +9,7 @@
  * Only point the suite at a disposable instance: the reset deletes every
  * policy, route, network, setup key, peer, nameserver group and group.
  */
-import { test, type Page } from "@playwright/test";
+import { type Page,test } from "@playwright/test";
 import * as fs from "fs";
 import * as path from "path";
 import { getApiContext } from "../helpers/api";

@@ -97,7 +97,7 @@ export const JSONFileUpload = ({ onChange }: Props) => {
           "bg-nb-gray-930 p-2.5 rounded-md mt-0.5 group-hover/upload:bg-nb-gray-930/80 transition-all"
         }
       >
-        <FileJson2 size={20} className={"text-netbird"} />
+        <FileJson2 size={20} className={"text-netbirdy"} />
       </div>
 
       <div>

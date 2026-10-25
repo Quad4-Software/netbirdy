@@ -31,6 +31,7 @@ import { useSWRConfig } from "swr";
 import useCopyToClipboard from "@/hooks/useCopyToClipboard";
 import { AccessToken } from "@/interfaces/AccessToken";
 import { User } from "@/interfaces/User";
+import { docsLink } from "@/modules/docs/links";
 
 type Props = {
   children: React.ReactNode;
@@ -166,8 +167,8 @@ export function AccessTokenModalContent({
       <ModalHeader
         icon={<IconApi />}
         title={"Create Access Token"}
-        description={"Use this token to access NetBird's public API"}
-        color={"netbird"}
+        description={"Use this token to access NetBirdy's public API"}
+        color={"netbirdy"}
       />
 
       <Separator />
@@ -211,7 +212,7 @@ export function AccessTokenModalContent({
           <Paragraph className={"text-sm mt-auto"}>
             Learn more about
             <InlineLink
-              href={"https://docs.netbird.io/how-to/access-netbird-public-api"}
+              href={docsLink("https://docs.netbird.io/how-to/access-netbirdy-public-api")}
               target={"_blank"}
             >
               Access Tokens

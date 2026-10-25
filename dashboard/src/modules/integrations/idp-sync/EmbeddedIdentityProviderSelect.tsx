@@ -1,5 +1,8 @@
+import { Callout } from "@components/Callout";
 import HelpText from "@components/HelpText";
+import { InlineButtonLink } from "@components/InlineLink";
 import { Label } from "@components/Label";
+import Paragraph from "@components/Paragraph";
 import {
   Select,
   SelectContent,
@@ -8,17 +11,14 @@ import {
   SelectValue,
 } from "@components/Select";
 import { FingerprintIcon } from "lucide-react";
+import { useRouter } from "next/navigation";
 import React from "react";
+import { idpIcon } from "@/assets/icons/IdentityProviderIcons";
+import { useEmbeddedIdentityProviders } from "@/hooks/useEmbeddedIdentityProviders";
 import {
   SSOIdentityProvider,
   SSOIdentityProviderType,
 } from "@/interfaces/IdentityProvider";
-import { idpIcon } from "@/assets/icons/IdentityProviderIcons";
-import { useEmbeddedIdentityProviders } from "@/hooks/useEmbeddedIdentityProviders";
-import { Callout } from "@components/Callout";
-import Paragraph from "@components/Paragraph";
-import { InlineButtonLink } from "@components/InlineLink";
-import { useRouter } from "next/navigation";
 
 type Props = {
   value: string;

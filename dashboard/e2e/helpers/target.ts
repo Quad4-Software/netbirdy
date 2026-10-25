@@ -8,9 +8,9 @@
  * instead, such as the self-hosted instance the pre-release tests bring up.
  * That dashboard is a production build behind any IdP, so the config skips
  * every test tagged with something the deployment cannot provide:
- *   - `@test-build`: needs the `netbird-test-*` hooks of an APP_ENV=test build;
+ *   - `@test-build`: needs the `netbirdy-test-*` hooks of an APP_ENV=test build;
  *   - `@test-env`:   needs the local docker environment;
- *   - `@cloud`:      needs a NetBird Cloud management server;
+ *   - `@cloud`:      needs a NetBirdy Cloud management server;
  *   - `@enterprise`: needs an Enterprise dashboard (skipped only when
  *     `NETBIRD_E2E_EDITION=community`).
  */

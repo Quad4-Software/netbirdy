@@ -34,7 +34,7 @@ const config: Record<
 > = {
   v4: {
     title: "Edit Peer IP Address",
-    description: "Update the NetBird IP address for this peer.",
+    description: "Update the NetBirdy IP address for this peer.",
     placeholder: "e.g., 100.64.0.15",
     errorMessage: "Please enter a valid IP, e.g., 100.64.0.15",
     validate: (ip: string) =>
@@ -44,7 +44,7 @@ const config: Record<
   },
   v6: {
     title: "Edit Peer IPv6 Address",
-    description: "Update the NetBird IPv6 address for this peer.",
+    description: "Update the NetBirdy IPv6 address for this peer.",
     placeholder: "e.g., fd00:1234::1",
     errorMessage: "Please enter a valid IPv6 address, e.g., fd00:1234::1",
     validate: (ip: string) => isValidIP(ip) && ip.includes(":"),

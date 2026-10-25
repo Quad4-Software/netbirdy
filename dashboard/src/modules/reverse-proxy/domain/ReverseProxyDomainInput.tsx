@@ -1,11 +1,11 @@
+import { Callout } from "@components/Callout";
 import HelpText from "@components/HelpText";
+import InlineLink from "@components/InlineLink";
 import { Input } from "@components/Input";
 import { Label } from "@components/Label";
-import { Callout } from "@components/Callout";
+import { isNetBirdCloud } from "@utils/netbirdy";
 import React from "react";
 import { CustomDomainSelector } from "./CustomDomainSelector";
-import { isNetBirdCloud } from "@utils/netbird";
-import InlineLink from "@components/InlineLink";
 
 type Props = {
   subdomain: string;
@@ -72,7 +72,7 @@ export default function ReverseProxyDomainInput({
             Cluster {clusterOffline.clusterName} is offline. Please try again in
             a few minutes. If the issue persists, check{" "}
             <InlineLink href={"https://status.netbird.io/"} target={"_blank"}>
-              NetBird Status
+              NetBirdy Status
             </InlineLink>{" "}
             or reach out to{"  "}
             <InlineLink href={"mailto:support@netbird.io"}>

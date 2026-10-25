@@ -390,7 +390,7 @@ export const FilterPickers: StoryObj = {
               close={() => {}}
               options={[
                 { value: undefined, label: "All" },
-                { value: "admin", label: "Admin", dotClass: "bg-netbird" },
+                { value: "admin", label: "Admin", dotClass: "bg-netbirdy" },
                 { value: "user", label: "User", dotClass: "bg-sky-500" },
               ]}
             />

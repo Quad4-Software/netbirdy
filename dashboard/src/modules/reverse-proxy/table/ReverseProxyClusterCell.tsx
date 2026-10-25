@@ -1,6 +1,8 @@
 "use client";
 
 import Badge from "@components/Badge";
+import FullTooltip from "@components/FullTooltip";
+import InlineLink from "@components/InlineLink";
 import { cn } from "@utils/helpers";
 import { AlertTriangle, Globe, Server } from "lucide-react";
 import React from "react";
@@ -9,9 +11,7 @@ import {
   ReverseProxy,
   ReverseProxyDomainType,
 } from "@/interfaces/ReverseProxy";
-import FullTooltip from "@components/FullTooltip";
-import { isNetBirdCloud } from "@/utils/netbird";
-import InlineLink from "@components/InlineLink";
+import { isNetBirdCloud } from "@/utils/netbirdy";
 
 type Props = {
   reverseProxy: ReverseProxy;
@@ -97,7 +97,7 @@ export default function ReverseProxyClusterCell({
             Cluster {reverseProxy.proxy_cluster} is offline. Please try again in
             a few minutes. If the issue persists, check{" "}
             <InlineLink href={"https://status.netbird.io/"} target={"_blank"}>
-              NetBird Status
+              NetBirdy Status
             </InlineLink>{" "}
             or reach out to{"  "}
             <InlineLink href={"mailto:support@netbird.io"}>

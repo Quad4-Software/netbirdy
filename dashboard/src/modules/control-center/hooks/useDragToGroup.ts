@@ -1,9 +1,13 @@
-import { useCallback, useRef } from "react";
 import { Node, useReactFlow, XYPosition } from "@xyflow/react";
+import { useCallback, useRef } from "react";
+import { Group } from "@/interfaces/Group";
+import { NetworkResource } from "@/interfaces/Network";
+import { Peer } from "@/interfaces/Peer";
 import { useCanvasState } from "@/modules/control-center/contexts/ControlCenterContext";
 import { useControlCenterPolicy } from "@/modules/control-center/contexts/ControlCenterPolicyModals";
-import { useDraftMode } from "@/modules/control-center/draft/DraftModeContext";
 import { useDraftChangeset } from "@/modules/control-center/draft/DraftChangesetContext";
+import { useDraftMode } from "@/modules/control-center/draft/DraftModeContext";
+import { useControlCenterData } from "@/modules/control-center/hooks/useControlCenterData";
 import {
   getNetworkRef,
   useDraftNetworkActions,
@@ -13,20 +17,16 @@ import {
   getDraftResource,
   getFrameChildPosition,
   getPlaceholderPeer,
-  getTopZIndex,
   getPolicyRegroupUpdates,
+  getTopZIndex,
   isFrameNode,
   NETWORK_FRAME_CHILD_WIDTH,
 } from "@/modules/control-center/utils/helpers";
-import { NodeType } from "@/modules/control-center/utils/nodes";
-import { useControlCenterData } from "@/modules/control-center/hooks/useControlCenterData";
 import {
   DROPPABLE_INTO_GROUP_NODE_TYPES as DROPPABLE_NODE_TYPES,
   getGroupableEntityId,
 } from "@/modules/control-center/utils/node-capabilities";
-import { Peer } from "@/interfaces/Peer";
-import { NetworkResource } from "@/interfaces/Network";
-import { Group } from "@/interfaces/Group";
+import { NodeType } from "@/modules/control-center/utils/nodes";
 import {
   patchGroupInPolicies,
   sameGroupMatcher,
@@ -262,7 +262,7 @@ export function useDragToGroup() {
   const lastHighlightCheck = useRef<XYPosition | null>(null);
 
   const onNodeDragStart = useCallback(
-    (_event: React.MouseEvent, draggedNode: Node) => {
+    (_event: MouseEvent | TouchEvent, draggedNode: Node) => {
       frameDrag.current = null;
       lastHighlightCheck.current = null;
       if (!isDraft) return;
@@ -288,7 +288,7 @@ export function useDragToGroup() {
   );
 
   const onNodeDrag = useCallback(
-    (_event: React.MouseEvent, draggedNode: Node) => {
+    (_event: MouseEvent | TouchEvent, draggedNode: Node) => {
       if (!isDraft) return;
 
       const frame = frameDrag.current;
@@ -398,7 +398,7 @@ export function useDragToGroup() {
   );
 
   const onNodeDragStop = useCallback(
-    (_event: React.MouseEvent, draggedNode: Node) => {
+    (_event: MouseEvent | TouchEvent, draggedNode: Node) => {
       if (!isDraft) return;
 
       // Clear the highlight first: the branches below return early.

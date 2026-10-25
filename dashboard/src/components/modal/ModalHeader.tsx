@@ -17,7 +17,7 @@ export default function ModalHeader({
   icon,
   title,
   description,
-  color = "netbird",
+  color = "netbirdy",
   className = "pb-6 px-8",
   margin = "mt-0",
   truncate = false,

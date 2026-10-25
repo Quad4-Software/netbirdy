@@ -16,6 +16,7 @@ const VirtuosoScroller = forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
 >((props, ref) => <ScrollAreaViewport ref={ref} {...props} />);
+VirtuosoScroller.displayName = "VirtuosoScroller";
 
 type Props<T extends { id?: string }> = {
   items: T[];

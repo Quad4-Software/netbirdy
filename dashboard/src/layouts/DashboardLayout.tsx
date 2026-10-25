@@ -5,25 +5,19 @@ import { useOidcUser } from "@axa-fr/react-oidc";
 import Button from "@components/Button";
 import { UserAvatar } from "@components/ui/UserAvatar";
 import { cn } from "@utils/helpers";
-import { isNetBirdCloud } from "@utils/netbird";
+import { isNetBirdCloud } from "@utils/netbirdy";
 import { useIsSm, useIsXs } from "@utils/responsive";
 import { AnimatePresence, motion } from "framer-motion";
 import { XIcon } from "lucide-react";
 import React from "react";
-import { NetBirdCloudProvider } from "@/cloud/contexts/NetBirdCloudProvider";
-import DistributorProvider from "@/cloud/distributor/contexts/DistributorProvider";
-import MSPProvider from "@/cloud/msp/contexts/MSPProvider";
-import AnnouncementProvider, {
-  useAnnouncement,
-} from "@/contexts/AnnouncementProvider";
 import ApplicationProvider, {
   useApplicationContext,
 } from "@/contexts/ApplicationProvider";
-import BillingProvider from "@/contexts/BillingProvider";
 import CountryProvider from "@/contexts/CountryProvider";
 import GroupsProvider from "@/contexts/GroupsProvider";
 import UsersProvider from "@/contexts/UsersProvider";
 import Navigation from "@/layouts/Navigation";
+import { useShortcuts } from "@/hooks/useShortcuts";
 import { OnboardingProvider } from "@/modules/onboarding/OnboardingProvider";
 import Header, { headerHeight } from "./Header";
 
@@ -32,25 +26,26 @@ export default function DashboardLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const shortcutsUI = useShortcuts();
   return (
     <ApplicationProvider>
-      <DistributorProvider>
-        <MSPProvider>
+      
+        
           <UsersProvider>
-            <AnnouncementProvider>
-              <BillingProvider>
+            
+              
                 <GroupsProvider>
                   <CountryProvider>
-                    <NetBirdCloudProvider />
+                    
                     {!isNetBirdCloud() && <OnboardingProvider />}
-                    <DashboardPageContent>{children}</DashboardPageContent>
+                    <DashboardPageContent>{children}{shortcutsUI}</DashboardPageContent>
                   </CountryProvider>
                 </GroupsProvider>
-              </BillingProvider>
-            </AnnouncementProvider>
+              
+            
           </UsersProvider>
-        </MSPProvider>
-      </DistributorProvider>
+        
+      
     </ApplicationProvider>
   );
 }
@@ -67,12 +62,12 @@ function DashboardPageContent({
   // itself in Navigation. Gating the sidebar itself here once emptied it for
   // the limited (user role) view, whose items were the Agent Network ones.
   const navOpenPageWidth = isSm ? "45%" : isXs ? "60%" : "80%";
-  const { bannerHeight } = useAnnouncement();
+  const bannerHeight = 0;
   return (
     <div className={cn("flex flex-col h-screen", mobileNavOpen && "flex")}>
       {mobileNavOpen && (
         <motion.div
-          className={"h-screen bg-nb-gray-950 w-11/12 max-w-[22rem]"}
+          className={"h-screen bg-gray-50 dark:bg-nb-gray-950 w-11/12 max-w-[22rem]"}
           layout={true}
           transition={{
             type: "spring",

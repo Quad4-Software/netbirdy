@@ -2,17 +2,12 @@
 
 import Button from "@components/Button";
 import { NetBirdLogo } from "@components/NetBirdLogo";
-import { AnnouncementBanner } from "@components/ui/AnnouncementBanner";
 import HelpAndSupportButton from "@components/ui/HelpAndSupportButton";
 import UserDropdown from "@components/ui/UserDropdown";
 import { cn } from "@utils/helpers";
 import { useGuardedRouter } from "@utils/navigation-guard";
 import { MenuIcon, PanelLeftCloseIcon, PanelLeftOpenIcon } from "lucide-react";
 import React from "react";
-import { DistributorTransferAccountModal } from "@/cloud/distributor/DistributorTransferAccountModal";
-import { MSPTenantsSwitcher } from "@/cloud/msp/MSPTenantsSwitcher";
-import { MSPTransferAccountModal } from "@/cloud/msp/MSPTransferAccountModal";
-import { useAnnouncement } from "@/contexts/AnnouncementProvider";
 import { useApplicationContext } from "@/contexts/ApplicationProvider";
 import { usePermissions } from "@/contexts/PermissionsProvider";
 
@@ -21,7 +16,7 @@ export const headerHeight = 65;
 export default function NavbarWithDropdown() {
   const router = useGuardedRouter();
   const { toggleMobileNav } = useApplicationContext();
-  const { bannerHeight } = useAnnouncement();
+  const bannerHeight = 0;
   const { isRestricted } = usePermissions();
 
   return (
@@ -32,7 +27,7 @@ export default function NavbarWithDropdown() {
           height: headerHeight + bannerHeight,
         }}
       >
-        <AnnouncementBanner />
+        
         <div
           className={cn(
             "bg-white px-2 py-3 dark:border-gray-700 dark:bg-nb-gray backdrop-blur-lg sm:px-6",
@@ -67,9 +62,15 @@ export default function NavbarWithDropdown() {
           </div>
 
           <div className="flex md:order-2 gap-5 items-center">
-            <MSPTransferAccountModal />
-            <DistributorTransferAccountModal />
-            <MSPTenantsSwitcher />
+            <button
+              type="button"
+              onClick={() => document.dispatchEvent(new KeyboardEvent("keydown", { key: "k", ctrlKey: true, shiftKey: true }))}
+              aria-label="Command palette"
+              className="hidden md:flex items-center gap-2 rounded-lg border border-neutral-200 px-2.5 py-1.5 text-xs text-neutral-500 hover:bg-neutral-100 dark:border-nb-gray-700 dark:text-nb-gray-400 dark:hover:bg-nb-gray-800"
+            >
+              Search
+              <kbd className="rounded border border-neutral-300 px-1 font-mono text-[10px] dark:border-nb-gray-600">Ctrl+Shift+K</kbd>
+            </button>
             <HelpAndSupportButton />
             <UserDropdown />
           </div>

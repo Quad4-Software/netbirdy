@@ -1,3 +1,4 @@
+import * as bypass from "@utils/bypass";
 import Button from "@components/Button";
 import FancyToggleSwitch from "@components/FancyToggleSwitch";
 import FullTooltip from "@components/FullTooltip";
@@ -28,10 +29,6 @@ import { useSWRConfig } from "swr";
 import { useDialog } from "@/contexts/DialogProvider";
 import { usePeers } from "@/contexts/PeersProvider";
 import { usePermissions } from "@/contexts/PermissionsProvider";
-import {
-  useBypass,
-  useBypassedPeers,
-} from "@/cloud/edr/useBypass";
 import { Group, GroupPeer } from "@/interfaces/Group";
 import { Peer } from "@/interfaces/Peer";
 import useGroupHelper from "@/modules/groups/useGroupHelper";
@@ -246,8 +243,6 @@ const PeerGroupMassAssignmentContent = ({
   };
 
   // Bypass compliance hooks
-  const { bypassCompliance, revokeBypass, canBypass } = useBypass();
-  const { isBypassed } = useBypassedPeers();
   const { isAnyIntegrationEnabled } = useIntegrations();
 
   // Count selected peers that need bypass (approval_required and not bypassed)
@@ -261,8 +256,8 @@ const PeerGroupMassAssignmentContent = ({
 
   // Count selected peers that are bypassed
   const bypassedSelectedPeers = useMemo(() => {
-    return selectedPeerIDs.filter((id) => isBypassed(id));
-  }, [selectedPeerIDs, isBypassed]);
+    return selectedPeerIDs.filter((id) => false);
+  }, [selectedPeerIDs]);
 
   const batchBypassCompliance = async () => {
     if (peersNeedingBypass.length === 0) return;
@@ -281,7 +276,7 @@ const PeerGroupMassAssignmentContent = ({
       title: "Bypass Compliance",
       description: "Compliance was successfully bypassed for selected peers",
       promise: Promise.all(
-        peersNeedingBypass.map((id) => bypassCompliance(id)),
+        peersNeedingBypass.map((id) => bypass.bypassCompliance(id)),
       ).then(() => {
         mutate("/peers");
         mutate("/peers/edr/bypassed");
@@ -307,7 +302,7 @@ const PeerGroupMassAssignmentContent = ({
       title: "Revoke Compliance Bypass",
       description: "Compliance bypass was successfully revoked",
       promise: Promise.all(
-        bypassedSelectedPeers.map((id) => revokeBypass(id)),
+        bypassedSelectedPeers.map((id) => bypass.revokeBypass(id)),
       ).then(() => {
         mutate("/peers");
         mutate("/peers/edr/bypassed");
@@ -490,7 +485,7 @@ const PeerGroupMassAssignmentContent = ({
                               size={"xs"}
                               className={"!h-9 !w-9"}
                               onClick={batchBypassCompliance}
-                              disabled={!canBypass}
+                              disabled={!bypass.canBypass()}
                             >
                               <ShieldCheck size={16} className={"shrink-0"} />
                             </Button>
@@ -511,7 +506,7 @@ const PeerGroupMassAssignmentContent = ({
                               size={"xs"}
                               className={"!h-9 !w-9"}
                               onClick={batchRevokeBypass}
-                              disabled={!canBypass}
+                              disabled={!bypass.canBypass()}
                             >
                               <ShieldOff size={16} className={"shrink-0"} />
                             </Button>

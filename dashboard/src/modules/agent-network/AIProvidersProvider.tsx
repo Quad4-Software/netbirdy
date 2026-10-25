@@ -30,7 +30,7 @@ export type APIProviderModel = {
   id: string;
   input_per_1k: number;
   output_per_1k: number;
-  // Optional cache rates. Omitted on the wire = inherit NetBird's
+  // Optional cache rates. Omitted on the wire = inherit NetBirdy's
   // default rate for this model (the backend folds it in at synthesis
   // time); explicit 0 = no discount (bucket bills at the input rate).
   // Never coerce undefined to 0 — the two mean different things.
@@ -157,7 +157,7 @@ export type APIAgentNetworkSettingsRequest = {
   access_log_retention_days: number;
 };
 
-// AgentNetworkManagedProxy is a NetBird-managed gateway deployment as
+// AgentNetworkManagedProxy is a NetBirdy-managed gateway deployment as
 // /integrations/agent-network/managed-proxy reports it. state is derived by
 // the server on every read and typed as an open string: the spec lists
 // provisioning, ready and failed, and a value outside those must render as
@@ -293,7 +293,7 @@ function notifyFailure(props: { title: string; description: string }) {
 
 function toAPIModels(models: ProviderModel[]): APIProviderModel[] {
   // undefined cache rates stay undefined so JSON.stringify omits the
-  // key: an omitted rate inherits NetBird's default, an explicit 0
+  // key: an omitted rate inherits NetBirdy's default, an explicit 0
   // disables the discount. Coercing here would change billing.
   return models.map((m) => ({
     id: m.id,

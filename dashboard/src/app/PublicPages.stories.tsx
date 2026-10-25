@@ -38,7 +38,7 @@ export const Setup: Story = {
     </InstanceSetupProvider>
   ),
   play: async () => {
-    await findText("Welcome to NetBird");
+    await findText("Welcome to NetBirdy");
     await settle();
   },
 };
@@ -47,7 +47,7 @@ export const SetupFilledPasswordMismatch: Story = {
   parameters: setup,
   render: Setup.render,
   play: async () => {
-    await findText("Welcome to NetBird");
+    await findText("Welcome to NetBirdy");
     const field = (placeholder: string) =>
       document.querySelector(`input[placeholder="${placeholder}"]`);
     await type(field("Your name"), "Olivia Owner");
@@ -62,7 +62,7 @@ export const Invite: Story = {
   parameters: nav("/invite", { token: "inv-token-valid" }),
   render: () => <InviteAcceptPage />,
   play: async () => {
-    await findText(/nora\.new-hire@netbird\.io/);
+    await findText(/nora\.new-hire@netbirdy\.io/);
     await settle();
   },
 };
@@ -71,7 +71,7 @@ export const InvitePasswordChecks: Story = {
   parameters: Invite.parameters,
   render: Invite.render,
   play: async () => {
-    await findText(/nora\.new-hire@netbird\.io/);
+    await findText(/nora\.new-hire@netbirdy\.io/);
     const [password, confirm] = Array.from(
       document.querySelectorAll("input[type=password]"),
     );

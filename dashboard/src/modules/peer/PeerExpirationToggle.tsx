@@ -2,13 +2,13 @@ import FancyToggleSwitch, {
   FancyToggleSwitchVariants,
 } from "@components/FancyToggleSwitch";
 import FullTooltip from "@components/FullTooltip";
+import InlineLink from "@components/InlineLink";
 import { IconInfoCircle } from "@tabler/icons-react";
 import { ArrowUpRightIcon, LockIcon } from "lucide-react";
 import * as React from "react";
 import { useMemo } from "react";
 import { usePermissions } from "@/contexts/PermissionsProvider";
 import { Peer } from "@/interfaces/Peer";
-import InlineLink from "@components/InlineLink";
 import { useAccount } from "@/modules/account/useAccount";
 
 type Props = {

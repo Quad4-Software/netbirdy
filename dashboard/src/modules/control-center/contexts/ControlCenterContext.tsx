@@ -2,6 +2,7 @@
 
 import { SelectOption } from "@components/select/SelectDropdown";
 import useFetchApi from "@utils/api";
+import { e2eHooksEnabled } from "@utils/netbirdy";
 import {
   applyNodeChanges,
   Edge,
@@ -51,7 +52,6 @@ import {
 import { NetworkAccessControlProvider } from "@/modules/networks/NetworkAccessControlProvider";
 import { NetworkProvider } from "@/modules/networks/NetworkProvider";
 import NetworkResourceModal from "@/modules/networks/resources/NetworkResourceModal";
-import { e2eHooksEnabled } from "@utils/netbird";
 
 interface CanvasState {
   nodes: Node[];

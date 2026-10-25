@@ -124,7 +124,7 @@ const CheckContent = ({ value, onChange, disabled }: Props) => {
         </div>
         <Callout variant={"warning"} className={"mb-2"}>
           This check is not supported on mobile devices. Peers running the
-          NetBird iOS or Android app will always fail this check and be denied
+          NetBirdy iOS or Android app will always fail this check and be denied
           access.
         </Callout>
         {certificates.length > 0 && (

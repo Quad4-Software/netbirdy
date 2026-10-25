@@ -4,17 +4,17 @@ import Breadcrumbs from "@components/Breadcrumbs";
 import InlineLink from "@components/InlineLink";
 import Paragraph from "@components/Paragraph";
 import { RestrictedAccess } from "@components/ui/RestrictedAccess";
+import { usePortalElement } from "@hooks/usePortalElement";
 import dayjs from "dayjs";
 import { ExternalLinkIcon } from "lucide-react";
-import ReverseProxyIcon from "@/assets/icons/ReverseProxyIcon";
 import React, { useMemo } from "react";
+import ReverseProxyIcon from "@/assets/icons/ReverseProxyIcon";
 import PeersProvider from "@/contexts/PeersProvider";
 import { usePermissions } from "@/contexts/PermissionsProvider";
 import ServerPaginationProvider from "@/contexts/ServerPaginationProvider";
+import { REVERSE_PROXY_EVENTS_DOCS_LINK } from "@/interfaces/ReverseProxy";
 import PageContainer from "@/layouts/PageContainer";
 import ReverseProxyEventsTable from "@/modules/reverse-proxy/events/ReverseProxyEventsTable";
-import { usePortalElement } from "@hooks/usePortalElement";
-import { REVERSE_PROXY_EVENTS_DOCS_LINK } from "@/interfaces/ReverseProxy";
 
 export default function ProxyLogsPage() {
   const { permission } = usePermissions();

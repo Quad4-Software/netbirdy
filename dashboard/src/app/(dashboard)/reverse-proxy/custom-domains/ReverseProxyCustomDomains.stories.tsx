@@ -114,7 +114,7 @@ export const AddDomainClusterOpen: Story = {
 export const AddDomainFilled: Story = {
   play: async () => {
     await AddDomainClusterOpen.play!({} as never);
-    await clickTextIn(popover(), /eu\.proxy\.netbird\.io/);
+    await clickTextIn(popover(), /eu\.proxy\.netbirdy\.io/);
     await settle();
   },
 };

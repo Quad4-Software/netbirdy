@@ -6,7 +6,7 @@ import { PlusCircle } from "lucide-react";
 import React, { memo, useState } from "react";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { Peer } from "@/interfaces/Peer";
-import SetupModal from "@/modules/setup-netbird-modal/SetupModal";
+import SetupModal from "@/modules/setup-netbirdy-modal/SetupModal";
 
 type Props = {
   isUserDevice?: boolean;
@@ -17,7 +17,7 @@ function AddPeerButton({ isUserDevice }: Readonly<Props>) {
   const { oidcUser: user } = useOidcUser();
 
   const [isFirstRun, setIsFirstRun] = useLocalStorage<boolean>(
-    "netbird-first-run",
+    "netbirdy-first-run",
     !(peers && peers.length > 0),
   );
 

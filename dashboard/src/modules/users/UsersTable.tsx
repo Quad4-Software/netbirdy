@@ -36,7 +36,7 @@ import {
   Table,
 } from "@tanstack/react-table";
 import useFetchApi from "@utils/api";
-import { isNetBirdCloud } from "@utils/netbird";
+import { isNetBirdCloud } from "@utils/netbirdy";
 import dayjs from "dayjs";
 import { ExternalLinkIcon, Link2, MailPlus } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
@@ -196,7 +196,7 @@ export default function UsersTable({
 
   // Default sorting state of the table
   const [sorting, setSorting] = useLocalStorage<SortingState>(
-    "netbird-table-sort" + path,
+    "netbirdy-table-sort" + path,
     [
       {
         id: "is_current",
@@ -238,7 +238,7 @@ export default function UsersTable({
     () => [
       { value: undefined, label: "All", dotClass: "bg-nb-gray-500" },
       { value: "active", label: "Active", dotClass: "bg-green-500" },
-      { value: "pending", label: "Pending", dotClass: "bg-netbird" },
+      { value: "pending", label: "Pending", dotClass: "bg-netbirdy" },
       { value: "invited", label: "Invited", dotClass: "bg-yellow-400" },
       { value: "blocked", label: "Blocked", dotClass: "bg-red-500" },
     ],

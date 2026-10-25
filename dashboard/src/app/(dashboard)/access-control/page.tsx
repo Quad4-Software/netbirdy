@@ -15,6 +15,7 @@ import { usePermissions } from "@/contexts/PermissionsProvider";
 import PoliciesProvider from "@/contexts/PoliciesProvider";
 import { Policy } from "@/interfaces/Policy";
 import PageContainer from "@/layouts/PageContainer";
+import { docsLink } from "@/modules/docs/links";
 
 const AccessControlTable = lazy(
   () => import("@/modules/access-control/table/AccessControlTable"),
@@ -43,7 +44,7 @@ export default function AccessControlPage() {
             Policies connect users and agents to your network resources,
             controlling what each identity can reach.{" "}
             <InlineLink
-              href={"https://docs.netbird.io/how-to/manage-network-access"}
+              href={docsLink("https://docs.netbird.io/how-to/manage-network-access")}
               target={"_blank"}
             >
               Learn more

@@ -7,7 +7,6 @@ import { useSWRConfig } from "swr";
 import integrationImage from "@/assets/integrations/s3.svg";
 import { useDialog } from "@/contexts/DialogProvider";
 import { usePermissions } from "@/contexts/PermissionsProvider";
-import { useIsLicensed } from "@/hooks/useIsLicensed";
 import { EventStream } from "@/interfaces/EventStream";
 import S3Setup from "@/modules/integrations/event-streaming/amazon/s3/S3Setup";
 import { IntegrationCard } from "@/modules/integrations/IntegrationCard";
@@ -15,7 +14,7 @@ import { IntegrationCard } from "@/modules/integrations/IntegrationCard";
 export default function S3() {
   const { permission } = usePermissions();
   // Event Streaming is a licensed feature; skip the call on open-source.
-  const { isLicensed } = useIsLicensed();
+  const isLicensed = true;
 
   const { mutate } = useSWRConfig();
   const { data: eventStreamIntegrations, isLoading } = useFetchApi<

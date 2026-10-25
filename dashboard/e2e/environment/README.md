@@ -20,13 +20,13 @@ To run the focused target-access traffic test, check out the matching backend
 and dashboard branches, then build both backend images and the dashboard:
 
 ```bash
-cd /path/to/netbird
-docker build -f management/Dockerfile.multistage -t local/netbird-management:target-access .
-docker build -f proxy/Dockerfile.multistage -t local/netbird-proxy:target-access .
+cd /path/to/netbirdy
+docker build -f management/Dockerfile.multistage -t local/netbirdy-management:target-access .
+docker build -f proxy/Dockerfile.multistage -t local/netbirdy-proxy:target-access .
 
 cd /path/to/dashboard/e2e/environment
-MANAGEMENT_IMAGE=local/netbird-management:target-access \
-REVERSE_PROXY_IMAGE=local/netbird-proxy:target-access \
+MANAGEMENT_IMAGE=local/netbirdy-management:target-access \
+REVERSE_PROXY_IMAGE=local/netbirdy-proxy:target-access \
 MANAGEMENT_DISABLE_GEOLOCATION=true \
 bash create-test-env.sh
 
@@ -44,8 +44,8 @@ connection.
 
 Explicit image references take precedence over tags. Setup uses an existing
 local image or pulls it if missing; rebuild local images before rerunning after
-backend changes. Management images must provide `/go/bin/netbird-mgmt` with
-the `management` and `token` commands. The NetBird OSS management image supports
+backend changes. Management images must provide `/go/bin/netbirdy-mgmt` with
+the `management` and `token` commands. The NetBirdy OSS management image supports
 the focused reverse-proxy tests; cloud-specific tests still require the cloud
 image. Target access tests require both images to include `access_action`
 support and intentionally fail against an older management image that drops it.

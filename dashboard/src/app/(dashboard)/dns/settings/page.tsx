@@ -24,6 +24,7 @@ import { NameserverSettings } from "@/interfaces/NameserverSettings";
 import PageContainer from "@/layouts/PageContainer";
 import useGroupHelper from "@/modules/groups/useGroupHelper";
 import { useGroupIdsToGroups } from "@/modules/groups/useGroupIdsToGroups";
+import { docsLink } from "@/modules/docs/links";
 
 export default function NameServerSettings() {
   const { permission } = usePermissions();
@@ -55,7 +56,7 @@ export default function NameServerSettings() {
         <Paragraph>
           {"Manage your account's DNS settings."}{" "}
           <InlineLink
-            href={"https://docs.netbird.io/how-to/manage-dns-in-your-network"}
+            href={docsLink("https://docs.netbird.io/how-to/manage-dns-in-your-network")}
             target={"_blank"}
           >
             Learn more

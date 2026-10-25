@@ -138,7 +138,7 @@ const CheckContent = ({ value, onChange, disabled }: Props) => {
           <TabsTrigger value={String(OperatingSystem.LINUX)}>
             <LinuxIcon
               className={
-                "fill-nb-gray-500 group-data-[state=active]/trigger:fill-netbird transition-all"
+                "fill-nb-gray-500 group-data-[state=active]/trigger:fill-netbirdy transition-all"
               }
             />
             Linux
@@ -146,7 +146,7 @@ const CheckContent = ({ value, onChange, disabled }: Props) => {
           <TabsTrigger value={String(OperatingSystem.WINDOWS)}>
             <WindowsIcon
               className={
-                "fill-nb-gray-500 group-data-[state=active]/trigger:fill-netbird transition-all"
+                "fill-nb-gray-500 group-data-[state=active]/trigger:fill-netbirdy transition-all"
               }
             />
             Windows
@@ -154,7 +154,7 @@ const CheckContent = ({ value, onChange, disabled }: Props) => {
           <TabsTrigger value={String(OperatingSystem.APPLE)}>
             <AppleIcon
               className={
-                "fill-nb-gray-500 group-data-[state=active]/trigger:fill-netbird transition-all"
+                "fill-nb-gray-500 group-data-[state=active]/trigger:fill-netbirdy transition-all"
               }
             />
             macOS
@@ -162,7 +162,7 @@ const CheckContent = ({ value, onChange, disabled }: Props) => {
           <TabsTrigger value={String(OperatingSystem.IOS)}>
             <IOSIcon
               className={
-                "fill-nb-gray-500 group-data-[state=active]/trigger:fill-netbird transition-all"
+                "fill-nb-gray-500 group-data-[state=active]/trigger:fill-netbirdy transition-all"
               }
             />
             iOS
@@ -170,7 +170,7 @@ const CheckContent = ({ value, onChange, disabled }: Props) => {
           <TabsTrigger value={String(OperatingSystem.ANDROID)}>
             <AndroidIcon
               className={
-                "fill-nb-gray-500 group-data-[state=active]/trigger:fill-netbird transition-all"
+                "fill-nb-gray-500 group-data-[state=active]/trigger:fill-netbirdy transition-all"
               }
             />
             Android

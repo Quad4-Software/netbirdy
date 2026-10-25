@@ -1,5 +1,4 @@
 import { expect } from "@playwright/test";
-import { test } from "../helpers/fixtures";
 import { deleteGroupsByPrefix } from "../helpers/api";
 import {
   canvasNode,
@@ -7,6 +6,7 @@ import {
   expectChangeCount,
   resetDraftState,
 } from "../helpers/control-center";
+import { test } from "../helpers/fixtures";
 
 test.describe.serial("Control Center Draft Shortcuts @control-center", () => {
   test.beforeEach(async ({ dashboardAsOwner: page }) => {

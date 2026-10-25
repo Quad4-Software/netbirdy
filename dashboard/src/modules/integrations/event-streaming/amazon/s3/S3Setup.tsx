@@ -106,7 +106,7 @@ export function SetupContent({ onSuccess }: Readonly<ModalProps>) {
   const connect = async () => {
     notify({
       title: "Amazon S3 Integration",
-      description: `Amazon S3 was successfully connected to NetBird.`,
+      description: `Amazon S3 was successfully connected to NetBirdy.`,
       promise: integrationRequest
         .post({
           platform: "s3",
@@ -138,9 +138,9 @@ export function SetupContent({ onSuccess }: Readonly<ModalProps>) {
 
       <IntegrationModalHeader
         image={s3Logo}
-        title={"Connect NetBird with Amazon S3"}
+        title={"Connect NetBirdy with Amazon S3"}
         description={
-          "Start streaming your NetBird audit & traffic events to Amazon S3. Follow the steps below to get started."
+          "Start streaming your NetBirdy audit & traffic events to Amazon S3. Follow the steps below to get started."
         }
       />
 
@@ -211,7 +211,7 @@ export function SetupContent({ onSuccess }: Readonly<ModalProps>) {
             <Steps.Step step={3}>
               <p className={"font-normal"}>
                 Give it a descriptive name like{" "}
-                <Mark copy>netbird-activity-events</Mark>
+                <Mark copy>netbirdy-activity-events</Mark>
                 and click <Mark>Create bucket</Mark>
               </p>
             </Steps.Step>
@@ -226,7 +226,7 @@ export function SetupContent({ onSuccess }: Readonly<ModalProps>) {
                       <PencilLine size={16} className={"text-nb-gray-300"} />
                     </div>
                   }
-                  placeholder={"netbird-activity-events"}
+                  placeholder={"netbirdy-activity-events"}
                   value={bucketName}
                   onChange={(e) => setBucketName(e.target.value)}
                 />

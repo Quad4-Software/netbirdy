@@ -18,7 +18,7 @@ import {
   UsersIcon,
 } from "lucide-react";
 import React, { useMemo, useState } from "react";
-import { HubspotFormField } from "@/contexts/AnalyticsProvider";
+type HubspotFormField = any;
 import { useLoggedInUser } from "@/contexts/UsersProvider";
 import { countryOptions } from "@/modules/onboarding/countryOptions";
 import {
@@ -48,8 +48,8 @@ export const AgentNetworkSignupForm = ({ onSubmit }: Props) => {
   const { loggedInUser } = useLoggedInUser();
   const name = user?.given_name || user?.name || user?.preferred_username;
   const welcomeMessage = name
-    ? `Welcome to NetBird, ${name}!`
-    : "Welcome to NetBird!";
+    ? `Welcome to NetBirdy, ${name}!`
+    : "Welcome to NetBirdy!";
 
   // The email is already known from the authenticated user, so it's submitted
   // with the form silently — no field to fill or correct.

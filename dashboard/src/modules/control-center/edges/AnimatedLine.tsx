@@ -66,7 +66,7 @@ function AnimatedLine({ source, target, data }: AnimatedLineProps) {
               alignItems: "center",
               justifyContent: "center",
               boxSizing: "border-box",
-              background: "#181a1d",
+              background: "#0a0a0a",
               borderRadius: 4,
             }}
             className={

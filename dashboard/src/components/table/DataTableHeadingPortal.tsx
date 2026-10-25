@@ -85,7 +85,7 @@ const Heading = ({
   if (hasAnyFilterActive) {
     return (
       <>
-        <span className={"text-netbird"}>{filteredItems}</span> of {totalItems}{" "}
+        <span className={"text-netbirdy"}>{filteredItems}</span> of {totalItems}{" "}
       </>
     );
   }

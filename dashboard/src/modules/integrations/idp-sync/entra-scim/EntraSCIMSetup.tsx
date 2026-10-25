@@ -5,12 +5,13 @@ import { Modal, ModalContent, ModalFooter } from "@components/modal/Modal";
 import { notify } from "@components/Notification";
 import Steps from "@components/Steps";
 import { GradientFadedBackground } from "@components/ui/GradientFadedBackground";
+import { Lightbox } from "@components/ui/Lightbox";
 import { Mark } from "@components/ui/Mark";
 import { MinimalList } from "@components/ui/MinimalList";
 import { IconArrowLeft, IconArrowRight } from "@tabler/icons-react";
 import { useApiCall } from "@utils/api";
 import { cn } from "@utils/helpers";
-import { isAuth0 } from "@utils/netbird";
+import { isAuth0 } from "@utils/netbirdy";
 import { isEmpty, trim } from "lodash";
 import {
   BoxIcon,
@@ -21,24 +22,23 @@ import {
   Shield,
 } from "lucide-react";
 import React, { useEffect, useState } from "react";
-import { useEmbeddedIdentityProviders } from "@/hooks/useEmbeddedIdentityProviders";
 import Skeleton from "react-loading-skeleton";
 import { useSWRConfig } from "swr";
 import integrationImage from "@/assets/integrations/generic-scim.png";
+import { useEmbeddedIdentityProviders } from "@/hooks/useEmbeddedIdentityProviders";
 import {
   IdentityProvider,
   ScimIntegration,
 } from "@/interfaces/IdentityProvider";
 import { EmbeddedIdentityProviderSelect } from "@/modules/integrations/idp-sync/EmbeddedIdentityProviderSelect";
-import { GenericSCIMProps } from "@/modules/integrations/idp-sync/generic-scim/GenericSCIM";
-import { IntegrationModalHeader } from "@/modules/integrations/IntegrationModalHeader";
-import { useSSOConnections } from "@/modules/integrations/sso/useSSOConnections";
-import entraGetStarted from "@/modules/integrations/idp-sync/entra-scim/images/entra-provisioning-get-started.png";
-import entraStartProvisioning from "@/modules/integrations/idp-sync/entra-scim/images/entra-provisioning-started.png";
 import entraAssignUsers from "@/modules/integrations/idp-sync/entra-scim/images/entra-assign-users-groups.png";
 import entraEditExternalId from "@/modules/integrations/idp-sync/entra-scim/images/entra-edit-externalid.png";
 import entraGroupMapping from "@/modules/integrations/idp-sync/entra-scim/images/entra-group-attribute-mapping.png";
-import { Lightbox } from "@components/ui/Lightbox";
+import entraGetStarted from "@/modules/integrations/idp-sync/entra-scim/images/entra-provisioning-get-started.png";
+import entraStartProvisioning from "@/modules/integrations/idp-sync/entra-scim/images/entra-provisioning-started.png";
+import { GenericSCIMProps } from "@/modules/integrations/idp-sync/generic-scim/GenericSCIM";
+import { IntegrationModalHeader } from "@/modules/integrations/IntegrationModalHeader";
+import { useSSOConnections } from "@/modules/integrations/sso/useSSOConnections";
 
 interface Props extends GenericSCIMProps {
   open: boolean;
@@ -213,7 +213,7 @@ export function SetupContent({
               key={index}
               className={cn(
                 "w-8 h-1 rounded-full bg-nb-gray-800",
-                step >= index + 1 && "bg-netbird",
+                step >= index + 1 && "bg-netbirdy",
               )}
             />
           ))}
@@ -222,8 +222,8 @@ export function SetupContent({
 
       <IntegrationModalHeader
         image={image || integrationImage}
-        title={`Connect NetBird with ${name}`}
-        description={`Start syncing your users and groups from ${name} to NetBird. Follow the steps below to get started.`}
+        title={`Connect NetBirdy with ${name}`}
+        description={`Start syncing your users and groups from ${name} to NetBirdy. Follow the steps below to get started.`}
       />
 
       {step === -1 && (
@@ -334,7 +334,7 @@ export function SetupContent({
             </Steps.Step>
             <Steps.Step step={4}>
               <p className={"font-normal"}>
-                Enter <Mark copy={true}>NetBird SCIM</Mark> as the name and
+                Enter <Mark copy={true}>NetBirdy SCIM</Mark> as the name and
                 select
                 <Mark>
                   Integrate any other application you don&apos;t find in the
@@ -395,7 +395,7 @@ export function SetupContent({
                 ]}
               />
               <Callout variant={"warning"}>
-                The <span className={"font-medium"}>'?aadOptscim062020'</span>{" "}
+                The <span className={"font-medium"}>&apos;?aadOptscim062020&apos;</span>{" "}
                 flag appended to the Tenant URL is required to ensure Microsoft
                 Entra ID sends SCIM 2.0 compliant requests.{" "}
                 <InlineLink
@@ -473,7 +473,7 @@ export function SetupContent({
                 <Mark>userName</Mark>
                 <Mark>active</Mark>
                 <Mark>displayName</Mark>
-                <Mark>emails[type eq "work"].value</Mark>
+                <Mark>emails[type eq &quot;work&quot;].value</Mark>
                 <Mark>name.givenName</Mark>
                 <Mark>name.familyName</Mark>
                 <Mark>externalId</Mark>
@@ -509,7 +509,7 @@ export function SetupContent({
           <Steps>
             <Steps.Step step={1}>
               <p>
-                Navigate to your NetBird enterprise application and click on{" "}
+                Navigate to your NetBirdy enterprise application and click on{" "}
                 <Mark>Users and groups</Mark> in the left menu
               </p>
               <Lightbox image={entraAssignUsers} />
@@ -517,7 +517,7 @@ export function SetupContent({
             <Steps.Step step={2}>
               <p className={"font-normal"}>
                 Click <Mark>+ Add user/group</Mark> and select the users and
-                groups you want to synchronize to NetBird
+                groups you want to synchronize to NetBirdy
               </p>
             </Steps.Step>
             <Steps.Step step={3} line={false}>

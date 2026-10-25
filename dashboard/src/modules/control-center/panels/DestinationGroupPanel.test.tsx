@@ -11,7 +11,7 @@ vi.mock("@utils/api", () => ({
   default: () => ({ data: undefined, isLoading: false }),
   useApiCall: () => ({}),
 }));
-// @utils/netbird calls loadConfig() at module init, which reads the same
+// @utils/netbirdy calls loadConfig() at module init, which reads the same
 // missing config.
 vi.mock("@utils/config", () => ({ default: () => ({}) }));
 

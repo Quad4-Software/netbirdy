@@ -36,6 +36,7 @@ import { usePermissions } from "@/contexts/PermissionsProvider";
 import { Account } from "@/interfaces/Account";
 import { useAgentNetworkMode } from "@/modules/agent-network/useAgentNetworkMode";
 import useGroupHelper from "@/modules/groups/useGroupHelper";
+import { docsLink } from "@/modules/docs/links";
 
 type Props = {
   account: Account;
@@ -302,12 +303,12 @@ function ClientSettingsTabContent({ account }: Readonly<Props>) {
               />
             </Label>
             <HelpText>
-              Configure how NetBird clients receive update notifications. When
+              Configure how NetBirdy clients receive update notifications. When
               enabled, users will be prompted to install the selected version.
-              This requires at least NetBird{" "}
+              This requires at least NetBirdy{" "}
               <span className={"text-white font-medium"}>v0.61.0</span>.{" "}
               <InlineLink
-                href={"https://docs.netbird.io/manage/peers/auto-update"}
+                href={docsLink("https://docs.netbird.io/manage/peers/auto-update")}
                 target={"_blank"}
               >
                 Learn more
@@ -363,7 +364,7 @@ function ClientSettingsTabContent({ account }: Readonly<Props>) {
                   />
                 }
               >
-                Enabling automatic updates will restart the NetBird client
+                Enabling automatic updates will restart the NetBirdy client
                 during updates, which can temporarily disrupt active
                 connections. Use with caution in production environments.
               </Callout>
@@ -377,8 +378,8 @@ function ClientSettingsTabContent({ account }: Readonly<Props>) {
                 Expose Services from CLI
               </Label>
               <HelpText>
-                Allow peers to expose local services through the NetBird reverse
-                proxy using the CLI. <br /> This requires at least NetBird{" "}
+                Allow peers to expose local services through the NetBirdy reverse
+                proxy using the CLI. <br /> This requires at least NetBirdy{" "}
                 <span className={"text-white font-medium"}>v0.66.0</span>.{" "}
                 <InlineLink
                   href={
@@ -435,11 +436,11 @@ function ClientSettingsTabContent({ account }: Readonly<Props>) {
             </Label>
 
             <HelpText>
-              Instead of maintaining always-on connections, NetBird activates
+              Instead of maintaining always-on connections, NetBirdy activates
               them on-demand based on activity or signaling. This requires
-              NetBird client v0.50.1 or higher.{" "}
+              NetBirdy client v0.50.1 or higher.{" "}
               <InlineLink
-                href={"https://docs.netbird.io/how-to/lazy-connection"}
+                href={docsLink("https://docs.netbird.io/how-to/lazy-connection")}
                 target={"_blank"}
               >
                 Learn more

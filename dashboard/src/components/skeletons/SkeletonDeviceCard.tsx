@@ -1,6 +1,6 @@
+import { cn } from "@utils/helpers";
 import * as React from "react";
 import Skeleton from "react-loading-skeleton";
-import { cn } from "@utils/helpers";
 
 type Props = {
   className?: string;

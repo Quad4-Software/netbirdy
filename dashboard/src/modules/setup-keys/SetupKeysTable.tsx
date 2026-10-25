@@ -24,10 +24,10 @@ import GetStartedTest from "@components/ui/GetStartedTest";
 import NoResults from "@components/ui/NoResults";
 import { ColumnDef, SortingState } from "@tanstack/react-table";
 import dayjs from "dayjs";
+import { uniqBy } from "lodash";
 import { ExternalLinkIcon, PlusCircle } from "lucide-react";
 import { usePathname } from "next/navigation";
 import React, { useMemo, useState } from "react";
-import { uniqBy } from "lodash";
 import { useSWRConfig } from "swr";
 import SetupKeysIcon from "@/assets/icons/SetupKeysIcon";
 import { usePermissions } from "@/contexts/PermissionsProvider";
@@ -157,7 +157,7 @@ export default function SetupKeysTable({
 
   // Default sorting state of the table
   const [sorting, setSorting] = useLocalStorage<SortingState>(
-    "netbird-table-sort" + path,
+    "netbirdy-table-sort" + path,
     [
       {
         id: "valid",

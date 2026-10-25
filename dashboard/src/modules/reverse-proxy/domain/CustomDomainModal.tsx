@@ -1,5 +1,6 @@
 import Button from "@components/Button";
 import { Callout } from "@components/Callout";
+import HelpText from "@components/HelpText";
 import InlineLink from "@components/InlineLink";
 import { Input } from "@components/Input";
 import { Label } from "@components/Label";
@@ -11,6 +12,11 @@ import {
 } from "@components/modal/Modal";
 import ModalHeader from "@components/modal/ModalHeader";
 import Paragraph from "@components/Paragraph";
+import {
+  SelectDropdown,
+  SelectOption,
+} from "@components/select/SelectDropdown";
+import Separator from "@components/Separator";
 import { validator } from "@utils/helpers";
 import { ExternalLinkIcon, GlobeIcon, ServerIcon } from "lucide-react";
 import * as React from "react";
@@ -21,13 +27,7 @@ import {
   REVERSE_PROXY_CUSTOM_DOMAINS_DOCS_LINK,
   ReverseProxyDomainType,
 } from "@/interfaces/ReverseProxy";
-import HelpText from "@components/HelpText";
-import Separator from "@components/Separator";
-import { isNetBirdCloud } from "@/utils/netbird";
-import {
-  SelectDropdown,
-  SelectOption,
-} from "@components/select/SelectDropdown";
+import { isNetBirdCloud } from "@/utils/netbirdy";
 
 type Props = {
   open: boolean;
@@ -93,7 +93,7 @@ export const CustomDomainModal = ({
           icon={<GlobeIcon size={20} />}
           title={"Add Custom Domain"}
           description={"You will need to verify the domain with DNS records"}
-          color={"netbird"}
+          color={"netbirdy"}
         />
 
         <Separator />
@@ -108,7 +108,7 @@ export const CustomDomainModal = ({
                   href={"https://status.netbird.io/"}
                   target={"_blank"}
                 >
-                  NetBird Status
+                  NetBirdy Status
                 </InlineLink>{" "}
                 or reach out to{"  "}
                 <InlineLink href={"mailto:support@netbird.io"}>

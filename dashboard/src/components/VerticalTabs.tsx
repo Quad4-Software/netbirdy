@@ -5,7 +5,6 @@ import { TabsTrigger } from "@radix-ui/react-tabs";
 import { cn } from "@utils/helpers";
 import { usePathname, useRouter } from "next/navigation";
 import React from "react";
-import { useAnnouncement } from "@/contexts/AnnouncementProvider";
 import { headerHeight } from "@/layouts/Header";
 
 type Props = {
@@ -48,7 +47,7 @@ function VerticalTabs({ value, onChange, children }: Props) {
 }
 
 function List({ children }: { children: React.ReactNode }) {
-  const { bannerHeight } = useAnnouncement();
+  const bannerHeight = 0;
   const viewport = React.useRef<HTMLDivElement>(null);
   const [overflows, setOverflows] = React.useState({
     start: false,

@@ -11,11 +11,11 @@ import { useDialog } from "@/contexts/DialogProvider";
 import { usePermissions } from "@/contexts/PermissionsProvider";
 import { Account } from "@/interfaces/Account";
 import { IntuneIntegration } from "@/interfaces/EDR";
+import { Group } from "@/interfaces/Group";
 import IntuneConfiguration from "@/modules/integrations/edr/intune/IntuneConfiguration";
 import IntuneSetup from "@/modules/integrations/edr/intune/IntuneSetup";
 import { useIntegrations } from "@/modules/integrations/edr/useIntegrations";
 import { IntegrationCard } from "@/modules/integrations/IntegrationCard";
-import { Group } from "@/interfaces/Group";
 
 type Props = {
   account: Account;

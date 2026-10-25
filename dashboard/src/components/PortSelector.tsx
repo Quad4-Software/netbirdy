@@ -265,7 +265,7 @@ export function PortSelector({
                           className={"text-neutral-500 dark:text-nb-gray-300"}
                         >
                           Add this port or range by pressing{" "}
-                          <span className={"font-bold text-netbird"}>
+                          <span className={"font-bold text-netbirdy"}>
                             {"'Enter'"}
                           </span>
                         </div>
@@ -322,7 +322,7 @@ export function PortSelector({
       </Popover>
       {portRanges?.length > 0 && (
         <Callout variant={"info"} className={"mt-4"}>
-          Port ranges requires NetBird client{" "}
+          Port ranges requires NetBirdy client{" "}
           <span className={"text-white font-normal"}>v0.48</span> or higher.
         </Callout>
       )}

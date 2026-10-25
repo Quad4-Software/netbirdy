@@ -21,9 +21,9 @@ import {
   AIProviderId,
 } from "@/modules/agent-network/data/mockData";
 
-// Same gray-to-netbird treatment the install-peer modal gives its OS tabs.
+// Same gray-to-netbirdy treatment the install-peer modal gives its OS tabs.
 const TAB_ICON =
-  "fill-nb-gray-500 group-data-[state=active]/trigger:fill-netbird transition-all";
+  "fill-nb-gray-500 group-data-[state=active]/trigger:fill-netbirdy transition-all";
 
 // providerIcon badges a backend option with the same mark the providers
 // tables show for that catalog entry.
@@ -204,7 +204,7 @@ const PROMPT = "Say hello in one word.";
 const MAX_TOKENS = 32;
 
 // sdkLines calls the SDK of the example's API shape. Both SDKs insist on an
-// API key, which NetBird swaps for the provider's.
+// API key, which NetBirdy swaps for the provider's.
 function sdkLines({ api, model }: ConnectExample, baseUrl: string): string[] {
   const messages = `    messages=[{"role": "user", "content": "${PROMPT}"}],`;
   if (api === "anthropic") {
@@ -282,17 +282,17 @@ function openCodeLines({ api, model }: ConnectExample, baseUrl: string) {
   return json({
     $schema: "https://opencode.ai/config.json",
     provider: {
-      netbird: {
+      netbirdy: {
         npm:
           api === "anthropic"
             ? "@ai-sdk/anthropic"
             : "@ai-sdk/openai-compatible",
-        name: "NetBird",
+        name: "NetBirdy",
         options: { baseURL: `${baseUrl}/v1`, apiKey: "not-needed" },
         models: { [model]: {} },
       },
     },
-    model: `netbird/${model}`,
+    model: `netbirdy/${model}`,
   });
 }
 
@@ -304,7 +304,7 @@ function piModelsLines({ api, model }: ConnectExample, baseUrl: string) {
   const anthropic = api === "anthropic";
   return json({
     providers: {
-      netbird: {
+      netbirdy: {
         baseUrl: anthropic ? baseUrl : `${baseUrl}/v1`,
         api: anthropic ? "anthropic-messages" : "openai-completions",
         apiKey: "not-needed",
@@ -649,10 +649,10 @@ export function AgentConnectTabs({
                   }
                   lines={[
                     ...(codexModel ? [`model = "${codexModel}"`] : []),
-                    `model_provider = "netbird"`,
+                    `model_provider = "netbirdy"`,
                     ``,
-                    `[model_providers.netbird]`,
-                    `name = "NetBird"`,
+                    `[model_providers.netbirdy]`,
+                    `name = "NetBirdy"`,
                     `base_url = "${openaiBase}"`,
                     `wire_api = "responses"`,
                   ]}
@@ -703,7 +703,7 @@ export function AgentConnectTabs({
                     </>
                   }
                   lines={json({
-                    defaultProvider: "netbird",
+                    defaultProvider: "netbirdy",
                     defaultModel: model,
                   })}
                 />
@@ -718,7 +718,7 @@ export function AgentConnectTabs({
               // Kimi CLI reads providers from ~/.kimi/config.toml. Unlike
               // Claude Code, its "anthropic" provider type needs the bare
               // endpoint — no /anthropic prefix in base_url; api_key is a
-              // placeholder since NetBird injects the real key server-side.
+              // placeholder since NetBirdy injects the real key server-side.
               title={
                 <>
                   Add to <ConfigPath path={"~/.kimi/config.toml"} />
@@ -727,13 +727,13 @@ export function AgentConnectTabs({
               lines={[
                 `default_model = "${kimiModel}"`,
                 ``,
-                `[providers.netbird]`,
+                `[providers.netbirdy]`,
                 `type = "anthropic"`,
                 `base_url = "${baseUrl}"`,
                 `api_key = "-"`,
                 ``,
                 `[models."${kimiModel}"]`,
-                `provider = "netbird"`,
+                `provider = "netbirdy"`,
                 `model = "${kimiModel}"`,
                 `max_context_size = 1000000`,
               ]}

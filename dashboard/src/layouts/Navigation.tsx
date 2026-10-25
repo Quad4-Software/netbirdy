@@ -1,33 +1,29 @@
 "use client";
 
 import { ScrollArea } from "@components/ScrollArea";
+import { SmallBadge } from "@components/ui/SmallBadge";
 import { cn } from "@utils/helpers";
-import { isNetBirdCloud } from "@utils/netbird";
+import { isNetBirdCloud } from "@utils/netbirdy";
+import * as React from "react";
 import AccessControlIcon from "@/assets/icons/AccessControlIcon";
+import ActivityIcon from "@/assets/icons/ActivityIcon";
 import AgentNetworkIcon from "@/assets/icons/AgentNetworkIcon";
 import ControlCenterIcon from "@/assets/icons/ControlCenterIcon";
 import DNSIcon from "@/assets/icons/DNSIcon";
 import DocsIcon from "@/assets/icons/DocsIcon";
 import IntegrationIcon from "@/assets/icons/IntegrationIcon";
 import PeerIcon from "@/assets/icons/PeerIcon";
+import ReverseProxyIcon from "@/assets/icons/ReverseProxyIcon";
 import SettingsIcon from "@/assets/icons/SettingsIcon";
 import TeamIcon from "@/assets/icons/TeamIcon";
-import { DistributorNavigation } from "@/cloud/distributor/DistributorNavigation";
-import { MSPNavigationItem } from "@/cloud/msp/MSPNavigationItem";
 import SidebarItem from "@/components/SidebarItem";
 import { NavigationVersionInfo } from "@/components/VersionInfo";
-import { useAnnouncement } from "@/contexts/AnnouncementProvider";
 import { useApplicationContext } from "@/contexts/ApplicationProvider";
 import { usePermissions } from "@/contexts/PermissionsProvider";
 import { headerHeight } from "@/layouts/Header";
 import { useAgentNetworkMode } from "@/modules/agent-network/useAgentNetworkMode";
 import { useMyAgentNetworkSetup } from "@/modules/agent-network/useMyAgentNetworkSetup";
-import { NavigationUsageInfo } from "@/modules/billing/NavigationUsageInfo";
 import { NetworkNavigation } from "@/modules/networks/misc/NetworkNavigation";
-import { SmallBadge } from "@components/ui/SmallBadge";
-import * as React from "react";
-import ReverseProxyIcon from "@/assets/icons/ReverseProxyIcon";
-import ActivityIcon from "@/assets/icons/ActivityIcon";
 
 type Props = {
   fullWidth?: boolean;
@@ -38,7 +34,7 @@ export default function Navigation({
   fullWidth = false,
   hideOnMobile = false,
 }: Readonly<Props>) {
-  const { bannerHeight } = useAnnouncement();
+  const bannerHeight = 0;
   const { isNavigationCollapsed } = useApplicationContext();
   const { permission } = usePermissions();
   // "enabled" already falls back to the caller's agent_network grants when
@@ -113,8 +109,6 @@ export default function Navigation({
                   // the link stays even in the limited (user role) sidebar.
                   visible={true}
                 />
-
-                <DistributorNavigation />
                 <SidebarItem
                   icon={<AccessControlIcon />}
                   label="Access Control"
@@ -357,29 +351,15 @@ export default function Navigation({
                   exactPathMatch={true}
                   visible={permission.settings.read}
                 />
-                <MSPNavigationItem />
-                <SidebarItem
-                  icon={<IntegrationIcon />}
-                  label="Integrations"
-                  href={"/integrations"}
-                  exactPathMatch={true}
-                  visible={
-                    permission?.edr?.read ||
-                    permission?.idp?.read ||
-                    permission?.event_streaming?.read ||
-                    (!isNetBirdCloud() && (permission?.settings?.read ?? false))
-                  }
-                />
                 <SidebarItem
                   icon={<DocsIcon />}
-                  href={"https://docs.netbird.io/"}
-                  target={"_blank"}
+                  href={"/docs"}
                   label="Documentation"
                   visible={true}
                 />
               </SidebarItemGroup>
             </div>
-            <NavigationUsageInfo />
+            
             <NavigationVersionInfo />
           </div>
         </ScrollArea>

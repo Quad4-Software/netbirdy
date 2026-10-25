@@ -34,6 +34,7 @@ import {
 } from "lucide-react";
 import React, { useMemo, useState } from "react";
 import { useSWRConfig } from "swr";
+import { idpIcon } from "@/assets/icons/IdentityProviderIcons";
 import { usePermissions } from "@/contexts/PermissionsProvider";
 import {
   SSOIdentityProvider,
@@ -41,7 +42,6 @@ import {
   SSOIdentityProviderRequest,
   SSOIdentityProviderType,
 } from "@/interfaces/IdentityProvider";
-import { idpIcon } from "@/assets/icons/IdentityProviderIcons";
 
 const issuerHints: Partial<Record<SSOIdentityProviderType, string>> = {
   keycloak: "https://keycloak.example.com/realms/{REALM}",
@@ -170,7 +170,7 @@ export default function IdentityProviderModal({
                 ? "Update the identity provider configuration"
                 : "Configure a new identity provider for authentication"
             }
-            color={"netbird"}
+            color={"netbirdy"}
           />
 
           <Separator />

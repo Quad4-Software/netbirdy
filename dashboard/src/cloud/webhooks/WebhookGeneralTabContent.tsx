@@ -1,11 +1,11 @@
-import React from "react";
 import HelpText from "@components/HelpText";
 import { Input } from "@components/Input";
 import { Label } from "@components/Label";
 import { TabsContent } from "@components/Tabs";
 import { GlobeIcon } from "lucide-react";
-import { AuthenticationSettings } from "@/cloud/webhooks/WebhookAuthenticationSettings";
+import React from "react";
 import { WebhookConfig } from "@/cloud/webhooks/useWebhookConfig";
+import { AuthenticationSettings } from "@/cloud/webhooks/WebhookAuthenticationSettings";
 
 type Props = {
   value: WebhookConfig;

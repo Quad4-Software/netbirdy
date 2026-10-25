@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
-import { createPortal } from "react-dom";
 import Badge from "@components/Badge";
 import FullTooltip from "@components/FullTooltip";
-import { AlertTriangle } from "lucide-react";
 import InlineLink from "@components/InlineLink";
+import { AlertTriangle } from "lucide-react";
+import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { useReverseProxies } from "@/contexts/ReverseProxiesProvider";
 
 export function TerminatedProxiesProvider() {
@@ -50,7 +50,7 @@ const terminatedBadge = (
   <FullTooltip
     content={
       <div className={"text-xs max-w-xs"}>
-        This service has been terminated by the NetBird team as it violates the
+        This service has been terminated by the NetBirdy team as it violates the
         Terms of Service. For questions, please contact{" "}
         <InlineLink href="mailto:support@netbird.io?subject=Request%20for%20Assistance%3A%20Terminated%20Service">
           support@netbird.io

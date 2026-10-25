@@ -1,5 +1,4 @@
 import { expect } from "@playwright/test";
-import { test } from "../helpers/fixtures";
 import {
   createGroup,
   createPolicy,
@@ -7,7 +6,6 @@ import {
   deletePeersByPrefix,
   deletePoliciesBySubstring,
 } from "../helpers/api";
-import { generateRandomName } from "../helpers/utils";
 import {
   canvasNode,
   dismissBlockingOverlays,
@@ -15,6 +13,8 @@ import {
   resetDraftState,
 } from "../helpers/control-center";
 import { cleanupDockerPeer, registerDockerPeer } from "../helpers/docker-peer";
+import { test } from "../helpers/fixtures";
+import { generateRandomName } from "../helpers/utils";
 
 /**
  * Live PEER view with a REAL docker peer registered via a setup key (the test

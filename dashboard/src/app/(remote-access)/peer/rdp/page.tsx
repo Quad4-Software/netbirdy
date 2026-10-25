@@ -2,13 +2,14 @@
 
 import { notify } from "@components/Notification";
 import FullScreenLoading from "@components/ui/FullScreenLoading";
+import { getOperatingSystem } from "@hooks/useOperatingSystem";
 import { IconCircleX } from "@tabler/icons-react";
 import useFetchApi from "@utils/api";
+import { cn } from "@utils/helpers";
 import { Loader2Icon } from "lucide-react";
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import type { Peer } from "@/interfaces/Peer";
-import { getOperatingSystem } from "@hooks/useOperatingSystem";
 import { OperatingSystem } from "@/interfaces/OperatingSystem";
+import type { Peer } from "@/interfaces/Peer";
 import { RDPCertificateModal } from "@/modules/remote-access/rdp/RDPCertificateModal";
 import { RDPCredentialsModal } from "@/modules/remote-access/rdp/RDPCredentialsModal";
 import { useRDPQueryParams } from "@/modules/remote-access/rdp/useRDPQueryParams";
@@ -21,7 +22,6 @@ import {
   NetBirdStatus,
   useNetBirdClient,
 } from "@/modules/remote-access/useNetBirdClient";
-import { cn } from "@utils/helpers";
 
 export default function RDPPage() {
   const { peerId } = useRDPQueryParams();
@@ -70,7 +70,7 @@ function RDPSession({ peer }: Props) {
   };
 
   /**
-   * Reset the RDP session state but keep the NetBird client connected,
+   * Reset the RDP session state but keep the NetBirdy client connected,
    * so a retry does not pay the full engine reconnect.
    */
   const reset = useCallback(async () => {
@@ -104,7 +104,7 @@ function RDPSession({ peer }: Props) {
         status = NetBirdStatus.DISCONNECTED;
       } catch (error) {
         sendErrorNotification(
-          "NetBird Connection Error",
+          "NetBirdy Connection Error",
           (error as Error).message,
         );
         return;
@@ -121,7 +121,7 @@ function RDPSession({ peer }: Props) {
         setIsNetBirdConnecting(false);
       } catch (error) {
         sendErrorNotification(
-          "NetBird Connection Error",
+          "NetBirdy Connection Error",
           (error as Error).message,
         );
         setIsNetBirdConnecting(false);
@@ -155,7 +155,7 @@ function RDPSession({ peer }: Props) {
   }, [credentials, peer.ip, rdp, reset]);
 
   /**
-   * Establish RDP session when NetBird connection is ready
+   * Establish RDP session when NetBirdy connection is ready
    */
   useEffect(() => {
     if (
@@ -177,16 +177,16 @@ function RDPSession({ peer }: Props) {
   ]);
 
   /**
-   * Display notifications for RDP and NetBird client errors
+   * Display notifications for RDP and NetBirdy client errors
    */
   useEffect(() => {
     if (rdp.error) {
       sendErrorNotification("RDP Error", rdp.error);
     }
     if (client.error) {
-      sendErrorNotification("NetBird Client Error", client.error);
+      sendErrorNotification("NetBirdy Client Error", client.error);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [rdp.error, client.error]);
 
   /**

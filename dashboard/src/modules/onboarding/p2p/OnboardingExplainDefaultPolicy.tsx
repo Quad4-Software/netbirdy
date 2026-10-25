@@ -25,7 +25,7 @@ export const OnboardingExplainDefaultPolicy = ({
             "text-sm text-nb-gray-300 font-light mt-2 block text-center sm:px-4"
           }
         >
-            {`With NetBird, you decide who gets access to what.
+            {`With NetBirdy, you decide who gets access to what.
             We've already set up an access policy for your devices.`}
         </div>
 

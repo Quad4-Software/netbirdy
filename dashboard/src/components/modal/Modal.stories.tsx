@@ -88,7 +88,7 @@ function Footer({
           Learn more about{" "}
           <a
             href={"#"}
-            className={"text-netbird inline-flex items-center gap-1"}
+            className={"text-netbirdy inline-flex items-center gap-1"}
           >
             Groups <ExternalLinkIcon size={12} />
           </a>
@@ -112,7 +112,7 @@ export const Default: StoryObj = {
           icon={<FolderGit2 size={18} />}
           title={"Create group"}
           description={"Groups bundle peers for access control."}
-          color={"netbird"}
+          color={"netbirdy"}
         />
         <FormBody />
         <Footer />
@@ -128,7 +128,7 @@ export const SetupFooterNoSeparator: StoryObj = {
         <ModalHeader
           icon={<MonitorSmartphoneIcon size={18} />}
           color={"blue"}
-          title={"Install NetBird"}
+          title={"Install NetBirdy"}
           description={"Footer in the setup variant, without a separator."}
         />
         <FormBody />
@@ -145,7 +145,7 @@ export const HeaderVariants: StoryObj = {
         <div className={"flex flex-col gap-2 pb-6"}>
           {(
             [
-              "netbird",
+              "netbirdy",
               "blue",
               "red",
               "gray",

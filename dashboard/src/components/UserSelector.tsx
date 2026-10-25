@@ -170,7 +170,7 @@ export const UserListItem = ({
   className,
   variant,
 }: UserListItemProps) => {
-  const isSystemUser = user?.email === "NetBird" || user?.email === "";
+  const isSystemUser = user?.email === "NetBirdy" || user?.email === "";
   const maxChars = variant === "selected" ? 30 : 20;
 
   return (
@@ -209,7 +209,7 @@ export const UserListItem = ({
           )}
         >
           <TextWithTooltip
-            text={user?.email || "NetBird"}
+            text={user?.email || "NetBirdy"}
             maxChars={maxChars}
           />
         </span>

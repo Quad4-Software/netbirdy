@@ -1,10 +1,10 @@
 import { Input } from "@components/Input";
 import Kbd from "@components/Kbd";
 import { useDebounce } from "@hooks/useDebounce";
+import { isMac } from "@hooks/useOperatingSystem";
 import { Search } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
-import { isMac } from "@hooks/useOperatingSystem";
 
 interface Props extends React.InputHTMLAttributes<HTMLInputElement> {
   setGlobalSearch: (value: string) => void;

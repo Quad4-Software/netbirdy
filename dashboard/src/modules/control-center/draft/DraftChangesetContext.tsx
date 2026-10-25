@@ -1,5 +1,6 @@
 "use client";
 
+import { e2eHooksEnabled } from "@utils/netbirdy";
 import React, {
   createContext,
   useCallback,
@@ -19,9 +20,9 @@ import type { AgentPolicy } from "@/modules/agent-network/data/mockData";
 import {
   deletedGroupRefs,
   detachChangesFromDraftNetwork,
+  dropGroupIdsFromAgentPolicy,
   isEmptiedPolicy,
   isNoopGroupUpdate,
-  dropGroupIdsFromAgentPolicy,
   isPendingPolicyWrite,
   mergeAgentGroupDeletions,
   mergeGroupDeletions,
@@ -29,7 +30,6 @@ import {
   reduceRemoveChange,
 } from "@/modules/control-center/utils/change-cascade";
 import { draftUid } from "@/modules/control-center/utils/helpers";
-import { e2eHooksEnabled } from "@utils/netbird";
 
 export {
   isEmptiedPolicy,

@@ -1,5 +1,5 @@
-import { test, expect } from "../helpers/fixtures";
 import { navigateTo } from "../helpers/auth";
+import { expect,test } from "../helpers/fixtures";
 
 test.describe.serial("Settings - Authentication @settings", () => {
   test("Should toggle peer approval @enterprise", async ({ dashboardAsOwner: page }) => {

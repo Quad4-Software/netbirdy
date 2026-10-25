@@ -10,7 +10,7 @@
  * `dashboardAsOwner` logs in once (via OIDC redirect) and reuses the same
  * browser page for every test in the worker — no per-test login overhead.
  */
-import { test as base, type Page, type BrowserContext } from "@playwright/test";
+import { type BrowserContext,type Page, test as base } from "@playwright/test";
 import { loginToApp, type TestUser } from "./auth";
 
 type Fixtures = {

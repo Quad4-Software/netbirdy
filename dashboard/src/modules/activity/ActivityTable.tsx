@@ -29,6 +29,7 @@ import PeerIcon from "@/assets/icons/PeerIcon";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { ActivityEvent } from "@/interfaces/ActivityEvent";
 import { ActivityEntryRow } from "@/modules/activity/ActivityEntryRow";
+import { docsLink } from "@/modules/docs/links";
 import {
   ActivityTypePicker,
   formatActivityTypeChip,
@@ -77,7 +78,7 @@ const ActivityFeedColumnsTable: ColumnDef<ActivityEvent>[] = [
   },
   {
     id: "initiator_email",
-    accessorFn: (row) => row.initiator_email || "NetBird",
+    accessorFn: (row) => row.initiator_email || "NetBirdy",
     filterFn: "exactMatch",
   },
 ];
@@ -104,7 +105,7 @@ export default function ActivityTable({
   // Initial Date Range
   const [initialDateRange, setInitialDateRange] = useLocalStorage<
     DateRange | undefined
-  >("netbird-table-range" + path, {
+  >("netbirdy-table-range" + path, {
     from: defaultFromDate,
     to: defaultToDate,
   });
@@ -120,7 +121,7 @@ export default function ActivityTable({
     return uniqueUsers.map((event) => ({
       name: event.initiator_name,
       id: event.initiator_id,
-      email: event.initiator_email || "NetBird",
+      email: event.initiator_email || "NetBirdy",
       external: !!event?.meta?.external,
     }));
   }, [events]);
@@ -192,7 +193,7 @@ export default function ActivityTable({
               size={"large"}
             />
           }
-          title={"Get Started with NetBird"}
+          title={"Get Started with NetBirdy"}
           description={
             "It looks like you don't have any connected machines.\n" +
             "Get started by adding one to your network."
@@ -202,7 +203,7 @@ export default function ActivityTable({
             <>
               Learn more in our{" "}
               <InlineLink
-                href={"https://docs.netbird.io/how-to/getting-started"}
+                href={docsLink("https://docs.netbird.io/how-to/getting-started")}
                 target={"_blank"}
               >
                 Getting Started Guide

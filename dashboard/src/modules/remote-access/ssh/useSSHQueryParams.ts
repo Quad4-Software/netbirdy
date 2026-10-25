@@ -18,7 +18,7 @@ export function useSSHQueryParams() {
     port: null,
     ipVersion: null,
   });
-  const [, setLocalQueryParams] = useLocalStorage("netbird-query-params", "");
+  const [, setLocalQueryParams] = useLocalStorage("netbirdy-query-params", "");
 
   useEffect(() => {
     const peerId = searchParams.get("id");
@@ -33,7 +33,7 @@ export function useSSHQueryParams() {
     }
 
     // Otherwise, try to restore from localStorage
-    const storedParams = localStorage.getItem("netbird-query-params");
+    const storedParams = localStorage.getItem("netbirdy-query-params");
     if (!storedParams) return;
 
     // Handle JSON encoded strings from localStorage

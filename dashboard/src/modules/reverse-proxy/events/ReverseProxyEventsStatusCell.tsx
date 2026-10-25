@@ -1,7 +1,7 @@
+import Badge from "@components/Badge";
 import FullTooltip from "@components/FullTooltip";
 import * as React from "react";
 import { isL4Event, ReverseProxyEvent } from "@/interfaces/ReverseProxy";
-import Badge from "@components/Badge";
 import EmptyRow from "@/modules/common-table-rows/EmptyRow";
 
 type Props = {

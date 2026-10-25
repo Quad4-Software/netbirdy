@@ -1,22 +1,22 @@
 "use client";
 
 import HelpText from "@components/HelpText";
+import { HelpTooltip } from "@components/HelpTooltip";
+import InlineLink, { InlineButtonLink } from "@components/InlineLink";
 import { Label } from "@components/Label";
 import { Modal } from "@components/modal/Modal";
 import { ClusterOption, PeerGroupSelector } from "@components/PeerGroupSelector";
 import React, { useMemo, useState } from "react";
+import {
+  isResourceTargetType,
+  useReverseProxies,
+} from "@/contexts/ReverseProxiesProvider";
 import { Network } from "@/interfaces/Network";
 import {
   ReverseProxyDomainType,
   ReverseProxyTargetType,
 } from "@/interfaces/ReverseProxy";
-import {
-  isResourceTargetType,
-  useReverseProxies,
-} from "@/contexts/ReverseProxiesProvider";
-import { HelpTooltip } from "@components/HelpTooltip";
-import InlineLink, { InlineButtonLink } from "@components/InlineLink";
-import SetupModal from "@/modules/setup-netbird-modal/SetupModal";
+import SetupModal from "@/modules/setup-netbirdy-modal/SetupModal";
 
 export type Target = {
   type: ReverseProxyTargetType;
@@ -92,12 +92,12 @@ export default function ReverseProxyTargetSelector({
               content={
                 <>
                   A <span className={"text-white font-medium"}>peer</span> is a
-                  machine (e.g., laptop, server, container) running NetBird.
+                  machine (e.g., laptop, server, container) running NetBirdy.
                   Select a peer if your service runs directly on it.
                   <span className={"mt-1 block"}>
                     If you don&apos;t have a peer yet, you can{" "}
                     <InlineButtonLink onClick={() => setInstallModal(true)}>
-                      Install NetBird
+                      Install NetBirdy
                     </InlineButtonLink>
                     .
                   </span>
@@ -114,7 +114,7 @@ export default function ReverseProxyTargetSelector({
                 <>
                   A <span className={"text-white font-medium"}>resource</span>{" "}
                   is a destination (IP, subnet, or domain) that can&apos;t run
-                  NetBird directly. Resources are part of a network and are
+                  NetBirdy directly. Resources are part of a network and are
                   reached through a routing peer that forwards traffic to them.
                   <span className={"mt-1 block"}>
                     If you don&apos;t have resources yet, go to{" "}

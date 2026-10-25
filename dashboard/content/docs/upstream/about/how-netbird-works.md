@@ -1,0 +1,128 @@
+---
+title: "How NetBird Works"
+description: ""
+order: 100
+upstream: "about-netbird/how-netbird-works.mdx@2382247"
+---
+
+> **Note** This page is adapted from the upstream NetBird documentation (BSD-3-Clause) and may describe features that NetBirdy does not include.
+
+# How NetBird Works
+
+NetBird is an open source platform consisting of a collection of components, responsible for handling peer-to-peer
+connections, tunneling, authentication, and network management (IPs, keys, ACLs, etc).
+
+It uses open-source technologies like [WireGuard®](https://www.wireguard.com/), [Pion ICE (WebRTC)](https://github.com/pion/ice), [Coturn](https://github.com/coturn/coturn),
+and [software](https://github.com/netbirdio/netbird) developed by NetBird to make secure private networks deployment and management simple.
+
+NetBird relies on four components - **Client** application, **Management**, **Signal** and **Relay** services.
+
+The combination of these elements ensures that direct point-to-point connections are established and only authenticated
+users (or machines) have access to the resources for which they are authorized.
+
+A **Peer** is a machine or any device that is connected to the network.
+It can be a Linux server running in the cloud or on-premises, a personal laptop, mobile phone, or even a Raspberry Pi.
+
+<p>
+    <img src="/docs-img/docs-static-img-about-netbird-high-level-dia.png" alt="high-level-dia" className="imagewrapper-big"/>
+</p>
+
+With NetBird clients installed and authorized on the Management service, machines form a mesh network connecting
+to each other directly via an encrypted point-to-point WireGuard tunnel.
+
+<p>
+    <img src="/docs-img/docs-static-img-about-netbird-mesh.png" alt="high-level-dia" className="imagewrapper"/>
+</p>
+
+While it is possible to create a full mesh network, it might be not a desirable outcome.
+In this case, [groups and access controls](/manage/access-control/manage-network-access) can be utilized to limit the access to certain machines.
+
+Let's now take a closer look at each of NetBird's components.
+
+## Management Service
+
+The Management service is the central coordination component for NetBird with a UI dashboard.
+It keeps the network state, public WireGuard keys of the peers, authenticates and distributes network changes to peers.
+
+The Management Service's responsibilities include:
+
+* **Registering and authenticating new peers.**  Every new machine has to register itself in the network in order to connect to other machines.
+After installation, NetBird client requires login that can be done through Identity Provider (IDP) like Okta or with a [setup key](/manage/peers/register-machines-using-setup-keys).
+* **Keeping the network map.** The Management service stores information about all the registered peers including WireGuard public key that was sent during the registration process.
+* **Managing private IP addresses.** Each peer receives a unique private IP with which it can be identified in the network.
+We use [Carrier Grade NAT](https://en.wikipedia.org/wiki/Carrier-grade_NAT) address space with an allocated address block <em>100.64.0.0/10</em>.
+Each account gets its own range inside this block, a randomly chosen /16 by default, and each new peer receives a randomly chosen free address from it.
+When a peer is deleted, its address is released immediately and can be assigned to a later peer; there is no holding period.
+* **Synchronizing network changes to peers.** The Management Service keeps a control channel open to each peer sending network updates.
+Whenever a new peer joins the network, all other peers that are authorized to connect to it receive an update.
+After that, they are able to establish a connection to the new peer.
+* **Creating and managing access control rules.**
+* **Managing private DNS.** [DNS](/manage/dns) allows referring to each of the peers with a fully qualified domain name (FQDN).
+* **Logging network activity.**
+* **Managing users.**
+
+The Management service runs in the cloud NetBird-managed. It can also be self-hosted.
+
+<p>
+    <img src="/docs-img/docs-static-img-about-netbird-management.png" alt="management-dia" className="imagewrapper-big"/>
+</p>
+
+## Client Application
+
+The NetBird client is software installed on the machines within a NetBird network.
+It is an entry point to your private network that makes it possible for machines to communicate with each other.
+Once installed and registered, a machine becomes a peer within the network.
+
+The Client's roles are the following:
+
+* **Generating private and public WireGuard keys.** These keys are used for packet encryption between peers and for [WireGuard Cryptokey Routing](https://www.wireguard.com/#cryptokey-routing).
+To accept the incoming connections, peers have to know each other, therefore, the generated public keys have to be pre-shared on the machines.
+The client application sends its public key to the Management service which then distributes it to the authorized peers.
+* **Handling peer registration and authentication.**  Each peer has to be authenticated and registered in the system.
+The client application requests a user to log in with an Identity Provider (IDP) or a [setup key](/manage/peers/register-machines-using-setup-keys) so that the peer can be associated with the organization's account.
+* **Receiving network updates from the Management service.**
+Each peer receives initial configuration and a list of peers with corresponding public keys and IP addresses so that it can establish a point-to-point connection.
+* **Establishing point-to-point WireGuard connection.** To establish a connection with a remote peer, the Client first discovers the most suitable connection candidate, or simply address (IP:port) that other peers can use to connect to it.
+It then sends it to the remote peer via Signal. The message body is encrypted end to end with a shared key that each peer derives from its own private key and the other peer's public key (NaCl `box`: Curve25519, XSalsa20, Poly1305). Signal sees the two peers' public keys, so it knows who is talking to whom, but never the contents. The same shared key also authenticates the message, so there is no separate signature step.
+The remote peer does the same and once the peers can reach each other, they establish an encrypted WireGuard tunnel.
+* **Applying access control policies.** The client application applies access control rules that are received from the Management service.
+The client uses a system's available firewall manager like `nftables` to apply the rules.
+* **Applying DNS settings.** The client application runs an [embedded DNS resolver](https://netbird.io/knowledge-hub/using-xdp-ebpf-to-share-default-dns-port-between-resolvers) and ensures that the machine can resolve other peers' FQDNs in the `netbird.cloud` namespaces.
+The client also applies other DNS settings that are received from the Management service.
+
+> **Note** The **private key**, generated by the NetBird client, **never leaves the machine**, ensuring that only the machine that owns the key can decrypt traffic addressed to it.
+
+
+## Signal Service
+
+The Signal Service, or simply Signal, is a lightweight piece of software that helps peers to negotiate direct connections.
+It does not store any data and no traffic passes through it.
+
+Signal's sole responsibility is:
+* **Serve as a notification mechanism for peers.** Before a connection can be established,
+peers need to find each other and exchange the most suitable connection candidates.
+This is done through Signal. After a connection has been established, Signal steps out.
+
+<p>
+    <img src="/docs-img/docs-static-img-about-netbird-signal.png" alt="signal-dia" className="imagewrapper-big"/>
+</p>
+
+> **Note** Messages that are sent over Signal are **point-to-point encrypted**, so Signal can't see the contents.
+
+
+NetBird Signal is very similar to the signaling servers used in [WebRTC](https://developer.mozilla.org/en-US/Web/API/WebRTC_API/Signaling_and_video_calling#the_signaling_server).
+It runs in the cloud NetBird-managed and can be self-hosted.
+
+## Relay Service
+
+The Relay service is a [TURN server](https://webrtc.org/getting-started/turn-server) in WebRTC terminology.
+In fact, we use an open-source implementation called [Coturn](https://github.com/coturn/coturn).
+The purpose of the Relay service is to gracefully implement a "Plan B" by relaying traffic between peers when a direct point-to-point connection is not possible. However, starting with v0.29.0, a new WebSocket-based relay has been introduced with the intent of replacing the previous TURN relay (Coturn). [More info](https://netbird.io/knowledge-hub/september-newsletter).
+<p>
+    <img src="/docs-img/docs-static-img-about-netbird-relay.png" alt="relay-dia" className="imagewrapper-big"/>
+</p>
+
+> **Note** Similar to Signal, traffic that flows through the Relay cannot be decrypted due to the **WireGuard point-to-point encryption**.
+
+
+It runs in the cloud or can be self-hosted.

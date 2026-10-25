@@ -1,15 +1,15 @@
 import CopyToClipboardText from "@components/CopyToClipboardText";
 import FullTooltip from "@components/FullTooltip";
+import { ListItem } from "@components/ListItem";
 import { cn } from "@utils/helpers";
 import { isEmpty } from "lodash";
 import { FlagIcon, GlobeIcon } from "lucide-react";
 import * as React from "react";
 import { useMemo } from "react";
+import Skeleton from "react-loading-skeleton";
 import RoundedFlag from "@/assets/countries/RoundedFlag";
 import { useCountries } from "@/contexts/CountryProvider";
 import { ReverseProxyEvent } from "@/interfaces/ReverseProxy";
-import Skeleton from "react-loading-skeleton";
-import { ListItem } from "@components/ListItem";
 
 type Props = {
   event: ReverseProxyEvent;

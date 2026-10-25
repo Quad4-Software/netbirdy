@@ -214,7 +214,7 @@ export class IronRDPWASMBridge {
       }
       // RDCleanPath proxy is required for IronRDP
       if (!netbirdClient || !netbirdClient.createRDPProxy) {
-        throw new Error("NetBird client with RDP proxy support is required");
+        throw new Error("NetBirdy client with RDP proxy support is required");
       }
       const proxyURL = await netbirdClient.createRDPProxy(
         hostname,

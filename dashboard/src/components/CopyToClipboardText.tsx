@@ -28,11 +28,21 @@ export default function CopyToClipboardText({
 
   return (
     <div
+      role="button"
+      tabIndex={0}
+      aria-label="Copy to clipboard"
       className={cn("flex gap-2 items-center group cursor-pointer", className)}
       onClick={(e) => {
         e.stopPropagation();
         e.preventDefault();
         copyToClipboard(message).then();
+      }}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.stopPropagation();
+          e.preventDefault();
+          copyToClipboard(message).then();
+        }
       }}
       ref={wrapper}
     >

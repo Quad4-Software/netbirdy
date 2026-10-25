@@ -1,16 +1,16 @@
 import { describe, expect, it, vi } from "vitest";
-import { Policy } from "@/interfaces/Policy";
 import { Group } from "@/interfaces/Group";
+import { Policy } from "@/interfaces/Policy";
 import {
   CreateGroupChange,
   CreatePolicyChange,
   CreateResourceChange,
   DeletePolicyChange,
+  DraftChange,
   InstallPeerChange,
   UpdateGroupChange,
   UpdatePolicyChange,
   UpdateResourceChange,
-  DraftChange,
 } from "@/modules/control-center/draft/DraftChangesetContext";
 import {
   buildBeforeRequest,
@@ -96,7 +96,7 @@ describe("buildChangeRequest", () => {
             destinations: [{ id: "g2", name: "Admins" }],
             bidirectional: true,
             action: "accept",
-            protocol: "netbird-ssh",
+            protocol: "netbirdy-ssh",
             ports: [],
             authorized_groups: { Admins: ["root"] },
           },

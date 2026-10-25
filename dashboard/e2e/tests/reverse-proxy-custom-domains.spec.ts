@@ -1,7 +1,7 @@
-import { test, expect } from "../helpers/fixtures";
 import { navigateTo } from "../helpers/auth";
-import { applyRadioTableFilter, generateRandomName } from "../helpers/utils";
+import { expect,test } from "../helpers/fixtures";
 import { gotoReverseProxyPage } from "../helpers/reverse-proxy-l4";
+import { applyRadioTableFilter, generateRandomName } from "../helpers/utils";
 
 let domain = "";
 const TARGET_CLUSTER = "example.com";

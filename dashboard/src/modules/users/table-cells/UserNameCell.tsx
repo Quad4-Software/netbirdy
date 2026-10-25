@@ -1,17 +1,17 @@
-import { cn, generateColorFromUser } from "@utils/helpers";
-import useFetchApi from "@utils/api";
-import { Ban, Clock, Cog } from "lucide-react";
-import React, { useMemo } from "react";
-import { User } from "@/interfaces/User";
-import { SSOIdentityProvider } from "@/interfaces/IdentityProvider";
-import { useAccount } from "@/modules/account/useAccount";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "@components/Tooltip";
+import useFetchApi from "@utils/api";
+import { cn, generateColorFromUser } from "@utils/helpers";
+import { Ban, Clock, Cog } from "lucide-react";
+import React, { useMemo } from "react";
 import { idpIcon } from "@/assets/icons/IdentityProviderIcons";
+import { SSOIdentityProvider } from "@/interfaces/IdentityProvider";
+import { User } from "@/interfaces/User";
+import { useAccount } from "@/modules/account/useAccount";
 
 type Props = {
   user: User;
@@ -38,7 +38,7 @@ export default function UserNameCell({ user }: Readonly<Props>) {
   const getStatusIcon = () => {
     if (user?.pending_approval) {
       return {
-        color: "bg-netbird text-netbird-950",
+        color: "bg-netbirdy text-netbirdy-950",
         icon: <Clock size={12} />,
       };
     }

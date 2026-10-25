@@ -27,7 +27,7 @@ import {
   kindHasBoundGroup,
   PLACEHOLDER_BASE_NAMES,
 } from "@/modules/control-center/utils/helpers";
-import SetupModal from "@/modules/setup-netbird-modal/SetupModal";
+import SetupModal from "@/modules/setup-netbirdy-modal/SetupModal";
 
 // Server/Agent installs arrive without a setup key: it is generated on demand
 // and written back onto the placeholder node so reopening Install reuses it.

@@ -75,7 +75,7 @@ export const OnboardingAgentEnd = ({
           <span className={"text-nb-gray-100 whitespace-nowrap"}>
             {deviceName || "your device"}
           </span>
-          . The request shows up here once NetBird logs it.
+          . The request shows up here once NetBirdy logs it.
         </div>
       </div>
 

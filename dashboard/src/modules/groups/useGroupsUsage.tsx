@@ -1,7 +1,7 @@
 import useFetchApi from "@utils/api";
 import { useMemo } from "react";
 import { DNSZone } from "@/interfaces/DNS";
-import { GROUP_TOOLTIP_TEXT, Group, GroupIssued } from "@/interfaces/Group";
+import { Group, GROUP_TOOLTIP_TEXT, GroupIssued } from "@/interfaces/Group";
 import { NameserverGroup } from "@/interfaces/Nameserver";
 import { Policy } from "@/interfaces/Policy";
 import { Route } from "@/interfaces/Route";

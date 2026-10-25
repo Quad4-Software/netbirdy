@@ -1,13 +1,14 @@
+import InlineLink from "@components/InlineLink";
+import Paragraph from "@components/Paragraph";
 import SkeletonTable, {
   SkeletonTableHeader,
 } from "@components/skeletons/SkeletonTable";
+import { ExternalLinkIcon } from "lucide-react";
 import * as React from "react";
 import { Suspense } from "react";
 import { NetworkResource } from "@/interfaces/Network";
 import ResourcesTable from "@/modules/networks/resources/ResourcesTable";
-import Paragraph from "@components/Paragraph";
-import InlineLink from "@components/InlineLink";
-import { ExternalLinkIcon } from "lucide-react";
+import { docsLink } from "@/modules/docs/links";
 
 type ResourcesSectionProps = {
   data?: NetworkResource[];
@@ -25,7 +26,7 @@ export const ResourcesTabContent = ({
           <Paragraph>
             Add resources to this network to control what peers can access.{" "}
             <InlineLink
-              href={"https://docs.netbird.io/how-to/networks#resources"}
+              href={docsLink("https://docs.netbird.io/how-to/networks#resources")}
               target={"_blank"}
             >
               Learn more

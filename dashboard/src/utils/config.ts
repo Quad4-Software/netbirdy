@@ -14,9 +14,6 @@ interface Config {
   silentRedirectURI: string;
   tokenSource: string;
   dragQueryParams: boolean;
-  hotjarTrackID?: number;
-  googleAnalyticsID?: string;
-  googleTagManagerID?: string;
   authServiceUrl?: string;
   wasmPath: string;
   licensed: boolean;
@@ -26,11 +23,6 @@ interface Config {
   // agentNetworkEnabled: the regular UI plus the Agent Network menu item (Beta).
   agentNetworkOnly: boolean;
   agentNetworkEnabled: boolean;
-  hubspotPortalId?: string;
-  hubspotSignupFormId?: string;
-  hubspotOnboardingFormId?: string;
-  hubspotSurveyFormId?: string;
-  analyticsExcludedEmails: string[];
   // announcement: text the operator wants every user of this deployment to
   // see in a permanent banner (NETBIRD_ANNOUNCEMENT), e.g. which environment
   // or backend instance a dashboard belongs to. Unset for none.
@@ -96,11 +88,6 @@ const loadConfig = (): Config => {
     hubspotPortalId: configJson?.hubspotPortalId || undefined,
     hubspotSignupFormId: configJson?.hubspotSignupFormId || undefined,
     hubspotOnboardingFormId: configJson?.hubspotOnboardingFormId || undefined,
-    hubspotSurveyFormId: configJson?.hubspotSurveyFormId || undefined,
-    analyticsExcludedEmails: (configJson?.analyticsExcludedEmails || "")
-      .split(",")
-      .map((email: string) => email.trim())
-      .filter(Boolean),
     announcement: configJson?.announcement || undefined,
   } as Config;
 };

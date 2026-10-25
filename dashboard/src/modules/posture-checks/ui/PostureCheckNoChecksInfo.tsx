@@ -32,7 +32,7 @@ export function PostureCheckNoChecksInfo({
         </h2>
         <Paragraph className={cn("text-sm text-center max-w-md mt-1")}>
           Add various posture checks to further restrict access in your network.
-          E.g., only clients with a specific NetBird client version, operating
+          E.g., only clients with a specific NetBirdy client version, operating
           system or location are allowed to connect.
         </Paragraph>
       </div>

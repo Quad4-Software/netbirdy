@@ -108,11 +108,11 @@ const RoutingPeerGroupNonLinuxWarning = ({
         icon={
           <AlertCircleIcon
             size={14}
-            className={"shrink-0 relative top-[3px] text-netbird"}
+            className={"shrink-0 relative top-[3px] text-netbirdy"}
           />
         }
       >
-        Group <span className={"text-netbird font-normal"}>{group?.name}</span>{" "}
+        Group <span className={"text-netbirdy font-normal"}>{group?.name}</span>{" "}
         contains at least one non-Linux peer.
         <br /> Disabled Masquerade will have no effect on non-Linux routing
         peers.

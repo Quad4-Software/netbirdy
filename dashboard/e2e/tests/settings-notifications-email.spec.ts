@@ -1,6 +1,6 @@
-import { test, expect } from "../helpers/fixtures";
-import { navigateTo } from "../helpers/auth";
 import { deleteNotificationChannelsByType } from "../helpers/api";
+import { navigateTo } from "../helpers/auth";
+import { expect,test } from "../helpers/fixtures";
 
 const TEST_EMAIL = "notify@example.test";
 

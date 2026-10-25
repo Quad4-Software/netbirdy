@@ -1,5 +1,7 @@
+import InlineLink from "@components/InlineLink";
 import Paragraph from "@components/Paragraph";
 import SkeletonTable from "@components/skeletons/SkeletonTable";
+import { ExternalLinkIcon } from "lucide-react";
 import * as React from "react";
 import { lazy, Suspense } from "react";
 import type { Peer } from "@/interfaces/Peer";
@@ -7,8 +9,6 @@ import { AddExitNodeButton } from "@/modules/exit-node/AddExitNodeButton";
 import { useHasExitNodes } from "@/modules/exit-node/useHasExitNodes";
 import AddRouteDropdownButton from "@/modules/peer/AddRouteDropdownButton";
 import usePeerRoutes from "@/modules/peer/usePeerRoutes";
-import InlineLink from "@components/InlineLink";
-import { ExternalLinkIcon } from "lucide-react";
 
 const PeerRoutesTable = lazy(() => import("@/modules/peer/PeerRoutesTable"));
 
@@ -26,7 +26,7 @@ export const PeerNetworkRoutesSection = ({ peer }: Props) => {
         <div className={"flex justify-between items-center mb-5"}>
           <div>
             <Paragraph>
-              Access other networks without installing NetBird on every
+              Access other networks without installing NetBirdy on every
               resource.{" "}
               <InlineLink
                 href={

@@ -1,20 +1,17 @@
-import Image from "next/image";
 import * as React from "react";
 import { memo } from "react";
-import NetBirdLogo from "@/assets/netbird.svg";
+import { NetBirdyMark } from "@/components/NetBirdLogo";
 
 type Props = {
   size?: number;
   className?: string;
 };
+
 function NetBirdIcon({ size = 16, className }: Props) {
   return (
-    <Image
-      src={NetBirdLogo}
-      alt={"Netbird Icon"}
-      width={size}
-      className={className}
-    />
+    <span className={className} role="img" aria-label="NetBirdy">
+      <NetBirdyMark size={size} />
+    </span>
   );
 }
 

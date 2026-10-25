@@ -13,7 +13,7 @@ import * as Tabs from "@radix-ui/react-tabs";
 import { useApiCall } from "@utils/api";
 import { validator } from "@utils/helpers";
 import { isValidCIDR } from "@utils/ip";
-import { isNetBirdCloud } from "@utils/netbird";
+import { isNetBirdCloud } from "@utils/netbirdy";
 import { ExternalLinkIcon, GlobeIcon, NetworkIcon } from "lucide-react";
 import React, { useMemo, useState } from "react";
 import { useSWRConfig } from "swr";
@@ -339,7 +339,7 @@ function NetworkSettingsTabContent({ account }: Readonly<Props>) {
             helpText={
               <>
                 Resolves DNS for routed domains on the routing peer instead of
-                on the client. Requires NetBird client v0.35 or higher. Changes
+                on the client. Requires NetBirdy client v0.35 or higher. Changes
                 will only take effect after restarting the clients.{" "}
                 <InlineLink
                   href={

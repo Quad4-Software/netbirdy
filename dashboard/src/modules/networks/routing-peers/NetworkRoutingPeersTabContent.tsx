@@ -1,17 +1,18 @@
+import InlineLink from "@components/InlineLink";
+import Paragraph from "@components/Paragraph";
 import SkeletonTable, {
   SkeletonTableHeader,
 } from "@components/skeletons/SkeletonTable";
+import useFetchApi from "@utils/api";
+import { ExternalLinkIcon } from "lucide-react";
 import * as React from "react";
 import { Suspense, useMemo } from "react";
-import { NetworkRouter } from "@/interfaces/Network";
-import NetworkRoutingPeersTable from "@/modules/networks/routing-peers/NetworkRoutingPeersTable";
-import useFetchApi from "@utils/api";
 import { useGroups } from "@/contexts/GroupsProvider";
-import { Peer } from "@/interfaces/Peer";
 import { useUsers } from "@/contexts/UsersProvider";
-import Paragraph from "@components/Paragraph";
-import InlineLink from "@components/InlineLink";
-import { ExternalLinkIcon } from "lucide-react";
+import { NetworkRouter } from "@/interfaces/Network";
+import { Peer } from "@/interfaces/Peer";
+import NetworkRoutingPeersTable from "@/modules/networks/routing-peers/NetworkRoutingPeersTable";
+import { docsLink } from "@/modules/docs/links";
 
 export const NetworkRoutingPeersTabContent = ({
   routers,
@@ -47,7 +48,7 @@ export const NetworkRoutingPeersTabContent = ({
             Add routing peers to this network to access resources inside this
             network.{" "}
             <InlineLink
-              href={"https://docs.netbird.io/manage/networks#routing-peers"}
+              href={docsLink("https://docs.netbird.io/manage/networks#routing-peers")}
               target={"_blank"}
             >
               Learn more

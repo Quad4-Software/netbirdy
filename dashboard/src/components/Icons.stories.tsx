@@ -8,7 +8,7 @@ import { GroupIssued } from "@/interfaces/Group";
 import { padded, Row, Stack } from "@/storybook/components";
 
 const colors = [
-  "netbird",
+  "netbirdy",
   "blue",
   "blue-darker",
   "red",

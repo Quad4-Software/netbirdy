@@ -1,9 +1,6 @@
 import type { Decorator } from "@storybook/nextjs-vite";
 import * as React from "react";
 import { expect, userEvent, waitFor, within } from "storybook/test";
-import DistributorProvider from "@/cloud/distributor/contexts/DistributorProvider";
-import MSPProvider from "@/cloud/msp/contexts/MSPProvider";
-import AnnouncementProvider from "@/contexts/AnnouncementProvider";
 import ApplicationProvider from "@/contexts/ApplicationProvider";
 import CountryProvider from "@/contexts/CountryProvider";
 import GroupsProvider from "@/contexts/GroupsProvider";
@@ -22,19 +19,19 @@ export const padded: Decorator = (Story) => (
    that read groups, users, countries or permissions from context. */
 export const withAppProviders: Decorator = (Story) => (
   <ApplicationProvider>
-    <DistributorProvider>
-      <MSPProvider>
+    
+      
         <UsersProvider>
-          <AnnouncementProvider>
+          
             <GroupsProvider>
               <CountryProvider>
                 <Story />
               </CountryProvider>
             </GroupsProvider>
-          </AnnouncementProvider>
+          
         </UsersProvider>
-      </MSPProvider>
-    </DistributorProvider>
+      
+    
   </ApplicationProvider>
 );
 
@@ -147,7 +144,7 @@ export const focusOpen =
    the table refresh icon, for one, spins for 0.8s after mount. */
 export const waitForMotion = () => settle(1000);
 
-/* SMIL animations (the NetBird loading icon) are frozen at their start. */
+/* SMIL animations (the NetBirdy loading icon) are frozen at their start. */
 export const pauseSvgAnimations = ({ canvasElement }: PlayCtx) => {
   canvasElement.querySelectorAll("svg").forEach((svg) => {
     svg.pauseAnimations();

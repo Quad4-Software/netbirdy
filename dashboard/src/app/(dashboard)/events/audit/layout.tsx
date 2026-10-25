@@ -1,8 +1,7 @@
-import { globalMetaTitle } from "@utils/meta";
 import type { Metadata } from "next";
 import BlankLayout from "@/layouts/BlankLayout";
 
 export const metadata: Metadata = {
-  title: `Audit Events - Activity - ${globalMetaTitle}`,
+  title: "Audit Events - Activity",
 };
 export default BlankLayout;

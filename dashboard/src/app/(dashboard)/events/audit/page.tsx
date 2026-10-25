@@ -14,6 +14,7 @@ import { ActivityEvent } from "@/interfaces/ActivityEvent";
 import PageContainer from "@/layouts/PageContainer";
 import ActivityTable from "@/modules/activity/ActivityTable";
 import { EventStreamingCard } from "@/modules/integrations/event-streaming/EventStreamingCard";
+import { docsLink } from "@/modules/docs/links";
 
 export default function Activity() {
   const { permission } = usePermissions();
@@ -44,7 +45,7 @@ export default function Activity() {
           Audit configuration changes, access policy updates, and peer
           registration and login events across your network.{" "}
           <InlineLink
-            href={"https://docs.netbird.io/how-to/audit-events-logging"}
+            href={docsLink("https://docs.netbird.io/how-to/audit-events-logging")}
             target={"_blank"}
           >
             Learn more

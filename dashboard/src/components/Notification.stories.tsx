@@ -57,7 +57,7 @@ export const Variants: StoryObj = {
         title={"Group created"}
         description={"Developers was created."}
         icon={<FolderGit2 size={14} />}
-        backgroundColor={"bg-netbird"}
+        backgroundColor={"bg-netbirdy"}
         duration={LONG}
       />
       <Notification

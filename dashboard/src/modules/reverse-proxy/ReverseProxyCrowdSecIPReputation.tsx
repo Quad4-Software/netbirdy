@@ -1,7 +1,6 @@
-import * as React from "react";
-import { ReactNode } from "react";
-import { Label } from "@components/Label";
 import HelpText from "@components/HelpText";
+import { HelpTooltip } from "@components/HelpTooltip";
+import { Label } from "@components/Label";
 import {
   Select,
   SelectContent,
@@ -10,10 +9,11 @@ import {
   SelectValue,
 } from "@components/Select";
 import { EyeIcon, PowerOffIcon, ShieldCheckIcon } from "lucide-react";
-import { HelpTooltip } from "@components/HelpTooltip";
-import { CrowdSecMode } from "@/interfaces/ReverseProxy";
 import Image from "next/image";
+import * as React from "react";
+import { ReactNode } from "react";
 import CrowdSecIconImage from "@/assets/integrations/crowdsec.png";
+import { CrowdSecMode } from "@/interfaces/ReverseProxy";
 
 type Props = {
   value: CrowdSecMode;

@@ -1,5 +1,5 @@
-import { useCallback, useRef, useState } from "react";
 import { useOidcAccessToken } from "@axa-fr/react-oidc";
+import { useCallback, useRef, useState } from "react";
 
 interface SSHConfig {
   hostname: string;

@@ -12,8 +12,8 @@ import ModalHeader from "@components/modal/ModalHeader";
 import { cn } from "@utils/helpers";
 import { ShieldHalf } from "lucide-react";
 import React, { useState } from "react";
-import { AgentGuardrail } from "@/modules/agent-network/data/mockData";
 import { useAIProviders } from "@/modules/agent-network/AIProvidersProvider";
+import { AgentGuardrail } from "@/modules/agent-network/data/mockData";
 
 type Props = {
   open: boolean;
@@ -49,7 +49,7 @@ export default function AgentGuardrailBrowseModal({
           icon={<ShieldHalf size={19} />}
           title={"Browse Guardrails"}
           description={"Pick one or more existing guardrails to attach."}
-          color={"netbird"}
+          color={"netbirdy"}
         />
         <div className={"px-8 pb-2"}>
           {available.length === 0 ? (
@@ -106,7 +106,7 @@ function GuardrailRow({
       className={cn(
         "flex items-center gap-3 p-3 rounded border cursor-pointer transition-colors",
         checked
-          ? "border-netbird/40 bg-netbird/5"
+          ? "border-netbirdy/40 bg-netbirdy/5"
           : "border-nb-gray-800 bg-nb-gray-900/20 hover:border-nb-gray-700",
       )}
     >

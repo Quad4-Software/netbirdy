@@ -5,7 +5,7 @@ import { PendingApproval } from "@/modules/users/PendingApproval";
 // The logo is an SVG import vitest does not transform, and it carries no copy
 // these tests care about.
 vi.mock("@components/NetBirdLogo", () => ({
-  NetBirdLogo: () => <div data-testid={"netbird-logo"} />,
+  NetBirdLogo: () => <div data-testid={"netbirdy-logo"} />,
 }));
 
 // Management names the owner inside the refusal itself. By the time it reaches

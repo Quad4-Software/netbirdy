@@ -3,11 +3,11 @@ import type { Group } from "@/interfaces/Group";
 import type { Peer } from "@/interfaces/Peer";
 
 // An account that exists already reaches the Agent Network onboarding through
-// the netbird.ai link rather than a signup. The request is kept per account
+// the netbirdy.ai link rather than a signup. The request is kept per account
 // in this browser, because the account itself has no field that says which
 // onboarding is pending, and the signup source key is cleared right after the
 // Agent Network menu is saved.
-const REQUEST_KEY_PREFIX = "netbird-agent-network-onboarding:";
+const REQUEST_KEY_PREFIX = "netbirdy-agent-network-onboarding:";
 // The event useLocalStorage listens to, so every reader refreshes at once.
 const LOCAL_STORAGE_EVENT = "local-storage";
 

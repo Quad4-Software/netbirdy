@@ -1,14 +1,14 @@
 import Button from "@components/Button";
 import { DropdownMenuItem } from "@components/DropdownMenu";
+import { getOperatingSystem } from "@hooks/useOperatingSystem";
 import { CircleHelpIcon, TerminalIcon } from "lucide-react";
 import * as React from "react";
 import { useState } from "react";
 import { usePermissions } from "@/contexts/PermissionsProvider";
+import { OperatingSystem } from "@/interfaces/OperatingSystem";
 import { Peer } from "@/interfaces/Peer";
 import { SSHCredentialsModal } from "@/modules/remote-access/ssh/SSHCredentialsModal";
 import { SSHTooltip } from "@/modules/remote-access/ssh/SSHTooltip";
-import { getOperatingSystem } from "@hooks/useOperatingSystem";
-import { OperatingSystem } from "@/interfaces/OperatingSystem";
 
 type Props = {
   peer: Peer;

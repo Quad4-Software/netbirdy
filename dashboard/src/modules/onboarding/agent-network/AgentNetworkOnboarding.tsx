@@ -9,7 +9,7 @@ import { cn } from "@utils/helpers";
 import * as React from "react";
 import { useEffect, useReducer } from "react";
 import { useSWRConfig } from "swr";
-import { HubspotFormField } from "@/contexts/AnalyticsProvider";
+type HubspotFormField = any;
 import { useLoggedInUser } from "@/contexts/UsersProvider";
 import type { Peer } from "@/interfaces/Peer";
 import AIProvidersProvider from "@/modules/agent-network/AIProvidersProvider";
@@ -45,7 +45,7 @@ type Props = {
   // OnboardingProvider) so a refresh resumes where the operator left off.
   onStepChange: (step: AgentStep) => void;
   // gatewayStep adds the gateway step before the provider step, for the
-  // NetBird Cloud signups where a managed gateway can be offered.
+  // NetBirdy Cloud signups where a managed gateway can be offered.
   gatewayStep: boolean;
   // existingAccount marks an account that existed before its Agent Network
   // onboarding: it already has devices, groups and policies of its own, so it
@@ -243,7 +243,7 @@ const Stepper = ({ step, maxSteps }: { step: number; maxSteps: number }) => {
           key={index}
           className={cn(
             "w-8 h-1 rounded-full bg-nb-gray-800",
-            step >= index + 1 && "bg-netbird",
+            step >= index + 1 && "bg-netbirdy",
           )}
         />
       ))}

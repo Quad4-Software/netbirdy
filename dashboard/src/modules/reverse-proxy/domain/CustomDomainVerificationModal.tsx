@@ -1,5 +1,7 @@
 import Button from "@components/Button";
+import { Callout } from "@components/Callout";
 import Card from "@components/Card";
+import InlineLink from "@components/InlineLink";
 import {
   Modal,
   ModalClose,
@@ -7,12 +9,12 @@ import {
   ModalFooter,
 } from "@components/modal/Modal";
 import ModalHeader from "@components/modal/ModalHeader";
+import Paragraph from "@components/Paragraph";
 import Steps from "@components/Steps";
 import { GradientFadedBackground } from "@components/ui/GradientFadedBackground";
 import { Mark } from "@components/ui/Mark";
 import { ExternalLinkIcon, GlobeIcon } from "lucide-react";
 import * as React from "react";
-import { Callout } from "@components/Callout";
 import { useReverseProxies } from "@/contexts/ReverseProxiesProvider";
 import {
   REVERSE_PROXY_CLUSTERS_DOCS_LINK,
@@ -20,9 +22,7 @@ import {
   ReverseProxyDomain,
   ReverseProxyDomainType,
 } from "@/interfaces/ReverseProxy";
-import Paragraph from "@components/Paragraph";
-import InlineLink from "@components/InlineLink";
-import { isNetBirdCloud } from "@/utils/netbird";
+import { isNetBirdCloud } from "@/utils/netbirdy";
 
 type Props = {
   open: boolean;
@@ -61,7 +61,7 @@ export const CustomDomainVerificationModal = ({
           icon={<GlobeIcon size={20} />}
           title={"Verify Domain"}
           description={domain.domain}
-          color={"netbird"}
+          color={"netbirdy"}
         />
         <div className={"px-8 flex flex-col gap-0 pb-6"}>
           <Steps className={"pt-0 stepper-bg-variant"}>
@@ -88,7 +88,7 @@ export const CustomDomainVerificationModal = ({
                     href={"https://status.netbird.io/"}
                     target={"_blank"}
                   >
-                    NetBird Status
+                    NetBirdy Status
                   </InlineLink>{" "}
                   or reach out to{"  "}
                   <InlineLink href={"mailto:support@netbird.io"}>
@@ -140,7 +140,7 @@ export const CustomDomainVerificationModal = ({
                 )}
 
                 <Callout variant={"warning"}>
-                  DNS changes may take some time to propagate. If NetBird does
+                  DNS changes may take some time to propagate. If NetBirdy does
                   not find the record immediately, please wait up to 24 hours
                   and try again.
                 </Callout>

@@ -8,7 +8,7 @@ import { MinimalList } from "@components/ui/MinimalList";
 import { IconArrowLeft, IconArrowRight } from "@tabler/icons-react";
 import { useApiCall } from "@utils/api";
 import { cn } from "@utils/helpers";
-import { isAuth0 } from "@utils/netbird";
+import { isAuth0 } from "@utils/netbirdy";
 import { isEmpty, trim } from "lodash";
 import {
   BoxIcon,
@@ -17,20 +17,21 @@ import {
   UserCircle,
 } from "lucide-react";
 import React, { useEffect, useState } from "react";
-import { useEmbeddedIdentityProviders } from "@/hooks/useEmbeddedIdentityProviders";
 import Skeleton from "react-loading-skeleton";
 import { useSWRConfig } from "swr";
 import integrationImage from "@/assets/integrations/generic-scim.png";
+import { useEmbeddedIdentityProviders } from "@/hooks/useEmbeddedIdentityProviders";
 import {
   IdentityProvider,
   ScimIntegration,
 } from "@/interfaces/IdentityProvider";
-import { GenericSCIMProps } from "@/modules/integrations/idp-sync/generic-scim/GenericSCIM";
 import { EmbeddedIdentityProviderSelect } from "@/modules/integrations/idp-sync/EmbeddedIdentityProviderSelect";
+import { GenericSCIMProps } from "@/modules/integrations/idp-sync/generic-scim/GenericSCIM";
 import { GroupPrefixHelpText } from "@/modules/integrations/idp-sync/GroupPrefixHelpText";
 import { GroupPrefixInput } from "@/modules/integrations/idp-sync/GroupPrefixInput";
 import { IntegrationModalHeader } from "@/modules/integrations/IntegrationModalHeader";
 import { useSSOConnections } from "@/modules/integrations/sso/useSSOConnections";
+import { docsLink } from "@/modules/docs/links";
 
 interface Props extends GenericSCIMProps {
   open: boolean;
@@ -185,7 +186,7 @@ export function SetupContent({
               key={index}
               className={cn(
                 "w-8 h-1 rounded-full bg-nb-gray-800",
-                step >= index + 1 && "bg-netbird",
+                step >= index + 1 && "bg-netbirdy",
               )}
             />
           ))}
@@ -194,8 +195,8 @@ export function SetupContent({
 
       <IntegrationModalHeader
         image={image || integrationImage}
-        title={`Connect NetBird with ${name}`}
-        description={`Start syncing your users and groups from ${name} to NetBird. Follow the steps below to get started.`}
+        title={`Connect NetBirdy with ${name}`}
+        description={`Start syncing your users and groups from ${name} to NetBirdy. Follow the steps below to get started.`}
       />
 
       {step === -1 && (
@@ -246,7 +247,7 @@ export function SetupContent({
                 Single-Sign-On needs to be enabled and active before you can
                 enable IdP sync.{" "}
                 <InlineLink
-                  href={"https://docs.netbird.io/how-to/single-sign-on"}
+                  href={docsLink("https://docs.netbird.io/how-to/single-sign-on")}
                   target={"_blank"}
                 >
                   How to enable SSO
@@ -309,7 +310,7 @@ export function SetupContent({
             data={[
               {
                 label: "Name",
-                value: "NetBird",
+                value: "NetBirdy",
               },
               {
                 label: "API Type",

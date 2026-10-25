@@ -33,9 +33,9 @@ export const PostureCheckNetBirdVersion = ({
       setOpen={setOpen}
       key={open ? 1 : 0}
       active={value?.min_version !== undefined}
-      title={"NetBird Client Version"}
+      title={"NetBirdy Client Version"}
       description={
-        "Restrict access to peers with a specific NetBird client version."
+        "Restrict access to peers with a specific NetBirdy client version."
       }
       icon={<NetBirdIcon size={18} />}
       modalWidthClass={"max-w-lg"}
@@ -78,7 +78,7 @@ const CheckContent = ({ value, onChange, disabled }: Props) => {
         <div>
           <Label>Minimum required version</Label>
           <HelpText>
-            Only peers with the minimum specified NetBird client version will
+            Only peers with the minimum specified NetBirdy client version will
             have access to the network.
           </HelpText>
           <div>

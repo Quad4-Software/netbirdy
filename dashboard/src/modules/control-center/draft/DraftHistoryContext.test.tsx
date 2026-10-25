@@ -1,7 +1,7 @@
 import { cleanup, renderHook } from "@testing-library/react";
 import type { Edge, Node } from "@xyflow/react";
-import { act } from "react";
 import React from "react";
+import { act } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 // React's own act() is used directly (not RTL's), which requires the flag.

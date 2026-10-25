@@ -1,6 +1,6 @@
 import Badge from "@components/Badge";
 import FullTooltip from "@components/FullTooltip";
-import { Lock, ShieldAlert, SlidersHorizontal, Globe } from "lucide-react";
+import { Globe,Lock, ShieldAlert, SlidersHorizontal } from "lucide-react";
 import { ReverseProxyCluster } from "@/interfaces/ReverseProxy";
 import EmptyRow from "@/modules/common-table-rows/EmptyRow";
 
@@ -26,7 +26,7 @@ export default function ClustersFeaturesCell({ cluster }: Readonly<Props>) {
       key: "custom-ports",
       label: "Custom Ports",
       description: "Cluster can bind arbitrary TCP/UDP ports for services.",
-      icon: <SlidersHorizontal size={14} className={"text-netbird"} />,
+      icon: <SlidersHorizontal size={14} className={"text-netbirdy"} />,
     });
   }
   if (cluster.require_subdomain) {
@@ -54,14 +54,14 @@ export default function ClustersFeaturesCell({ cluster }: Readonly<Props>) {
       description: (
         <>
           Lets you publish services that are only reachable from peers in your
-          NetBird network. Required for{" "}
-          <span className={"font-medium text-white"}>NetBird-Only Access</span>{" "}
+          NetBirdy network. Required for{" "}
+          <span className={"font-medium text-white"}>NetBirdy-Only Access</span>{" "}
           and{" "}
           <span className={"font-medium text-white"}>Proxy Cluster</span>{" "}
           target types.
         </>
       ),
-      icon: <Lock size={14} className={"text-netbird"} />,
+      icon: <Lock size={14} className={"text-netbirdy"} />,
     });
   }
 

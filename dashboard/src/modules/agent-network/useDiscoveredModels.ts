@@ -10,7 +10,7 @@ export type DiscoveredModel = {
   // accepts at invoke time — so it must be stored verbatim, not tidied up.
   id: string;
   label?: string;
-  // false when NetBird's shipped pricing table has no rate for this model. The
+  // false when NetBirdy's shipped pricing table has no rate for this model. The
   // rates below are then all zero and the operator has to supply them, or
   // requests to it record a cost of zero.
   pricing_known: boolean;
@@ -51,7 +51,7 @@ export type DiscoveryState = {
 /**
  * useDiscoveredModels asks the vendor which models a credential can actually
  * reach, so the model picker can offer the operator's real entitlements
- * instead of only NetBird's compiled-in catalog.
+ * instead of only NetBirdy's compiled-in catalog.
  *
  * The catalog cannot know which OpenAI models an org is entitled to, which
  * Bedrock profiles an account and region hold, or which Vertex models a

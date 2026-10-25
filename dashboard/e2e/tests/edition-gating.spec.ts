@@ -2,14 +2,14 @@
  * Temporary spec validating edition gating (cloud / licensed / oss).
  *
  * The test build hard-codes APP_ENV=test, so isNetBirdCloud() normally returns
- * true. This spec uses the test-only `netbird-test-edition` localStorage
- * override (see testEditionOverride in src/utils/netbird.ts) to drive each
+ * true. This spec uses the test-only `netbirdy-test-edition` localStorage
+ * override (see testEditionOverride in src/utils/netbirdy.ts) to drive each
  * edition against the OSS test management backend, which does not report the
  * premium permission modules (edr, idp, event_streaming). That absence is what
  * triggered the original `permission.event_streaming.read` crash and is now
  * covered by withDefaultModules in PermissionsProvider.
  */
-import { test, expect, type Browser, type Page } from "@playwright/test";
+import { type Browser, expect, type Page,test } from "@playwright/test";
 import { loginToApp, navigateTo } from "../helpers/auth";
 
 type Edition = "cloud" | "licensed" | "oss";
@@ -57,7 +57,7 @@ async function openAs(
   });
   await context.addInitScript((ed) => {
     try {
-      window.localStorage.setItem("netbird-test-edition", ed as string);
+      window.localStorage.setItem("netbirdy-test-edition", ed as string);
     } catch (e) {}
   }, edition);
   const page = await context.newPage();

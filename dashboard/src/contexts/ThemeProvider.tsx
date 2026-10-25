@@ -7,15 +7,15 @@ import { SkeletonTheme } from "react-loading-skeleton";
 export type Theme = "dark" | "light" | "system";
 export type ResolvedTheme = Exclude<Theme, "system">;
 
-const STORAGE_KEY = "netbird-theme";
+const STORAGE_KEY = "netbirdy-theme";
 const DEFAULT_THEME: ResolvedTheme = "dark";
 const THEME_CLASSES: ResolvedTheme[] = ["dark", "light"];
 const SKELETON_COLORS: Record<
   ResolvedTheme,
   { base: string; highlight: string }
 > = {
-  dark: { base: "#25282d", highlight: "#33373e" },
-  light: { base: "#e4e7e9", highlight: "#f4f6f7" },
+  dark: { base: "#141414", highlight: "#242424" },
+  light: { base: "#ece6d8", highlight: "#fbf8f1" },
 };
 
 type Props = {

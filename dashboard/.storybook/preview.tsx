@@ -1,15 +1,15 @@
 import "../src/app/globals.css";
-import { setApiOverrides } from "./mocks/api";
-import type { Preview } from "@storybook/nextjs-vite";
 import { TooltipProvider } from "@components/Tooltip";
-import { MotionConfig } from "framer-motion";
+import type { Preview } from "@storybook/nextjs-vite";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
+import { MotionConfig } from "framer-motion";
 import localFont from "next/font/local";
 import React from "react";
 import { SWRConfig } from "swr";
 import DialogProvider from "@/contexts/DialogProvider";
 import { ThemeProvider } from "@/contexts/ThemeProvider";
+import { setApiOverrides } from "./mocks/api";
 
 dayjs.extend(relativeTime);
 
@@ -34,9 +34,9 @@ const withTheme = (
   // Table filters, the collapsed sidebar and first-run flags persist in
   // localStorage and would otherwise leak from one story into the next.
   Object.keys(localStorage)
-    .filter((key) => key.startsWith("netbird-"))
+    .filter((key) => key.startsWith("netbirdy-"))
     .forEach((key) => localStorage.removeItem(key));
-  localStorage.setItem("netbird-theme", theme);
+  localStorage.setItem("netbirdy-theme", theme);
   document.documentElement.classList.toggle("dark", theme === "dark");
   document.documentElement.style.colorScheme = theme;
   document.body.className = inter.className;
@@ -80,7 +80,7 @@ const preview: Preview = {
     },
     // Read once from the URL by mocks/config.ts; reload the preview after switching.
     flavor: {
-      description: "Self-hosted or NetBird Cloud",
+      description: "Self-hosted or NetBirdy Cloud",
       toolbar: {
         icon: "cloud",
         items: [

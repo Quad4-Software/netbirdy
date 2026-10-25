@@ -1,7 +1,9 @@
 "use client";
 
 import Button from "@components/Button";
+import HelpText from "@components/HelpText";
 import { Input } from "@components/Input";
+import { Label } from "@components/Label";
 import {
   Modal,
   ModalClose,
@@ -12,8 +14,6 @@ import {
 import ModalHeader from "@components/modal/ModalHeader";
 import { notify } from "@components/Notification";
 import Separator from "@components/Separator";
-import { Label } from "@components/Label";
-import HelpText from "@components/HelpText";
 import { useApiCall } from "@utils/api";
 import { KeyRound, LockIcon } from "lucide-react";
 import React, { useMemo, useState } from "react";
@@ -114,7 +114,7 @@ export function ChangePasswordModalContent({
         icon={<KeyRound size={18} />}
         title={"Change Password"}
         description={"Update your account password."}
-        color={"netbird"}
+        color={"netbirdy"}
       />
 
       <Separator />

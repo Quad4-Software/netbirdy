@@ -1,6 +1,6 @@
+import { formatDuration } from "@utils/helpers";
 import * as React from "react";
 import { ReverseProxyEvent } from "@/interfaces/ReverseProxy";
-import { formatDuration } from "@utils/helpers";
 
 type Props = {
   event: ReverseProxyEvent;

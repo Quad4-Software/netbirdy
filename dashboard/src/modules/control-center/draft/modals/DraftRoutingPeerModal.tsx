@@ -85,7 +85,7 @@ export const DraftRoutingPeerModal = () => {
           <ModalContent maxWidthClass={"max-w-md"}>
             <ModalHeader
               icon={<Share2Icon size={20} />}
-              color={"netbird"}
+              color={"netbirdy"}
               title={"Routing peer not installed yet"}
               description={
                 "This routing peer uses a peer that hasn't been installed. " +

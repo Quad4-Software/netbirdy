@@ -33,7 +33,7 @@ const LEGACY_STEPS: AgentStep[] = [
 ];
 
 // agentSteps lists the steps the flow runs. The gateway step only runs where
-// the account can get a NetBird-managed gateway, and the policy step only
+// the account can get a NetBirdy-managed gateway, and the policy step only
 // where the provider step does not create the policy; see OnboardingProvider.
 export function agentSteps(
   withGateway: boolean,

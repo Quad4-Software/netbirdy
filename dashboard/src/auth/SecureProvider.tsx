@@ -3,7 +3,7 @@ import { usePathname } from "next/navigation";
 import * as React from "react";
 import { useEffect } from "react";
 
-const QUERY_PARAMS_KEY = "netbird-query-params";
+const QUERY_PARAMS_KEY = "netbirdy-query-params";
 
 type StoredQueryParams = { path: string; params: string };
 

@@ -21,6 +21,7 @@ import { ExternalLinkIcon, PlusCircle } from "lucide-react";
 import React, { useState } from "react";
 import NetworkRoutesIcon from "@/assets/icons/NetworkRoutesIcon";
 import { Network } from "@/interfaces/Network";
+import { docsLink } from "@/modules/docs/links";
 
 type Props = {
   open: boolean;
@@ -101,14 +102,14 @@ export const NetworkModalContent = ({
   return (
     <ModalContent maxWidthClass={"max-w-xl"}>
       <ModalHeader
-        icon={<NetworkRoutesIcon className={"fill-netbird"} />}
+        icon={<NetworkRoutesIcon className={"fill-netbirdy"} />}
         title={network ? "Update Network" : "Add Network"}
         description={
           network
             ? network.name
             : "Access internal resources in LANs and VPC by adding a network."
         }
-        color={"netbird"}
+        color={"netbirdy"}
       />
       <Separator />
       <div className={"px-8 flex-col flex gap-6 py-6"}>
@@ -143,7 +144,7 @@ export const NetworkModalContent = ({
           <Paragraph className={"text-sm mt-auto"}>
             Learn more about
             <InlineLink
-              href={"https://docs.netbird.io/how-to/networks"}
+              href={docsLink("https://docs.netbird.io/how-to/networks")}
               target={"_blank"}
             >
               Networks

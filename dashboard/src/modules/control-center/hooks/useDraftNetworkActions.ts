@@ -1,7 +1,7 @@
 import { notify } from "@components/Notification";
 import useFetchApi from "@utils/api";
-import { useCallback } from "react";
 import { Node, useReactFlow } from "@xyflow/react";
+import { useCallback } from "react";
 import { Group } from "@/interfaces/Group";
 import { Network, NetworkResource } from "@/interfaces/Network";
 import { Peer } from "@/interfaces/Peer";

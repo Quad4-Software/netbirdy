@@ -4,7 +4,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { ActivityEvent } from "@/interfaces/ActivityEvent";
 import ActivityDescription from "@/modules/activity/ActivityDescription";
 
-// The component imports @utils/netbird, which reads config.json at module load.
+// The component imports @utils/netbirdy, which reads config.json at module load.
 vi.mock("@utils/config", () => ({
   default: () => ({ apiOrigin: "http://localhost", redirectURI: "/" }),
 }));

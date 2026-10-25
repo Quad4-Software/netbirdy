@@ -123,7 +123,7 @@ export function SetupContent({ onSuccess, account }: ModalProps) {
 
     notify({
       title: "CrowdStrike Integration",
-      description: `CrowdStrike was successfully connected to NetBird.`,
+      description: `CrowdStrike was successfully connected to NetBirdy.`,
       promise: falconRequest({
         client_id: clientId,
         secret: secret,
@@ -168,7 +168,7 @@ export function SetupContent({ onSuccess, account }: ModalProps) {
               key={index}
               className={cn(
                 "w-8 h-1 rounded-full bg-nb-gray-800",
-                step >= index + 1 && "bg-netbird",
+                step >= index + 1 && "bg-netbirdy",
               )}
             />
           ))}
@@ -177,7 +177,7 @@ export function SetupContent({ onSuccess, account }: ModalProps) {
 
       <IntegrationModalHeader
         image={integrationImage}
-        title={"Connect NetBird with CrowdStrike"}
+        title={"Connect NetBirdy with CrowdStrike"}
         description={
           "Restrict network access only to devices managed by the company's IT department"
         }
@@ -224,7 +224,7 @@ export function SetupContent({ onSuccess, account }: ModalProps) {
             <Steps.Step step={2}>
               <p className={"font-normal"}>
                 Click <Mark>Create API client</Mark> and enter
-                <Mark copy>NetBird</Mark>
+                <Mark copy>NetBirdy</Mark>
                 as the client name and select <Mark>Hosts (Read)</Mark> and{" "}
                 <Mark>Zero Trust Assessment (Read)</Mark> as the scope
               </p>

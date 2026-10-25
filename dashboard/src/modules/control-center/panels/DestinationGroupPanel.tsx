@@ -1244,7 +1244,7 @@ export const DestinationGroupPanel = ({
               <MonitorSmartphoneIcon
                 size={14}
                 className={
-                  "text-nb-gray-500 group-data-[state=active]/trigger:text-netbird transition-all"
+                  "text-nb-gray-500 group-data-[state=active]/trigger:text-netbirdy transition-all"
                 }
               />
               Peers
@@ -1256,7 +1256,7 @@ export const DestinationGroupPanel = ({
               <Layers3Icon
                 size={14}
                 className={
-                  "text-nb-gray-500 group-data-[state=active]/trigger:text-netbird transition-all"
+                  "text-nb-gray-500 group-data-[state=active]/trigger:text-netbirdy transition-all"
                 }
               />
               Resources
@@ -1265,7 +1265,7 @@ export const DestinationGroupPanel = ({
               <UsersIcon
                 size={14}
                 className={
-                  "text-nb-gray-500 group-data-[state=active]/trigger:text-netbird transition-all"
+                  "text-nb-gray-500 group-data-[state=active]/trigger:text-netbirdy transition-all"
                 }
               />
               Users

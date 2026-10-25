@@ -10,8 +10,8 @@ import {
   SelectDropdown,
   SelectOption,
 } from "@components/select/SelectDropdown";
-import Steps from "@components/Steps";
 import Separator from "@components/Separator";
+import Steps from "@components/Steps";
 import useFetchApi from "@utils/api";
 import { sortBy } from "lodash";
 import { DownloadIcon, MonitorSmartphoneIcon } from "lucide-react";
@@ -84,17 +84,17 @@ const StepperContent = ({
   return (
     <ModalContent maxWidthClass={"max-w-xl"}>
       <ModalHeader
-        icon={<MonitorSmartphoneIcon size={18} className={"text-netbird"} />}
+        icon={<MonitorSmartphoneIcon size={18} className={"text-netbirdy"} />}
         title={`Set up “${name}”`}
-        description={"Install NetBird and assign the registered peer."}
-        color={"netbird"}
+        description={"Install NetBirdy and assign the registered peer."}
+        color={"netbirdy"}
       />
       <Separator />
       <div className={"px-8 py-3 flex flex-col gap-0 z-0"}>
         <Steps>
           <Steps.Step step={1}>
             <p className={"text-sm font-normal"}>
-              Install NetBird on the device. Skip if it is already installed.
+              Install NetBirdy on the device. Skip if it is already installed.
             </p>
             <div className={"flex gap-4"}>
               <Button
@@ -109,7 +109,7 @@ const StepperContent = ({
                 }
               >
                 <DownloadIcon size={14} />
-                Install NetBird
+                Install NetBirdy
               </Button>
             </div>
           </Steps.Step>

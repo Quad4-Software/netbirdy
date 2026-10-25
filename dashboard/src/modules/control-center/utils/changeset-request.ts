@@ -95,7 +95,7 @@ export function policyRequestBody(policy: Policy, r: RequestResolvers) {
         | undefined) ?? []
     ).map((c) => (typeof c === "string" ? c : c.id)),
     rules: policy.rules.map((rule) => {
-      const isSsh = rule.protocol === "netbird-ssh";
+      const isSsh = rule.protocol === "netbirdy-ssh";
       const authorizedGroups: Record<string, string[]> = {};
       if (isSsh && rule.authorized_groups) {
         Object.entries(rule.authorized_groups).forEach(

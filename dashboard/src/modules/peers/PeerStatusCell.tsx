@@ -10,7 +10,7 @@ type Props = {
 //   • PeerActionCell (Approve / Bypass / Revoke Bypass menu items)
 // Kept as a no-op cell so the existing "status" column slot still
 // renders without breaking the column layout.
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+ 
 export default function PeerStatusCell(_: Props) {
   return null;
 }

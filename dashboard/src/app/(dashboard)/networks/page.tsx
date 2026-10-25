@@ -14,6 +14,7 @@ import { usePermissions } from "@/contexts/PermissionsProvider";
 import { Network } from "@/interfaces/Network";
 import PageContainer from "@/layouts/PageContainer";
 import NetworksTable from "@/modules/networks/table/NetworksTable";
+import { docsLink } from "@/modules/docs/links";
 
 export default function Networks() {
   const { data: networks, isLoading } = useFetchApi<Network[]>("/networks");
@@ -33,10 +34,10 @@ export default function Networks() {
         </Breadcrumbs>
         <h1 ref={headingRef}>Networks</h1>
         <Paragraph>
-          Access internal resources in LANs and VPCs without installing NetBird
+          Access internal resources in LANs and VPCs without installing NetBirdy
           on every machine.{" "}
           <InlineLink
-            href={"https://docs.netbird.io/how-to/networks"}
+            href={docsLink("https://docs.netbird.io/how-to/networks")}
             target={"_blank"}
           >
             Learn more

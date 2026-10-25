@@ -16,7 +16,7 @@ export const NetBirdVersionTooltip = ({ version, children }: Props) => {
           <span className={""}>Min. Client Version</span>
 
           <span
-            className={"text-netbird font-semibold flex items-center gap-1"}
+            className={"text-netbirdy font-semibold flex items-center gap-1"}
           >
             <IconMathEqualGreater size={14} />
             {version}

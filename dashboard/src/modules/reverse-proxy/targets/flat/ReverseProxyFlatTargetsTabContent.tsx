@@ -25,14 +25,14 @@ export const ReverseProxyFlatTargetsTabContent = ({
   isLoading,
   hideResourceColumn,
   emptyTableTitle = "This network has no services",
-  emptyTableDescription = "Create resources and expose services securely through NetBird's reverse proxy.",
+  emptyTableDescription = "Create resources and expose services securely through NetBirdy's reverse proxy.",
 }: Props) => {
   return (
     <div className={"pb-10 px-8"}>
       <div className={"flex justify-between items-center mb-5"}>
         <div>
           <Paragraph>
-            Expose services securely through NetBird&apos;s reverse proxy.{" "}
+            Expose services securely through NetBirdy&apos;s reverse proxy.{" "}
             <InlineLink href={REVERSE_PROXY_DOCS_LINK} target={"_blank"}>
               Learn more
               <ExternalLinkIcon size={12} />

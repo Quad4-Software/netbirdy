@@ -115,12 +115,16 @@ export default function SidebarItem({
                 ? "pl-7 pr-2 py-[.45rem] mt-1 mb-0.5"
                 : "py-[.45rem] px-3",
               isActive
-                ? "text-gray-900 bg-gray-200 dark:text-white dark:bg-nb-gray-900"
-                : "text-gray-600 hover:bg-gray-200 dark:text-nb-gray-400 dark:hover:bg-nb-gray-900/50",
+                ? "text-gray-900 dark:text-white font-medium " +
+                  "bg-[linear-gradient(to_right,color-mix(in_srgb,var(--color-netbirdy)_16%,transparent),color-mix(in_srgb,var(--color-netbirdy)_4%,transparent))] " +
+                  "shadow-[inset_0_0_0_1px_color-mix(in_srgb,var(--color-netbirdy)_24%,transparent)] " +
+                  "[&_svg]:text-netbirdy"
+                : "text-gray-600 hover:bg-black/5 dark:text-nb-gray-400 dark:hover:bg-white/5",
             )}
             onClick={handleClick}
             data-testid={"left-navigation-item"}
           >
+            
             {isChild && isNavigationCollapsed && !mobileNavOpen && (
               <div
                 className={
@@ -176,7 +180,13 @@ export default function SidebarItem({
           </button>
         </li>
       </Collapsible.Trigger>
-      {collapsible && <Collapsible.Content>{children}</Collapsible.Content>}
+      {collapsible && (
+        <Collapsible.Content>
+          <div className="relative ml-[26px] border-l border-nb-gray-800/60 dark:border-[#2a2a2a]">
+            {children}
+          </div>
+        </Collapsible.Content>
+      )}
     </Collapsible.Root>
   );
 }

@@ -57,7 +57,7 @@ export const DomainVerificationModal = ({
           icon={<GlobeIcon size={20} />}
           title={"Verify Domain Ownership"}
           description={domain}
-          color={"netbird"}
+          color={"netbirdy"}
         />
         <div className={"px-8 flex flex-col gap-0"}>
           <Steps className={"pt-0"}>
@@ -93,7 +93,7 @@ export const DomainVerificationModal = ({
 
           <Paragraph className={"text-sm mt-4"}>
             {
-              "Note: DNS changes may take some time to apply. If NetBird doesn't find the record immediately, please wait a day and try again."
+              "Note: DNS changes may take some time to apply. If NetBirdy doesn't find the record immediately, please wait a day and try again."
             }
           </Paragraph>
 

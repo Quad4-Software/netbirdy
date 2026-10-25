@@ -1,7 +1,7 @@
+import SkeletonTable from "@components/skeletons/SkeletonTable";
 import * as React from "react";
 import { useEffect, useState } from "react";
 import Skeleton from "react-loading-skeleton";
-import SkeletonTable from "@components/skeletons/SkeletonTable";
 
 export const SkeletonNetwork = ({ delay = 400 }: { delay?: number }) => {
   const [show, setShow] = useState(delay === 0);

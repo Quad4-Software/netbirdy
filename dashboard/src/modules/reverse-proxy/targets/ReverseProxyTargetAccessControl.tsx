@@ -68,7 +68,7 @@ export default function ReverseProxyTargetAccessControl({
         {privateService && (
           <div data-testid={"target-access-control-private-service"}>
             <HelpText className={"mb-0 mt-1 !text-yellow-400"}>
-              NetBird-only services cannot bypass authentication.
+              NetBirdy-only services cannot bypass authentication.
             </HelpText>
           </div>
         )}

@@ -162,7 +162,7 @@ describe("AgentConnectTabs", () => {
       expect.arrayContaining([
         `      "npm": "@ai-sdk/anthropic",`,
         `        "baseURL": "https://${ENDPOINT}/v1",`,
-        `  "model": "netbird/claude-sonnet-5"`,
+        `  "model": "netbirdy/claude-sonnet-5"`,
       ]),
     );
   });
@@ -175,7 +175,7 @@ describe("AgentConnectTabs", () => {
         `      "baseUrl": "https://${ENDPOINT}/v1",`,
         `      "api": "openai-completions",`,
         `          "id": "gpt-5.5"`,
-        `  "defaultProvider": "netbird",`,
+        `  "defaultProvider": "netbirdy",`,
         `  "defaultModel": "gpt-5.5"`,
       ]),
     );

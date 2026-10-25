@@ -35,7 +35,7 @@ export const TrafficEventsBytesCell = ({
       )}
       {showOutbound && (
         <div className={"flex gap-2 items-center whitespace-nowrap"}>
-          <ArrowUpIcon size={15} className={cn("text-netbird")} />
+          <ArrowUpIcon size={15} className={cn("text-netbirdy")} />
           {formatBytes(event.tx_bytes)}
         </div>
       )}

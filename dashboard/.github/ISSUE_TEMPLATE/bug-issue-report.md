@@ -23,17 +23,17 @@ Steps to reproduce the behavior:
 
 A clear and concise description of what you expected to happen.
 
-**Are you using NetBird Cloud?**
+**Are you using NetBirdy Cloud?**
 
-Please specify whether you use NetBird Cloud or self-host NetBird's control plane.
+Please specify whether you use NetBirdy Cloud or self-host NetBirdy's control plane.
 
-**NetBird version**
+**NetBirdy version**
 
-`netbird version`
+`netbirdy version`
 
-**NetBird status -d output:**
+**NetBirdy status -d output:**
 
-If applicable, add the `netbird status -d' command output.
+If applicable, add the `netbirdy status -d' command output.
 
 **Screenshots**
 

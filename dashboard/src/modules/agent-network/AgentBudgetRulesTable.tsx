@@ -14,9 +14,9 @@ import InlineLink from "@components/InlineLink";
 import SquareIcon from "@components/SquareIcon";
 import { DataTable } from "@components/table/DataTable";
 import DataTableHeader from "@components/table/DataTableHeader";
+import { ToggleSwitch } from "@components/ToggleSwitch";
 import GetStartedTest from "@components/ui/GetStartedTest";
 import MultipleGroups from "@components/ui/MultipleGroups";
-import { ToggleSwitch } from "@components/ToggleSwitch";
 import { IconCirclePlus } from "@tabler/icons-react";
 import { ColumnDef, SortingState } from "@tanstack/react-table";
 import { cn } from "@utils/helpers";
@@ -41,15 +41,16 @@ import { useGroups } from "@/contexts/GroupsProvider";
 import { useUsers } from "@/contexts/UsersProvider";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { Group } from "@/interfaces/Group";
-import { useAIProviders } from "@/modules/agent-network/AIProvidersProvider";
-import ActiveInactiveRow from "@/modules/common-table-rows/ActiveInactiveRow";
-import EmptyRow from "@/modules/common-table-rows/EmptyRow";
 import AgentBudgetRuleModal from "@/modules/agent-network/AgentBudgetRuleModal";
+import { useAIProviders } from "@/modules/agent-network/AIProvidersProvider";
 import {
   AgentBudgetRule,
   PolicyBudgetLimit,
   PolicyTokenLimit,
 } from "@/modules/agent-network/data/mockData";
+import ActiveInactiveRow from "@/modules/common-table-rows/ActiveInactiveRow";
+import EmptyRow from "@/modules/common-table-rows/EmptyRow";
+import { docsLink } from "@/modules/docs/links";
 
 function NameCell({ rule }: { rule: AgentBudgetRule }) {
   return (
@@ -310,7 +311,7 @@ export default function AgentBudgetRulesTable() {
   const { budgetRules, budgetRulesLoading } = useAIProviders();
 
   const [sorting, setSorting] = useLocalStorage<SortingState>(
-    "netbird-table-sort" + path + "-budget-rules",
+    "netbirdy-table-sort" + path + "-budget-rules",
     [{ id: "name", desc: false }],
   );
 
@@ -461,7 +462,7 @@ export default function AgentBudgetRulesTable() {
               <>
                 Learn more about
                 <InlineLink
-                  href={"https://docs.netbird.io/agent-network"}
+                  href={docsLink("https://docs.netbird.io/agent-network")}
                   target={"_blank"}
                 >
                   Agent Network

@@ -53,9 +53,9 @@ export default function ConnectAgentPage() {
         {/* block, so the <br /> lands: Paragraph is a flex container by
             default and a break element does nothing between flex items. */}
         <Paragraph className={"block"}>
-          Point your agent at the NetBird endpoint as its base URL. No provider
+          Point your agent at the NetBirdy endpoint as its base URL. No provider
           API key is required on the client. <br />
-          NetBird authenticates you through your identity provider and
+          NetBirdy authenticates you through your identity provider and
           authorizes each request against your access policies.
         </Paragraph>
 

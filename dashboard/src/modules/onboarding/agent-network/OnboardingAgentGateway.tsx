@@ -72,7 +72,7 @@ const GATEWAY_ALREADY_SET_UP = {
 };
 
 // OnboardingAgentGateway sets up the gateway the account's endpoint is served
-// from, before any provider is connected: a NetBird-managed gateway, a private
+// from, before any provider is connected: a NetBirdy-managed gateway, a private
 // proxy the account already runs, or a new proxy the operator deploys. The
 // step offers Continue once the gateway is ready, as the device step does once
 // the device connects, and an account that already has one skips it.
@@ -248,7 +248,7 @@ const GatewayChoice = ({
             <IntentCard
               title={"Managed proxy"}
               description={
-                "NetBird runs a dedicated, private proxy for your account."
+                "NetBirdy runs a dedicated, private proxy for your account."
               }
               icon={<CloudIcon size={18} className={"text-nb-gray-400"} />}
               onClick={onManaged}
@@ -585,7 +585,7 @@ const NewProxyGateway = ({
         <>
           Agent Network is served from your proxy at{" "}
           <span className={"font-mono text-nb-gray-100"}>{domain}</span> once it
-          connects to NetBird.
+          connects to NetBirdy.
         </>
       }
       onBack={onBack}
@@ -623,7 +623,7 @@ const SelfDeployStatus = ({
     <LiveStatus message={selfDeployAnnouncement(phase, bootstrap)} />
     {phase === "waiting" && (
       <StatusLine status={"active"}>
-        Waiting for your proxy to connect to NetBird…
+        Waiting for your proxy to connect to NetBirdy…
       </StatusLine>
     )}
     {phase === "found" && (

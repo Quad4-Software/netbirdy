@@ -1,6 +1,6 @@
-import * as React from "react";
-import { cn } from "@utils/helpers";
 import FullTooltip from "@components/FullTooltip";
+import { cn } from "@utils/helpers";
+import * as React from "react";
 
 interface ToolbarButtonProps {
   children: React.ReactNode;
@@ -37,7 +37,7 @@ export const ToolbarButton = ({
           "text-nb-gray-300 hover:text-nb-gray-100 hover:bg-nb-gray-800",
         variant === "default" && active && "bg-nb-gray-800 text-nb-gray-100",
         variant === "primary" &&
-          "bg-netbird text-white hover:bg-netbird-500 hover:text-white",
+          "bg-netbirdy text-white hover:bg-netbirdy-500 hover:text-white",
         disabled &&
           "text-nb-gray-700 hover:text-nb-gray-700 hover:bg-transparent cursor-not-allowed",
         className,

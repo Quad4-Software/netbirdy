@@ -11,7 +11,7 @@ const variants = cva([], {
     variant: {
       default: [
         "dark:data-[state=unchecked]:bg-nb-gray-950 dark:border-nb-gray-900 dark:ring-offset-neutral-950 dark:focus-visible:ring-neutral-300",
-        "dark:data-[state=checked]:bg-netbird",
+        "dark:data-[state=checked]:bg-netbirdy",
       ],
     },
   },
@@ -58,7 +58,7 @@ const RadioItem = ({ value, className, variant = "default" }: Props) => {
       <RadioPrimitive.Indicator asChild={true}>
         <div
           className={cn(
-            "h-2 w-2 bg-netbird absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center rounded-full",
+            "h-2 w-2 bg-netbirdy absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center rounded-full",
             "data-[state=checked]:bg-white data-[state=checked]:text-neutral-50 ",
           )}
         ></div>

@@ -1,6 +1,6 @@
-import { expect, test } from "../helpers/fixtures";
-import { loginToApp, navigateTo } from "../helpers/auth";
 import { deleteUserByEmail } from "../helpers/api";
+import { loginToApp, navigateTo } from "../helpers/auth";
+import { expect, test } from "../helpers/fixtures";
 import { setTestEdition } from "../helpers/utils";
 
 test.setTimeout(60_000);

@@ -40,6 +40,15 @@ const config = [
     rules: {
       ...react.configs.recommended.rules,
       ...reactHooks.configs.recommended.rules,
+      // React Compiler diagnostics are tracked as warnings while the
+      // codebase migrates; they are not disabled.
+      "react-hooks/set-state-in-effect": "warn",
+      "react-hooks/refs": "warn",
+      "react-hooks/static-components": "warn",
+      "react-hooks/immutability": "warn",
+      "react-hooks/purity": "warn",
+      "react-hooks/use-memo": "warn",
+      "react-hooks/preserve-manual-memoization": "warn",
       "import/no-anonymous-default-export": "warn",
       "react/no-unknown-property": "off",
       "react/react-in-jsx-scope": "off",

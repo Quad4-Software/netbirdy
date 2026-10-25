@@ -8,7 +8,7 @@ import { useSWRConfig } from "swr";
 import { Group, GroupPeer } from "@/interfaces/Group";
 import { Peer } from "@/interfaces/Peer";
 import { Policy } from "@/interfaces/Policy";
-import { SetupModalContent } from "@/modules/setup-netbird-modal/SetupModal";
+import { SetupModalContent } from "@/modules/setup-netbirdy-modal/SetupModal";
 
 type Props = {
   device?: Peer;
@@ -74,20 +74,20 @@ export const OnboardingAddUserDevice = ({ device, policy, onNext }: Props) => {
             "text-sm text-nb-gray-300 font-light mt-2 block text-center sm:px-4"
           }
         >
-          {`Your first resource and routing peer are all set. Now, take your device, install NetBird, and let's get you connected.`}
+          {`Your first resource and routing peer are all set. Now, take your device, install NetBirdy, and let's get you connected.`}
         </div>
       </div>
 
       <div className={"flex items-center justify-center mt-3"}>
         <Button variant={"primary"} onClick={() => setOpen(true)}>
           <DownloadIcon size={16} />
-          Install NetBird
+          Install NetBirdy
         </Button>
       </div>
 
       <Modal open={open} onOpenChange={setOpen}>
         <ModalContent>
-          <SetupModalContent title={"Install NetBird"} isUserDevice={true} />
+          <SetupModalContent title={"Install NetBirdy"} isUserDevice={true} />
         </ModalContent>
       </Modal>
     </div>

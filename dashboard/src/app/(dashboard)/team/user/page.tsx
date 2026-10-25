@@ -30,7 +30,6 @@ import { useRouter, useSearchParams } from "next/navigation";
 import React, { useMemo, useState } from "react";
 import { useSWRConfig } from "swr";
 import TeamIcon from "@/assets/icons/TeamIcon";
-import { UserMfaListItem } from "@/cloud/mfa/UserMFAListItem";
 import { usePermissions } from "@/contexts/PermissionsProvider";
 import { useLoggedInUser } from "@/contexts/UsersProvider";
 import { useHasChanges } from "@/hooks/useHasChanges";
@@ -320,7 +319,7 @@ function UserOverview({ user, initialGroups }: Readonly<Props>) {
                   <div>
                     <h2>Access Tokens</h2>
                     <Paragraph>
-                      Access tokens give access to NetBird API.
+                      Access tokens give access to NetBirdy API.
                     </Paragraph>
                   </div>
                   <div className={"inline-flex gap-4 justify-end"}>
@@ -391,7 +390,7 @@ function UserInformationCard({ user }: Readonly<{ user: User }>) {
           value={<UserStatusCell user={user} />}
         />
 
-        {!isServiceUser && user && <UserMfaListItem userId={user.id} />}
+        
 
         {!isServiceUser && (
           <>

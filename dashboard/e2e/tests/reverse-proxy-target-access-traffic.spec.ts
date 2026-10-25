@@ -90,8 +90,8 @@ test.describe("Reverse Proxy - Target Access Real Traffic @reverse-proxy @test-e
           Authorization: VALID_AUTH,
           "X-E2E-App": APPLICATION_HEADER,
           Cookie: APPLICATION_COOKIE,
-          "X-NetBird-User": "spoofed@example.com",
-          "X-NetBird-Groups": "administrators",
+          "X-NetBirdy-User": "spoofed@example.com",
+          "X-NetBirdy-Groups": "administrators",
         },
       );
       expect(
@@ -104,8 +104,8 @@ test.describe("Reverse Proxy - Target Access Real Traffic @reverse-proxy @test-e
       expect(inheritedEcho.headers.authorization).toBeUndefined();
       expect(inheritedEcho.headers["x-e2e-app"]).toBe(APPLICATION_HEADER);
       expect(inheritedEcho.headers.cookie).toContain(APPLICATION_COOKIE);
-      expect(inheritedEcho.headers["x-netbird-user"]).toBeUndefined();
-      expect(inheritedEcho.headers["x-netbird-groups"]).toBeUndefined();
+      expect(inheritedEcho.headers["x-netbirdy-user"]).toBeUndefined();
+      expect(inheritedEcho.headers["x-netbirdy-groups"]).toBeUndefined();
 
       const anonymousBypass = await requestThroughReverseProxy(
         serviceDomain,
@@ -121,8 +121,8 @@ test.describe("Reverse Proxy - Target Access Real Traffic @reverse-proxy @test-e
           Authorization: WRONG_AUTH,
           "X-E2E-App": APPLICATION_HEADER,
           Cookie: `${PROXY_SESSION_COOKIE}; ${APPLICATION_COOKIE}`,
-          "X-NetBird-User": "spoofed@example.com",
-          "X-NetBird-Groups": "administrators",
+          "X-NetBirdy-User": "spoofed@example.com",
+          "X-NetBirdy-Groups": "administrators",
         },
       );
       expect(bypassed.status).toBe(200);
@@ -132,8 +132,8 @@ test.describe("Reverse Proxy - Target Access Real Traffic @reverse-proxy @test-e
       expect(bypassedEcho.headers["x-e2e-app"]).toBe(APPLICATION_HEADER);
       expect(bypassedEcho.headers.cookie).toContain(APPLICATION_COOKIE);
       expect(bypassedEcho.headers.cookie).not.toContain("nb_session=");
-      expect(bypassedEcho.headers["x-netbird-user"]).toBeUndefined();
-      expect(bypassedEcho.headers["x-netbird-groups"]).toBeUndefined();
+      expect(bypassedEcho.headers["x-netbirdy-user"]).toBeUndefined();
+      expect(bypassedEcho.headers["x-netbirdy-groups"]).toBeUndefined();
 
       const literalPrefix = await requestThroughReverseProxy(
         serviceDomain,
@@ -207,7 +207,7 @@ async function createService(
   await addClusterTarget(page, options, "/public/admin");
 
   await page.getByTestId("proxy-continue").click();
-  const netBirdOnly = page.getByTestId("auth-netbird-only-card");
+  const netBirdOnly = page.getByTestId("auth-netbirdy-only-card");
   await expect(netBirdOnly.getByText("Enabled", { exact: true })).toBeVisible();
   await netBirdOnly.click();
   await page.getByRole("button", { name: "Remove", exact: true }).click();

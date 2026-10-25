@@ -30,7 +30,7 @@ export const OnboardingEnd = ({ onFinish }: Props) => {
             "text-sm text-nb-gray-300 font-light mt-2 block text-center sm:px-4"
           }
         >
-          What’s next? Check out these guides to get the most out of NetBird. To
+          What’s next? Check out these guides to get the most out of NetBirdy. To
           learn more, explore the dashboard, visit our documentation, or browse
           our YouTube channel.
         </div>
@@ -48,14 +48,14 @@ export const OnboardingEnd = ({ onFinish }: Props) => {
             title={"Provision Users & Groups From Your IdP"}
             src={PostureCheckImage}
             description={
-              "Learn how to provision users and groups from your identity provider, such as Okta, Azure AD, or Google Workspace, to manage access control in NetBird and automate onboarding and offboarding processes."
+              "Learn how to provision users and groups from your identity provider, such as Okta, Azure AD, or Google Workspace, to manage access control in NetBirdy and automate onboarding and offboarding processes."
             }
             href={"https://www.youtube.com/watch?v=RxYWTpf7cgY"}
           />
           <VideoGuide
-            title={"How NetBird Works"}
+            title={"How NetBirdy Works"}
             description={
-              "Learn more about how NetBird works, its architecture, and how it can help you build secure networks."
+              "Learn more about how NetBirdy works, its architecture, and how it can help you build secure networks."
             }
             src={ActivityImage}
             href={"https://www.youtube.com/watch?v=CFa7SY4Up9k&t=261s"}

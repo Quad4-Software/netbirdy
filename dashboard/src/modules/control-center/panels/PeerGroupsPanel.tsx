@@ -340,7 +340,7 @@ export const PeerGroupsPanel = ({ peerId, onClose }: PeerGroupsPanelProps) => {
               <FolderGit2
                 size={14}
                 className={
-                  "text-nb-gray-500 group-data-[state=active]/trigger:text-netbird transition-all"
+                  "text-nb-gray-500 group-data-[state=active]/trigger:text-netbirdy transition-all"
                 }
               />
               Groups

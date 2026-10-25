@@ -1,4 +1,5 @@
 import Badge, { BadgeVariants } from "@components/Badge";
+import ResourceCountBadge from "@components/ui/ResourceCountBadge";
 import { cn, singularize } from "@utils/helpers";
 import { MonitorSmartphoneIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -6,7 +7,6 @@ import * as React from "react";
 import { useMemo } from "react";
 import { useGroups } from "@/contexts/GroupsProvider";
 import { Group } from "@/interfaces/Group";
-import ResourceCountBadge from "@components/ui/ResourceCountBadge";
 
 type Props = {
   group?: Group;

@@ -1,11 +1,11 @@
+import Badge from "@components/Badge";
+import { cn } from "@utils/helpers";
+import { trim } from "lodash";
+import { ArrowRightFromLineIcon, GlobeIcon, LockKeyhole } from "lucide-react";
 import * as React from "react";
 import { useMemo } from "react";
 import { ReverseProxy, ServiceMode } from "@/interfaces/ReverseProxy";
-import { trim } from "lodash";
 import { SERVICE_MODES } from "@/modules/reverse-proxy/ReverseProxyServiceModeSelector";
-import Badge from "@components/Badge";
-import { cn } from "@utils/helpers";
-import { ArrowRightFromLineIcon, GlobeIcon, LockKeyhole } from "lucide-react";
 
 type Props = {
   reverseProxy?: ReverseProxy;

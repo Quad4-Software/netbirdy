@@ -5,6 +5,7 @@ import { Input } from "@components/Input";
 import Paragraph from "@components/Paragraph";
 import FullScreenLoading from "@components/ui/FullScreenLoading";
 import { acceptInvite, fetchInviteInfo } from "@utils/unauthenticatedApi";
+import dayjs from "dayjs";
 import {
   AlertCircle,
   CheckCircle2,
@@ -13,7 +14,6 @@ import {
   Mail,
   User2,
 } from "lucide-react";
-import dayjs from "dayjs";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useMemo, useState } from "react";
 import NetBirdIcon from "@/assets/icons/NetBirdIcon";
@@ -222,7 +222,7 @@ function InviteAcceptContent() {
 
         <div className="text-center mb-8">
           <h1 className="text-2xl font-semibold text-white mb-2">
-            Welcome to NetBird
+            Welcome to NetBirdy
           </h1>
           <p className="dark:text-nb-gray-400 text-nb-gray-500 text-base">
             You&apos;ve been invited by <span className="dark:text-white text-nb-gray-900 font-medium">{inviteInfo.invited_by}</span> to join the network. Set your password to complete your account setup.

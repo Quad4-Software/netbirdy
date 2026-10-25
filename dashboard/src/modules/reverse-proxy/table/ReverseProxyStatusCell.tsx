@@ -1,16 +1,16 @@
+import Badge from "@components/Badge";
+import FullTooltip from "@components/FullTooltip";
+import InlineLink from "@components/InlineLink";
+import useFetchApi from "@utils/api";
+import { CircleAlert, Loader2 } from "lucide-react";
+import * as React from "react";
+import { useRef } from "react";
 import {
   REVERSE_PROXY_TROUBLESHOOTING_DOCS_LINK,
   ReverseProxy,
   ReverseProxyMeta,
   ReverseProxyStatus,
 } from "@/interfaces/ReverseProxy";
-import useFetchApi from "@utils/api";
-import Badge from "@components/Badge";
-import FullTooltip from "@components/FullTooltip";
-import InlineLink from "@components/InlineLink";
-import { CircleAlert, Loader2 } from "lucide-react";
-import * as React from "react";
-import { useRef } from "react";
 
 type Props = {
   serviceId: string;

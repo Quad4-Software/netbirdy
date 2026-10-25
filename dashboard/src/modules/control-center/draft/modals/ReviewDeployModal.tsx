@@ -20,6 +20,7 @@ import {
   Loader2,
 } from "lucide-react";
 import React, { useCallback, useMemo, useRef } from "react";
+import { useAIProviders } from "@/modules/agent-network/AIProvidersProvider";
 import { useControlCenterPolicy } from "@/modules/control-center/contexts/ControlCenterPolicyModals";
 import { ChangeAccordionItem } from "@/modules/control-center/draft/changeset/ChangeAccordionItem";
 import {
@@ -30,12 +31,12 @@ import {
   useDraftChangeset,
 } from "@/modules/control-center/draft/DraftChangesetContext";
 import { useDraftMode } from "@/modules/control-center/draft/DraftModeContext";
-import { useAIProviders } from "@/modules/agent-network/AIProvidersProvider";
 import { useControlCenterData } from "@/modules/control-center/hooks/useControlCenterData";
 import { useDeployChangeset } from "@/modules/control-center/hooks/useDeployChangeset";
 import { useRemoveChange } from "@/modules/control-center/hooks/useRemoveChange";
 import { LiveData } from "@/modules/control-center/utils/changeset-request";
 import { getPlaceholderSetupKey } from "@/modules/control-center/utils/helpers";
+import { docsLink } from "@/modules/docs/links";
 
 type Props = {
   open: boolean;
@@ -202,11 +203,11 @@ export const ReviewDeployModal = ({
       <ModalContent maxWidthClass={"max-w-[45rem]"}>
         <ModalHeader
           icon={
-            <GitPullRequestArrowIcon size={18} className={"text-netbird"} />
+            <GitPullRequestArrowIcon size={18} className={"text-netbirdy"} />
           }
           title={"Review & Deploy"}
           description={description}
-          color={"netbird"}
+          color={"netbirdy"}
         />
 
         {/* min-w-0: as a grid item of ModalContent it would otherwise grow to
@@ -252,7 +253,7 @@ export const ReviewDeployModal = ({
               <InlineLink
                 // TODO: point at the Control Center / Review & Deploy docs
                 // page once it exists.
-                href={"https://docs.netbird.io/"}
+                href={docsLink("https://docs.netbird.io/")}
                 target={"_blank"}
               >
                 Review & Deploy

@@ -1,0 +1,186 @@
+---
+title: "Understanding NetBird Posture Checks"
+description: ""
+order: 116
+upstream: "manage/access-control/posture-checks/index.mdx@2382247"
+---
+
+> **Note** This page is adapted from the upstream NetBird documentation (BSD-3-Clause) and may describe features that NetBirdy does not include.
+
+Posture Checks is a security feature that enhances network protection by implementing automated assessments of a device's security status before granting network access, thus ensuring that only compliant devices can access your network resources.
+
+In this regard, NetBird posture checks verify various aspects of a connecting device, offering granular control over network access. These checks include **verifying the NetBird client version**, allowing you to restrict access to peers with specific versions of the client software. Additionally, you can implement **geographical restrictions** based on country or region, giving you control over where connections can originate from.
+
+
+[Watch video](https://youtube.com/watch?v=nk7XM8oi-4Y)
+
+
+The feature also allows for network-level restrictions by enabling you to **allow or block specific peer network ranges**. Furthermore, you can set constraints based on the operating system of the connecting device, **ensuring that only approved OS versions can gain access**. For an even more detailed level of control, Posture Checks can examine the running processes on a peer device, **allowing or denying access based on the presence of specific applications or services**. Finally, a device can be required to **hold a certificate issued by your own certificate authority** and prove it still has the private key, which ties access to a credential you issued rather than to anything the device merely reports.
+
+By using these diverse checking capabilities, NetBird empowers you to create a robust and finely-tuned security posture for your network, significantly reducing the risk of unauthorized access and potential security breaches.
+
+## Setting Up Posture Checks
+
+Setting up posture checks in NetBird is straightforward. Follow the guide and examples below:
+
+Log in to your NetBird dashboard and navigate to `Access Control` > `Posture Checks` in the left menu. Click `Create Posture Check` or edit an existing one.
+
+![NetBird Posture Checks]()
+
+A pop-up window will open with two tabs: `Checks` and `Name & Description`.
+
+![Create Posture Check]()
+
+From here, you can manage access with posture checks based on several aspects:
+
+### NetBird Client Version
+Restrict access to peers with specific NetBird client versions, thus ensuring that all devices connecting to the network use up-to-date, secure client software.
+
+![NetBird Client Version Posture Check]()
+
+### Country and Region
+Limit network access based on geographical location, helping comply with data regulations or restrict access from high-risk areas. Note that you have two tabs available for this: `Allow` (green) and `Block` (red), making it easy to set up your preferred access rules.
+
+![Country and Region Posture Check]()
+> **Note** When allowing access from specific locations in the network settings, all other locations are automatically blocked. Conversely, blocking certain locations means only those are blocked, while access remains open for all other locations.
+
+#### Peer Network Range
+This posture check lets you precisely control network access by specifying which IP ranges can connect to your network. You can create policies allowing only connections from approved locations, such as office networks or trusted remote work setups. Additionally, you can enhance security by blocking high-risk IP ranges working in tandem with geo-based posture checks. This granular control helps create a more secure network environment by limiting access to known, trusted sources while preventing connections from potentially risky or unauthorized IP addresses.
+
+![Peer Network Range Posture Check]()
+
+The check evaluates a peer against two sources of address information:
+
+- **The peer's local network interfaces** — the IP addresses configured on the device's NICs (e.g. the office LAN `192.168.1.0/24` the device is plugged into).
+- **The peer's public connection IP** — the source IP the NetBird management server observes when the peer connects (i.e. the egress / NAT'd IP).
+
+A configured range matches when it fully contains one of these, so the same check covers both private subnets and public CIDRs. Note that a local interface contributes its whole subnet (e.g. a `/24`), not a single address, so a configured range must be no more specific than that subnet to match it. A `/32` rule will not match a NIC sitting in a `/24`, though it does match the connection IP, which is compared as a single host. Both IPv4 and IPv6 are supported. A few examples:
+
+- Block a single office public IPv4: `203.0.113.10/32`
+- Allow a public ISP/office block: `198.51.100.0/24` or `203.0.113.0/24`
+- Block an entire private network: `192.168.1.0/24`
+- Block a single IPv6 host: `2001:db8::1/128`
+- Block an IPv6 prefix: `2001:db8::/48`
+
+> **Note** Matching against the public connection IP requires the management server to see the peer's real source IP. If NetBird sits behind a reverse proxy or load balancer, ensure the proxy forwards the client IP (e.g. via the PROXY protocol or `X-Forwarded-For`); otherwise the check will only see the proxy's IP. A quick sanity check: the country and city resolved on the peer in the dashboard should reflect the peer's actual location, not your proxy's.
+
+
+### Operating System
+Restrict access based on the connecting device's OS, ensuring only approved and potentially more secure operating systems can connect.
+
+![Operating System Posture Check]()
+> **Note** The Operating System Check requires NetBird version [0.26.0](https://github.com/netbirdio/netbird/releases) or newer.
+
+
+The check evaluates the actual `OS version` for Android, macOS, and iOS, while for Linux and Windows, it assesses the `kernel version`.
+
+Below are some examples of OS versions for each operating system:
+
+* Android 14 Upside Down Cake: `14`, `14.3`
+* macOS 13	Ventura: `13`, `13.6.4`
+* macOS 14 Sonoma: `14`, `14.3.1`
+* iOS 16 / iPadOS 16: `16`, `16.7.5`
+* Linux kernel: `6`, `6.7.5`
+* Windows 10, version 22H2: `10.0.19045`
+* Windows 11, version 23H2: `10.0.22631`
+* Windows Server 2022, Version 21H2: `10.0.20348`
+
+### Process
+[Limit network access based on specific applications or services running on the connecting device](https://netbird.io/knowledge-hub/limit-network-access-based-on-running-processes). By verifying specific applications or processes, you ensure that only devices running essential security software, such as antivirus, firewalls, or endpoint protection agents, can connect to your network, reducing the risk of malware entering your network through unprotected devices. It also aids in maintaining compliance with regulatory requirements by enforcing consistent security measures across all devices.
+
+Furthermore, this process-based posture check allows you to create specific policies for different user groups or network segments based on their unique security needs. Working in conjunction with other posture checks in NetBird, this setting offers a comprehensive and user-friendly approach to network security.
+
+![Process Posture Check]()
+
+### Certificate
+Restrict access to peers holding a certificate issued by your own certificate authority. Unlike most other checks, this one is not satisfied by something the device reports: the peer must present a certificate that chains to one of the CAs you paste here, and sign a challenge from the management server with the certificate's private key. A certificate copied to another machine without its key does not pass, and a key that is removed or a certificate that expires fails the check within 4 hours.
+
+![Certificate Posture Check]()
+
+The client finds certificates where the operating system keeps them: the computer and user stores on Windows, the System and login keychains on macOS, and on Linux a directory of PEM files or a PKCS#11 token, including keys held in a TPM. Which store to use, how to place a certificate on each platform and how to verify the result are covered in [Requiring a device certificate](/manage/access-control/posture-checks/device-certificates).
+
+> **Note** The Certificate check requires NetBird version [0.81.0](https://github.com/netbirdio/netbird/releases) or newer on both the management server and the client. It is not supported on iOS and Android: mobile peers always fail it and are denied the access the policy grants, so keep it off policies that mobile devices depend on.
+
+
+## Name & Description
+After enabling the desired posture check, go to the `Name & Description` tab. Here, enter a descriptive name for your newly created posture check and save it.
+
+![Name your Posture Check]()
+
+You'll notice a gray dot to the left of the posture check name, indicating it's inactive. To activate the posture check, you need to link it to an access control policy. 
+
+![New Posture Check]()
+
+## Applying Posture Checks to Access Control Policies
+
+To apply a posture check:
+
+* [Create or edit an access control policy](/manage/access-control).
+* Find the `Posture Checks` tab within the policy settings.
+* Choose `Browse Checks` to select an existing check or `New Posture Check` to create one.
+
+Note that you can add multiple posture checks to a single policy as needed for comprehensive security.
+
+![Add Posture Check to Access Control Policy]()
+
+After adding the posture check, it will appear in the `POSTURE CHECKS` column. For easy management, you can click on it to edit the access control policy, allowing you to add or remove posture checks as needed.
+
+![Access Control Policies Dashboard]()
+
+If you revisit the `Posture Checks` dashboard, you'll notice a green dot next to your recently configured posture check. This color shift indicates that the posture check is now active and integrated into your network security framework, actively contributing to your system's protection.
+
+![Posture Checks Dashboard]()
+
+Following these steps, you can effectively implement and manage NetBird's Posture Checks, significantly enhancing your network's security posture.
+
+## When Posture Checks Are Evaluated
+
+NetBird evaluates posture checks when a peer connects or logs in. Checks are also re-evaluated during an active session whenever a peer reports changed system metadata. The management server replays each check against the peer's previous and current metadata, and when a check's verdict flips, it recomputes the network map and distributes the update to the affected peers.
+
+When you add or change a posture check on a policy, the updated configuration is distributed to connected peers immediately. A peer that is already connected is evaluated against the new check on its next connection. There is no periodic redistribution interval; distribution is driven by configuration changes and peer metadata changes, not a timer. The one exception is the Certificate check, whose challenge the management server renews every four hours so a connected peer keeps re-proving possession of its key; see [How the check keeps itself current](/manage/access-control/posture-checks/device-certificates#how-the-check-keeps-itself-current). For more on how changes reach peers, see [How Policy Changes Are Distributed](/manage/access-control#how-policy-changes-are-distributed).
+
+> **Note** Mid-session re-evaluation requires a NetBird management server running [0.74.0](https://github.com/netbirdio/netbird/releases) or newer, and is driven by the peer reporting a metadata change rather than by a continuous poll. A peer that passes a posture check and later changes state during a long-lived session (for example an operating system downgrade or a required process stopping) is re-evaluated on its next metadata sync. On management servers older than 0.74.0, that state change is not picked up until the peer reconnects.
+
+
+## Known Limitations
+
+### Peer Network Range Check on Android
+
+This limitation applies only to Android clients older than 0.77.1. Those clients never reported the device's local network interfaces to the management server, so ranges intended to match a peer's **local NIC IPs** (e.g. an office LAN like `192.168.1.0/24`) could not be evaluated at all.
+
+From NetBird client [0.77.1](https://github.com/netbirdio/netbird/releases) onward, Android reports those addresses and local NIC ranges are evaluated exactly as they are on desktop.
+
+> **Note** iOS was affected by the same limitation in earlier releases. Local network ranges are reported and evaluated correctly on iOS from NetBird client [0.69.0](https://github.com/netbirdio/netbird/releases) onward.
+
+
+**Impact on Android clients older than 0.77.1:**
+
+A local NIC range never matches, so the outcome depends on the check's action:
+
+- An **Allow** check built on local NIC ranges is never satisfied by those peers. They fail the check, and routes gated by that policy become unavailable to them.
+- A **Deny** check built on local NIC ranges is never triggered, so those peers always pass it. The block silently does not apply on those devices.
+
+Checks built on the **public connection IP** are unaffected on every Android version, because the management server observes that source IP itself and does not depend on anything the client reports.
+
+**Recommendation:**
+
+Upgrade the Android client to 0.77.1 or newer. While older Android clients are still in your fleet and you need to gate on local network membership, consider one of the following:
+
+- Create separate policies for those clients that do not include local-NIC-based Peer Network Range posture checks
+- Use alternative posture checks (such as Geo Location) that are supported on every platform
+- Use Peer Network Range checks based on the **public connection IP**, which work on every platform and every version
+- Apply local-NIC-based Peer Network Range posture checks only to policies targeting platforms that report them (Windows, macOS, Linux, iOS 0.69.0+, and Android 0.77.1+)
+
+### Certificate Check on Mobile
+
+The NetBird iOS and Android apps do not collect certificate proofs, so a mobile peer always fails a Certificate check and is denied the access of every policy that carries it. There is no version of the mobile apps that changes this yet. Keep Certificate checks on policies whose source groups hold desktop and server peers only, and gate mobile devices with the checks they support.
+
+## Get started with NetBird
+<div>
+     window.open("https://netbird.io/pricing")}>Use NetBird
+</div>
+
+- Make sure to [star us on GitHub](https://github.com/netbirdio/netbird)
+- Follow us [on X](https://x.com/netbird)
+- Join our [Slack Channel](/slack-url)
+- NetBird [latest release](https://github.com/netbirdio/netbird/releases) on GitHub

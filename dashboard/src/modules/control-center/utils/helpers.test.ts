@@ -8,6 +8,7 @@ import {
   deriveResourceType,
   dropAbsorbedPlaceholder,
   findPlaceholderHolder,
+  focusWorthyIds,
   getDraftResource,
   getFirstGroup,
   getGroupCountLabel,
@@ -22,7 +23,6 @@ import {
   getResourceNodeEnabled,
   isCompleteDraftResource,
   isDeployablePolicy,
-  focusWorthyIds,
   isFocusWorthy,
   isPolicyNodeId,
   isTrackablePolicy,
@@ -72,7 +72,7 @@ const makePolicy = (
 });
 
 describe("getIpPlaceholderFromRange", () => {
-  it("falls back to the NetBird default range", () => {
+  it("falls back to the NetBirdy default range", () => {
     expect(getIpPlaceholderFromRange(undefined)).toBe("100.x.x.x");
     expect(getIpPlaceholderFromRange("")).toBe("100.x.x.x");
   });

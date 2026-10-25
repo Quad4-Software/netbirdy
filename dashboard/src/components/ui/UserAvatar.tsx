@@ -1,7 +1,7 @@
 import { cn, generateColorFromUser } from "@utils/helpers";
+import Image from "next/image";
 import * as React from "react";
 import { useState } from "react";
-import Image from "next/image";
 import { useApplicationContext } from "@/contexts/ApplicationProvider";
 
 type Props = {
@@ -31,7 +31,7 @@ export const UserAvatar = ({ size = "default" }: Props) => {
   ) : (
     <div
       className={cn(
-        "rounded-full flex items-center justify-center bg-nb-gray-900 text-netbird uppercase",
+        "rounded-full flex items-center justify-center bg-nb-gray-900 text-netbirdy uppercase",
         size == "small" && "w-8 h-8",
         size == "medium" && "w-[2.2rem] h-[2.2rem]",
         size == "default" && "w-10 h-10",

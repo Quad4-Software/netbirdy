@@ -1,5 +1,5 @@
-import { test, expect } from "../helpers/fixtures";
 import { navigateTo } from "../helpers/auth";
+import { expect,test } from "../helpers/fixtures";
 
 test.describe.serial("Settings - Groups @settings", () => {
   test("Should toggle user group propagation", async ({ dashboardAsOwner: page }) => {

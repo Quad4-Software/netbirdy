@@ -10,7 +10,7 @@ export type CatalogModel = {
   output_per_1k: number;
   // Default cache rates, present only when the model has one. Used to
   // prefill the model row so the operator sees (and can override) the
-  // rate NetBird would bill with.
+  // rate NetBirdy would bill with.
   cached_input_per_1k?: number;
   cache_read_per_1k?: number;
   cache_creation_per_1k?: number;

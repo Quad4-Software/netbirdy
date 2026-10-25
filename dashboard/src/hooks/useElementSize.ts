@@ -27,14 +27,14 @@ export function useElementSize<T extends HTMLElement = HTMLDivElement>(): [
       height: ref?.offsetHeight || 0,
     });
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [ref?.offsetHeight, ref?.offsetWidth]);
 
   useEventListener("resize", handleSize);
 
   useIsomorphicLayoutEffect(() => {
     handleSize();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [ref?.offsetHeight, ref?.offsetWidth]);
 
   return [setRef, size];

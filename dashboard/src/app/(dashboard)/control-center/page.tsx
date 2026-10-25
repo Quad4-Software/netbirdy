@@ -302,7 +302,7 @@ function ControlCenterCanvas() {
         selectionOnDrag={draft.isSelectMode && !emptyState}
         selectionMode={SelectionMode.Partial}
       >
-        <Background bgColor={"#181a1d"} gap={20} color={"#717171"} />
+        <Background bgColor={"#0a0a0a"} gap={20} color={"#4f4f4f"} />
         <CanvasContextMenu onOpenChange={setContextMenuOpen} />
         <NodeContextMenu
           position={nodeContextMenuPos}

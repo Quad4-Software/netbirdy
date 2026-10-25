@@ -6,7 +6,7 @@ import * as React from "react";
 import { useEffect, useState } from "react";
 import type { Peer } from "@/interfaces/Peer";
 import { WaitingForDevice } from "@/modules/onboarding/OnboardingDevices";
-import { SetupModalContent } from "@/modules/setup-netbird-modal/SetupModal";
+import { SetupModalContent } from "@/modules/setup-netbirdy-modal/SetupModal";
 
 type Props = {
   // onBack is left out when this is the flow's first step.
@@ -19,7 +19,7 @@ type Props = {
 
 // OnboardingAgentDevice covers the quickstart's "Add Your Device to the
 // Network" step: agent-network endpoints are reachable only over the
-// NetBird overlay, so the operator's device must run the client and be
+// NetBirdy overlay, so the operator's device must run the client and be
 // authenticated before anything else works.
 export const OnboardingAgentDevice = ({ onBack, onNext, device }: Props) => {
   const [open, setOpen] = useState(false);
@@ -40,7 +40,7 @@ export const OnboardingAgentDevice = ({ onBack, onNext, device }: Props) => {
           }
         >
           {`Agent Network endpoints are private and reachable only over the
-          NetBird overlay. Install the client and sign in to join the network
+          NetBirdy overlay. Install the client and sign in to join the network
           with keyless, encrypted access.`}
         </div>
       </div>
@@ -77,14 +77,14 @@ export const OnboardingAgentDevice = ({ onBack, onNext, device }: Props) => {
         ) : (
           <Button variant={"primary"} onClick={() => setOpen(true)}>
             <DownloadIcon size={16} />
-            Install NetBird
+            Install NetBirdy
           </Button>
         )}
       </div>
 
       <Modal open={open} onOpenChange={setOpen}>
         <ModalContent className={"!z-[70]"}>
-          <SetupModalContent title={"Install NetBird"} isUserDevice={true} />
+          <SetupModalContent title={"Install NetBirdy"} isUserDevice={true} />
         </ModalContent>
       </Modal>
     </div>

@@ -1,8 +1,7 @@
+import * as bypass from "@utils/bypass";
 import FullTooltip from "@components/FullTooltip";
 import { AlertTriangle } from "lucide-react";
 import * as React from "react";
-import { PeerDisapprovalReason } from "@/cloud/edr/PeerDisapprovalReason";
-import { useBypassedPeers } from "@/cloud/edr/useBypass";
 import { Peer } from "@/interfaces/Peer";
 import { useIntegrations } from "@/modules/integrations/edr/useIntegrations";
 
@@ -20,12 +19,11 @@ import { useIntegrations } from "@/modules/integrations/edr/useIntegrations";
 // Priority: bypassed → login_expired → non-compliant → approval_required.
 export const usePeerIssueIcon = (peer: Peer): React.ReactNode | null => {
   const { isAnyIntegrationEnabled, activeIntegrationName } = useIntegrations();
-  const { isBypassed: checkBypassed } = useBypassedPeers();
-  const isBypassed = peer.id ? checkBypassed(peer.id) : false;
+  const checkBypassed = (_id?: string) => false;
 
   const ICON_SIZE = 18;
 
-  if (isBypassed) {
+  if (bypass.isBypassed(peer.id)) {
     return (
       <FullTooltip
         interactive={false}
@@ -51,7 +49,7 @@ export const usePeerIssueIcon = (peer: Peer): React.ReactNode | null => {
         content={
           <div className={"text-xs max-w-xs"}>
             This peer&apos;s login has expired. Re-authenticate from the
-            NetBird client on the device to bring it back online.
+            NetBirdy client on the device to bring it back online.
           </div>
         }
       >
@@ -74,7 +72,7 @@ export const usePeerIssueIcon = (peer: Peer): React.ReactNode | null => {
                 This peer is not compliant with {activeIntegrationName} and
                 cannot connect until compliance is restored or bypassed.
               </div>
-              <PeerDisapprovalReason peer={peer} />
+              
             </div>
           }
         >

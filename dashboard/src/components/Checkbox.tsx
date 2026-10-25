@@ -12,14 +12,14 @@ const variants = cva([], {
   variants: {
     variant: {
       default: [
-        "dark:data-[state=unchecked]:bg-nb-gray-950 dark:border-nb-gray-900 dark:ring-offset-neutral-950 dark:focus-visible:ring-neutral-300 ",
-        "dark:data-[state=checked]:bg-netbird dark:data-[state=checked]:text-neutral-50",
-        "dark:data-[state=indeterminate]:bg-netbird dark:data-[state=indeterminate]:text-neutral-50",
+        "dark:data-[state=unchecked]:bg-nb-gray-950 dark:border-[#3a3a3a] dark:ring-offset-neutral-950 dark:focus-visible:ring-neutral-300 ",
+        "dark:data-[state=checked]:bg-netbirdy dark:data-[state=checked]:text-neutral-50",
+        "dark:data-[state=indeterminate]:bg-netbirdy dark:data-[state=indeterminate]:text-neutral-50",
       ],
       tableCell: [
-        "dark:data-[state=unchecked]:bg-nb-gray-920 dark:border-nb-gray-800 dark:ring-offset-neutral-950 dark:focus-visible:ring-neutral-300 ",
-        "dark:data-[state=checked]:bg-netbird dark:data-[state=checked]:text-neutral-50",
-        "dark:data-[state=indeterminate]:bg-netbird dark:data-[state=indeterminate]:text-neutral-50",
+        "dark:data-[state=unchecked]:bg-nb-gray-920 dark:border-[#3a3a3a] dark:ring-offset-neutral-950 dark:focus-visible:ring-neutral-300 ",
+        "dark:data-[state=checked]:bg-netbirdy dark:data-[state=checked]:text-neutral-50",
+        "dark:data-[state=indeterminate]:bg-netbirdy dark:data-[state=indeterminate]:text-neutral-50",
       ],
     },
   },
@@ -35,7 +35,7 @@ const Checkbox = React.forwardRef<
       ref={ref}
       className={cn(
         variants({ variant }),
-        "border-neutral-900",
+        "border-[#c9bfa8]",
         "peer h-5 w-5 shrink-0 rounded-[4px] border",
         "ring-offset-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-950 focus-visible:ring-offset-2",
         "disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-neutral-900 data-[state=checked]:text-neutral-50 ",

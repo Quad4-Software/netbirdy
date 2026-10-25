@@ -1,5 +1,6 @@
 "use client";
 
+import { DatePickerWithRange } from "@components/DatePickerWithRange";
 import InlineLink from "@components/InlineLink";
 import SquareIcon from "@components/SquareIcon";
 import { DataTable } from "@components/table/DataTable";
@@ -26,12 +27,11 @@ import {
 } from "@components/table/TableFilters";
 import GetStartedTest from "@components/ui/GetStartedTest";
 import type { ColumnDef, SortingState } from "@tanstack/react-table";
-import { ExternalLinkIcon } from "lucide-react";
-import ReverseProxyIcon from "@/assets/icons/ReverseProxyIcon";
 import dayjs from "dayjs";
+import { ExternalLinkIcon } from "lucide-react";
 import React, { useCallback, useMemo, useState } from "react";
 import { DateRange } from "react-day-picker";
-import { DatePickerWithRange } from "@components/DatePickerWithRange";
+import ReverseProxyIcon from "@/assets/icons/ReverseProxyIcon";
 import { useServerPagination } from "@/contexts/ServerPaginationProvider";
 import { useUsers } from "@/contexts/UsersProvider";
 import {
@@ -40,19 +40,19 @@ import {
   ReverseProxyEvent,
 } from "@/interfaces/ReverseProxy";
 import type { User } from "@/interfaces/User";
-import useFetchApi from "@/utils/api";
-import { ReverseProxyEventsStatusCell } from "@/modules/reverse-proxy/events/ReverseProxyEventsStatusCell";
-import { ReverseProxyEventsUserCell } from "@/modules/reverse-proxy/events/ReverseProxyEventsUserCell";
+import ReverseProxyEventExpandedRow from "@/modules/reverse-proxy/events/ReverseProxyEventExpandedRow";
+import { ReverseProxyEventsAuthMethodCell } from "@/modules/reverse-proxy/events/ReverseProxyEventsAuthMethodCell";
+import { ReverseProxyEventsBytesCell } from "@/modules/reverse-proxy/events/ReverseProxyEventsBytesCell";
+import { ReverseProxyEventsDurationCell } from "@/modules/reverse-proxy/events/ReverseProxyEventsDurationCell";
 import { ReverseProxyEventsLocationIpCell } from "@/modules/reverse-proxy/events/ReverseProxyEventsLocationIpCell";
 import {
   ReverseProxyEventsMethodCell,
   ReverseProxyEventsUrlCell,
 } from "@/modules/reverse-proxy/events/ReverseProxyEventsRequestCell";
+import { ReverseProxyEventsStatusCell } from "@/modules/reverse-proxy/events/ReverseProxyEventsStatusCell";
 import { ReverseProxyEventsTimeCell } from "@/modules/reverse-proxy/events/ReverseProxyEventsTimeCell";
-import { ReverseProxyEventsAuthMethodCell } from "@/modules/reverse-proxy/events/ReverseProxyEventsAuthMethodCell";
-import { ReverseProxyEventsDurationCell } from "@/modules/reverse-proxy/events/ReverseProxyEventsDurationCell";
-import { ReverseProxyEventsBytesCell } from "@/modules/reverse-proxy/events/ReverseProxyEventsBytesCell";
-import ReverseProxyEventExpandedRow from "@/modules/reverse-proxy/events/ReverseProxyEventExpandedRow";
+import { ReverseProxyEventsUserCell } from "@/modules/reverse-proxy/events/ReverseProxyEventsUserCell";
+import useFetchApi from "@/utils/api";
 
 export const makeEventsColumns = (
   servicesMap: Map<string, ReverseProxy>,

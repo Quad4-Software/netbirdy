@@ -1,5 +1,4 @@
 import { expect, type Response } from "@playwright/test";
-import { test } from "../helpers/fixtures";
 import { deleteGroup, deletePolicyById, listPolicies } from "../helpers/api";
 import {
   canvasNode,
@@ -10,6 +9,7 @@ import {
   resetDraftState,
   reviewButton,
 } from "../helpers/control-center";
+import { test } from "../helpers/fixtures";
 
 test.describe.serial("Control Center Deploy @control-center", () => {
   test.beforeEach(async ({ dashboardAsOwner: page }) => {

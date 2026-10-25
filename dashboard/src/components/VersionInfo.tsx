@@ -4,14 +4,15 @@ import FullTooltip from "@components/FullTooltip";
 import { SmallBadge } from "@components/ui/SmallBadge";
 import useFetchApi from "@utils/api";
 import { cn } from "@utils/helpers";
-import { isNetBirdCloud } from "@utils/netbird";
-import { isNewerVersion } from "@utils/version";
+import { isNetBirdCloud } from "@utils/netbirdy";
+import { isDevelopmentVersion, isUpdateAvailable } from "@utils/version";
 import { ArrowUpCircle } from "lucide-react";
 import * as React from "react";
 import Skeleton from "react-loading-skeleton";
 import { useApplicationContext } from "@/contexts/ApplicationProvider";
 import { usePermissions } from "@/contexts/PermissionsProvider";
 import { VersionInfo as VersionInfoType } from "@/interfaces/Instance";
+import { docsLink } from "@/modules/docs/links";
 
 function formatVersion(version: string): string {
   if (!version) return "";
@@ -113,13 +114,13 @@ const NavigationVersionInfoContent = () => {
   // comparison for management servers that don't report the flag yet.
   const managementUpdateAvailable =
     versionInfo.management_update_available ??
-    isNewerVersion(
+    isUpdateAvailable(
       versionInfo.management_current_version,
       versionInfo.management_available_version,
     );
   // The dashboard's installed version is baked in at build time and the server
   // never sees it, so this one is always compared here.
-  const dashboardUpdateAvailable = isNewerVersion(
+  const dashboardUpdateAvailable = isUpdateAvailable(
     dashboardVersion,
     versionInfo.dashboard_available_version,
   );
@@ -166,19 +167,21 @@ const NavigationVersionInfoContent = () => {
           side="top"
           className="w-full"
         >
-          <div className="flex items-center justify-between w-full cursor-default gap-2">
-            <span className="shrink-0">Dashboard</span>
-            <VersionValue version={dashboardVersion} />
-          </div>
+          {!isDevelopmentVersion(dashboardVersion) && (
+            <div className="flex items-center justify-between w-full cursor-default gap-2">
+              <span className="shrink-0">Dashboard</span>
+              <VersionValue version={dashboardVersion} />
+            </div>
+          )}
         </FullTooltip>
       </div>
 
       {hasUpdate && (
         <a
-          href="https://docs.netbird.io/selfhosted/maintenance/upgrade"
+          href={docsLink("https://docs.netbird.io/selfhosted/maintenance/upgrade")}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center justify-center gap-1.5 text-white font-medium bg-netbird hover:bg-netbird-500 transition-colors rounded-md py-1.5 px-2 mt-1"
+          className="flex items-center justify-center gap-1.5 text-white font-medium bg-netbirdy hover:bg-netbirdy-500 transition-colors rounded-md py-1.5 px-2 mt-1"
         >
           <ArrowUpCircle size={12} />
           <span>Update available</span>

@@ -51,6 +51,7 @@ import {
 } from "@/modules/agent-network/data/mockData";
 import useGroupHelper from "@/modules/groups/useGroupHelper";
 import { SmallUserAvatar } from "@/modules/users/SmallUserAvatar";
+import { docsLink } from "@/modules/docs/links";
 
 type Props = {
   open: boolean;
@@ -163,7 +164,7 @@ function AgentBudgetRuleModalContent({
         description={
           "Token and budget caps, applied account-wide or scoped to groups and users."
         }
-        color={"netbird"}
+        color={"netbirdy"}
       />
 
       <Tabs defaultValue={tab} onValueChange={setTab} value={tab}>
@@ -263,7 +264,7 @@ function AgentBudgetRuleModalContent({
           <Paragraph className={"text-sm mt-auto"}>
             Learn more about
             <InlineLink
-              href={"https://docs.netbird.io/agent-network"}
+              href={docsLink("https://docs.netbird.io/agent-network")}
               target={"_blank"}
             >
               Agent Network

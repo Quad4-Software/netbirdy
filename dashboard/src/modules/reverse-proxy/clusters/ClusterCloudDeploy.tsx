@@ -20,10 +20,10 @@ import React, { useEffect, useMemo, useState } from "react";
 import { isClusterConnected } from "@/interfaces/ReverseProxy";
 import { useProxyCluster } from "@/modules/reverse-proxy/clusters/useProxyCluster";
 
-// Synced from templates/reverse-proxy/netbird-proxy-cfn.yaml by the
+// Synced from templates/reverse-proxy/netbirdy-proxy-cfn.yaml by the
 // sync-deploy-templates workflow.
 const CFN_TEMPLATE_URL =
-  "https://netbird-deploy-templates.s3.eu-central-1.amazonaws.com/templates/netbird-proxy-cfn.yaml";
+  "https://netbirdy-deploy-templates.s3.eu-central-1.amazonaws.com/templates/netbirdy-proxy-cfn.yaml";
 
 const DEFAULT_WIREGUARD_PORT = 51820;
 
@@ -92,7 +92,7 @@ chpasswd:
 `
     : ""
 }write_files:
-  - path: /opt/netbird-proxy/env
+  - path: /opt/netbirdy-proxy/env
     permissions: "0600"
     content: |
       NB_PROXY_TOKEN=${token}
@@ -105,12 +105,12 @@ chpasswd:
       NB_PROXY_LOG_LEVEL=info
       NB_PROXY_ADDRESS=:443
       NB_PROXY_WG_PORT=${DEFAULT_WIREGUARD_PORT}
-  - path: /opt/netbird-proxy/docker-compose.yml
+  - path: /opt/netbirdy-proxy/docker-compose.yml
     permissions: "0644"
     content: |
       services:
         reverse-proxy:
-          image: netbirdio/reverse-proxy:latest
+          image: ghcr.io/sudo-ivan/netbirdy-reverse-proxy:latest
           restart: unless-stopped
           logging:
             driver: json-file
@@ -122,14 +122,14 @@ chpasswd:
             - "443:443"
             - "${DEFAULT_WIREGUARD_PORT}:${DEFAULT_WIREGUARD_PORT}/udp"
           env_file:
-            - /opt/netbird-proxy/env
+            - /opt/netbirdy-proxy/env
           volumes:
             - proxy_certs:/certs
       volumes:
         proxy_certs:
 runcmd:
   - curl -fsSL https://get.docker.com | sh
-  - docker compose -f /opt/netbird-proxy/docker-compose.yml up -d
+  - docker compose -f /opt/netbirdy-proxy/docker-compose.yml up -d
 `;
 
 export const ClusterCloudDeploy = ({ provider, ...props }: Props) => {
@@ -257,14 +257,14 @@ const RegistrationCheck = ({
         <>
           <CheckCircle2 size={16} className={"text-green-500 shrink-0"} />
           <span className={"text-nb-gray-100"}>
-            Proxy registered with NetBird and connected.
+            Proxy registered with NetBirdy and connected.
           </span>
         </>
       ) : (
         <>
           <Loader2 size={16} className={"animate-spin shrink-0"} />
           <span className={"text-nb-gray-300"}>
-            Waiting for the proxy to register with NetBird...
+            Waiting for the proxy to register with NetBirdy...
           </span>
         </>
       )}
@@ -274,7 +274,7 @@ const RegistrationCheck = ({
 
 // DeploySuccess shows the deployment result: the DNS records to create for
 // the new instance IP and a live check that the proxy registered with the
-// NetBird management service.
+// NetBirdy management service.
 const DeploySuccess = ({
   resourceLabel,
   name,
@@ -294,7 +294,7 @@ const DeploySuccess = ({
           <>
             {" "}
             with {isStaticIP ? "static IP" : "IP"}{" "}
-            <span className={"text-netbird font-medium"}>{ip}</span> and is still
+            <span className={"text-netbirdy font-medium"}>{ip}</span> and is still
             bootstrapping. Meanwhile, add the DNS records below.
           </>
         ) : (
@@ -363,7 +363,7 @@ const HetznerDeploy = ({
 
   const serverName = useMemo(() => {
     const label = domain.replace(/[^a-zA-Z0-9-]/g, "-").toLowerCase();
-    return `netbird-proxy-${label}`.slice(0, 63).replace(/-+$/, "");
+    return `netbirdy-proxy-${label}`.slice(0, 63).replace(/-+$/, "");
   }, [domain]);
 
   // Load the live catalog once a plausible token is entered, debounced so we
@@ -518,7 +518,7 @@ const HetznerDeploy = ({
             content={
               <>
                 The token goes straight from your browser to Hetzner and never
-                touches NetBird&apos;s servers, and you can delete it once setup
+                touches NetBirdy&apos;s servers, and you can delete it once setup
                 succeeds.{" "}
                 <InlineLink
                   href={
@@ -533,7 +533,7 @@ const HetznerDeploy = ({
           />
         </Label>
         <HelpText>
-          Create a read &amp; write API token. It is never stored by NetBird.
+          Create a read &amp; write API token. It is never stored by NetBirdy.
         </HelpText>
         <Input
           type={"password"}
@@ -671,7 +671,7 @@ const DigitalOceanDeploy = ({
 
   const dropletName = useMemo(() => {
     const label = domain.replace(/[^a-zA-Z0-9.-]/g, "-").toLowerCase();
-    return `netbird-proxy-${label}`.slice(0, 63).replace(/[-.]+$/, "");
+    return `netbirdy-proxy-${label}`.slice(0, 63).replace(/[-.]+$/, "");
   }, [domain]);
 
   const deploy = async () => {
@@ -688,7 +688,7 @@ const DigitalOceanDeploy = ({
         size,
         image: "ubuntu-24-04-x64",
         user_data: buildCloudInit(domain, token, managementUrl, rootPassword),
-        tags: ["netbird-proxy"],
+        tags: ["netbirdy-proxy"],
       }),
     })
       .then(async (res) => {
@@ -776,11 +776,11 @@ const DigitalOceanDeploy = ({
             content={
               <>
                 For the tightest scope, grant full access to{" "}
-                <span className={"font-mono text-netbird"}>tag</span>,{" "}
-                <span className={"font-mono text-netbird"}>droplet</span>, and{" "}
-                <span className={"font-mono text-netbird"}>reserved_ip</span>{" "}
+                <span className={"font-mono text-netbirdy"}>tag</span>,{" "}
+                <span className={"font-mono text-netbirdy"}>droplet</span>, and{" "}
+                <span className={"font-mono text-netbirdy"}>reserved_ip</span>{" "}
                 only. The token goes straight from your browser to DigitalOcean
-                and never touches NetBird&apos;s servers, and you can delete it
+                and never touches NetBirdy&apos;s servers, and you can delete it
                 once setup succeeds.{" "}
                 <InlineLink
                   href={
@@ -795,7 +795,7 @@ const DigitalOceanDeploy = ({
           />
         </Label>
         <HelpText>
-          Create a token with write access. It is never stored by NetBird.
+          Create a token with write access. It is never stored by NetBirdy.
         </HelpText>
         <Input
           type={"password"}
@@ -861,7 +861,7 @@ const AWSDeploy = ({
   const launchUrl = useMemo(() => {
     const params = new URLSearchParams({
       templateURL: CFN_TEMPLATE_URL,
-      stackName: "netbird-proxy",
+      stackName: "netbirdy-proxy",
       param_ProxyDomain: domain,
       param_ManagementURL: managementUrl,
     });

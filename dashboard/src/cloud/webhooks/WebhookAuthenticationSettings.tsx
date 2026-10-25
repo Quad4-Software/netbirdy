@@ -1,4 +1,3 @@
-import React from "react";
 import HelpText from "@components/HelpText";
 import { Input } from "@components/Input";
 import { Label } from "@components/Label";
@@ -14,6 +13,7 @@ import {
   TagIcon,
   UserIcon,
 } from "lucide-react";
+import React from "react";
 import { WebhookConfig } from "@/cloud/webhooks/useWebhookConfig";
 
 export enum AuthType {

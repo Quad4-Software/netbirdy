@@ -15,7 +15,7 @@ export const SELF_DEPLOY_HINT_AFTER_S = 300;
 // privateAccountClusters returns the proxies the account runs itself that can
 // already serve Agent Network: online, connected, and private. The choice
 // screen offers each of them next to the managed gateway and a new proxy.
-// Shared clusters are NetBird-operated and never count, or every Cloud
+// Shared clusters are NetBirdy-operated and never count, or every Cloud
 // account would be offered a proxy it does not run.
 export function privateAccountClusters(
   clusters?: ReverseProxyCluster[],

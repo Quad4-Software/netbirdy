@@ -8,6 +8,8 @@ import { DataTable } from "@components/table/DataTable";
 import DataTableHeader from "@components/table/DataTableHeader";
 import GetStartedTest from "@components/ui/GetStartedTest";
 import { ColumnDef, SortingState } from "@tanstack/react-table";
+import useFetchApi from "@utils/api";
+import { cn } from "@utils/helpers";
 import {
   BarElement,
   CategoryScale,
@@ -16,8 +18,6 @@ import {
   LinearScale,
   Tooltip,
 } from "chart.js";
-import useFetchApi from "@utils/api";
-import { cn } from "@utils/helpers";
 import dayjs from "dayjs";
 import { ActivityIcon, ExternalLinkIcon } from "lucide-react";
 import * as React from "react";
@@ -35,6 +35,7 @@ import {
   buildUsageOverviewQuery,
 } from "@/modules/agent-network/agentAccessLogApi";
 import { useAgentNetworkMode } from "@/modules/agent-network/useAgentNetworkMode";
+import { docsLink } from "@/modules/docs/links";
 
 // Register the chart.js building blocks we use. Idempotent, so it's safe
 // even when another agent-network chart already registered them.
@@ -383,7 +384,7 @@ function DailyBreakdownTable({ daily }: { daily: DayBucket[] }) {
             <>
               Learn more about
               <InlineLink
-                href={"https://docs.netbird.io/agent-network"}
+                href={docsLink("https://docs.netbird.io/agent-network")}
                 target={"_blank"}
               >
                 Agent Network
@@ -492,7 +493,7 @@ function ConsumptionByDayChart({
             {
               label: "Cost (USD)",
               data: daily.map((d) => d.cost),
-              backgroundColor: "rgba(246, 131, 48, 0.65)", // netbird orange
+              backgroundColor: "rgba(246, 131, 48, 0.65)", // netbirdy orange
             },
           ],
         };

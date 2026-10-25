@@ -18,7 +18,7 @@ export default meta;
 type Story = StoryObj;
 
 const loaded = async () => {
-  await findText(/acme\.ai\.eu\.proxy\.netbird\.io/);
+  await findText(/acme\.ai\.eu\.proxy\.netbirdy\.io/);
   await settle();
 };
 

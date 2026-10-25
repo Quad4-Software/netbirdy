@@ -25,9 +25,9 @@ import {
   UserCircle,
 } from "lucide-react";
 import React, { useState } from "react";
-import { useEmbeddedIdentityProviders } from "@/hooks/useEmbeddedIdentityProviders";
 import { useSWRConfig } from "swr";
 import integrationImage from "@/assets/integrations/entra-id.png";
+import { useEmbeddedIdentityProviders } from "@/hooks/useEmbeddedIdentityProviders";
 import { AzureADIntegration } from "@/interfaces/IdentityProvider";
 import azureGrantAdmin from "@/modules/integrations/idp-sync/azure-ad/images/azure-grant-admin-conset.png";
 import { EmbeddedIdentityProviderSelect } from "@/modules/integrations/idp-sync/EmbeddedIdentityProviderSelect";
@@ -92,7 +92,7 @@ export function SetupContent({ onSuccess }: ModalProps) {
   const connect = async () => {
     notify({
       title: "Entra ID Integration",
-      description: `Entra ID was successfully connected to NetBird.`,
+      description: `Entra ID was successfully connected to NetBirdy.`,
       promise: azureRequest
         .post({
           client_secret: btoa(clientSecret), // Encode client secret to base64
@@ -136,7 +136,7 @@ export function SetupContent({ onSuccess }: ModalProps) {
               key={index}
               className={cn(
                 "w-8 h-1 rounded-full bg-nb-gray-800",
-                step >= index + 1 && "bg-netbird",
+                step >= index + 1 && "bg-netbirdy",
               )}
             />
           ))}
@@ -145,9 +145,9 @@ export function SetupContent({ onSuccess }: ModalProps) {
 
       <IntegrationModalHeader
         image={integrationImage}
-        title={"Connect NetBird with Entra ID (API)"}
+        title={"Connect NetBirdy with Entra ID (API)"}
         description={
-          "Start syncing your users and groups from Entra ID to NetBird. Follow the steps below to get started."
+          "Start syncing your users and groups from Entra ID to NetBirdy. Follow the steps below to get started."
         }
       />
 
@@ -253,7 +253,7 @@ export function SetupContent({ onSuccess }: ModalProps) {
             data={[
               {
                 label: "Name",
-                value: "NetBird",
+                value: "NetBirdy",
               },
               {
                 label: "Account Types",
@@ -330,7 +330,7 @@ export function SetupContent({ onSuccess }: ModalProps) {
             </Steps.Step>
             <Steps.Step step={3}>
               <p className={"font-normal"}>
-                Add <Mark copy>NetBird</Mark> as the description and click{" "}
+                Add <Mark copy>NetBirdy</Mark> as the description and click{" "}
                 <Mark>Add</Mark>
               </p>
             </Steps.Step>
@@ -380,7 +380,7 @@ export function SetupContent({ onSuccess }: ModalProps) {
             </Steps.Step>
             <Steps.Step step={2} line={false}>
               <p className={"font-normal"}>
-                Select <Mark>NetBird</Mark> application in overview page and
+                Select <Mark>NetBirdy</Mark> application in overview page and
                 enter your <Mark>Application (client) ID</Mark> and{" "}
                 <Mark>Directory (tenant) ID</Mark>
               </p>

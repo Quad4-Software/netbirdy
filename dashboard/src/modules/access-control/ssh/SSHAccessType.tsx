@@ -1,5 +1,3 @@
-import * as React from "react";
-import { Dispatch, SetStateAction } from "react";
 import {
   Select,
   SelectContent,
@@ -7,8 +5,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@components/Select";
-import { usePermissions } from "@/contexts/PermissionsProvider";
 import { ShieldHalfIcon, ShieldUserIcon } from "lucide-react";
+import * as React from "react";
+import { Dispatch, SetStateAction } from "react";
+import { usePermissions } from "@/contexts/PermissionsProvider";
 
 type Props = {
   value: "full" | "limited";

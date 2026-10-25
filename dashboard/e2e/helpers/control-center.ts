@@ -1,4 +1,4 @@
-import { Page, Locator, expect, test } from "@playwright/test";
+import { expect, Locator, Page, test } from "@playwright/test";
 import { navigateTo } from "./auth";
 import { clearScrollLock, setTestEdition } from "./utils";
 
@@ -11,7 +11,7 @@ async function disableCloudBilling(page: Page) {
 async function enableE2EHooks(page: Page) {
   await page.evaluate(() => {
     try {
-      window.localStorage.setItem("netbird-e2e-hooks", "true");
+      window.localStorage.setItem("netbirdy-e2e-hooks", "true");
     } catch (e) {
       /* storage unavailable */
     }

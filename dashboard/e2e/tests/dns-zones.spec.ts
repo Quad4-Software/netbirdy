@@ -1,7 +1,7 @@
-import { test, expect } from "../helpers/fixtures";
+import { deleteDnsZonesByPrefix,deleteGroupsByPrefix } from "../helpers/api";
 import { navigateTo } from "../helpers/auth";
+import { expect,test } from "../helpers/fixtures";
 import { applyRadioTableFilter, generateRandomName } from "../helpers/utils";
-import { deleteGroupsByPrefix, deleteDnsZonesByPrefix } from "../helpers/api";
 
 let zoneDomain = "";
 let zoneGroup = "";

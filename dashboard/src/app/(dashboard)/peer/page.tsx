@@ -37,22 +37,25 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { EditPeerNameModal } from "@/modules/peers/EditPeerNameModal";
 import React, { useMemo, useState } from "react";
 import Skeleton from "react-loading-skeleton";
 import { useSWRConfig } from "swr";
-import {
-  TrafficEventsPeerTabContent,
-  TrafficEventsPeerTabTrigger,
-} from "@/cloud/traffic-events/TrafficEventsPeerTabContent";
 import RoundedFlag from "@/assets/countries/RoundedFlag";
 import CircleIcon from "@/assets/icons/CircleIcon";
 import NetBirdIcon from "@/assets/icons/NetBirdIcon";
 import PeerIcon from "@/assets/icons/PeerIcon";
 import ReverseProxyIcon from "@/assets/icons/ReverseProxyIcon";
+import {
+  TrafficEventsPeerTabContent,
+  TrafficEventsPeerTabTrigger,
+} from "@/cloud/traffic-events/TrafficEventsPeerTabContent";
 import { useCountries } from "@/contexts/CountryProvider";
 import PeerProvider, { usePeer } from "@/contexts/PeerProvider";
 import { usePermissions } from "@/contexts/PermissionsProvider";
+import ReverseProxiesProvider, {
+  flattenReverseProxies,
+  useReverseProxies,
+} from "@/contexts/ReverseProxiesProvider";
 import RoutesProvider from "@/contexts/RoutesProvider";
 import { useHasChanges } from "@/hooks/useHasChanges";
 import type { Group } from "@/interfaces/Group";
@@ -61,18 +64,15 @@ import type { User } from "@/interfaces/User";
 import PageContainer from "@/layouts/PageContainer";
 import useGroupHelper from "@/modules/groups/useGroupHelper";
 import { AccessiblePeersSection } from "@/modules/peer/AccessiblePeersSection";
+import { PeerEditIPModal } from "@/modules/peer/PeerEditIPModal";
+import { PeerExpirationSettings } from "@/modules/peer/PeerExpirationSettings";
 import { PeerNetworkRoutesSection } from "@/modules/peer/PeerNetworkRoutesSection";
 import { PeerRemoteJobsSection } from "@/modules/peer/PeerRemoteJobsSection";
-import ReverseProxiesProvider, {
-  flattenReverseProxies,
-  useReverseProxies,
-} from "@/contexts/ReverseProxiesProvider";
-import { ReverseProxyFlatTargetsTabContent } from "@/modules/reverse-proxy/targets/flat/ReverseProxyFlatTargetsTabContent";
-import { PeerEditIPModal } from "@/modules/peer/PeerEditIPModal";
 import { PeerSSHToggle } from "@/modules/peer/PeerSSHToggle";
+import { EditPeerNameModal } from "@/modules/peers/EditPeerNameModal";
 import { RDPButton } from "@/modules/remote-access/rdp/RDPButton";
 import { SSHButton } from "@/modules/remote-access/ssh/SSHButton";
-import { PeerExpirationSettings } from "@/modules/peer/PeerExpirationSettings";
+import { ReverseProxyFlatTargetsTabContent } from "@/modules/reverse-proxy/targets/flat/ReverseProxyFlatTargetsTabContent";
 
 export default function PeerPage() {
   const queryParameter = useSearchParams();
@@ -365,7 +365,7 @@ const PeerOverviewTabs = () => {
           <TabsTrigger value={"reverse-proxies"}>
             <ReverseProxyIcon
               size={16}
-              className="fill-nb-gray-400 group-data-[state=active]/trigger:fill-netbird"
+              className="fill-nb-gray-400 group-data-[state=active]/trigger:fill-netbirdy"
             />
             {singularize("Services", flatTargets.length)}
           </TabsTrigger>
@@ -405,7 +405,7 @@ const PeerOverviewTabs = () => {
             hideResourceColumn
             emptyTableTitle={"This peer has no services"}
             emptyTableDescription={
-              "Add your services to this peer and securely expose them through NetBird's reverse proxy"
+              "Add your services to this peer and securely expose them through NetBirdy's reverse proxy"
             }
           />
         </TabsContent>
@@ -489,7 +489,7 @@ function PeerInformationCard({ peer }: Readonly<{ peer: Peer }>) {
   const handleSaveIP = (newIP: string) => {
     notify({
       title: peer.name,
-      description: "NetBird Peer IP was successfully updated",
+      description: "NetBirdy Peer IP was successfully updated",
       promise: update({ ip: newIP }).then(() => {
         mutate("/peers/" + peer.id);
         setShowEditIPModal(false);
@@ -501,7 +501,7 @@ function PeerInformationCard({ peer }: Readonly<{ peer: Peer }>) {
   const handleSaveIPv6 = (newIPv6: string) => {
     notify({
       title: peer.name,
-      description: "NetBird Peer IPv6 was successfully updated",
+      description: "NetBirdy Peer IPv6 was successfully updated",
       promise: update({ ipv6: newIPv6 }).then(() => {
         mutate("/peers/" + peer.id);
         setShowEditIPv6Modal(false);
@@ -533,11 +533,11 @@ function PeerInformationCard({ peer }: Readonly<{ peer: Peer }>) {
           <Card.ListItem
             copy
             tooltip={false}
-            copyText={"NetBird IP Address"}
+            copyText={"NetBirdy IP Address"}
             label={
               <>
                 <MapPin size={16} className={"shrink-0"} />
-                NetBird IP Address
+                NetBirdy IP Address
               </>
             }
             valueToCopy={peer.ip}
@@ -554,11 +554,11 @@ function PeerInformationCard({ peer }: Readonly<{ peer: Peer }>) {
             <Card.ListItem
               copy
               tooltip={false}
-              copyText={"NetBird IPv6 Address"}
+              copyText={"NetBirdy IPv6 Address"}
               label={
                 <>
                   <MapPin size={16} className={"shrink-0"} />
-                  NetBird IPv6 Address
+                  NetBirdy IPv6 Address
                 </>
               }
               valueToCopy={peer.ipv6}
@@ -736,7 +736,7 @@ function PeerInformationCard({ peer }: Readonly<{ peer: Peer }>) {
                   UI Version
                 </>
               }
-              value={peer.ui_version?.replace("netbird-desktop-ui/", "")}
+              value={peer.ui_version?.replace("netbirdy-desktop-ui/", "")}
             />
           )}
         </Card.List>

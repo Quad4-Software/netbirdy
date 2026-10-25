@@ -1,3 +1,4 @@
+import * as bypass from "@utils/bypass";
 import Button from "@components/Button";
 import ButtonGroup from "@components/ButtonGroup";
 import { Checkbox } from "@components/Checkbox";
@@ -37,10 +38,9 @@ import {
   RowSelectionState,
   SortingState,
 } from "@tanstack/react-table";
+import { removeAllSpaces } from "@utils/helpers";
 import { trim, uniqBy } from "lodash";
 import { AlertTriangle, MonitorDotIcon, ShieldCheck } from "lucide-react";
-import { useBypassedPeers } from "@/cloud/edr/useBypass";
-import { useIntegrations } from "@/modules/integrations/edr/useIntegrations";
 import { usePathname } from "next/navigation";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useSWRConfig } from "swr";
@@ -52,6 +52,7 @@ import { getOperatingSystem } from "@/hooks/useOperatingSystem";
 import { Group } from "@/interfaces/Group";
 import { OperatingSystem } from "@/interfaces/OperatingSystem";
 import { Peer, peerMacAddresses } from "@/interfaces/Peer";
+import { useIntegrations } from "@/modules/integrations/edr/useIntegrations";
 import PeerActionCell from "@/modules/peers/PeerActionCell";
 import PeerAddressCell from "@/modules/peers/PeerAddressCell";
 import PeerGroupCell from "@/modules/peers/PeerGroupCell";
@@ -61,7 +62,6 @@ import PeerNameCell from "@/modules/peers/PeerNameCell";
 import { PeerOSCell } from "@/modules/peers/PeerOSCell";
 import PeerStatusCell from "@/modules/peers/PeerStatusCell";
 import PeerVersionCell from "@/modules/peers/PeerVersionCell";
-import { removeAllSpaces } from "@utils/helpers";
 
 // Stable key per OS family for the filter column. Mirrors the icon
 // selection in PeerOSCell so the chip label and the displayed OS icon
@@ -304,7 +304,7 @@ export default function PeersTable({
 
   // Default sorting state of the table
   const [sorting, setSorting] = useLocalStorage<SortingState>(
-    "netbird-table-sort" + path,
+    "netbirdy-table-sort" + path,
     [
       {
         id: "last_seen",
@@ -325,8 +325,7 @@ export default function PeersTable({
   const pendingApprovalCount =
     kindFilteredPeers?.filter((p) => p.approval_required).length || 0;
 
-  const { bypassedPeerIds } = useBypassedPeers();
-  const bypassedCount = bypassedPeerIds.size;
+  const bypassedCount = bypass.bypassedPeerIds.size;
 
   const { isAnyIntegrationEnabled } = useIntegrations();
 
@@ -709,7 +708,7 @@ export default function PeersTable({
               <FullTooltip
                 content={
                   <div className={"max-w-sm text-xs"}>
-                    Show temporary peers created by the NetBird browser client.
+                    Show temporary peers created by the NetBirdy browser client.
                     These peers are ephemeral and will be deleted automatically
                     after a short period of time.
                   </div>

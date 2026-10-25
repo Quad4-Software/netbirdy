@@ -100,7 +100,7 @@ export default function ServiceUsersTable({
 
   // Default sorting state of the table
   const [sorting, setSorting] = useLocalStorage<SortingState>(
-    "netbird-table-sort" + path,
+    "netbirdy-table-sort" + path,
     [
       {
         id: "is_current",
@@ -225,7 +225,7 @@ export default function ServiceUsersTable({
               Learn more about
               <InlineLink
                 href={
-                  "https://docs.netbird.io/how-to/access-netbird-public-api"
+                  "https://docs.netbird.io/how-to/access-netbirdy-public-api"
                 }
                 target={"_blank"}
               >

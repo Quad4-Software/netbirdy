@@ -14,11 +14,10 @@ import TextWithTooltip from "@components/ui/TextWithTooltip";
 import { UserAvatar } from "@components/ui/UserAvatar";
 import { isMac } from "@hooks/useOperatingSystem";
 import { useGuardedRouter } from "@utils/navigation-guard";
-import { isNetBirdCloud } from "@utils/netbird";
+import { isNetBirdCloud } from "@utils/netbirdy";
 import { CreditCardIcon, KeyRound, LogOutIcon, User2 } from "lucide-react";
 import { useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
-import { useMSP } from "@/cloud/msp/contexts/MSPProvider";
 import { useApplicationContext } from "@/contexts/ApplicationProvider";
 import { usePermissions } from "@/contexts/PermissionsProvider";
 import { useLoggedInUser } from "@/contexts/UsersProvider";
@@ -132,10 +131,10 @@ export default function UserDropdown() {
 }
 
 const ProfileSettingsDropdownItem = ({ onClick }: { onClick: () => void }) => {
-  const { isMSPInTenantContext } = useMSP();
+  
   const { permission } = usePermissions();
 
-  if (isMSPInTenantContext) return;
+  if (false) return;
   if (!permission?.users.read) return;
 
   return (
@@ -151,8 +150,8 @@ const ProfileSettingsDropdownItem = ({ onClick }: { onClick: () => void }) => {
 const PlansAndBillingDropdownItem = ({ onClick }: { onClick: () => void }) => {
   const { permission } = usePermissions();
 
-  const { isAccountWithMSPParent } = useMSP();
-  if (isAccountWithMSPParent) return;
+  
+  if (false) return;
 
   return (
     permission?.billing?.update && (

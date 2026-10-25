@@ -1,6 +1,6 @@
-import { test, expect } from "../helpers/fixtures";
-import { navigateTo } from "../helpers/auth";
 import { deleteNotificationChannelsByType } from "../helpers/api";
+import { navigateTo } from "../helpers/auth";
+import { expect,test } from "../helpers/fixtures";
 
 test.describe.serial("Settings - Notifications - Slack @notifications @cloud", () => {
   test("Should connect Slack through the 2-step wizard", async ({ dashboardAsOwner: page }) => {

@@ -1,10 +1,14 @@
-import * as React from "react";
-import { useCallback, useMemo, useState } from "react";
+import Button from "@components/Button";
+import HelpText from "@components/HelpText";
+import InlineLink from "@components/InlineLink";
+import { Input } from "@components/Input";
+import { Label } from "@components/Label";
 import { Modal, ModalContent, ModalFooter } from "@components/modal/Modal";
 import ModalHeader from "@components/modal/ModalHeader";
-import { Peer } from "@/interfaces/Peer";
+import Paragraph from "@components/Paragraph";
+import Separator from "@components/Separator";
 import { getOperatingSystem } from "@hooks/useOperatingSystem";
-import { OperatingSystem } from "@/interfaces/OperatingSystem";
+import { IconLoader2 } from "@tabler/icons-react";
 import {
   ChevronsLeftRightEllipsis,
   ExternalLinkIcon,
@@ -12,18 +16,14 @@ import {
   MonitorIcon,
   User2,
 } from "lucide-react";
-import Separator from "@components/Separator";
-import Paragraph from "@components/Paragraph";
-import InlineLink from "@components/InlineLink";
-import Button from "@components/Button";
-import { Label } from "@components/Label";
-import HelpText from "@components/HelpText";
-import { Input } from "@components/Input";
+import * as React from "react";
+import { useCallback, useMemo, useState } from "react";
+import { OperatingSystem } from "@/interfaces/OperatingSystem";
+import { Peer } from "@/interfaces/Peer";
 import {
   RDP_DOCS_LINK,
   RDPCredentials,
 } from "@/modules/remote-access/rdp/useRemoteDesktop";
-import { IconLoader2 } from "@tabler/icons-react";
 
 type Props = {
   open: boolean;
@@ -109,10 +109,10 @@ export const RDPCredentialsModal = ({
     <Modal open={open} onOpenChange={undefined}>
       <ModalContent maxWidthClass={"max-w-xl"} showClose={false}>
         <ModalHeader
-          icon={<MonitorIcon className={"text-netbird"} size={18} />}
+          icon={<MonitorIcon className={"text-netbirdy"} size={18} />}
           title={peer.name}
           description={`Connect to ${peer.ip} via RDP`}
-          color={"netbird"}
+          color={"netbirdy"}
         />
         <Separator />
 

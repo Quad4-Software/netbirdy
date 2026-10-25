@@ -1,0 +1,275 @@
+---
+title: "How Routing Peers Work"
+description: ""
+order: 124
+upstream: "manage/networks/how-routing-peers-work.mdx@2382247"
+---
+
+> **Note** This page is adapted from the upstream NetBird documentation (BSD-3-Clause) and may describe features that NetBirdy does not include.
+
+# How Routing Peers Work
+
+A routing peer is a NetBird peer whose client bridges your overlay network to private networks and resources that do not run the client. This page covers what routing peers are, how traffic flows through them, the requirements they impose on the host, how high availability and access control behave, and how to harden them.
+
+## What is a routing peer
+
+A routing peer is a NetBird peer installed inside a private network that forwards traffic between the NetBird overlay and resources that cannot or should not run the client themselves. It is the bridge between your Zero Trust mesh and the LANs, VPCs, datacenter networks, or individual hosts you need to reach.
+
+A single peer can serve multiple roles at once. The same machine can be a client peer, a routing peer for one or more networks, and an exit node simultaneously.
+
+Because routing peers are typically headless servers, register them with [setup keys](/manage/peers/register-machines-using-setup-keys) rather than interactive login.
+
+## When to use a routing peer
+
+- **Site or LAN access.** NetBird peers need to reach resources on a remote subnet, office network, datacenter, or cloud VPC without installing the client on every host.
+- **Domain-based access.** Traffic must be routed by FQDN or wildcard domain to services whose IPs change.
+- **Exit node.** All internet-bound traffic from a group of peers must egress through a controlled location.
+- **Kubernetes.** Pods or services need to be reachable from NetBird peers without putting the client on every node.
+
+## Networks vs Network Routes
+
+NetBird offers two ways to configure routing peers. Both are actively maintained.
+
+**[Networks](/manage/networks) (newer, recommended where possible)**
+- Mandatory groups for both routing peers and resources. Traffic is denied by default until a policy permits it.
+- Resources are typed: IP, IP range, or domain.
+- Access control is built in from the start.
+
+**[Routes](/manage/network-routes) (legacy, deprecated)**
+- Distribution Groups and ACL Groups are configured separately.
+- ACL Groups are optional, which means a route without them grants unrestricted access to the destination CIDR for every peer in the Distribution Group.
+- Only needed today for [exit node](/use-cases/remote-access/exit-nodes) setups. Use Networks for everything else, including [site-to-site](/use-cases/remote-access/site-to-site).
+
+## Mental model: how traffic flows
+
+<p>
+    <img src="" alt="Three NetBird peers on the overlay network connect through a WireGuard tunnel to a routing peer in a private network. Access policies on the routing peer allow a database on TCP 5432, a web app on TCP 443, and an RDP workstation on TCP/UDP 3389; a printer with no policy is unreachable." className="imagewrapper-big"/>
+</p>
+
+The walkthrough below describes the **Linux kernel-mode** path, where forwarding and firewalling happen in the kernel via `nftables` / `iptables`. On other platforms, NetBird performs the same logical steps in a userspace filter, but the implementation differs.
+
+1. The originating peer encrypts the packet to the routing peer's WireGuard public key. The packet enters the tunnel at the source and exits on the routing peer's NetBird interface.
+2. The routing peer's kernel forwards the packet according to the host routing table. If the destination is on a directly attached network or reachable via the host's gateway, the packet is forwarded.
+3. Forwarded packets traverse the host firewall's **forward chain**. NetBird applies the policies attached to the route or network resource here. Policies that target the routing peer itself live in the **input chain** and are evaluated separately.
+4. If masquerade is enabled (the default), the routing peer SNATs the source IP to its own LAN-side address before the packet leaves. With masquerade disabled, the original NetBird IP is preserved and the destination network must route return traffic back through the routing peer.
+5. Replies follow the reverse path. The stateful firewall on the routing peer tracks established connections so return traffic does not need an explicit policy.
+
+## Requirements
+
+### Operating system
+
+Linux, Windows, macOS, FreeBSD, Android, tvOS, and Docker peers can act as routing peers. Linux is the most common production choice because it uses the kernel WireGuard data path by default and integrates with native kernel firewalls (`nftables` / `iptables`). On other platforms the forwarding path runs in userspace.
+
+### IP forwarding
+
+The client enables IP forwarding automatically on Linux. If the client cannot modify sysctl on its own, set it yourself on the host and persist it:
+
+```bash
+# Runtime
+sudo sysctl -w net.ipv4.ip_forward=1
+sudo sysctl -w net.ipv6.conf.all.forwarding=1
+
+# Persistent
+echo "net.ipv4.ip_forward=1" | sudo tee /etc/sysctl.d/99-netbird.conf
+echo "net.ipv6.conf.all.forwarding=1" | sudo tee -a /etc/sysctl.d/99-netbird.conf
+```
+
+### Local forwarding
+
+IP forwarding (above) carries traffic to machines *behind* the routing peer. Reaching a service on the routing peer's **own address** is a separate case (self-access), and it needs `NB_ENABLE_LOCAL_FORWARDING` — and only on peers that forward in software (the userspace router):
+
+| Routing peer | Data path | Reaching a service on the peer's own address |
+|---|---|---|
+| Windows, macOS | userspace router (always) | needs `NB_ENABLE_LOCAL_FORWARDING` |
+| Linux, netstack mode (`NB_USE_NETSTACK_MODE`) | userspace router | needs `NB_ENABLE_LOCAL_FORWARDING` |
+| Linux, native backend (nftables/iptables) | kernel forwarding | not needed |
+
+The flag is off by default on every platform (see [Client Environment Variables](/client/environment-variables)):
+
+```powershell
+netbird service reconfigure --service-env NB_ENABLE_LOCAL_FORWARDING=true
+```
+
+This flag is only one of three things self-access needs — the peer also needs a route and a peer-to-peer policy. See [Reaching the routing peer itself](#reaching-the-routing-peer-itself) for the full picture. This is the common shape when the service host *is* the routing peer: a file server that runs the NetBird client, whose clients resolve its name to its LAN IP.
+
+Leave it off otherwise. With it on, any permitted peer can reach services bound to the routing peer's LAN addresses, not just the networks behind it — so don't enable it on a peer running local-only services you don't want exposed.
+
+### Container capabilities
+
+A containerized routing peer needs `NET_ADMIN`. The Kubernetes manifest also adds `SYS_RESOURCE` and `SYS_ADMIN` for tunnel and firewall management.
+
+### Network reachability
+
+The routing peer must have direct network reachability to the resources it serves. This is the most common cause of failed deployments in cloud environments: the peer ends up in the wrong subnet, the wrong security group, or on the wrong side of a VPC peering boundary.
+
+## High availability
+
+Multiple routing peers can serve the same network or route. Each peer that uses the network (a user's laptop, for example) picks one of those routing peers and sends all of that network's traffic through it until something makes it switch. The **metric** you assign each routing peer in the dashboard is the main control. There are no tunable thresholds.
+
+### How a peer picks a routing peer
+
+A peer compares the routing peers it is connected to, in this order:
+
+1. **Metric.** The lowest metric wins, whatever the connection type or latency.
+2. **Connection type.** Among equal metrics, a direct (peer-to-peer) connection beats a relayed one.
+3. **Latency.** Among equal metrics and the same connection type, the lowest latency wins. To prevent flapping, a peer only moves to a routing peer whose latency is at least 10 ms lower than its current one.
+
+Latency is measured once, when the connection to a routing peer is set up, and is not re-measured while that connection stays up.
+
+### What makes a peer switch
+
+A peer repeats this comparison whenever a routing peer's connection state changes or the network's configuration is updated. In practice it switches when:
+
+- **Its routing peer goes offline.** The peer moves to the next routing peer in the order above, normally within seconds.
+- **A routing peer with a lower metric comes back online.** The peer moves back as soon as that routing peer reconnects, even while its connection is still relayed.
+- **Its routing peer's connection falls back from direct to relayed.** If another routing peer with the same metric still has a direct connection, the peer moves to it, although nothing went offline. With different metrics this does not happen, because metric outranks connection type.
+
+### What a switch does to open connections
+
+With masquerade on (the default), every switch resets established TCP connections through the network, whatever caused it: a failover, a failback, or a fallback to relayed. The new routing peer translates the traffic to a different source address, so applications such as SSH must reconnect. Expect the connection to stall for several seconds before the reset, while the peer notices the change. With masquerade off, connections are not translated and behave differently: see [High availability with masquerade off](/manage/networks/masquerade#high-availability-with-masquerade-off).
+
+If users report dropped connections while no routing peer went offline, check whether the routing peers share a metric and whether their connections fall back to relayed. [Troubleshooting relayed connections](/help/troubleshooting-relayed-connections) covers why a connection is relayed.
+
+### Primary / failover (different metrics)
+
+Use different metrics when you want every peer on one known routing peer, with the others in reserve. Peers stay on the primary even when its connection falls back to relayed, but they fail back to it as soon as it returns, which resets connections a second time with masquerade on. To give routing peers different metrics, add them to the Network individually; routing peers added as a group share one metric.
+
+**Example.** Routing Peer A has a lower metric than Routing Peer B. Traffic uses Peer A, including while its connection is relayed. When Peer A goes down, traffic fails over to Peer B, and moves back as soon as Peer A reconnects.
+
+### Nearest routing peer (equal metrics)
+
+Use equal metrics when routing peers are spread across regions and you want each peer to use the closest one: for example, an EU-based and a US-based routing peer serving the same network, with users on both continents. Each peer picks the lowest-latency routing peer when it connects, though a direct connection still beats a relayed one whatever the latency. It does not move to another routing peer later just because latency changes, and routing peers within 10 ms of each other are effectively tied. The trade-off: a fallback to relayed can move peers to another routing peer and reset their connections.
+
+### Finding switches in the client log
+
+The client logs each switch at the default log level as `New chosen route is …`, followed by the chosen routing peer's WireGuard public key and its score. The comparison behind the decision, including the score of the routing peer it kept, is logged only at the debug level.
+
+### Failure domains
+
+Place highly available peers in different failure domains within the same network: separate AZs in cloud, separate hypervisors or hosts on-prem.
+
+> **Note** High availability is failover and nearest-peer selection, not load balancing — it does not spread one network's traffic across its peers. To carry sustained high throughput, see [Sizing Routing Peers](/manage/networks/sizing-routing-peers) for how to size each peer and split load across multiple Networks.
+
+
+## Masquerade
+
+Masquerade is on by default. The routing peer SNATs forwarded traffic to its own LAN-side IP. This is the simplest configuration because the destination network does not need any awareness of NetBird.
+
+Turn masquerade off when:
+
+- You need source IP visibility for auditing, compliance, or application logic.
+- You want the destination network's existing firewalls to filter peers by their NetBird IP.
+
+With masquerade off, you must add a return route on the destination network pointing the NetBird CIDR (default `100.64.0.0/10`) at the routing peer.
+
+High availability then needs one more thing from you. Clients still move to the standby peer on their own, but that return route keeps pointing at the peer that just failed, so replies are dropped even though the outbound direction has recovered. The destination network has to be able to follow the failover too. See [High availability with masquerade off](/manage/networks/masquerade#high-availability-with-masquerade-off).
+
+> **Note** Masquerade can only be turned off on Linux routing peers.
+
+
+## Access control behavior
+
+This is the subtlest part of the model and the source of most policy mistakes.
+
+### Two chains, two policy types
+
+- **Forward chain.** Packets routed *through* the peer to backend resources. Network resource policies (Networks) and ACL Groups (Routes) apply here.
+- **Input chain.** Packets destined to the routing peer's own IP. [Peer-to-peer policies](/manage/access-control/manage-network-access) apply here.
+
+<p>
+    <img src="" alt="Two paths compared. Through the routing peer: a network resource policy, evaluated in the forward chain, lets a client reach a web app behind the routing peer on TCP 443. To the routing peer: a peer-to-peer policy, evaluated in the input chain, lets a client reach SSH on the routing peer's NetBird IP on TCP 22." className="imagewrapper-big"/>
+</p>
+
+If users need to reach both the resources behind a routing peer **and** services running on the routing peer itself (Pi-hole, monitoring, jump-host SSH), you need one policy of each kind.
+
+**Example.** A routing peer fronts the `10.10.0.0/16` office network and also runs Grafana on TCP/3000 plus SSH on TCP/22. To let the `Engineers` group reach both, create two policies:
+
+1. **Network resource policy** (forward chain): `Engineers` → `10.10.0.0/16` resource. Permits traffic *through* the routing peer.
+2. **Peer-to-peer policy** (input chain): `Engineers` → routing peer group, on TCP/22 and TCP/3000. Permits traffic *to* the routing peer.
+
+### Reaching the routing peer itself
+
+Every peer has two addresses — its **NetBird IP** (its `100.x` overlay address, the one in `netbird status`) and its **LAN IP** (its address on the local network). Reaching the routing peer at each needs different things:
+
+- **At its NetBird IP** — a single peer-to-peer policy (input chain) is enough. Every client already has an overlay route to every peer.
+- **At its LAN IP** — when DNS (or a DFS path) resolves the service to its LAN address, the client has **no route** to that IP yet. Reaching it needs three things together:
+  - a **resource** that covers the LAN IP (the route),
+  - a **peer-to-peer policy** (the input-chain accept), and
+  - on userspace peers (Windows, macOS, Linux netstack), [`NB_ENABLE_LOCAL_FORWARDING`](#local-forwarding).
+
+For the full setup — the file-server scenario, the commands, the Active Directory tie-in, and a fallback for when you can't set the flag — see [Reach Services on the Routing Peer](/use-cases/remote-access/reach-services-on-the-routing-peer).
+
+### Directionality is forced for routed traffic
+
+Policies whose destination is a network resource are always unidirectional from source to destination. The resource has no client and cannot initiate connections back through the overlay. The bidirectional toggle is disabled in the UI for these policies.
+
+### Network Routes default-allow caveat
+
+> **Warning** A Network Route without ACL Groups grants unrestricted access to the destination CIDR for every peer in the Distribution Group. From a Zero Trust posture this is the wrong default. Always either:
+>
+> - Set ACL Groups on the route, or
+> - Use [Networks](/manage/networks) instead, which enforces policy by default.
+
+
+## DNS and domain routing
+
+Routing peers can serve DNS-based routes in addition to CIDR-based ones.
+
+### Local DNS Forwarder
+
+The client runs a local DNS forwarder. Queries for a routed domain go to the routing peer's resolver:
+
+- **Port 22054** for clients on 0.59.0 and newer.
+- **Port 5353** for clients on 0.58.x and older.
+
+The Management service only flips an account to 22054 once every peer is on 0.59.0 or newer. Mixed-version accounts continue using 5353.
+
+> **Note** Clients running `0.59.0` and `0.59.1` may fail to resolve domain resources served by routing peers running `0.59.0` to `0.59.9` when every peer in the account is on `0.59.0` or newer. Fix it by using client versions `<= 0.58.2` or `>= 0.59.2`, or upgrading the routing peer to `0.59.10` or later.
+
+
+### Routing Peer DNS Resolution
+
+Domain resources rely on Routing Peer DNS Resolution, which is enabled by default. With it on, DNS resolution happens on the routing peer rather than on the client: the client forwards its name-to-IP lookups (`A`/`AAAA`) for a domain resource to the routing peer's resolver, and needs no nameserver of its own for that name. With it off, each client resolves the domain itself using its own DNS, so it must already be able to resolve the name — via a [nameserver](/manage/dns/internal-dns-servers) or its network adapter's DNS. Either way, this covers name-to-IP lookups only; Active Directory clients also need a nameserver for the `SRV` records Windows uses to find a domain controller.
+
+### Pitfall: domains and IP ranges in the same network
+
+> **Warning** When a network contains both a domain resource and an IP-range resource, their policies can leak into each other. The routing peer enforces forwarded traffic by destination IP, and a domain that resolves into an IP-range resource's CIDR ends up covered by both policies — so a peer permitted to reach the IP range can also reach domains in that range, even if the domain policy alone would deny it. Put domain resources in a dedicated network with their own routing peers.
+
+
+## Exit node mode
+
+An exit node is a routing peer with a `0.0.0.0/0` route. Internet-bound traffic from peers in the assigned distribution groups egresses through it.
+
+Specifics:
+
+- IPv6 is blocked to prevent leakage outside the tunnel.
+- Masquerade is on by default and required in practice.
+- The minimum policy for an exit node to function is ICMP from source group to the routing peer group.
+- Auto Apply controls whether clients use the exit node automatically (v0.55.0+) or only when manually selected.
+- Set a DNS server with match domain `ALL` to prevent DNS-based location leaks. Local DNS servers may not be reachable from the exit node in any case.
+- The `0.0.0.0/0` route exposes any network the exit node can reach, including its local LAN, not just the internet.
+
+For setup steps and ways to limit what the exit node exposes (Block LAN access, network isolation), see [Configuring Exit Nodes for Internet Traffic](/use-cases/remote-access/exit-nodes#routing-peer). For combining an exit node with access to specific internal resources only, see [Selective Internal Access Behind an Exit Node](/use-cases/remote-access/exit-nodes#selective-internal-access-behind-an-exit-node).
+
+## Observability and troubleshooting
+
+When a peer is `Connected` but a resource behind it is still unreachable, [Troubleshooting resource connectivity](/help/troubleshooting-resource-connectivity) walks these checks in order, from the peer through to the TCP handshake at the resource.
+
+- `netbird status -d` shows the connection type, status, and details for every peer the client is connected to.
+- `netbird networks ls` shows which networks the client is currently using.
+- `netbird debug trace` simulates a packet against the firewall rules without sending real traffic. Useful when policies look right but traffic is dropped. On Linux this is most informative when the kernel firewall backend is active.
+- On the routing peer host:
+  - `sysctl net.ipv4.ip_forward` to confirm forwarding.
+  - `ip route` to confirm reachability to the destination CIDR.
+  - `nft list ruleset` (or `iptables-save`) to inspect the rules NetBird installed.
+
+## Common pitfalls
+
+- Network Route with no ACL Groups, granting blanket access.
+- Policy to a network resource works, but SSH to the routing peer itself is denied because the input chain has no matching policy.
+- Highly available peers in the same AZ, defeating the redundancy.
+- Mixing domain and IP-range resources in the same network.
+- Exit node missing the ICMP policy, so clients can't connect to the routing peer in the first place.
+- DNS port mismatch when an account has a mix of pre-0.59 and post-0.59 peers.
+- Reaching a service on the routing peer's **own LAN IP** (not its NetBird IP) with only an input policy — it also needs a resource for the route, and on userspace peers `NB_ENABLE_LOCAL_FORWARDING`. See [Reaching the routing peer itself](#reaching-the-routing-peer-itself).
+- Health-checking that path with `ping` — ICMP needs its own peer-to-peer policy; a service up while ping is down is a missing ICMP policy, not a routing failure.

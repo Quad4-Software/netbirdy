@@ -21,6 +21,7 @@ import React, { useMemo, useState } from "react";
 import { useSWRConfig } from "swr";
 import { Role, User } from "@/interfaces/User";
 import { UserRoleSelector } from "@/modules/users/UserRoleSelector";
+import { docsLink } from "@/modules/docs/links";
 
 type Props = {
   children: React.ReactNode;
@@ -78,7 +79,7 @@ export function ServiceUserModalContent({ onSuccess }: Readonly<ModalProps>) {
         description={
           "Service users are non-login users that are not associated with any specific person."
         }
-        color={"netbird"}
+        color={"netbirdy"}
       />
 
       <Separator />
@@ -113,7 +114,7 @@ export function ServiceUserModalContent({ onSuccess }: Readonly<ModalProps>) {
           <Paragraph className={"text-sm mt-auto"}>
             Learn more about
             <InlineLink
-              href={"https://docs.netbird.io/how-to/access-netbird-public-api"}
+              href={docsLink("https://docs.netbird.io/how-to/access-netbirdy-public-api")}
               target={"_blank"}
             >
               Service Users

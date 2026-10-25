@@ -19,7 +19,6 @@ import { useSearch } from "@hooks/useSearch";
 import useSortedDropdownOptions from "@hooks/useSortedDropdownOptions";
 import { IconArrowBack } from "@tabler/icons-react";
 import useFetchApi from "@utils/api";
-import { usePermissions } from "@/contexts/PermissionsProvider";
 import { cn } from "@utils/helpers";
 import { Command, CommandGroup, CommandInput, CommandList } from "cmdk";
 import { sortBy, trim, unionBy } from "lodash";
@@ -41,6 +40,7 @@ import * as React from "react";
 import { Fragment, useEffect, useMemo, useState } from "react";
 import Skeleton from "react-loading-skeleton";
 import { useGroups } from "@/contexts/GroupsProvider";
+import { usePermissions } from "@/contexts/PermissionsProvider";
 import { useElementSize } from "@/hooks/useElementSize";
 import type { Group, GroupPeer, GroupResource } from "@/interfaces/Group";
 import { NetworkResource } from "@/interfaces/Network";
@@ -688,7 +688,7 @@ export function PeerGroupSelector({
                           className={"text-neutral-500 dark:text-nb-gray-300"}
                         >
                           Add this group by pressing{" "}
-                          <span className={"font-bold text-netbird"}>
+                          <span className={"font-bold text-netbirdy"}>
                             {"'Enter'"}
                           </span>
                         </div>
@@ -866,7 +866,7 @@ const TabTriggers = ({
     >
       <FolderGit2
         className={
-          "text-nb-gray-500 group-data-[state=active]/trigger:text-netbird transition-all"
+          "text-nb-gray-500 group-data-[state=active]/trigger:text-netbirdy transition-all"
         }
         size={14}
       />
@@ -883,7 +883,7 @@ const TabTriggers = ({
     >
       <Layers3Icon
         className={
-          "text-nb-gray-500 group-data-[state=active]/trigger:text-netbird transition-all"
+          "text-nb-gray-500 group-data-[state=active]/trigger:text-netbirdy transition-all"
         }
         size={14}
       />
@@ -900,7 +900,7 @@ const TabTriggers = ({
     >
       <MonitorSmartphoneIcon
         className={
-          "text-nb-gray-500 group-data-[state=active]/trigger:text-netbird transition-all"
+          "text-nb-gray-500 group-data-[state=active]/trigger:text-netbirdy transition-all"
         }
         size={14}
       />
@@ -917,7 +917,7 @@ const TabTriggers = ({
     >
       <ServerIcon
         className={
-          "text-nb-gray-500 group-data-[state=active]/trigger:text-netbird transition-all"
+          "text-nb-gray-500 group-data-[state=active]/trigger:text-netbirdy transition-all"
         }
         size={14}
       />

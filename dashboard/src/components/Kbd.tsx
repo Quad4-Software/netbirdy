@@ -13,7 +13,7 @@ const variants = cva("", {
     variant: {
       default: ["bg-nb-gray-800 border-nb-gray-700 text-nb-gray-300 "],
       darker: ["bg-nb-gray-930 border-nb-gray-900 text-nb-gray-250 "],
-      netbird: ["bg-netbird-100 text-netbird border-netbird "],
+      netbirdy: ["bg-[#ffe1e4] text-[#d92a41] border-[#d92a41]/40"],
     },
     size: {
       default: ["py-2.5 px-1.5 text-xs h-[12px]"],

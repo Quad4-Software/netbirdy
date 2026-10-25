@@ -33,7 +33,7 @@ import { type Browser, expect, type Page, test } from "@playwright/test";
 import { loginToApp, navigateTo } from "../helpers/auth";
 import { generateRandomName } from "../helpers/utils";
 
-const AGENT_NETWORK_CONFIG_KEY = "netbird-test-agent-network";
+const AGENT_NETWORK_CONFIG_KEY = "netbirdy-test-agent-network";
 const PROVIDERS_ENDPOINT = /\/api\/agent-network\/providers(\?|$)/;
 const PROVIDER_PREFIX = "e2e-refused-";
 const TITLE_TESTID = "notification-title";

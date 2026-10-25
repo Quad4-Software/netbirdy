@@ -1,0 +1,54 @@
+---
+title: "Connect on Startup"
+description: ""
+order: 109
+upstream: "client/connect-on-startup.mdx@2382247"
+---
+
+> **Note** This page is adapted from the upstream NetBird documentation (BSD-3-Clause) and may describe features that NetBirdy does not include.
+
+# Connect on Startup
+
+The Connect on Startup setting controls whether the NetBird client automatically connects to the network when the service starts. When enabled (the default), the client establishes a connection as soon as the NetBird service launches — for example, after a system reboot or service restart.
+
+## When to use it
+
+- **Always-on connectivity** (default): Keep the peer connected to the NetBird network at all times, ensuring it is reachable and can access remote resources immediately after boot.
+- **Manual connection control**: Disable this setting if you prefer to connect only when needed, such as on laptops that switch between networks or in environments where you want to minimize background activity.
+- **Conditional startup**: Useful in scripted or automated environments where you want the NetBird service running but only connect on demand.
+
+## What it does
+
+When Connect on Startup is **enabled** (default behavior):
+- The NetBird client automatically connects to the management service and joins the network when the service starts.
+- The peer becomes reachable by other peers immediately after boot.
+
+When Connect on Startup is **disabled**:
+- The NetBird service starts but does not connect automatically.
+- You must manually run `netbird up` or click **Connect** in the desktop app or tray menu.
+- The peer remains offline until an explicit connection is initiated.
+
+> **Note** Whether the device successfully connects also depends on the <a href="/manage/settings/enforce-periodic-user-authentication">Peer Session Expiration</a> setting under Settings &gt; Authentication. If the peer's session has expired, the user must reauthenticate before the peer can connect.
+
+
+## Changing the setting in the desktop app
+
+1. Open the NetBird desktop app.
+2. Go to **Settings → General**.
+3. Toggle **Connect on Startup**.
+
+This setting controls the background network connection. It is separate from **Launch NetBird UI at Login**, which controls only whether the graphical interface opens when you sign in to the operating system.
+
+## Enabling via the CLI
+
+Connect on Startup is enabled by default. To disable it:
+
+```bash
+netbird up --disable-auto-connect
+```
+
+To re-enable it:
+
+```bash
+netbird up --disable-auto-connect=false
+```

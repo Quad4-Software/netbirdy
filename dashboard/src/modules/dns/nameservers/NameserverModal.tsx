@@ -39,6 +39,7 @@ import DNSIcon from "@/assets/icons/DNSIcon";
 import { usePermissions } from "@/contexts/PermissionsProvider";
 import { Nameserver, NameserverGroup } from "@/interfaces/Nameserver";
 import useGroupHelper from "@/modules/groups/useGroupHelper";
+import { docsLink } from "@/modules/docs/links";
 
 type Props = {
   children?: React.ReactNode;
@@ -252,10 +253,10 @@ export function NameserverModalContent({
   return (
     <ModalContent maxWidthClass={"max-w-xl"}>
       <ModalHeader
-        icon={<DNSIcon className={"fill-netbird"} />}
+        icon={<DNSIcon className={"fill-netbirdy"} />}
         title={isUpdate ? preset?.name : "Add Nameserver"}
         description={"Use a nameserver to resolve domains in your network"}
-        color={"netbird"}
+        color={"netbirdy"}
       />
 
       <Tabs defaultValue={tab} onValueChange={(v) => setTab(v)} value={tab}>
@@ -264,7 +265,7 @@ export function NameserverModalContent({
             <ServerIcon
               size={16}
               className={
-                "text-nb-gray-500 group-data-[state=active]/trigger:text-netbird transition-all"
+                "text-nb-gray-500 group-data-[state=active]/trigger:text-netbirdy transition-all"
               }
             />
             Nameserver
@@ -277,7 +278,7 @@ export function NameserverModalContent({
             <GlobeIcon
               size={16}
               className={
-                "text-nb-gray-500 group-data-[state=active]/trigger:text-netbird transition-all"
+                "text-nb-gray-500 group-data-[state=active]/trigger:text-netbirdy transition-all"
               }
             />
             Domains
@@ -290,7 +291,7 @@ export function NameserverModalContent({
             <Text
               size={16}
               className={
-                "text-nb-gray-500 group-data-[state=active]/trigger:text-netbird transition-all"
+                "text-nb-gray-500 group-data-[state=active]/trigger:text-netbirdy transition-all"
               }
             />
             Name & Description
@@ -481,7 +482,7 @@ export function NameserverModalContent({
           <Paragraph className={"text-sm mt-auto"}>
             Learn more about
             <InlineLink
-              href={"https://docs.netbird.io/how-to/manage-dns-in-your-network"}
+              href={docsLink("https://docs.netbird.io/how-to/manage-dns-in-your-network")}
               target={"_blank"}
             >
               DNS

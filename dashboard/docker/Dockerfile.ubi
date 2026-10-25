@@ -4,12 +4,12 @@ ARG VERSION=dev
 ARG RELEASE=0
 
 LABEL name="netbird-dashboard" \
-      maintainer="NetBird <dev@netbird.io>" \
-      vendor="NetBird GmbH" \
+      maintainer="NetBirdy <dev@netbird.io>" \
+      vendor="NetBirdy GmbH" \
       version="${VERSION}" \
       release="${RELEASE}" \
-      summary="NetBird Dashboard" \
-      description="Web UI for managing NetBird peers, users, and access policies."
+      summary="NetBirdy Dashboard" \
+      description="Web UI for managing NetBirdy peers, users, and access policies."
 
 # Only nginx-core: the nginx metapackage pulls in a default web root and logos
 # that would clash with out/. Our nginx config lives outside the RPM-owned

@@ -106,7 +106,7 @@ export const useNetBirdClient = () => {
         setTimeout(resolve, WASM_CONFIG.RETRY_DELAY),
       );
     }
-    throw new Error("NetBird WASM failed to initialize in time");
+    throw new Error("NetBirdy WASM failed to initialize in time");
   }, []);
 
   const initIronRDP = useCallback(() => {
@@ -181,7 +181,7 @@ export const useNetBirdClient = () => {
         });
 
         await netBirdClient.current.start();
-        (window as any).netbird = netBirdClient.current;
+        (window as any).netbirdy = netBirdClient.current;
         netBirdStore.setState({ status: NetBirdStatus.CONNECTED });
         return true;
       } catch (error) {
@@ -204,14 +204,14 @@ export const useNetBirdClient = () => {
     netBirdStore.setState({ status: NetBirdStatus.DISCONNECTED });
     await netBirdClient.current.stop();
     netBirdClient.current = null;
-    delete (window as any).netbird;
+    delete (window as any).netbirdy;
     return Promise.resolve();
   }, []);
 
   const detectSSHServerType = useCallback(
     async (host: string, port: number, timeoutMs: number): Promise<boolean> => {
       if (!netBirdClient.current?.detectSSHServerType) {
-        throw new Error("NetBird client not ready");
+        throw new Error("NetBirdy client not ready");
       }
       return netBirdClient.current.detectSSHServerType(host, port, timeoutMs);
     },
@@ -289,7 +289,7 @@ export const useNetBirdClient = () => {
           {
             name,
             wg_pub_key: keyPairs.publicKey,
-            rules: rules ?? ["tcp/22022", "tcp/3389", "tcp/44338", "netbird-ssh/22"],
+            rules: rules ?? ["tcp/22022", "tcp/3389", "tcp/44338", "netbirdy-ssh/22"],
           },
           `/${peerId}/temporary-access`,
         );

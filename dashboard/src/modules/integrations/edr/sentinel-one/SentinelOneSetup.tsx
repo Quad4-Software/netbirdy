@@ -130,7 +130,7 @@ export function SetupContent({ onSuccess, account }: Readonly<ModalProps>) {
 
     notify({
       title: "SentinelOne Integration",
-      description: `SentinelOne was successfully connected to NetBird.`,
+      description: `SentinelOne was successfully connected to NetBirdy.`,
       promise: sentinelOneRequest
         .post({
           api_token: apiToken,
@@ -195,7 +195,7 @@ export function SetupContent({ onSuccess, account }: Readonly<ModalProps>) {
               key={index}
               className={cn(
                 "w-8 h-1 rounded-full bg-nb-gray-800",
-                step >= index + 1 && "bg-netbird",
+                step >= index + 1 && "bg-netbirdy",
               )}
             />
           ))}
@@ -204,7 +204,7 @@ export function SetupContent({ onSuccess, account }: Readonly<ModalProps>) {
 
       <IntegrationModalHeader
         image={integrationImage}
-        title={"Connect NetBird with SentinelOne"}
+        title={"Connect NetBirdy with SentinelOne"}
         description={
           "Restrict network access to devices managed by SentinelOne based on their security posture."
         }
@@ -319,7 +319,7 @@ export function SetupContent({ onSuccess, account }: Readonly<ModalProps>) {
             </Steps.Step>
             <Steps.Step step={3}>
               <p className={"font-normal"}>
-                Enter <Mark copy>NetBird Integration</Mark> as the name, a
+                Enter <Mark copy>NetBirdy Integration</Mark> as the name, a
                 optional description and select your preferred expiration date.
                 Click <Mark>Next</Mark>
               </p>

@@ -41,7 +41,7 @@ export const Lists: StoryObj = {
               label={
                 <>
                   <NetworkIcon size={16} />
-                  NetBird IP
+                  NetBirdy IP
                 </>
               }
               value={"100.92.14.3"}

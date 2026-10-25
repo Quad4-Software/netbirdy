@@ -13,7 +13,7 @@ import { navigateTo } from "../helpers/auth";
 import { expect, test } from "../helpers/fixtures";
 import { generateRandomName } from "../helpers/utils";
 
-const AGENT_NETWORK_CONFIG_KEY = "netbird-test-agent-network";
+const AGENT_NETWORK_CONFIG_KEY = "netbirdy-test-agent-network";
 const AGENTGATEWAY_CATALOG_ID = "agentgateway";
 const PROVIDER_PREFIX = "e2e-agentgateway-";
 
@@ -90,10 +90,10 @@ test.describe
       ).toHaveAttribute("data-state", "active");
       await expect(
         page.getByTestId("agent-network-provider-user-mapping"),
-      ).toContainText("x-netbird-user-id");
+      ).toContainText("x-netbirdy-user-id");
       await expect(
         page.getByTestId("agent-network-provider-groups-mapping"),
-      ).toContainText("x-netbird-groups");
+      ).toContainText("x-netbirdy-groups");
       await expect(
         page.getByTestId("agent-network-provider-groups-guidance"),
       ).toContainText("must not be used as an agentgateway authorization claim");
@@ -141,10 +141,10 @@ test.describe
         .click({ force: true });
       await expect(
         page.getByTestId("agent-network-provider-user-mapping"),
-      ).toContainText("x-netbird-user-id");
+      ).toContainText("x-netbirdy-user-id");
       await expect(
         page.getByTestId("agent-network-provider-groups-mapping"),
-      ).toContainText("x-netbird-groups");
+      ).toContainText("x-netbirdy-groups");
       await page
         .getByTestId("agent-network-provider-modal")
         .getByTestId("modal-close")

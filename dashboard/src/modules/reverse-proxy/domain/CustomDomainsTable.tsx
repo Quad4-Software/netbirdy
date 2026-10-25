@@ -97,7 +97,7 @@ export default function CustomDomainsTable({ headingTarget }: Readonly<Props>) {
   const [selectedTargetCluster, setSelectedTargetCluster] = useState("");
 
   const [sorting, setSorting] = useLocalStorage<SortingState>(
-    "netbird-table-sort" + path,
+    "netbirdy-table-sort" + path,
     [
       {
         id: "domain",
@@ -196,7 +196,7 @@ export default function CustomDomainsTable({ headingTarget }: Readonly<Props>) {
             }
             title={"Add Custom Domains"}
             description={
-              "Use your own domains with NetBird's reverse proxy. To get started, add a CNAME record that points to a cluster and verify domain ownership."
+              "Use your own domains with NetBirdy's reverse proxy. To get started, add a CNAME record that points to a cluster and verify domain ownership."
             }
             button={
               <Button
@@ -307,7 +307,7 @@ function CustomDomainStatusCell({ domain }: Readonly<CellProps>) {
         <FullTooltip
           content={
             <div className={"text-xs max-w-xs"}>
-              DNS changes may take some time to propagate. If NetBird does not
+              DNS changes may take some time to propagate. If NetBirdy does not
               find the record immediately, please wait up to 24 hours and try
               again.
             </div>

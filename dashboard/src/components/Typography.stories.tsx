@@ -28,7 +28,7 @@ export const Text: StoryObj = {
       </div>
       <Paragraph>
         Paragraph text with an <InlineLink href={"#"}>inline link</InlineLink>{" "}
-        in the middle of a sentence and a <Mark>netbird up</Mark> mark.
+        in the middle of a sentence and a <Mark>netbirdy up</Mark> mark.
       </Paragraph>
       <SmallParagraph>Small paragraph for secondary details.</SmallParagraph>
       <Separator />
@@ -101,7 +101,7 @@ export const CopyHover: StoryObj = {
 export const Keyboard: StoryObj = {
   render: () => (
     <Stack>
-      {(["default", "darker", "netbird"] as const).map((variant) => (
+      {(["default", "darker", "netbirdy"] as const).map((variant) => (
         <Row key={variant} label={variant}>
           <Kbd variant={variant}>⌘</Kbd>
           <Kbd variant={variant}>K</Kbd>

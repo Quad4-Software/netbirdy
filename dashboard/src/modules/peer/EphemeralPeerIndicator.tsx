@@ -1,7 +1,7 @@
 import FullTooltip from "@components/FullTooltip";
+import {PowerOffIcon} from "lucide-react";
 import * as React from "react";
 import { Peer } from "@/interfaces/Peer";
-import {PowerOffIcon} from "lucide-react";
 
 type Props = {
     peer: Peer;

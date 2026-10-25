@@ -76,7 +76,7 @@ export default function PeerRouteActionCell({ route }: Props) {
           {peerGroup && (
             <TooltipContent>
               <div className={"max-w-xs text-sm"}>
-                <span className={"text-netbird"}>{peer.name}</span> is a part of
+                <span className={"text-netbirdy"}>{peer.name}</span> is a part of
                 a group used in a network route. To remove this peer from the
                 network route, you need to disassociate this peer from the group
                 used in this route.

@@ -6,13 +6,13 @@ wraps the same contract as the modal's Docker snippet: inject
 `NB_PROXY_TOKEN` + `NB_PROXY_DOMAIN` into the container environment, publish
 443/tcp, 80/tcp, and the WireGuard UDP port.
 
-## AWS CloudFormation (`netbird-proxy-cfn.yaml`)
+## AWS CloudFormation (`netbirdy-proxy-cfn.yaml`)
 
 CloudFormation requires templates to be served from S3 (GitHub raw URLs are
 rejected), so upload on change:
 
 ```bash
-aws s3 cp netbird-proxy-cfn.yaml s3://<bucket>/netbird-proxy-cfn.yaml
+aws s3 cp netbirdy-proxy-cfn.yaml s3://<bucket>/netbirdy-proxy-cfn.yaml
 ```
 
 The `CFN_TEMPLATE_URL` constant in `ClusterCloudDeploy.tsx` must point at that
@@ -28,7 +28,7 @@ key pair is given; alternatively an IAM instance profile can be attached
 access — creating one requires acknowledging IAM capabilities in the console
 form).
 
-## Cloud-init (`netbird-proxy-cloud-init.yaml`)
+## Cloud-init (`netbirdy-proxy-cloud-init.yaml`)
 
 Canonical bootstrap for VM user data. The Hetzner and DigitalOcean deploy
 flows render this same content inline (see `buildCloudInit` in
@@ -36,8 +36,8 @@ flows render this same content inline (see `buildCloudInit` in
 keep the two in sync when changing either. Also usable manually:
 
 ```bash
-hcloud server create --name netbird-proxy --type cx22 --image ubuntu-24.04 \
-  --user-data-from-file netbird-proxy.rendered.yaml
+hcloud server create --name netbirdy-proxy --type cx22 --image ubuntu-24.04 \
+  --user-data-from-file netbirdy-proxy.rendered.yaml
 ```
 
 The token must never be committed or baked into a public image; it is always

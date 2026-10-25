@@ -118,7 +118,7 @@ export const OktaSsoSettings = ({ open, onOpenChange, config }: Props) => {
               <GlobeIcon
                 size={16}
                 className={
-                  "text-nb-gray-500 group-data-[state=active]/trigger:text-netbird transition-all"
+                  "text-nb-gray-500 group-data-[state=active]/trigger:text-netbirdy transition-all"
                 }
               />
               Domains
@@ -127,7 +127,7 @@ export const OktaSsoSettings = ({ open, onOpenChange, config }: Props) => {
               <Settings
                 size={16}
                 className={
-                  "text-nb-gray-500 group-data-[state=active]/trigger:text-netbird transition-all"
+                  "text-nb-gray-500 group-data-[state=active]/trigger:text-netbirdy transition-all"
                 }
               />
               Configuration
@@ -136,7 +136,7 @@ export const OktaSsoSettings = ({ open, onOpenChange, config }: Props) => {
               <AlertOctagon
                 size={16}
                 className={
-                  "text-nb-gray-500 group-data-[state=active]/trigger:text-netbird transition-all"
+                  "text-nb-gray-500 group-data-[state=active]/trigger:text-netbirdy transition-all"
                 }
               />
               Danger Zone

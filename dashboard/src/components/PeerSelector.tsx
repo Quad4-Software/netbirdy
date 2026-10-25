@@ -207,8 +207,8 @@ export function PeerSelector({
                         </div>
                       ) : (
                         <div className={"max-w-[240px] text-xs"}>
-                          Please update NetBird to at least{" "}
-                          <span className={"text-netbird"}>v0.36.6</span> or
+                          Please update NetBirdy to at least{" "}
+                          <span className={"text-netbirdy"}>v0.36.6</span> or
                           later to use this peer as a routing peer.
                         </div>
                       )
@@ -236,10 +236,10 @@ export function PeerSelector({
                       </div>
                       {!isSupported && (
                         <div className={"relative"}>
-                          <span className="animate-ping absolute left-0 inline-flex h-[14px] w-[14px] rounded-full bg-netbird opacity-20"></span>
+                          <span className="animate-ping absolute left-0 inline-flex h-[14px] w-[14px] rounded-full bg-netbirdy opacity-20"></span>
                           <ArrowUpCircleIcon
                             size={14}
-                            className={"text-netbird"}
+                            className={"text-netbirdy"}
                           />
                         </div>
                       )}

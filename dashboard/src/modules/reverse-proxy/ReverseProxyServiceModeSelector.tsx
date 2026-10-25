@@ -1,9 +1,6 @@
-import React, { ReactNode, useEffect } from "react";
-import {
-  isL4Mode as isL4ServiceMode,
-  type ReverseProxyDomain,
-  ServiceMode,
-} from "@/interfaces/ReverseProxy";
+import HelpText from "@components/HelpText";
+import { HelpTooltip } from "@components/HelpTooltip";
+import { Label } from "@components/Label";
 import {
   Select,
   SelectContent,
@@ -12,9 +9,12 @@ import {
   SelectValue,
 } from "@components/Select";
 import { ArrowRightFromLine, Globe, LockKeyhole } from "lucide-react";
-import { HelpTooltip } from "@components/HelpTooltip";
-import { Label } from "@components/Label";
-import HelpText from "@components/HelpText";
+import React, { ReactNode, useEffect } from "react";
+import {
+  isL4Mode as isL4ServiceMode,
+  type ReverseProxyDomain,
+  ServiceMode,
+} from "@/interfaces/ReverseProxy";
 
 type Props = {
   value?: ServiceMode;

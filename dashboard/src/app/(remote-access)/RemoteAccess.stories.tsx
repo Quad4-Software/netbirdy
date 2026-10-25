@@ -5,7 +5,7 @@ import SSHPage from "@/app/(remote-access)/peer/ssh/page";
 import { PEER } from "@/storybook/fixtures";
 import { findText, settle } from "@/storybook/platform";
 
-/* The browser SSH and RDP clients need the NetBird WASM client, which the
+/* The browser SSH and RDP clients need the NetBirdy WASM client, which the
    stories do not load; only the states before and without it are captured. */
 const meta: Meta = { title: "Pages/Platform/Remote Access" };
 export default meta;

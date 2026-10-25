@@ -11,7 +11,7 @@ export const PostureCheckCard = ({
   title,
   description,
   icon,
-  iconClass = "bg-gradient-to-tr from-netbird-200 to-netbird-100",
+  iconClass = "bg-gradient-to-tr from-netbirdy-200 to-netbirdy-100",
   modalWidthClass = "max-w-xl",
   onClose,
   open,

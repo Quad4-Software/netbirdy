@@ -23,7 +23,7 @@ import * as Tabs from "@radix-ui/react-tabs";
 import { IconDevicesCheck } from "@tabler/icons-react";
 import { useApiCall } from "@utils/api";
 import { cn } from "@utils/helpers";
-import { isNetBirdCloud } from "@utils/netbird";
+import { isNetBirdCloud } from "@utils/netbirdy";
 import {
   CalendarClock,
   ExternalLinkIcon,
@@ -35,15 +35,9 @@ import {
 import React, { useState } from "react";
 import { useSWRConfig } from "swr";
 import SettingsIcon from "@/assets/icons/SettingsIcon";
-import { AccountMFASettings } from "@/cloud/mfa/AccountMFASettings";
-import {
-  SignInDomainsSettings,
-  useCanViewSignInDomains,
-} from "@/cloud/sign-in-domains/SignInDomainsSettings";
 import { usePermissions } from "@/contexts/PermissionsProvider";
 import { useHasChanges } from "@/hooks/useHasChanges";
 import { Account } from "@/interfaces/Account";
-import { LockedFeatureBadge } from "@/modules/billing/locked-feature/LockedFeatureBadge";
 import { useIntegrations } from "@/modules/integrations/edr/useIntegrations";
 
 type Props = {
@@ -52,7 +46,7 @@ type Props = {
 
 export default function AuthenticationTab({ account }: Readonly<Props>) {
   const { permission } = usePermissions();
-  const canViewSignInDomains = useCanViewSignInDomains();
+  const canViewSignInDomains = false;
 
   const { mutate } = useSWRConfig();
 
@@ -237,27 +231,7 @@ export default function AuthenticationTab({ account }: Readonly<Props>) {
             disabled={!isAnyIntegrationEnabled}
           >
             <div className={"w-full"} data-auth-setting={"peer-approval"}>
-              <LockedFeatureBadge
-                featureText={"Peer approval"}
-                feature={"DEVICE_APPROVALS"}
-                disabled={peerApproval}
-              >
-                <FancyToggleSwitch
-                  value={peerApproval}
-                  onChange={setPeerApproval}
-                  data-testid={"peer-approval"}
-                  label={
-                    <>
-                      <IconDevicesCheck size={15} />
-                      Peer Approval
-                    </>
-                  }
-                  disabled={
-                    isAnyIntegrationEnabled || !permission.settings.update
-                  }
-                  helpText={"Require peers to be approved by an administrator."}
-                />
-              </LockedFeatureBadge>
+              
             </div>
           </FullTooltip>
 
@@ -421,7 +395,7 @@ export default function AuthenticationTab({ account }: Readonly<Props>) {
           <Separator />
           <div className={"p-default py-8 pb-0 max-w-2xl"}>
             <div className={"max-w-6xl"}>
-              <AccountMFASettings />
+              
             </div>
           </div>
         </>
@@ -432,7 +406,7 @@ export default function AuthenticationTab({ account }: Readonly<Props>) {
           <Separator />
           <div className={"p-default py-8 max-w-2xl"}>
             <div className={"max-w-6xl"}>
-              <SignInDomainsSettings />
+              
             </div>
           </div>
         </>

@@ -8,8 +8,8 @@ export const GroupPrefixHelpText = ({ type = "groups" }: Props) => {
   return type === "user-groups" ? (
     <HelpText className={"max-w-lg mt-2"}>
       By default,{" "}
-      <span className={"text-netbird font-semibold"}>All Users</span> will be
-      synchronized from your IdP to NetBird. <br />
+      <span className={"text-netbirdy font-semibold"}>All Users</span> will be
+      synchronized from your IdP to NetBirdy. <br />
       If you want to synchronize only users that belong to a specific group, you
       can add them below. Keep in mind that the prefix matching is
       case-sensitive.
@@ -17,8 +17,8 @@ export const GroupPrefixHelpText = ({ type = "groups" }: Props) => {
   ) : (
     <HelpText className={"max-w-lg mt-2"}>
       By default,{" "}
-      <span className={"text-netbird font-semibold"}>All Groups</span> will be
-      synchronized from your IdP to NetBird. <br />
+      <span className={"text-netbirdy font-semibold"}>All Groups</span> will be
+      synchronized from your IdP to NetBirdy. <br />
       If you want to synchronize only groups that start with a specific prefix,
       you can add them below. Keep in mind that the prefix matching is
       case-sensitive.

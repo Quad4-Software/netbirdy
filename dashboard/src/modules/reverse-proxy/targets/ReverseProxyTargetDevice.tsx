@@ -1,17 +1,17 @@
-import * as React from "react";
-import useFetchApi from "@utils/api";
-import { useRouter } from "next/navigation";
-import type { Peer } from "@/interfaces/Peer";
 import { DeviceCard } from "@components/DeviceCard";
+import { SkeletonDeviceCard } from "@components/skeletons/SkeletonDeviceCard";
+import useFetchApi from "@utils/api";
+import { cn } from "@utils/helpers";
+import { ArrowUpRight } from "lucide-react";
+import { useRouter } from "next/navigation";
+import * as React from "react";
+import { isResourceTargetType } from "@/contexts/ReverseProxiesProvider";
 import { Network, NetworkResource } from "@/interfaces/Network";
+import type { Peer } from "@/interfaces/Peer";
 import {
   ReverseProxyTarget,
   ReverseProxyTargetType,
 } from "@/interfaces/ReverseProxy";
-import { isResourceTargetType } from "@/contexts/ReverseProxiesProvider";
-import { cn } from "@utils/helpers";
-import { ArrowUpRight } from "lucide-react";
-import { SkeletonDeviceCard } from "@components/skeletons/SkeletonDeviceCard";
 import EmptyRow from "@/modules/common-table-rows/EmptyRow";
 
 type Props = {

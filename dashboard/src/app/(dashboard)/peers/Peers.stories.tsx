@@ -55,7 +55,7 @@ export const Servers: Story = {
 export const Empty: Story = {
   parameters: { api: { "GET /peers": [] } },
   play: async () => {
-    await text("Get Started with NetBird");
+    await text("Get Started with NetBirdy");
   },
 };
 
@@ -119,7 +119,7 @@ export const BrowserPeers: Story = {
       .querySelector(".lucide-monitor-dot")
       ?.closest("button");
     await click(toggle!);
-    await text("netbird-browser-7f3a");
+    await text("netbirdy-browser-7f3a");
   },
 };
 

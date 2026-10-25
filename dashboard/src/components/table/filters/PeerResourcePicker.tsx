@@ -6,8 +6,8 @@ import { Tabs, TabsContent, TabsTrigger } from "@components/Tabs";
 import TextWithTooltip from "@components/ui/TextWithTooltip";
 import { VirtualScrollAreaList } from "@components/VirtualScrollAreaList";
 import { useSearch } from "@hooks/useSearch";
-import { cn } from "@utils/helpers";
 import * as TabsPrimitive from "@radix-ui/react-tabs";
+import { cn } from "@utils/helpers";
 import { sortBy } from "lodash";
 import {
   CheckIcon,
@@ -172,7 +172,7 @@ function OptionList({
                 {isSelected && (
                   <CheckIcon
                     size={14}
-                    className={"shrink-0 text-netbird ml-auto"}
+                    className={"shrink-0 text-netbirdy ml-auto"}
                   />
                 )}
               </div>

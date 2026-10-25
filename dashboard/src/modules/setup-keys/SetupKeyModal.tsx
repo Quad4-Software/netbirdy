@@ -36,7 +36,7 @@ import SetupKeysIcon from "@/assets/icons/SetupKeysIcon";
 import { Group } from "@/interfaces/Group";
 import { SetupKey } from "@/interfaces/SetupKey";
 import useGroupHelper from "@/modules/groups/useGroupHelper";
-import SetupModal from "@/modules/setup-netbird-modal/SetupModal";
+import SetupModal from "@/modules/setup-netbirdy-modal/SetupModal";
 
 type Props = {
   children?: React.ReactNode;
@@ -149,7 +149,7 @@ export default function SetupKeyModal({
                 onClick={() => setInstallModal(true)}
               >
                 <DownloadIcon size={14} />
-                Install NetBird
+                Install NetBirdy
               </Button>
             </div>
           </ModalFooter>
@@ -226,10 +226,10 @@ export function SetupKeyModalContent({
   return (
     <ModalContent maxWidthClass={"max-w-xl"}>
       <ModalHeader
-        icon={<SetupKeysIcon className={"fill-netbird"} />}
+        icon={<SetupKeysIcon className={"fill-netbirdy"} />}
         title={"Create New Setup Key"}
         description={"Use this key to register new machines in your network"}
-        color={"netbird"}
+        color={"netbirdy"}
       />
 
       <Separator />

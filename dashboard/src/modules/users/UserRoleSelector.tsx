@@ -4,7 +4,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@components/Popover";
 import { ScrollArea } from "@components/ScrollArea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@components/Tabs";
 import { cn } from "@utils/helpers";
-import { isNetBirdCloud } from "@utils/netbird";
+import { isNetBirdCloud } from "@utils/netbirdy";
 import { Command, CommandGroup, CommandList } from "cmdk";
 import { trim } from "lodash";
 import {
@@ -21,7 +21,6 @@ import * as React from "react";
 import { useMemo, useState } from "react";
 import AgentNetworkIcon from "@/assets/icons/AgentNetworkIcon";
 import NetBirdIcon from "@/assets/icons/NetBirdIcon";
-import { useMSP } from "@/cloud/msp/contexts/MSPProvider";
 import { useDialog } from "@/contexts/DialogProvider";
 import { useLoggedInUser } from "@/contexts/UsersProvider";
 import { useElementSize } from "@/hooks/useElementSize";
@@ -210,17 +209,17 @@ export function UserRoleSelector({
         description: (
           <div className={"inline-block"}>
             This action will transfer the{" "}
-            <span className={"text-netbird inline font-medium"}>Owner</span>{" "}
+            <span className={"text-netbirdy inline font-medium"}>Owner</span>{" "}
             role to{" "}
             {currentUser ? (
-              <span className={"text-netbird inline font-medium"}>
+              <span className={"text-netbirdy inline font-medium"}>
                 {currentUser.name}
               </span>
             ) : (
               "this user"
             )}{" "}
             and leave you with the{" "}
-            <span className={"text-netbird inline font-medium"}>Admin</span>{" "}
+            <span className={"text-netbirdy inline font-medium"}>Admin</span>{" "}
             role. This action can only be undone if the new owner transfers the
             role back to you.
           </div>
@@ -239,7 +238,7 @@ export function UserRoleSelector({
   const selectedRole = UserRoles.find((role) => role.value === value);
 
   // Cloud only
-  const { isAccountWithMSPParent } = useMSP();
+  
 
   const { enabled: agentNetworkEnabled } = useAgentNetworkMode();
 
@@ -251,8 +250,8 @@ export function UserRoleSelector({
 
       // Cloud only
       if (role === Role.BillingAdmin && !isNetBirdCloud()) return false;
-      if (role === Role.BillingAdmin && isAccountWithMSPParent) return false;
-      if (role === Role.Owner && isAccountWithMSPParent) return false;
+      if (role === Role.BillingAdmin && false) return false;
+      if (role === Role.Owner && false) return false;
 
       return true;
     };
@@ -272,7 +271,7 @@ export function UserRoleSelector({
     isOwner,
     hideOwner,
     hideBillingAdmin,
-    isAccountWithMSPParent,
+    false,
     agentNetworkEnabled,
   ]);
 
@@ -377,7 +376,7 @@ export function UserRoleSelector({
                       <category.icon
                         size={14}
                         className={
-                          "text-nb-gray-500 group-data-[state=active]/trigger:text-netbird transition-all"
+                          "text-nb-gray-500 group-data-[state=active]/trigger:text-netbirdy transition-all"
                         }
                       />
                       {category.name}

@@ -11,7 +11,7 @@ import { Group } from "@/interfaces/Group";
 import { Network, NetworkRouter } from "@/interfaces/Network";
 import { Peer } from "@/interfaces/Peer";
 import { SetupKey } from "@/interfaces/SetupKey";
-import { SetupModalContent } from "@/modules/setup-netbird-modal/SetupModal";
+import { SetupModalContent } from "@/modules/setup-netbirdy-modal/SetupModal";
 
 type Props = {
   network?: Network;
@@ -119,14 +119,14 @@ export const OnboardingAddRoutingPeer = ({
                 }
             >
                 Think of a routing peer as a connector to your internal network.
-                It runs NetBird and lets your remote devices access internal resources, while enforcing access control policies.
+                It runs NetBirdy and lets your remote devices access internal resources, while enforcing access control policies.
             </div>
             <div
                 className={
                     "text-sm text-nb-gray-300 font-light mt-2 block text-center sm:px-4"
                 }
             >
-                Generate a setup key and install NetBird on that machine.
+                Generate a setup key and install NetBirdy on that machine.
             </div>
         </div>
 
@@ -174,7 +174,7 @@ export const OnboardingAddRoutingPeer = ({
           <ModalContent>
             <SetupModalContent
               hostname={"routing-peer"}
-              title={"Install NetBird"}
+              title={"Install NetBirdy"}
               setupKey={setupKey.key}
             />
           </ModalContent>

@@ -32,8 +32,8 @@ export async function openCard(index: number) {
 
 const SERVICE_ACCOUNT_KEY = JSON.stringify({
   type: "service_account",
-  project_id: "acme-netbird",
-  client_email: "netbird-sync@acme-netbird.iam.gserviceaccount.com",
+  project_id: "acme-netbirdy",
+  client_email: "netbirdy-sync@acme-netbirdy.iam.gserviceaccount.com",
   client_id: "104857600000000000000",
 });
 

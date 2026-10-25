@@ -12,8 +12,8 @@ import { Label } from "@components/Label";
 import Paragraph from "@components/Paragraph";
 import { TabsContent } from "@components/Tabs";
 import DescriptionWithTooltip from "@components/ui/DescriptionWithTooltip";
-import { cn } from "@utils/helpers";
 import { IconCirclePlus } from "@tabler/icons-react";
+import { cn } from "@utils/helpers";
 import {
   Edit,
   FolderSearch,
@@ -23,11 +23,11 @@ import {
 } from "lucide-react";
 import * as React from "react";
 import { useState } from "react";
-import { AgentGuardrail } from "@/modules/agent-network/data/mockData";
-import { useAIProviders } from "@/modules/agent-network/AIProvidersProvider";
-import AgentGuardrailModal from "@/modules/agent-network/AgentGuardrailModal";
 import AgentGuardrailBrowseModal from "@/modules/agent-network/AgentGuardrailBrowseModal";
 import AgentGuardrailChecksCell from "@/modules/agent-network/AgentGuardrailChecksCell";
+import AgentGuardrailModal from "@/modules/agent-network/AgentGuardrailModal";
+import { useAIProviders } from "@/modules/agent-network/AIProvidersProvider";
+import { AgentGuardrail } from "@/modules/agent-network/data/mockData";
 
 type Props = {
   guardrailIds: string[];

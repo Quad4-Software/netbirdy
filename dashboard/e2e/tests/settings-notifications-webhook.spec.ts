@@ -1,6 +1,6 @@
-import { test, expect } from "../helpers/fixtures";
-import { navigateTo } from "../helpers/auth";
 import { deleteNotificationChannelsByType } from "../helpers/api";
+import { navigateTo } from "../helpers/auth";
+import { expect,test } from "../helpers/fixtures";
 
 test.describe.serial("Settings - Notifications - Webhook @notifications @cloud", () => {
   test("Should connect a webhook with no authentication", async ({ dashboardAsOwner: page }) => {

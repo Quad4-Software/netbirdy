@@ -1,5 +1,6 @@
 "use client";
 
+import * as bypass from "@utils/bypass";
 import Breadcrumbs from "@components/Breadcrumbs";
 import InlineLink from "@components/InlineLink";
 import Paragraph from "@components/Paragraph";
@@ -10,21 +11,19 @@ import { ExternalLinkIcon } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import React, { lazy, Suspense, useMemo } from "react";
 import PeerIcon from "@/assets/icons/PeerIcon";
-import useDistributorRedirect from "@/cloud/distributor/useDistributorRedirect";
-import { useBypassedPeers } from "@/cloud/edr/useBypass";
 import PeersProvider, { usePeers } from "@/contexts/PeersProvider";
 import { usePermissions } from "@/contexts/PermissionsProvider";
 import { useUsers } from "@/contexts/UsersProvider";
 import PageContainer from "@/layouts/PageContainer";
 import type { PeersTableKind } from "@/modules/peers/PeersTable";
-import { SetupModalContent } from "@/modules/setup-netbird-modal/SetupModal";
+import { SetupModalContent } from "@/modules/setup-netbirdy-modal/SetupModal";
+import { docsLink } from "@/modules/docs/links";
 
 const PeersTable = lazy(() => import("@/modules/peers/PeersTable"));
 
 export default function PeersPage() {
   const { isRestricted } = usePermissions();
-  const { isLoading: isDistributorRedirecting } = useDistributorRedirect();
-  if (isDistributorRedirecting) return <FullScreenLoading />;
+  if (false) return <FullScreenLoading />;
 
   return (
     <PageContainer>
@@ -69,7 +68,6 @@ function PeersView() {
 
   const { peers, isLoading: isPeersLoading } = usePeers();
   const { users, isLoading: isUsersLoading } = useUsers();
-  const { isBypassed } = useBypassedPeers();
   const { ref: headingRef, portalTarget } =
     usePortalElement<HTMLHeadingElement>();
 
@@ -83,9 +81,9 @@ function PeersView() {
     return peers.map((peer) => ({
       ...peer,
       user: users.find((u) => u.id === peer.user_id),
-      force_approved: peer.id ? isBypassed(peer.id) : false,
+      force_approved: peer.id ? false : false,
     }));
-  }, [peers, users, isBypassed]);
+  }, [peers, users]);
 
   return (
     <>
@@ -102,7 +100,7 @@ function PeersView() {
         <Paragraph>
             User devices and headless machines, such as servers and autonomous agents, connected to your network.{" "}
           <InlineLink
-            href={"https://docs.netbird.io/how-to/add-machines-to-your-network"}
+            href={docsLink("https://docs.netbird.io/how-to/add-machines-to-your-network")}
             target={"_blank"}
           >
             Learn more
@@ -129,11 +127,11 @@ function PeersBlockedView() {
       <div className={"p-default py-6 max-w-3xl text-center"}>
         <h1>Add new device to your network</h1>
         <Paragraph className={"inline"}>
-          To get started, install NetBird and log in using your email account.
+          To get started, install NetBirdy and log in using your email account.
           After that you should be connected. If you have further questions
           check out our{" "}
           <InlineLink
-            href={"https://docs.netbird.io/how-to/getting-started#installation"}
+            href={docsLink("https://docs.netbird.io/how-to/getting-started#installation")}
             target={"_blank"}
           >
             Installation Guide

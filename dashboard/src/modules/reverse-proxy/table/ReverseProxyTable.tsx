@@ -35,13 +35,13 @@ import {
   REVERSE_PROXY_DOCS_LINK,
   ReverseProxy,
 } from "@/interfaces/ReverseProxy";
-import ReverseProxyActionCell from "@/modules/reverse-proxy/table/ReverseProxyActionCell";
 import ReverseProxyAccessControlCell from "@/modules/reverse-proxy/table/ReverseProxyAccessControlCell";
+import ReverseProxyActionCell from "@/modules/reverse-proxy/table/ReverseProxyActionCell";
 import ReverseProxyAuthCell from "@/modules/reverse-proxy/table/ReverseProxyAuthCell";
 import ReverseProxyNameCell from "@/modules/reverse-proxy/table/ReverseProxyNameCell";
 import ReverseProxyTargetsCell from "@/modules/reverse-proxy/table/ReverseProxyTargetsCell";
-import ReverseProxyTargetsTable from "@/modules/reverse-proxy/targets/ReverseProxyTargetsTable";
 import { ReverseProxyTypeCell } from "@/modules/reverse-proxy/table/ReverseProxyTypeCell";
+import ReverseProxyTargetsTable from "@/modules/reverse-proxy/targets/ReverseProxyTargetsTable";
 
 const ReverseProxyColumns: ColumnDef<ReverseProxy>[] = [
   {
@@ -114,7 +114,7 @@ export default function ReverseProxyTable({ headingTarget }: Readonly<Props>) {
   const { reverseProxies, isLoading, openModal } = useReverseProxies();
 
   const [sorting, setSorting] = useLocalStorage<SortingState>(
-    "netbird-table-sort" + path,
+    "netbirdy-table-sort" + path,
     [
       {
         id: "domain",
@@ -220,7 +220,7 @@ export default function ReverseProxyTable({ headingTarget }: Readonly<Props>) {
           }
           title={"Create Services"}
           description={
-            "Expose your internal services securely through NetBird's reverse proxy with automatic TLS and optional authentication to protect your services."
+            "Expose your internal services securely through NetBirdy's reverse proxy with automatic TLS and optional authentication to protect your services."
           }
           button={
             <Button

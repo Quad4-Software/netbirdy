@@ -130,7 +130,7 @@ export default function IdentityProvidersTab() {
   );
 
   const [sorting, setSorting] = useLocalStorage<SortingState>(
-    "netbird-table-sort-identity-providers",
+    "netbirdy-table-sort-identity-providers",
     [
       {
         id: "name",

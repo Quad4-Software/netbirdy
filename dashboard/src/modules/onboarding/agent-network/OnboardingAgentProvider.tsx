@@ -36,9 +36,9 @@ export const OnboardingAgentProvider = ({
             "text-sm text-nb-gray-300 font-light mt-2 block text-center sm:px-4"
           }
         >
-          {`A provider is an upstream LLM service NetBird routes to, such as
+          {`A provider is an upstream LLM service NetBirdy routes to, such as
           OpenAI, Anthropic, Vertex AI, Bedrock, an AI gateway, or a
-          self-hosted model server like vLLM. NetBird stores the API key
+          self-hosted model server like vLLM. NetBirdy stores the API key
           securely, so your agents never hold it.`}
         </div>
       </div>

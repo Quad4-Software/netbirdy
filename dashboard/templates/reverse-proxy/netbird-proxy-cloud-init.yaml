@@ -1,4 +1,4 @@
-# NetBird Reverse Proxy - canonical cloud-init bootstrap.
+# NetBirdy Reverse Proxy - canonical cloud-init bootstrap.
 #
 # This is the single source template all provider deployments derive from
 # (Hetzner user_data, DigitalOcean user_data, AWS CloudFormation UserData,
@@ -9,7 +9,7 @@
 # be committed or baked into a public image.
 #cloud-config
 write_files:
-  - path: /opt/netbird-proxy/env
+  - path: /opt/netbirdy-proxy/env
     permissions: "0600"
     content: |
       NB_PROXY_TOKEN={{NB_PROXY_TOKEN}}
@@ -22,7 +22,7 @@ write_files:
       NB_PROXY_LOG_LEVEL=info
       NB_PROXY_ADDRESS=:443
       NB_PROXY_WG_PORT={{NB_PROXY_WG_PORT}}
-  - path: /opt/netbird-proxy/docker-compose.yml
+  - path: /opt/netbirdy-proxy/docker-compose.yml
     permissions: "0644"
     content: |
       services:
@@ -39,11 +39,11 @@ write_files:
             - "443:443"
             - "{{NB_PROXY_WG_PORT}}:{{NB_PROXY_WG_PORT}}/udp"
           env_file:
-            - /opt/netbird-proxy/env
+            - /opt/netbirdy-proxy/env
           volumes:
             - proxy_certs:/certs
       volumes:
         proxy_certs:
 runcmd:
   - curl -fsSL https://get.docker.com | sh
-  - docker compose -f /opt/netbird-proxy/docker-compose.yml up -d
+  - docker compose -f /opt/netbirdy-proxy/docker-compose.yml up -d

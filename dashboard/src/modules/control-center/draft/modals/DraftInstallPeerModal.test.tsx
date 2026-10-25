@@ -52,7 +52,7 @@ vi.mock("@components/Button", () => ({
     <button>{children}</button>
   ),
 }));
-vi.mock("@/modules/setup-netbird-modal/SetupModal", () => ({
+vi.mock("@/modules/setup-netbirdy-modal/SetupModal", () => ({
   default: (props: Record<string, unknown>) => {
     setupModalProps.push(props);
     return null;

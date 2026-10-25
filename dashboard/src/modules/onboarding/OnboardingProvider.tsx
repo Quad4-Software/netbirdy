@@ -4,18 +4,13 @@ import {
   isLocalDev,
   isNetBirdCloud,
   testOnboardingEnabled,
-} from "@utils/netbird";
+} from "@utils/netbirdy";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo } from "react";
 import { useSWRConfig } from "swr";
-import { submitHubspotForm } from "@/cloud/analytics/Hubspot";
-import { HubspotFormField, useAnalytics } from "@/contexts/AnalyticsProvider";
+type HubspotFormField = any;
 import { usePermissions } from "@/contexts/PermissionsProvider";
 import { useLoggedInUser } from "@/contexts/UsersProvider";
-import {
-  AGENT_NETWORK_SIGNUP_SOURCE,
-  SIGNUP_SOURCE_LOCAL_STORAGE_KEY,
-} from "@/hooks/useSignupSource";
 import { Account } from "@/interfaces/Account";
 import { Group } from "@/interfaces/Group";
 import { Network } from "@/interfaces/Network";
@@ -37,7 +32,7 @@ import {
   OnboardingState,
 } from "@/modules/onboarding/Onboarding";
 
-// hasAgentNetworkSignupSource reads the netbird.ai signup source captured
+// hasAgentNetworkSignupSource reads the netbirdy.ai signup source captured
 // before authentication. It is available synchronously from the first render,
 // so the onboarding can commit to the Agent Network form immediately instead
 // of briefly showing the regular form while the account/mode data settles.
@@ -45,8 +40,8 @@ const hasAgentNetworkSignupSource = () => {
   try {
     return (
       typeof window !== "undefined" &&
-      localStorage.getItem(SIGNUP_SOURCE_LOCAL_STORAGE_KEY) ===
-        AGENT_NETWORK_SIGNUP_SOURCE
+      localStorage.getItem("nb-signup-source") ===
+        "agent_network"
     );
   } catch (e) {
     return false;
@@ -83,7 +78,7 @@ export const OnboardingProvider = ({
   const router = useRouter();
   const { isOwner, isOwnerOrAdmin, loggedInUser } = useLoggedInUser();
   const { mutate } = useSWRConfig();
-  const { trackEventV2 } = useAnalytics();
+  
   const params = useSearchParams();
   const hsId = params?.get("hs_id") ?? "";
   const gaId = params?.get("ga_id") ?? "";
@@ -94,11 +89,11 @@ export const OnboardingProvider = ({
   } = useAgentNetworkMode();
 
   const accountId = account?.id ?? "unknown";
-  const onboardingKey = `netbird-onboarding-flow:${accountId}`;
+  const onboardingKey = `netbirdy-onboarding-flow:${accountId}`;
 
   // Migrate old onboarding state to new key if needed
   if (typeof window !== "undefined" && account?.id) {
-    const oldKey = "netbird-onboarding-flow";
+    const oldKey = "netbirdy-onboarding-flow";
     const oldValue = window.localStorage.getItem(oldKey);
     const newValue = window.localStorage.getItem(onboardingKey);
     if (oldValue && !newValue) {
@@ -116,7 +111,7 @@ export const OnboardingProvider = ({
   );
 
   // An existing account asks for the Agent Network onboarding through the
-  // netbird.ai link (see NetBirdCloudProvider). It opens for an owner or admin
+  // netbirdy.ai link (see NetBirdCloudProvider). It opens for an owner or admin
   // on Cloud once the Agent Network menu is saved, unless the account already
   // has an Agent Network endpoint; once open, it runs until finished or
   // skipped.
@@ -135,7 +130,7 @@ export const OnboardingProvider = ({
   });
   const existingAccountRequest = request === "open";
 
-  // A netbird.ai arrival commits to the Agent Network onboarding regardless of
+  // A netbirdy.ai arrival commits to the Agent Network onboarding regardless of
   // when the account setting is persisted; the signup source is known
   // synchronously, so the regular form is never shown for these users.
   const agentNetworkOnboarding =
@@ -187,10 +182,10 @@ export const OnboardingProvider = ({
   ]);
 
   // The agent-network flow uses its own signup step on both cloud and
-  // self-hosted, so netbird.ai signups fill the form before onboarding.
+  // self-hosted, so netbirdy.ai signups fill the form before onboarding.
   const agentSignupPending = !!account?.onboarding?.signup_form_pending;
 
-  // The gateway step offers a NetBird-managed gateway, which only exists on
+  // The gateway step offers a NetBirdy-managed gateway, which only exists on
   // Cloud. showOnboarding limits the flow to the owner's own signup, or to an
   // owner or admin whose existing account asked for it. This also covers a
   // return after the signup source was cleared: the account is still
@@ -198,7 +193,7 @@ export const OnboardingProvider = ({
   const gatewayStep =
     isNetBirdCloud() && showOnboarding && agentNetworkOnboarding;
 
-  // On Cloud a netbird.ai signup is switched to the focused view, so an
+  // On Cloud a netbirdy.ai signup is switched to the focused view, so an
   // Agent Network onboarding outside it, past the signup form, belongs to an
   // account that existed before. Such an account keeps its groups and policies
   // and its saved position, which is the regular onboarding's.
@@ -264,24 +259,13 @@ export const OnboardingProvider = ({
     await updateAccountMeta({
       onboarding_flow_pending: false,
     });
-    trackEventV2(
-      "Onboarding",
-      `Skipped Onboarding - ${intent} (Step ${step})`,
-      account?.id,
-      loggedInUser?.id,
-    );
   };
 
   const onFinish = async (n?: Network) => {
     await updateAccountMeta({
       onboarding_flow_pending: false,
     });
-    trackEventV2(
-      "Onboarding",
-      "Finished Onboarding",
-      account?.id,
-      loggedInUser?.id,
-    );
+    
     if (n) {
       // router.push(`/network?id=${n.id}`);
       router.push("/control-center?tab=networks");
@@ -310,12 +294,7 @@ export const OnboardingProvider = ({
 
   const onFinishAgentNetwork = async () => {
     await endAgentNetworkOnboarding();
-    trackEventV2(
-      "Onboarding",
-      "Finished Agent Network Onboarding",
-      account?.id,
-      loggedInUser?.id,
-    );
+    
     router.push("/agent-network/usage?tab=access-logs");
   };
 
@@ -323,44 +302,19 @@ export const OnboardingProvider = ({
     await updateAccountMeta({
       signup_form_pending: false,
     });
-    trackEventV2(
-      "Onboarding",
-      "Submitted Agent Network Signup",
-      account?.id,
-      loggedInUser?.id,
-    );
+    
     if (isLocalDev()) return;
     try {
-      await submitHubspotForm({
-        // Dedicated HubSpot form for the self-hosted Agent Network signup, and
-        // NetBird's portal id — hardcoded so the submission works without the
-        // operator configuring NETBIRD_HUBSPOT_PORTAL_ID on their deployment.
-        id: "f387844f-8752-489e-a7b3-4ded545a2f2f",
-        portalId: "144571599",
-        fields,
-        hubspotQueryId: hsId,
-        gaId,
-      });
+      await Promise.resolve();
     } catch (e) {}
   };
 
   const onSkipAgentNetwork = async (step: number) => {
     await endAgentNetworkOnboarding();
-    trackEventV2(
-      "Onboarding",
-      `Skipped Agent Network Onboarding (Step ${step})`,
-      account?.id,
-      loggedInUser?.id,
-    );
   };
 
   const onTroubleshootingClick = (intent: Intent) => {
-    trackEventV2(
-      "Onboarding",
-      `Troubleshooting - ${intent}`,
-      account?.id,
-      loggedInUser?.id,
-    );
+    
   };
 
   const submitSurvey = async (fields: HubspotFormField[]) => {

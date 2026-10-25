@@ -35,6 +35,7 @@ import {
   EMPTY_GUARDRAIL_CHECKS,
 } from "@/modules/agent-network/data/mockData";
 import { PostureCheckCard } from "@/modules/posture-checks/ui/PostureCheckCard";
+import { docsLink } from "@/modules/docs/links";
 
 type Props = {
   open: boolean;
@@ -97,7 +98,7 @@ export default function AgentGuardrailModal({
           description={
             "Define a reusable set of LLM guardrails to attach to one or more policies."
           }
-          color={"netbird"}
+          color={"netbirdy"}
         />
 
         <Tabs onValueChange={setTab} defaultValue={tab} value={tab}>
@@ -110,7 +111,7 @@ export default function AgentGuardrailModal({
               <Text
                 size={16}
                 className={
-                  "text-nb-gray-500 group-data-[state=active]/trigger:text-netbird transition-all"
+                  "text-nb-gray-500 group-data-[state=active]/trigger:text-netbirdy transition-all"
                 }
               />
               Name & Description
@@ -185,7 +186,7 @@ export default function AgentGuardrailModal({
             <Paragraph className={"text-sm mt-auto"}>
               Learn more about
               <InlineLink
-                href={"https://docs.netbird.io/agent-network"}
+                href={docsLink("https://docs.netbird.io/agent-network")}
                 target={"_blank"}
               >
                 Agent Network
@@ -248,8 +249,8 @@ function ModelAllowlistCheck({
       title={"Model Allowlist"}
       description={"Block requests for models not on the allowlist."}
       // The tile is a cream gradient, so the mark on it has to be dark.
-      icon={<Boxes size={16} className={"text-netbird-950"} />}
-      iconClass={"bg-gradient-to-tr from-netbird-200 to-netbird-100"}
+      icon={<Boxes size={16} className={"text-netbirdy-950"} />}
+      iconClass={"bg-gradient-to-tr from-netbirdy-200 to-netbirdy-100"}
       modalWidthClass={"max-w-2xl"}
       onReset={() => onChange(undefined)}
     >
@@ -484,7 +485,7 @@ function PromptCaptureContent({ onConfirm }: { onConfirm: () => void }) {
     <>
       <div className={"flex flex-col px-8 gap-3 pb-6"}>
         <div className={"text-sm text-nb-gray-300"}>
-          NetBird redacts emails, SSN-shaped, phone-shaped, and credit-card
+          NetBirdy redacts emails, SSN-shaped, phone-shaped, and credit-card
           patterns before storing the prompt body. Enabling this guardrail adds
           strict redaction on top of the proxy&apos;s built-in token redaction.
         </div>

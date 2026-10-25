@@ -209,15 +209,15 @@ export default function ReverseProxyModal({
     reverseProxy?.private ?? false,
   );
 
-  // Tracks whether NetBird-only was switched on automatically because the
+  // Tracks whether NetBirdy-only was switched on automatically because the
   // operator picked a cluster target (see onClusterPick), as opposed to an
-  // explicit choice in the NetBird-Only modal. Only auto-enabled private is
+  // explicit choice in the NetBirdy-Only modal. Only auto-enabled private is
   // reverted when the cluster target is later removed or changed.
   const [privateFromCluster, setPrivateFromCluster] = useState(false);
 
   // togglePrivate normalises related state when the operator flips
-  // NetBird-only access. Private services are HTTP-only, so we drop out
-  // of L4 mode. NetBird-only and the other auth modes are mutually
+  // NetBirdy-only access. Private services are HTTP-only, so we drop out
+  // of L4 mode. NetBirdy-only and the other auth modes are mutually
   // exclusive — entering private clears bearer/password/pin/header/link
   // state so the inbound peer's tunnel identity is the only auth path.
   // Existing targets are preserved; the backend rejects non-cluster
@@ -281,7 +281,7 @@ export default function ReverseProxyModal({
     initial: reverseProxy?.auth?.bearer_auth?.distribution_groups ?? [],
   });
 
-  // Access groups for NetBird-only services. Distinct from bearerGroups
+  // Access groups for NetBirdy-only services. Distinct from bearerGroups
   // (which gates SSO callers); these groups gate inbound peers on
   // private services and feed the auto-generated private-access policy.
   const [
@@ -316,9 +316,9 @@ export default function ReverseProxyModal({
   );
   const effectiveDirectUpstream = hasClusterTarget || directUpstream;
 
-  // Reverts the NetBird-only state that was auto-applied when a cluster
+  // Reverts the NetBirdy-only state that was auto-applied when a cluster
   // target was picked, once the committed targets no longer include a
-  // cluster. Explicit NetBird-only choices (privateFromCluster === false)
+  // cluster. Explicit NetBirdy-only choices (privateFromCluster === false)
   // are left untouched.
   const resetClusterPrivateIfNeeded = (next: ReverseProxyTarget[]) => {
     if (
@@ -401,7 +401,7 @@ export default function ReverseProxyModal({
 
   // canSaveService is the Save / Add Service button gate. Layers the
   // private-service requirement on top of canContinueToSettings: a
-  // NetBird-only service must declare at least one access group so the
+  // NetBirdy-only service must declare at least one access group so the
   // auto-generated policy has sources to allow inbound peers from.
   const canSaveService = useMemo(() => {
     if (!canContinueToSettings) return false;
@@ -569,7 +569,7 @@ export default function ReverseProxyModal({
     () =>
       isL4Mode
         ? "Forward traffic directly to your backend service."
-        : "Expose services securely through NetBird's reverse proxy.",
+        : "Expose services securely through NetBirdy's reverse proxy.",
     [isL4Mode],
   );
 
@@ -579,10 +579,10 @@ export default function ReverseProxyModal({
         maxWidthClass={tab === "service" ? "max-w-xl" : "max-w-2xl"}
       >
         <ModalHeader
-          icon={<ReverseProxyIcon className={"fill-netbird"} size={18} />}
+          icon={<ReverseProxyIcon className={"fill-netbirdy"} size={18} />}
           title={modalTitle}
           description={modalDescription}
-          color={"netbird"}
+          color={"netbirdy"}
         />
 
         <Tabs value={tab} onValueChange={setTab}>
@@ -645,7 +645,7 @@ export default function ReverseProxyModal({
 
               {isPrivate && accessGroups.length === 0 && (
                 <Paragraph className={"!text-yellow-400 !text-xs !mt-0"}>
-                  NetBird-only is on but no access groups are set. Open it
+                  NetBirdy-only is on but no access groups are set. Open it
                   on the Authentication tab and pick at least one group.
                 </Paragraph>
               )}
@@ -688,21 +688,21 @@ export default function ReverseProxyModal({
                 {serviceMode === ServiceMode.HTTP &&
                   (selectedDomain?.supports_private === true ? (
                     <SettingCard.Item
-                      data-testid="auth-netbird-only-card"
+                      data-testid="auth-netbirdy-only-card"
                       label={
                         <>
                           <NetworkIcon size={15} />
-                          NetBird-Only Access
+                          NetBirdy-Only Access
                         </>
                       }
-                      description="Reachable only from connected peers in the selected NetBird groups."
+                      description="Reachable only from connected peers in the selected NetBirdy groups."
                       enabled={isPrivate}
                       onClick={() => {
                         setNetBirdOnlyModalOpen(true);
                       }}
                     />
                   ) : (
-                    // Cluster doesn't advertise supports_private: keep the
+                    // Cluster doesn&apos;t advertise supports_private: keep the
                     // row visible but disabled, with a tooltip explaining
                     // why. FullTooltip's inline-flex wrapper makes this
                     // row a bit narrower than the others; that's
@@ -711,23 +711,23 @@ export default function ReverseProxyModal({
                       className={"w-full"}
                       content={
                         <div className={"text-xs max-w-xs"}>
-                          NetBird-Only Access requires a proxy cluster with
+                          NetBirdy-Only Access requires a proxy cluster with
                           at least one connected embedded proxy (
-                          <code>netbird proxy</code>). The selected cluster
-                          doesn't have one. Connect an embedded proxy to
+                          <code>netbirdy proxy</code>). The selected cluster
+                          doesn&apos;t have one. Connect an embedded proxy to
                           this cluster to enable this option.
                         </div>
                       }
                     >
                       <SettingCard.Item
-                        data-testid="auth-netbird-only-card"
+                        data-testid="auth-netbirdy-only-card"
                         label={
                           <>
                             <NetworkIcon size={15} />
-                            NetBird-Only Access
+                            NetBirdy-Only Access
                           </>
                         }
-                        description="Reachable only from connected peers in the selected NetBird groups."
+                        description="Reachable only from connected peers in the selected NetBirdy groups."
                         enabled={isPrivate}
                         disabled={true}
                         onClick={() => {
@@ -804,8 +804,8 @@ export default function ReverseProxyModal({
                     />
                   }
                 >
-                  This service is accessible via NetBird only. An allow rule
-                  for the NetBird network range is applied by default. Any
+                  This service is accessible via NetBirdy only. An allow rule
+                  for the NetBirdy network range is applied by default. Any
                   rules you add here are layered on top.
                 </Callout>
               )}
@@ -907,8 +907,8 @@ export default function ReverseProxyModal({
                         <div className={"text-xs max-w-xs"}>
                           Direct Upstream is only configurable on clusters with
                           at least one connected embedded proxy (
-                          <code>netbird proxy</code>). The selected cluster
-                          doesn't have one.
+                          <code>netbirdy proxy</code>). The selected cluster
+                          doesn&apos;t have one.
                         </div>
                       }
                     >
@@ -1110,8 +1110,8 @@ export default function ReverseProxyModal({
             setBaseDomain(cluster);
           }
           // Cluster targets are reached over the WireGuard overlay, so
-          // the only callers that ever hit the proxy are NetBird peers.
-          // Auto-flip the service to NetBird-only so the auth model
+          // the only callers that ever hit the proxy are NetBirdy peers.
+          // Auto-flip the service to NetBirdy-only so the auth model
           // matches the wire reality instead of advertising SSO/PW/PIN
           // that no public client could ever exercise. No-op when
           // already private.

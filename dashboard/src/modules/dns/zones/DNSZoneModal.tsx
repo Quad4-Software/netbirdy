@@ -18,11 +18,11 @@ import Separator from "@components/Separator";
 import { validator } from "@utils/helpers";
 import { ExternalLinkIcon, Power, ScanSearch } from "lucide-react";
 import React, { useMemo, useState } from "react";
+import DNSZoneIcon from "@/assets/icons/DNSZoneIcon";
 import { DNS_ZONE_DOCS_LINK, DNSZone } from "@/interfaces/DNS";
+import { Group } from "@/interfaces/Group";
 import { useDNSZones } from "@/modules/dns/zones/DNSZonesProvider";
 import useGroupHelper from "@/modules/groups/useGroupHelper";
-import { Group } from "@/interfaces/Group";
-import DNSZoneIcon from "@/assets/icons/DNSZoneIcon";
 
 type Props = {
   children?: React.ReactNode;
@@ -129,12 +129,12 @@ export function DNSZoneModalContent({
   return (
     <ModalContent maxWidthClass={"max-w-2xl"}>
       <ModalHeader
-        icon={<DNSZoneIcon size={20} className={"fill-netbird"} />}
+        icon={<DNSZoneIcon size={20} className={"fill-netbirdy"} />}
         title={zone ? "Update DNS Zone" : "Add DNS Zone"}
         description={
           "Use a zone to control domain name resolution for your network."
         }
-        color={"netbird"}
+        color={"netbirdy"}
       />
 
       <Separator />

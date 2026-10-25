@@ -1,5 +1,4 @@
 import { expect, Page } from "@playwright/test";
-import { test } from "../helpers/fixtures";
 import {
   createGroup,
   createNetwork,
@@ -10,7 +9,6 @@ import {
   listNetworks,
   listPolicies,
 } from "../helpers/api";
-import { generateRandomName } from "../helpers/utils";
 import {
   canvasNode,
   clickContextMenuItem,
@@ -23,6 +21,8 @@ import {
   resetDraftState,
   reviewButton,
 } from "../helpers/control-center";
+import { test } from "../helpers/fixtures";
+import { generateRandomName } from "../helpers/utils";
 
 test.describe
   .serial("Control Center Draft — remove change cascade @control-center", () => {

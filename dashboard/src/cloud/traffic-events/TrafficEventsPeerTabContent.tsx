@@ -1,6 +1,7 @@
 import Button from "@components/Button";
 import Card from "@components/Card";
 import { DatePickerWithRange } from "@components/DatePickerWithRange";
+import InlineLink from "@components/InlineLink";
 import Paragraph from "@components/Paragraph";
 import SkeletonTable, {
   SkeletonTableHeader,
@@ -30,13 +31,12 @@ import {
   TrafficEventDirection,
 } from "@/cloud/traffic-events/interfaces/TrafficEvent";
 import { TrafficEventsDetailRow } from "@/cloud/traffic-events/table/TrafficEventsDetailRow";
+import { TRAFFIC_EVENTS_DOC_LINK } from "@/cloud/traffic-events/TrafficEventSetting";
 import { TrafficEventsInboundOutboundFilter } from "@/cloud/traffic-events/TrafficEventsInboundOutboundFilter";
 import { TrafficEventsTableColumns } from "@/cloud/traffic-events/TrafficEventsTable";
 import { usePeer } from "@/contexts/PeerProvider";
 import { Pagination } from "@/interfaces/Pagination";
 import { useAccount } from "@/modules/account/useAccount";
-import InlineLink from "@components/InlineLink";
-import { TRAFFIC_EVENTS_DOC_LINK } from "@/cloud/traffic-events/TrafficEventSetting";
 
 export const TrafficEventsPeerTabContent = () => {
   const account = useAccount();

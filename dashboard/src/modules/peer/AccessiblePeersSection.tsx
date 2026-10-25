@@ -9,6 +9,7 @@ import * as React from "react";
 import { lazy, Suspense } from "react";
 import { useUsers } from "@/contexts/UsersProvider";
 import type { Peer } from "@/interfaces/Peer";
+import { docsLink } from "@/modules/docs/links";
 
 const AccessiblePeersTable = lazy(
   () => import("@/modules/peer/MinimalPeersTable"),
@@ -37,10 +38,10 @@ export const AccessiblePeersSection = ({ peerID }: Props) => {
         <div className={"flex justify-between items-center mb-5"}>
           <div>
             <Paragraph>
-              This peer can connect to the following peers within the NetBird
+              This peer can connect to the following peers within the NetBirdy
               network.{" "}
               <InlineLink
-                href={"https://docs.netbird.io/how-to/manage-network-access"}
+                href={docsLink("https://docs.netbird.io/how-to/manage-network-access")}
                 target={"_blank"}
               >
                 Learn more

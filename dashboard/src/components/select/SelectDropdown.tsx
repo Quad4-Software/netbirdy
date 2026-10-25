@@ -1,5 +1,6 @@
 import Button, { ButtonVariants } from "@components/Button";
 import { CommandItem } from "@components/Command";
+import { DropdownInfoText } from "@components/DropdownInfoText";
 import Paragraph from "@components/Paragraph";
 import { Popover, PopoverContent, PopoverTrigger } from "@components/Popover";
 import { ScrollArea } from "@components/ScrollArea";
@@ -14,7 +15,6 @@ import * as React from "react";
 import { useEffect, useRef, useState } from "react";
 import Skeleton from "react-loading-skeleton";
 import { useElementSize } from "@/hooks/useElementSize";
-import { DropdownInfoText } from "@components/DropdownInfoText";
 
 export interface SelectOption {
   label: string | React.ReactNode;
@@ -102,6 +102,7 @@ export function SelectDropdown({
       else onChange?.(selectedValue);
     }
     setTimeout(() => {
+      if (typeof window === "undefined") return;
       setSearch("");
     }, 100);
   };

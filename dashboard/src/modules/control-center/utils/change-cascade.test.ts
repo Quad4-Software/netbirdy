@@ -148,7 +148,7 @@ describe("reduceRemoveChange", () => {
       [{ name: "Web" }, { name: "Other" }],
       [{ id: "g-dest" }],
     );
-    (policy as any).policy.rules[0].protocol = "netbird-ssh";
+    (policy as any).policy.rules[0].protocol = "netbirdy-ssh";
     (policy as any).policy.rules[0].authorized_groups = {
       Web: ["root"],
       Other: ["admin"],

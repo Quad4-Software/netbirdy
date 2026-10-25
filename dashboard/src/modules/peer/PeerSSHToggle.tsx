@@ -1,5 +1,16 @@
+import Badge from "@components/Badge";
+import Button from "@components/Button";
+import { Callout } from "@components/Callout";
 import FancyToggleSwitch from "@components/FancyToggleSwitch";
 import FullTooltip from "@components/FullTooltip";
+import HelpText from "@components/HelpText";
+import InlineLink from "@components/InlineLink";
+import { Label } from "@components/Label";
+import { Modal } from "@components/modal/Modal";
+import useFetchApi from "@utils/api";
+import { cn, singularize } from "@utils/helpers";
+import { isNetbirdSSHProtocolSupported } from "@utils/version";
+import { orderBy } from "lodash";
 import {
   AlertCircleIcon,
   ArrowUpRightIcon,
@@ -12,27 +23,17 @@ import {
 } from "lucide-react";
 import * as React from "react";
 import { useMemo, useState } from "react";
+import CircleIcon from "@/assets/icons/CircleIcon";
+import { useDialog } from "@/contexts/DialogProvider";
 import { usePeer } from "@/contexts/PeerProvider";
 import { usePermissions } from "@/contexts/PermissionsProvider";
-import { PeerSSHPolicyInfo } from "@/modules/peer/PeerSSHPolicyInfo";
-import { Label } from "@components/Label";
-import HelpText from "@components/HelpText";
-import Button from "@components/Button";
-import useFetchApi from "@utils/api";
-import { Policy } from "@/interfaces/Policy";
-import { Group } from "@/interfaces/Group";
-import { orderBy } from "lodash";
-import CircleIcon from "@/assets/icons/CircleIcon";
-import Badge from "@components/Badge";
-import { cn, singularize } from "@utils/helpers";
-import { Modal } from "@components/modal/Modal";
-import { AccessControlModalContent } from "@/modules/access-control/AccessControlModal";
 import PoliciesProvider from "@/contexts/PoliciesProvider";
+import { Group } from "@/interfaces/Group";
+import { Policy } from "@/interfaces/Policy";
+import { AccessControlModalContent } from "@/modules/access-control/AccessControlModal";
+import { PeerSSHPolicyInfo } from "@/modules/peer/PeerSSHPolicyInfo";
 import { PeerSSHPolicyModal } from "@/modules/peer/PeerSSHPolicyModal";
-import { Callout } from "@components/Callout";
-import { useDialog } from "@/contexts/DialogProvider";
-import InlineLink from "@components/InlineLink";
-import { isNetbirdSSHProtocolSupported } from "@utils/version";
+import { docsLink } from "@/modules/docs/links";
 
 export const PeerSSHToggle = () => {
   const { permission } = usePermissions();
@@ -57,7 +58,7 @@ export const PeerSSHToggle = () => {
     return orderBy(
       policies?.filter((policy) => {
         const rule = policy?.rules?.[0];
-        const isSSHProtocol = rule?.protocol === "netbird-ssh";
+        const isSSHProtocol = rule?.protocol === "netbirdy-ssh";
         if (!isSSHProtocol) return false;
         const destinationResource = policy.rules
           ?.map((rule) => rule?.destinationResource?.id === peer?.id)
@@ -83,12 +84,12 @@ export const PeerSSHToggle = () => {
       title: `Disable SSH Access?`,
       description: (
         <div>
-          Starting from NetBird v0.61.0, once SSH access is disabled, you cannot
+          Starting from NetBirdy v0.61.0, once SSH access is disabled, you cannot
           re-enable it again from the dashboard. You&apos;ll need to create an
-          explicit access control policy and update your NetBird client to
+          explicit access control policy and update your NetBirdy client to
           restore SSH functionality.{" "}
           <InlineLink
-            href={"https://docs.netbird.io/manage/peers/ssh"}
+            href={docsLink("https://docs.netbird.io/manage/peers/ssh")}
             target={"_blank"}
             onClick={(e) => e.stopPropagation()}
           >
@@ -159,13 +160,13 @@ export const PeerSSHToggle = () => {
             icon={
               <AlertCircleIcon
                 size={14}
-                className={"shrink-0 relative top-[3px] text-netbird"}
+                className={"shrink-0 relative top-[3px] text-netbirdy"}
               />
             }
             className="my-3"
           >
             You have SSH access configured but your client runs on an older
-            NetBird version. Please update your NetBird client to v.0.61.0+ in
+            NetBirdy version. Please update your NetBirdy client to v.0.61.0+ in
             order to allow SSH connections.
           </Callout>
         )}
@@ -176,7 +177,7 @@ export const PeerSSHToggle = () => {
           icon={
             <AlertCircleIcon
               size={14}
-              className={"shrink-0 relative top-[3px] text-netbird"}
+              className={"shrink-0 relative top-[3px] text-netbirdy"}
             />
           }
           className="my-3"
@@ -193,12 +194,12 @@ export const PeerSSHToggle = () => {
           icon={
             <AlertCircleIcon
               size={14}
-              className={"shrink-0 relative top-[3px] text-netbird"}
+              className={"shrink-0 relative top-[3px] text-netbirdy"}
             />
           }
           className="my-3"
         >
-          Your SSH server is enabled, but starting from NetBird v0.61.0, SSH
+          Your SSH server is enabled, but starting from NetBirdy v0.61.0, SSH
           requires an explicit access control policy. Please create an SSH
           access control policy in order to allow SSH connections.
         </Callout>

@@ -6,6 +6,7 @@ import { ExternalLinkIcon } from "lucide-react";
 import * as React from "react";
 import { Peer } from "@/interfaces/Peer";
 import { Policy } from "@/interfaces/Policy";
+import { docsLink } from "@/modules/docs/links";
 
 type Props = {
   firstDevice?: Peer;
@@ -56,7 +57,7 @@ export const OnboardingTestP2P = ({
             If something isn’t right, please check our{" "}
             <InlineLink
               onClick={onTroubleshootingClick}
-              href={"https://docs.netbird.io/how-to/troubleshooting-client"}
+              href={docsLink("https://docs.netbird.io/how-to/troubleshooting-client")}
               target={"_blank"}
             >
               troubleshooting guide

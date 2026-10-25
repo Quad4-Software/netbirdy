@@ -7,12 +7,12 @@ import { DialogContent, DialogTitle } from "@radix-ui/react-dialog";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import useFetchApi, { useApiCall } from "@utils/api";
 import { cn } from "@utils/helpers";
-import { isNetBirdCloud } from "@utils/netbird";
+import { isNetBirdCloud } from "@utils/netbirdy";
 import { useRouter } from "next/navigation";
 import * as React from "react";
 import { useEffect, useMemo, useReducer, useState } from "react";
 import { useSWRConfig } from "swr";
-import { HubspotFormField } from "@/contexts/AnalyticsProvider";
+type HubspotFormField = any;
 import { Group } from "@/interfaces/Group";
 import { Network, NetworkResource, NetworkRouter } from "@/interfaces/Network";
 import type { Peer } from "@/interfaces/Peer";
@@ -370,18 +370,18 @@ export const Onboarding = ({
                   {step === 1 && domainCategory && (
                     <OnboardingSurvey
                       domainCategory={domainCategory}
-                      onSubmit={(fields) => {
+                      onSubmit={(fields: any) => {
                         dispatch({
                           type: "SET_SURVEY_SUBMITTED_AT",
                           payload: new Date().toISOString(),
                         });
                         onSurveySubmit?.(fields);
 
-                        let u = fields?.find((f) => f.name === "use_case");
+                        let u = fields?.find((f: any) => f.name === "use_case");
                         if (u) setUseCases(u.value);
 
                         let businessOrPersonal = fields?.find(
-                          (f) => f.name === "is_company",
+                          (f: any) => f.name === "is_company",
                         );
                         if (businessOrPersonal)
                           setIsBusiness(
@@ -591,7 +591,7 @@ export const Onboarding = ({
                     "text-sm text-nb-gray-400 font-light pb-10 text-center px-4"
                   }
                 >
-                  Already know how NetBird works?
+                  Already know how NetBirdy works?
                   <InlineLink
                     href={"#"}
                     className={"!text-nb-gray-200 ml-1"}
@@ -624,7 +624,7 @@ const Stepper = ({ step, maxSteps }: { step: number; maxSteps: number }) => {
           key={index}
           className={cn(
             "w-8 h-1 rounded-full bg-nb-gray-800",
-            step >= index + 1 && "bg-netbird",
+            step >= index + 1 && "bg-netbirdy",
           )}
         />
       ))}

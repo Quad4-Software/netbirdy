@@ -1,23 +1,23 @@
+import CopyToClipboardText from "@components/CopyToClipboardText";
 import { Modal } from "@components/modal/Modal";
 import { notify } from "@components/Notification";
 import { useApiCall } from "@utils/api";
+import { cn } from "@utils/helpers";
 import * as React from "react";
 import { useState } from "react";
 import { useSWRConfig } from "swr";
+import { ResourceIcon } from "@/assets/icons/ResourceIcon";
 import { useDialog } from "@/contexts/DialogProvider";
-import { useNetworkAccessControl } from "@/modules/networks/NetworkAccessControlProvider";
+import PoliciesProvider from "@/contexts/PoliciesProvider";
 import { Group } from "@/interfaces/Group";
 import { Network, NetworkResource, NetworkRouter } from "@/interfaces/Network";
+import { Policy, PolicyRuleResource } from "@/interfaces/Policy";
 import { AccessControlModalContent } from "@/modules/access-control/AccessControlModal";
+import { useNetworkAccessControl } from "@/modules/networks/NetworkAccessControlProvider";
 import NetworkModal from "@/modules/networks/NetworkModal";
 import NetworkResourceModal from "@/modules/networks/resources/NetworkResourceModal";
 import { ResourceGroupModal } from "@/modules/networks/resources/ResourceGroupModal";
 import NetworkRoutingPeerModal from "@/modules/networks/routing-peers/NetworkRoutingPeerModal";
-import { Policy, PolicyRuleResource } from "@/interfaces/Policy";
-import PoliciesProvider from "@/contexts/PoliciesProvider";
-import { ResourceIcon } from "@/assets/icons/ResourceIcon";
-import CopyToClipboardText from "@components/CopyToClipboardText";
-import { cn } from "@utils/helpers";
 
 type Props = {
   children: React.ReactNode;

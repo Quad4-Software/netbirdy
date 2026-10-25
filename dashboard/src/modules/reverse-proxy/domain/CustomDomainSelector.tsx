@@ -3,14 +3,14 @@ import {
   SelectOption,
 } from "@components/select/SelectDropdown";
 import { SmallBadge } from "@components/ui/SmallBadge";
+import TruncatedText from "@components/ui/TruncatedText";
+import { isNetBirdCloud } from "@utils/netbirdy";
 import { ArrowUpRight } from "lucide-react";
 import { useRouter } from "next/navigation";
 import * as React from "react";
 import { useMemo } from "react";
 import { useReverseProxies } from "@/contexts/ReverseProxiesProvider";
 import { ReverseProxyDomainType } from "@/interfaces/ReverseProxy";
-import { isNetBirdCloud } from "@utils/netbird";
-import TruncatedText from "@components/ui/TruncatedText";
 
 interface DomainSelectorProps {
   value: string;
@@ -81,7 +81,7 @@ export function CustomDomainSelector({
       value: "add_custom",
       label: "Add Custom Domain",
       renderItem: () => (
-        <div className="flex items-center justify-between gap-2 text-netbird text-sm w-full">
+        <div className="flex items-center justify-between gap-2 text-netbirdy text-sm w-full">
           <div className={"flex items-center gap-2"}>
             <span>Add Custom Domain</span>
           </div>

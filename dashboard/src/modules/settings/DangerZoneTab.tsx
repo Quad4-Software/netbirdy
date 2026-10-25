@@ -8,7 +8,6 @@ import loadConfig from "@utils/config";
 import { AlertOctagonIcon } from "lucide-react";
 import React from "react";
 import SettingsIcon from "@/assets/icons/SettingsIcon";
-import { useAuthService } from "@/cloud/cloud-hooks/useAuthService";
 import { useDialog } from "@/contexts/DialogProvider";
 import { useLoggedInUser } from "@/contexts/UsersProvider";
 import { Account } from "@/interfaces/Account";
@@ -19,7 +18,7 @@ type Props = {
 const config = loadConfig();
 
 export default function DangerZoneTab({ account }: Props) {
-  const { deleteAccount: deleteAuthServiceData } = useAuthService();
+  const deleteAuthServiceData = async () => {};
   const { confirm } = useDialog();
   const deleteRequest = useApiCall<Account>("/accounts/" + account.id);
   const { logout } = useLoggedInUser();
@@ -45,8 +44,8 @@ export default function DangerZoneTab({ account }: Props) {
     });
 
     notify({
-      title: "Delete NetBird account",
-      description: "NetBird account was successfully deleted.",
+      title: "Delete NetBirdy account",
+      description: "NetBirdy account was successfully deleted.",
       promise: deletePromise,
       loadingMessage: "Deleting the account...",
     });
@@ -54,9 +53,9 @@ export default function DangerZoneTab({ account }: Props) {
 
   const handleConfirm = async () => {
     const choice = await confirm({
-      title: "Delete NetBird account",
+      title: "Delete NetBirdy account",
       description:
-        "Are you sure you want to delete your NetBird account? This action cannot be undone.",
+        "Are you sure you want to delete your NetBirdy account? This action cannot be undone.",
       confirmText: "Delete",
       cancelText: "Cancel",
       type: "danger",
@@ -90,10 +89,10 @@ export default function DangerZoneTab({ account }: Props) {
           >
             <div className={"px-8 py-6"}>
               <p className={"text-xl font-medium mb-2 !text-red-50"}>
-                Delete NetBird account
+                Delete NetBirdy account
               </p>
               <p className={"!text-red-50/80"}>
-                Before proceeding to delete your Netbird account, please be
+                Before proceeding to delete your NetBirdy account, please be
                 aware that this action is irreversible. Once your account is
                 deleted, you will permanently lose access to all associated
                 data, including your peers, users, groups, policies, and routes.

@@ -142,12 +142,12 @@ const PickerContent = ({
   return (
     <ModalContent maxWidthClass={"max-w-lg"}>
       <ModalHeader
-        icon={<NetworkRoutesIcon className={"fill-netbird"} />}
+        icon={<NetworkRoutesIcon className={"fill-netbirdy"} />}
         title={"Select Destination"}
         description={`Access ${network?.name ?? "this network"}${
           policy?.name ? ` via "${policy.name}"` : ""
         }`}
-        color={"netbird"}
+        color={"netbirdy"}
       />
       <div className={"p-default flex flex-col"}>
         {resources.length === 0 && groupIds.length === 0 ? (

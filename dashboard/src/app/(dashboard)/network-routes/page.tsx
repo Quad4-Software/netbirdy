@@ -1,6 +1,7 @@
 "use client";
 
 import Breadcrumbs from "@components/Breadcrumbs";
+import { Callout } from "@components/Callout";
 import InlineLink from "@components/InlineLink";
 import Paragraph from "@components/Paragraph";
 import SkeletonTable from "@components/skeletons/SkeletonTable";
@@ -16,7 +17,6 @@ import RoutesProvider from "@/contexts/RoutesProvider";
 import { Route } from "@/interfaces/Route";
 import PageContainer from "@/layouts/PageContainer";
 import useGroupedRoutes from "@/modules/route-group/useGroupedRoutes";
-import { Callout } from "@components/Callout";
 
 const NetworkRoutesTable = lazy(
   () => import("@/modules/route-group/NetworkRoutesTable"),
@@ -45,7 +45,7 @@ export default function NetworkRoutes() {
             <h1 ref={headingRef}>Routes</h1>
             <Paragraph>
               Access other networks like LANs and VPCs without installing
-              NetBird on every resource.{" "}
+              NetBirdy on every resource.{" "}
               <InlineLink
                 href={
                   "https://docs.netbird.io/how-to/routing-traffic-to-private-networks"

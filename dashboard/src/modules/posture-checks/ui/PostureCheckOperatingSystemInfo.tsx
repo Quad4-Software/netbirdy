@@ -52,7 +52,7 @@ export const PostureCheckOperatingSystemInfo = ({
               {" "}
               {os} {operatingSystemName ? "Version" : versionText}
               <span
-                className={"text-netbird flex items-center gap-1 font-semibold"}
+                className={"text-netbirdy flex items-center gap-1 font-semibold"}
               >
                 <IconMathEqualGreater size={14} />
                 {operatingSystemName || version}

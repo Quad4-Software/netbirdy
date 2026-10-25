@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Description: >-
-  NetBird Reverse Proxy - launches a single EC2 instance running the
+  NetBirdy Reverse Proxy - launches a single EC2 instance running the
   netbirdio/reverse-proxy container with ACME certificates. Point your proxy
   domain's DNS A record at the instance IP after stack creation.
 
@@ -8,7 +8,7 @@ Metadata:
   AWS::CloudFormation::Interface:
     ParameterGroups:
       - Label:
-          default: NetBird configuration
+          default: NetBirdy configuration
         Parameters:
           - ProxyToken
           - ProxyDomain
@@ -53,8 +53,8 @@ Parameters:
     Type: String
     NoEcho: true
     AllowedPattern: "^nbx_\\S+$"
-    ConstraintDescription: must be a NetBird proxy access token starting with nbx_
-    Description: NetBird proxy access token created in the dashboard (kept out of logs and console output).
+    ConstraintDescription: must be a NetBirdy proxy access token starting with nbx_
+    Description: NetBirdy proxy access token created in the dashboard (kept out of logs and console output).
   ProxyDomain:
     Type: String
     AllowedPattern: "^[a-zA-Z0-9.-]+$"
@@ -62,7 +62,7 @@ Parameters:
   ManagementURL:
     Type: String
     Default: https://api.netbird.io:443
-    Description: NetBird management service address.
+    Description: NetBirdy management service address.
   ImageTag:
     Type: String
     Default: latest
@@ -124,7 +124,7 @@ Resources:
   ProxySecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: NetBird reverse proxy - HTTPS, ACME HTTP challenge, WireGuard
+      GroupDescription: NetBirdy reverse proxy - HTTPS, ACME HTTP challenge, WireGuard
       SecurityGroupIngress:
         - IpProtocol: tcp
           FromPort: 443
@@ -151,7 +151,7 @@ Resources:
           - !Ref AWS::NoValue
       Tags:
         - Key: Name
-          Value: !Sub "${AWS::StackName}-netbird-proxy"
+          Value: !Sub "${AWS::StackName}-netbirdy-proxy"
 
   ProxyInstanceRole:
     Type: AWS::IAM::Role
@@ -168,7 +168,7 @@ Resources:
         - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
       Tags:
         - Key: Name
-          Value: !Sub "${AWS::StackName}-netbird-proxy"
+          Value: !Sub "${AWS::StackName}-netbirdy-proxy"
 
   ProxyInstanceProfile:
     Type: AWS::IAM::InstanceProfile
@@ -201,7 +201,7 @@ Resources:
         Fn::Base64: !Sub |
           #cloud-config
           write_files:
-            - path: /opt/netbird-proxy/env
+            - path: /opt/netbirdy-proxy/env
               permissions: "0600"
               content: |
                 NB_PROXY_TOKEN=${ProxyToken}
@@ -214,7 +214,7 @@ Resources:
                 NB_PROXY_LOG_LEVEL=info
                 NB_PROXY_ADDRESS=:443
                 NB_PROXY_WG_PORT=${WireGuardPort}
-            - path: /opt/netbird-proxy/docker-compose.yml
+            - path: /opt/netbirdy-proxy/docker-compose.yml
               permissions: "0644"
               content: |
                 services:
@@ -231,17 +231,17 @@ Resources:
                       - "443:443"
                       - "${WireGuardPort}:${WireGuardPort}/udp"
                     env_file:
-                      - /opt/netbird-proxy/env
+                      - /opt/netbirdy-proxy/env
                     volumes:
                       - proxy_certs:/certs
                 volumes:
                   proxy_certs:
           runcmd:
             - curl -fsSL https://get.docker.com | sh
-            - docker compose -f /opt/netbird-proxy/docker-compose.yml up -d
+            - docker compose -f /opt/netbirdy-proxy/docker-compose.yml up -d
       Tags:
         - Key: Name
-          Value: !Sub "${AWS::StackName}-netbird-proxy"
+          Value: !Sub "${AWS::StackName}-netbirdy-proxy"
 
   ProxyElasticIP:
     Type: AWS::EC2::EIP
@@ -250,7 +250,7 @@ Resources:
       InstanceId: !Ref ProxyInstance
       Tags:
         - Key: Name
-          Value: !Sub "${AWS::StackName}-netbird-proxy"
+          Value: !Sub "${AWS::StackName}-netbirdy-proxy"
 
 Outputs:
   PublicIP:

@@ -44,7 +44,7 @@ export type ProviderModel = {
   inputPer1k: number;
   outputPer1k: number;
   // Optional prompt-cache rates (USD per 1k tokens). undefined means
-  // "inherit NetBird's default rate for this model" — the backend folds
+  // "inherit NetBirdy's default rate for this model" — the backend folds
   // the default in at synthesis time; an explicit 0 means "no discount,
   // bill this cache bucket at the input rate". Keep undefined distinct
   // from 0 when round-tripping.

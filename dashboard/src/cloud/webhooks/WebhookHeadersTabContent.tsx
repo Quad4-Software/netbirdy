@@ -1,10 +1,11 @@
-import React from "react";
 import Button from "@components/Button";
+import { Callout } from "@components/Callout";
 import HelpText from "@components/HelpText";
 import { Label } from "@components/Label";
-import { Callout } from "@components/Callout";
 import { TabsContent } from "@components/Tabs";
 import { AlertTriangleIcon, PlusIcon } from "lucide-react";
+import React from "react";
+import { WebhookConfig } from "@/cloud/webhooks/useWebhookConfig";
 import {
   AuthType,
 } from "@/cloud/webhooks/WebhookAuthenticationSettings";
@@ -12,7 +13,6 @@ import {
   ActionType,
   HeadersInput,
 } from "@/cloud/webhooks/WebhookHeadersInput";
-import { WebhookConfig } from "@/cloud/webhooks/useWebhookConfig";
 
 type Props = {
   value: WebhookConfig;

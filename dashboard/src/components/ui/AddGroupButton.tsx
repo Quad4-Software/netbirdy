@@ -21,6 +21,7 @@ import ModalHeader from "../modal/ModalHeader";
 import { notify } from "../Notification";
 import Paragraph from "../Paragraph";
 import Separator from "../Separator";
+import { docsLink } from "@/modules/docs/links";
 
 export const AddGroupButton = () => {
   const create = useApiCall<Group>("/groups", true).post;
@@ -63,7 +64,7 @@ export const AddGroupButton = () => {
             icon={<FolderGit2Icon size={18} />}
             title="Create Group"
             description="Create a group to manage and organize access in your network"
-            color="netbird"
+            color="netbirdy"
           />
           <Separator />
           <div className={"px-8 flex-col flex gap-6 py-6"}>
@@ -86,7 +87,7 @@ export const AddGroupButton = () => {
               <Paragraph className={"text-sm mt-auto"}>
                 Learn more about
                 <InlineLink
-                  href={"https://docs.netbird.io/how-to/manage-network-access"}
+                  href={docsLink("https://docs.netbird.io/how-to/manage-network-access")}
                   target={"_blank"}
                 >
                   Groups

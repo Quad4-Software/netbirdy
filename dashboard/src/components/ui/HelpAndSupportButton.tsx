@@ -1,5 +1,6 @@
 "use client";
 
+import Button from "@components/Button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,20 +10,21 @@ import {
   DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@components/DropdownMenu";
+import { cn } from "@utils/helpers";
+import { isNetBirdCloud } from "@utils/netbirdy";
 import {
   ArrowUpRightIcon,
   BookText,
   CircleQuestionMark,
+  CodeXml,
   MailIcon,
   MessageSquareShare,
   MessagesSquareIcon,
   TriangleAlert,
 } from "lucide-react";
 import { useState } from "react";
-import Button from "@components/Button";
-import { cn } from "@utils/helpers";
 import SlackIcon from "@/assets/icons/SlackIcon";
-import { isNetBirdCloud } from "@utils/netbird";
+import { docsLink } from "@/modules/docs/links";
 
 export default function HelpAndSupportButton() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -55,7 +57,7 @@ export default function HelpAndSupportButton() {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem
-          href="https://docs.netbird.io/"
+          href="/docs"
           target="_blank"
           rel="noopener noreferrer"
           asChild
@@ -69,7 +71,7 @@ export default function HelpAndSupportButton() {
           </DropdownMenuShortcut>
         </DropdownMenuItem>
         <DropdownMenuItem
-          href="https://docs.netbird.io/help/troubleshooting-client"
+          href={docsLink("https://docs.netbird.io/help/troubleshooting-client")}
           target="_blank"
           rel="noopener noreferrer"
           asChild
@@ -92,6 +94,21 @@ export default function HelpAndSupportButton() {
           </DropdownMenuItem>
         )}
 
+        <DropdownMenuItem
+          href="https://github.com/Sudo-Ivan/netbirdy"
+          target="_blank"
+          rel="noopener noreferrer"
+          asChild
+        >
+          <div className={"flex gap-3 items-center"}>
+            <CodeXml size={14} />
+            Source code
+          </div>
+          <DropdownMenuShortcut>
+            <ArrowUpRightIcon size={16} />
+          </DropdownMenuShortcut>
+        </DropdownMenuItem>
+
         <DropdownMenuSeparator />
 
         <DropdownMenuItem
@@ -102,21 +119,21 @@ export default function HelpAndSupportButton() {
         >
           <div className={"flex gap-3 items-center"}>
             <MessagesSquareIcon size={14} />
-            NetBird Forum
+            NetBirdy Forum
           </div>
           <DropdownMenuShortcut>
             <ArrowUpRightIcon size={16} />
           </DropdownMenuShortcut>
         </DropdownMenuItem>
         <DropdownMenuItem
-          href="https://docs.netbird.io/slack-url"
+          href={docsLink("https://docs.netbird.io/slack-url")}
           target="_blank"
           rel="noopener noreferrer"
           asChild
         >
           <div className={"flex gap-3 items-center"}>
             <SlackIcon size={14} />
-            NetBird Slack
+            NetBirdy Slack
           </div>
           <DropdownMenuShortcut>
             <ArrowUpRightIcon size={16} />

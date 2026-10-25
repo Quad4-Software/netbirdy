@@ -84,7 +84,7 @@ const Step = ({
               : cn("h-full w-[2px] absolute left-0", sizing.railVertical),
             // The line trails its step, so a completed step also means the hop
             // to the next one is behind us.
-            status === "complete" && "bg-netbird dark:bg-netbird",
+            status === "complete" && "bg-netbirdy dark:bg-netbirdy",
           )}
         ></span>
       )}
@@ -100,7 +100,7 @@ const Step = ({
             "group-hover:bg-nb-gray-200 dark:group-hover:bg-nb-gray-800",
           status && "border-white dark:border-nb-gray-940",
           status === "complete" &&
-            "bg-netbird text-white dark:bg-netbird dark:text-white",
+            "bg-netbirdy text-white dark:bg-netbirdy dark:text-white",
           status === "current" && "text-nb-gray-800 dark:text-white",
         )}
       >

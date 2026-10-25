@@ -1,6 +1,7 @@
 "use client";
 
 import Badge from "@components/Badge";
+import ButtonGroup from "@components/ButtonGroup";
 import { DatePickerWithRange } from "@components/DatePickerWithRange";
 import FullTooltip from "@components/FullTooltip";
 import InlineLink from "@components/InlineLink";
@@ -17,14 +18,14 @@ import {
   GroupsPicker,
 } from "@components/table/filters/GroupsPicker";
 import {
+  formatTextChip,
+  TextInputPicker,
+} from "@components/table/filters/TextInputPicker";
+import {
   formatUsersChip,
   UserOption,
   UsersPicker,
 } from "@components/table/filters/UsersPicker";
-import {
-  formatTextChip,
-  TextInputPicker,
-} from "@components/table/filters/TextInputPicker";
 import {
   TableFilterChips,
   TableFilterDef,
@@ -32,9 +33,8 @@ import {
 } from "@components/table/TableFilters";
 import GetStartedTest from "@components/ui/GetStartedTest";
 import MultipleGroups from "@components/ui/MultipleGroups";
-import ButtonGroup from "@components/ButtonGroup";
-import { cn, formatDuration } from "@utils/helpers";
 import type { ColumnDef, SortingState } from "@tanstack/react-table";
+import { cn, formatDuration } from "@utils/helpers";
 import dayjs from "dayjs";
 import {
   ArrowDownIcon,
@@ -53,13 +53,6 @@ import { usePeers } from "@/contexts/PeersProvider";
 import { useServerPagination } from "@/contexts/ServerPaginationProvider";
 import { useUsers } from "@/contexts/UsersProvider";
 import { Group } from "@/interfaces/Group";
-import {
-  AIAccessLogEntry,
-  AIAccessLogSession,
-  AIProvider,
-  AIProviderId,
-  formatDenyReason,
-} from "@/modules/agent-network/data/mockData";
 import { formatDateChip } from "@/modules/agent-network/AccessLogFilters";
 import {
   accessLogFromAgentAPI,
@@ -68,6 +61,13 @@ import {
   APIAgentNetworkAccessLogSession,
 } from "@/modules/agent-network/agentAccessLogApi";
 import { useAIProviders } from "@/modules/agent-network/AIProvidersProvider";
+import {
+  AIAccessLogEntry,
+  AIAccessLogSession,
+  AIProvider,
+  AIProviderId,
+  formatDenyReason,
+} from "@/modules/agent-network/data/mockData";
 
 // Self-scoped callers keep the non-identity filters: the server pins
 // user/group to the caller regardless, while the provider and model
@@ -78,12 +78,13 @@ const SELF_SCOPED_LOG_FILTER_IDS = new Set([
   "provider",
   "model",
 ]);
-import AIProviderLogo from "@/modules/agent-network/AIProviderLogo";
-import { useProviderCatalog } from "@/modules/agent-network/useProviderCatalog";
-import AgentAccessLogExpandedRow from "@/modules/agent-network/AgentAccessLogExpandedRow";
-import EmptyRow from "@/modules/common-table-rows/EmptyRow";
 import TextWithTooltip from "@components/ui/TextWithTooltip";
 import { generateColorFromUser } from "@utils/helpers";
+import AgentAccessLogExpandedRow from "@/modules/agent-network/AgentAccessLogExpandedRow";
+import AIProviderLogo from "@/modules/agent-network/AIProviderLogo";
+import { useProviderCatalog } from "@/modules/agent-network/useProviderCatalog";
+import EmptyRow from "@/modules/common-table-rows/EmptyRow";
+import { docsLink } from "@/modules/docs/links";
 
 type Props = {
   headingTarget?: HTMLHeadingElement | null;
@@ -777,7 +778,7 @@ export default function AgentAccessLogTable({
             <>
               Learn more about
               <InlineLink
-                href={"https://docs.netbird.io/agent-network"}
+                href={docsLink("https://docs.netbird.io/agent-network")}
                 target={"_blank"}
               >
                 Agent Network
@@ -1057,7 +1058,7 @@ function resolveProviderDisplay(
       key: "unknown",
       name: "Unknown",
       resolved: false,
-      hint: "Not attributed to a provider. The request was rejected before NetBird recognised it as an LLM call.",
+      hint: "Not attributed to a provider. The request was rejected before NetBirdy recognised it as an LLM call.",
     };
   }
 
@@ -1184,7 +1185,7 @@ function TokensCell({ entry }: { entry: AIAccessLogEntry }) {
           {(entry.inputTokens ?? 0).toLocaleString()}
         </div>
         <div className={"flex gap-2 items-center whitespace-nowrap"}>
-          <ArrowDownIcon size={15} className={"text-netbird"} />
+          <ArrowDownIcon size={15} className={"text-netbirdy"} />
           <span className={"sr-only"}>Output:</span>
           {(entry.outputTokens ?? 0).toLocaleString()}
         </div>

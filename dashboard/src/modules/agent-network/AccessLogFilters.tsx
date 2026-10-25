@@ -4,6 +4,7 @@ import {
   DatePickerWithRange,
   dateRangePresetLabel,
 } from "@components/DatePickerWithRange";
+import DataTableResetFilterButton from "@components/table/DataTableResetFilterButton";
 import {
   CheckboxListPicker,
   formatCheckboxChip,
@@ -17,7 +18,6 @@ import {
   UserOption,
   UsersPicker,
 } from "@components/table/filters/UsersPicker";
-import DataTableResetFilterButton from "@components/table/DataTableResetFilterButton";
 import {
   TableFilterChips,
   TableFilterDef,

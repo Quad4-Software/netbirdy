@@ -23,7 +23,7 @@ export const ReverseProxyEventsBytesCell = ({ event }: Props) => {
         {formatBytes(event.bytes_download ?? 0)}
       </div>
       <div className={"flex gap-2 items-center whitespace-nowrap"}>
-        <ArrowUpIcon size={15} className={cn("text-netbird")} />
+        <ArrowUpIcon size={15} className={cn("text-netbirdy")} />
         <span className="sr-only">Upload:</span>
         {formatBytes(event.bytes_upload ?? 0)}
       </div>

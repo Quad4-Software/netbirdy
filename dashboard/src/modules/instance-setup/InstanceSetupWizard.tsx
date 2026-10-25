@@ -1,16 +1,16 @@
 "use client";
 
+import Button from "@components/Button";
+import HelpText from "@components/HelpText";
+import { Input } from "@components/Input";
+import { Label } from "@components/Label";
+import { NetBirdLogo } from "@components/NetBirdLogo";
+import { GradientFadedBackground } from "@components/ui/GradientFadedBackground";
 import { cn } from "@utils/helpers";
 import { CheckCircle2, Loader2 } from "lucide-react";
 import React, { useCallback, useEffect, useState } from "react";
 import { ApiError, SetupRequest } from "@/interfaces/Instance";
 import { submitSetup } from "@/utils/unauthenticatedApi";
-import { NetBirdLogo } from "@components/NetBirdLogo";
-import Button from "@components/Button";
-import { Label } from "@components/Label";
-import { Input } from "@components/Input";
-import HelpText from "@components/HelpText";
-import { GradientFadedBackground } from "@components/ui/GradientFadedBackground";
 
 interface FormData {
   email: string;
@@ -194,7 +194,7 @@ export default function InstanceSetupWizard() {
       </div>
       <Card className={"max-w-[420px] mt-8 mx-auto"}>
         <h1 className={"text-xl text-center z-10 relative"}>
-          Welcome to NetBird
+          Welcome to NetBirdy
         </h1>
         <div
           className={
@@ -289,7 +289,7 @@ export default function InstanceSetupWizard() {
         <span
           className={"text-sm text-nb-gray-400 font-light pb-10 text-center"}
         >
-          This is a one-time setup for your NetBird instance.
+          This is a one-time setup for your NetBirdy instance.
         </span>
       </div>
     </div>

@@ -14,11 +14,9 @@ import {
   TableFilterDef,
   TableFiltersButton,
 } from "@components/table/TableFilters";
-
 import GetStartedTest from "@components/ui/GetStartedTest";
 import { ColumnDef, SortingState } from "@tanstack/react-table";
 import { PlusCircle, ServerIcon } from "lucide-react";
-
 import { usePathname } from "next/navigation";
 import React, { useMemo, useState } from "react";
 import { useSWRConfig } from "swr";
@@ -28,12 +26,12 @@ import {
   ReverseProxyCluster,
   ReverseProxyClusterType,
 } from "@/interfaces/ReverseProxy";
-import useFetchApi from "@/utils/api";
 import ClustersActionCell from "@/modules/reverse-proxy/clusters/ClustersActionCell";
 import ClustersConnectedCell from "@/modules/reverse-proxy/clusters/ClustersConnectedCell";
 import ClustersFeaturesCell from "@/modules/reverse-proxy/clusters/ClustersFeaturesCell";
 import { ClustersModal } from "@/modules/reverse-proxy/clusters/ClustersModal";
 import ClustersNameCell from "@/modules/reverse-proxy/clusters/ClustersNameCell";
+import useFetchApi from "@/utils/api";
 
 const ClustersColumns: ColumnDef<ReverseProxyCluster>[] = [
   {
@@ -99,7 +97,7 @@ export default function ClustersTable({ headingTarget }: Readonly<Props>) {
   const [addModalOpen, setAddModalOpen] = useState(false);
 
   const [sorting, setSorting] = useLocalStorage<SortingState>(
-    "netbird-table-sort" + path,
+    "netbirdy-table-sort" + path,
     [
       {
         id: "address",

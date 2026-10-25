@@ -45,7 +45,8 @@ import { Peer } from "@/interfaces/Peer";
 import { SetupKey } from "@/interfaces/SetupKey";
 import useGroupHelper from "@/modules/groups/useGroupHelper";
 import { RoutingPeerMasqueradeSwitch } from "@/modules/networks/routing-peers/RoutingPeerMasqueradeSwitch";
-import SetupModal from "@/modules/setup-netbird-modal/SetupModal";
+import SetupModal from "@/modules/setup-netbirdy-modal/SetupModal";
+import { docsLink } from "@/modules/docs/links";
 
 type Props = {
   network: Network;
@@ -244,7 +245,7 @@ export function RoutingPeerModalContent({
         icon={<Share2Icon size={16} />}
         title={router ? "Update Routing Peer" : "Add Routing Peer"}
         description={`Route traffic to '${network.name}'`}
-        color={"netbird"}
+        color={"netbirdy"}
       />
 
       <Tabs defaultValue={tab} onValueChange={(v) => setTab(v)} value={tab}>
@@ -253,7 +254,7 @@ export function RoutingPeerModalContent({
             <Share2Icon
               size={16}
               className={
-                "text-nb-gray-500 group-data-[state=active]/trigger:text-netbird transition-all"
+                "text-nb-gray-500 group-data-[state=active]/trigger:text-netbirdy transition-all"
               }
             />
             Routing Peers
@@ -263,7 +264,7 @@ export function RoutingPeerModalContent({
             <Settings2
               size={16}
               className={
-                "text-nb-gray-500 group-data-[state=active]/trigger:text-netbird transition-all"
+                "text-nb-gray-500 group-data-[state=active]/trigger:text-netbirdy transition-all"
               }
             />
             Advanced Settings
@@ -334,7 +335,7 @@ export function RoutingPeerModalContent({
               <div>
                 <Label>{"Don't have a routing peer?"}</Label>
                 <HelpText className={""}>
-                  You can install NetBird with a setup key on one or more
+                  You can install NetBirdy with a setup key on one or more
                   machines to act as routing peers.
                 </HelpText>
               </div>
@@ -403,7 +404,7 @@ export function RoutingPeerModalContent({
           <Paragraph className={"text-sm mt-auto"}>
             Learn more about
             <InlineLink
-              href={"https://docs.netbird.io/how-to/networks#routing-peers"}
+              href={docsLink("https://docs.netbird.io/how-to/networks#routing-peers")}
               target={"_blank"}
             >
               Routing Peers
@@ -479,7 +480,7 @@ const InstallNetBirdWithSetupKeyButton = ({
     const choice = await confirm({
       title: `Create a Setup Key?`,
       description:
-        "If you continue, a one-off setup key will be automatically created and you will be able to install NetBird.",
+        "If you continue, a one-off setup key will be automatically created and you will be able to install NetBirdy.",
       confirmText: "Continue",
       cancelText: "Cancel",
       type: "default",
@@ -524,7 +525,7 @@ const InstallNetBirdWithSetupKeyButton = ({
         ) : (
           <DownloadIcon size={14} />
         )}
-        Install NetBird
+        Install NetBirdy
       </Button>
       {setupKey && (
         <Modal

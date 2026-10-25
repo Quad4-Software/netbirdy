@@ -14,6 +14,7 @@ import TeamIcon from "@/assets/icons/TeamIcon";
 import { usePermissions } from "@/contexts/PermissionsProvider";
 import { User } from "@/interfaces/User";
 import PageContainer from "@/layouts/PageContainer";
+import { docsLink } from "@/modules/docs/links";
 
 const ServiceUsersTable = lazy(
   () => import("@/modules/users/ServiceUsersTable"),
@@ -49,7 +50,7 @@ export default function ServiceUsers() {
           Use service users to create API tokens and avoid losing automated
           access.{" "}
           <InlineLink
-            href={"https://docs.netbird.io/how-to/access-netbird-public-api"}
+            href={docsLink("https://docs.netbird.io/how-to/access-netbirdy-public-api")}
             target={"_blank"}
           >
             Learn more

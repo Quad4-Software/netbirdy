@@ -1,6 +1,9 @@
+import Badge from "@components/Badge";
 import Button from "@components/Button";
+import { CirclePlusIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useMemo } from "react";
+import ReverseProxyIcon from "@/assets/icons/ReverseProxyIcon";
 import { usePermissions } from "@/contexts/PermissionsProvider";
 import {
   isResourceTargetType,
@@ -8,9 +11,6 @@ import {
 } from "@/contexts/ReverseProxiesProvider";
 import { NetworkResource } from "@/interfaces/Network";
 import { useNetworksContext } from "@/modules/networks/NetworkProvider";
-import ReverseProxyIcon from "@/assets/icons/ReverseProxyIcon";
-import Badge from "@components/Badge";
-import { CirclePlusIcon } from "lucide-react";
 
 type Props = {
   resource: NetworkResource;

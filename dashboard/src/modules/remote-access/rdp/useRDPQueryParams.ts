@@ -12,7 +12,7 @@ export function useRDPQueryParams() {
   const [params, setParams] = useState<RDPQueryParams>({
     peerId: null,
   });
-  const [, setLocalQueryParams] = useLocalStorage("netbird-query-params", "");
+  const [, setLocalQueryParams] = useLocalStorage("netbirdy-query-params", "");
 
   useEffect(() => {
     const peerId = searchParams.get("id");
@@ -24,7 +24,7 @@ export function useRDPQueryParams() {
     }
 
     // Otherwise, try to restore from localStorage
-    const storedParams = localStorage.getItem("netbird-query-params");
+    const storedParams = localStorage.getItem("netbirdy-query-params");
     if (!storedParams) return;
 
     // Handle JSON encoded strings from localStorage

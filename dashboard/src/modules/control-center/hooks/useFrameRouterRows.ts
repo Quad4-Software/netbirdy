@@ -1,9 +1,9 @@
-import { useMemo } from "react";
-import { useStore } from "@xyflow/react";
 import useFetchApi from "@utils/api";
-import { NetworkRouter } from "@/interfaces/Network";
-import { usePeers } from "@/contexts/PeersProvider";
+import { useStore } from "@xyflow/react";
+import { useMemo } from "react";
 import { useGroups } from "@/contexts/GroupsProvider";
+import { usePeers } from "@/contexts/PeersProvider";
+import { NetworkRouter } from "@/interfaces/Network";
 import {
   UpdateRouterChange,
   useDraftChangeset,

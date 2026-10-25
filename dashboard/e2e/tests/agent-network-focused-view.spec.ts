@@ -1,9 +1,9 @@
 /**
  * Agent Network focused-view spec.
  *
- * Exercises the account-driven focused view added for netbird.ai signups:
+ * Exercises the account-driven focused view added for netbirdy.ai signups:
  * the `agent_network_only` account setting hides the rest of the dashboard,
- * an explicit `false` opts back out, and a pending netbird.ai signup applies
+ * an explicit `false` opts back out, and a pending netbirdy.ai signup applies
  * the focused view optimistically and persists the setting via PUT /accounts.
  *
  * The test management backend does not know the setting, so GET /accounts is
@@ -12,14 +12,14 @@
  * item, which toggles purely on the focused-view flag and does not depend on
  * premium permission modules.
  */
-import { test, expect, type Browser, type Page } from "@playwright/test";
+import { type Browser, expect, type Page,test } from "@playwright/test";
 import { loginToApp, navigateTo } from "../helpers/auth";
 
-const SIGNUP_SOURCE_KEY = "netbird-signup-source";
-const AGENT_NETWORK_SOURCE = "netbird.ai";
+const SIGNUP_SOURCE_KEY = "netbirdy-signup-source";
+const AGENT_NETWORK_SOURCE = "netbirdy.ai";
 // Drives the NETBIRD_AGENT_NETWORK_ONLY / _ENABLED deployment flags against the
-// test build (see testAgentNetworkOverride in utils/netbird.ts).
-const AGENT_NETWORK_CONFIG_KEY = "netbird-test-agent-network";
+// test build (see testAgentNetworkOverride in utils/netbirdy.ts).
+const AGENT_NETWORK_CONFIG_KEY = "netbirdy-test-agent-network";
 
 type AgentNetworkConfig = "only" | "enabled" | "off";
 
@@ -230,7 +230,7 @@ test.describe.serial("Agent Network focused view @agent-network @test-build", ()
     }
   });
 
-  test("applies the focused view optimistically for a pending netbird.ai signup and persists it", async ({
+  test("applies the focused view optimistically for a pending netbirdy.ai signup and persists it", async ({
     browser,
   }) => {
     const { page, captured, close } = await openWithAccount(
@@ -259,10 +259,10 @@ test.describe.serial("Agent Network focused view @agent-network @test-build", ()
     }
   });
 
-  test("existing netbird.ai account gets dashboard_features, not the focused view", async ({
+  test("existing netbirdy.ai account gets dashboard_features, not the focused view", async ({
     browser,
   }) => {
-    // An existing account (signup form already submitted) with the netbird.ai
+    // An existing account (signup form already submitted) with the netbirdy.ai
     // source should have the Agent Network menu made available via
     // dashboard_features, not the focused agent_network_only view.
     const { page, captured, close } = await openWithAccount(
@@ -283,7 +283,7 @@ test.describe.serial("Agent Network focused view @agent-network @test-build", ()
   });
 
   // Matrix of the two deployment flags (NETBIRD_AGENT_NETWORK_ONLY / _ENABLED,
-  // "off" = neither) crossed with the netbird.ai signup source, with no explicit
+  // "off" = neither) crossed with the netbirdy.ai signup source, with no explicit
   // account settings. The API defaults agent_network_only to false, so the
   // deployment flags must still take effect. A present source implies a new
   // signup (signup_form_pending), which focuses the dashboard optimistically
@@ -328,13 +328,13 @@ test.describe.serial("Agent Network focused view @agent-network @test-build", ()
   }
 
   for (const { env, signupSource, expected } of ENV_SIGNUP_MATRIX) {
-    const sourceLabel = signupSource ? "netbird.ai" : "none";
+    const sourceLabel = signupSource ? "netbirdy.ai" : "none";
     test(`env=${env} signup_source=${sourceLabel} -> ${expected}`, async ({
       browser,
     }) => {
       const { page, close } = await openWithAccount(
         browser,
-        // A source present means a fresh netbird.ai signup (form still pending);
+        // A source present means a fresh netbirdy.ai signup (form still pending);
         // otherwise a plain account with no agent-network settings.
         { signupFormPending: signupSource },
         { agentNetworkConfig: env, signupSource },

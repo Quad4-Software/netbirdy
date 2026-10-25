@@ -4,16 +4,16 @@
  * Validates which onboarding form is shown first and which one persists,
  * across signup-source and account states — the recurring "regular form
  * flashes before the Agent Network form" bug. Onboarding is disabled in the
- * test build by default; each test opts in via the `netbird-test-onboarding`
- * localStorage flag (see testOnboardingEnabled in src/utils/netbird.ts), and
+ * test build by default; each test opts in via the `netbirdy-test-onboarding`
+ * localStorage flag (see testOnboardingEnabled in src/utils/netbirdy.ts), and
  * GET /accounts is rewritten to drive the account's onboarding + settings
  * state (same interception approach as edition-gating.spec.ts).
  */
-import { test, expect, type Browser, type Page } from "@playwright/test";
+import { type Browser, expect, type Page,test } from "@playwright/test";
 import { loginToApp } from "../helpers/auth";
 
-const SIGNUP_SOURCE_KEY = "netbird-signup-source";
-const AGENT_NETWORK_SOURCE = "netbird.ai";
+const SIGNUP_SOURCE_KEY = "netbirdy-signup-source";
+const AGENT_NETWORK_SOURCE = "netbirdy.ai";
 
 const AGENT_FORM = "agent-network-onboarding";
 const REGULAR_FORM = "regular-onboarding";
@@ -27,7 +27,7 @@ type AccountState = {
 // mockAccounts rewrites GET /accounts to drive the onboarding + focused-view
 // state, optionally delaying the response to emulate a slow backend. A PUT to
 // /accounts/{id} flips agent_network_only to true afterwards, mirroring the
-// server persisting the netbird.ai signup mark.
+// server persisting the netbirdy.ai signup mark.
 function mockAccounts(page: Page, state: AccountState, delayMs: number) {
   let agentNetworkOnly = state.agentNetworkOnly;
 
@@ -86,7 +86,7 @@ async function openOnboarding(
   await context.addInitScript(
     ([sourceKey, sourceValue, withSource, edition]) => {
       try {
-        window.localStorage.setItem("netbird-test-onboarding", "true");
+        window.localStorage.setItem("netbirdy-test-onboarding", "true");
         if (withSource) {
           window.localStorage.setItem(
             sourceKey as string,
@@ -94,7 +94,7 @@ async function openOnboarding(
           );
         }
         if (edition) {
-          window.localStorage.setItem("netbird-test-edition", edition as string);
+          window.localStorage.setItem("netbirdy-test-edition", edition as string);
         }
       } catch (e) {}
     },
@@ -123,7 +123,7 @@ async function openOnboarding(
 }
 
 test.describe.serial("Onboarding form selection @onboarding @test-build", () => {
-  test("netbird.ai signup shows the Agent Network form and never the regular one", async ({
+  test("netbirdy.ai signup shows the Agent Network form and never the regular one", async ({
     browser,
   }) => {
     const { page, close } = await openOnboarding(browser, {
@@ -182,11 +182,11 @@ test.describe.serial("Onboarding form selection @onboarding @test-build", () => 
       // The signup survey relies on a JWT domain claim self-hosted IdPs don't
       // emit, so the flow skips it and opens on the intent step. Scoped to the
       // form: the dashboard behind the modal has its own "Get Started with
-      // NetBird" heading, and getByText matches case-insensitively.
+      // NetBirdy" heading, and getByText matches case-insensitively.
       await expect(
         page
           .getByTestId(REGULAR_FORM)
-          .getByRole("heading", { name: "Get started with NetBird" }),
+          .getByRole("heading", { name: "Get started with NetBirdy" }),
       ).toBeVisible();
     } finally {
       await close();
@@ -212,7 +212,7 @@ test.describe.serial("Onboarding form selection @onboarding @test-build", () => 
     }
   });
 
-  test("a slow backend never flashes the regular form for a netbird.ai signup", async ({
+  test("a slow backend never flashes the regular form for a netbirdy.ai signup", async ({
     browser,
   }) => {
     const { page, close } = await openOnboarding(browser, {

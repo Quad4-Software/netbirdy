@@ -150,9 +150,9 @@ export const WaitingForDevice = ({
     <div className={"flex flex-col items-center justify-center mt-3"}>
       <div className="relative h-10 w-10 mt-4">
         <div className="absolute inset-0 flex items-center justify-center">
-          <div className="h-10 w-10 rounded-full bg-netbird/10 border border-netbird/60 animate-slow-ping "></div>
+          <div className="h-10 w-10 rounded-full bg-netbirdy/10 border border-netbirdy/60 animate-slow-ping "></div>
         </div>
-        <div className="absolute top-1/2 left-1/2 h-4 w-4 -translate-x-1/2 -translate-y-1/2 rounded-full bg-netbird z-10" />
+        <div className="absolute top-1/2 left-1/2 h-4 w-4 -translate-x-1/2 -translate-y-1/2 rounded-full bg-netbirdy z-10" />
       </div>
       <div className="text-sm font-light animate-slow-pulse mt-6">{text}</div>
     </div>

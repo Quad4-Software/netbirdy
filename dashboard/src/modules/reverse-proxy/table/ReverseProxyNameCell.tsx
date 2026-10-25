@@ -1,9 +1,9 @@
+import CopyToClipboardText from "@components/CopyToClipboardText";
+import ExternalLinkText from "@components/ExternalLinkText";
 import { cn } from "@utils/helpers";
 import { ChevronDown, ChevronRightIcon } from "lucide-react";
 import * as React from "react";
 import { isL4Mode, ReverseProxy, ServiceMode } from "@/interfaces/ReverseProxy";
-import ExternalLinkText from "@components/ExternalLinkText";
-import CopyToClipboardText from "@components/CopyToClipboardText";
 import ReverseProxyClusterCell from "@/modules/reverse-proxy/table/ReverseProxyClusterCell";
 import ReverseProxyStatusCell from "@/modules/reverse-proxy/table/ReverseProxyStatusCell";
 

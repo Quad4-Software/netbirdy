@@ -244,9 +244,9 @@ create_service_user() {
       -H "Authorization: Bearer $PAT" \
       -H "Content-Type: application/json" \
       -d '{
-            "userName": "netbird-service-account",
-            "name": "Netbird Service Account",
-            "description": "Netbird Service Account for IDP management",
+            "userName": "netbirdy-service-account",
+            "name": "NetBirdy Service Account",
+            "description": "NetBirdy Service Account for IDP management",
             "accessTokenType": "ACCESS_TOKEN_TYPE_JWT"
       }'
   )
@@ -383,7 +383,7 @@ create_proxy_token() {
   local out=""
   local tok=""
   for ((i = 1; i <= attempts; i++)); do
-    out=$($DOCKER_COMPOSE_COMMAND exec -T management /go/bin/netbird-mgmt token create \
+    out=$($DOCKER_COMPOSE_COMMAND exec -T management /go/bin/netbirdy-mgmt token create \
       --name "$TOKEN_NAME" \
       --config /etc/netbird/management.json \
       --log-file console \
@@ -430,7 +430,7 @@ PROXYEOF
 }
 
 init_zitadel() {
-  echo -e "\nInitializing Zitadel with NetBird's applications\n"
+  echo -e "\nInitializing Zitadel with NetBirdy's applications\n"
   INSTANCE_URL="$NETBIRD_HTTP_PROTOCOL://$NETBIRD_DOMAIN:$NETBIRD_PORT"
 
   TOKEN_PATH=./machinekey/zitadel-admin-sa.token
@@ -511,8 +511,8 @@ check_nb_domain() {
     return 1
   fi
 
-  if [ "$DOMAIN" == "netbird.example.com" ]; then
-    echo "The NETBIRD_DOMAIN cannot be netbird.example.com" > /dev/stderr
+  if [ "$DOMAIN" == "netbirdy.example.com" ]; then
+    echo "The NETBIRD_DOMAIN cannot be netbirdy.example.com" > /dev/stderr
     return 1
   fi
   return 0
@@ -520,7 +520,7 @@ check_nb_domain() {
 
 read_nb_domain() {
   READ_NETBIRD_DOMAIN=""
-  echo -n "Enter the domain you want to use for NetBird (e.g. netbird.my-domain.com): " > /dev/stderr
+  echo -n "Enter the domain you want to use for NetBirdy (e.g. netbirdy.my-domain.com): " > /dev/stderr
   read -r READ_NETBIRD_DOMAIN < /dev/tty
   if ! check_nb_domain "$READ_NETBIRD_DOMAIN"; then
     read_nb_domain
@@ -581,7 +581,7 @@ initEnvironment() {
   $DOCKER_COMPOSE_COMMAND up -d caddy zitadel
   init_zitadel
 
-  echo -e "\nRendering NetBird files...\n"
+  echo -e "\nRendering NetBirdy files...\n"
   renderTurnServerConf > turnserver.conf
   renderManagementJson > management.json
   renderDashboardEnv > "../../.test-config.json"
@@ -589,7 +589,7 @@ initEnvironment() {
   echo -e "\nRendering Playwright environment file...\n"
   renderPlaywrightEnv > "../playwright.env.json"
 
-  echo -e "\nPreparing NetBird images...\n"
+  echo -e "\nPreparing NetBirdy images...\n"
   prepare_test_image "$MANAGEMENT_IMAGE" "$MANAGEMENT_IMAGE_OVERRIDE"
   prepare_test_image "$REVERSE_PROXY_IMAGE" "$REVERSE_PROXY_IMAGE_OVERRIDE"
   prepare_test_image "$SIGNAL_IMAGE" "$SIGNAL_IMAGE_OVERRIDE"
@@ -603,7 +603,7 @@ initEnvironment() {
   # flaps cluster registration).
   mkdir -p proxy-certs proxy-certs-no-ports
 
-  echo -e "\nStarting NetBird services\n"
+  echo -e "\nStarting NetBirdy services\n"
   $DOCKER_COMPOSE_COMMAND up -d
 
   echo -e "\nWaiting for management to be ready...\n"
@@ -654,7 +654,7 @@ renderAgentGatewayStub() {
 :8088 {
 	handle /v1/models {
 		header Content-Type application/json
-		respond `{"object":"list","data":[{"id":"agentgateway-e2e-model","object":"model","owned_by":"netbird-e2e"}]}` 200
+		respond `{"object":"list","data":[{"id":"agentgateway-e2e-model","object":"model","owned_by":"netbirdy-e2e"}]}` 200
 	}
 	handle {
 		respond 404
@@ -869,7 +869,7 @@ services:
   caddy:
     image: caddy
     restart: unless-stopped
-    networks: [ netbird ]
+    networks: [ netbirdy ]
     environment:
       - NO_PROXY=${test_no_proxy}
       - no_proxy=${test_no_proxy}
@@ -886,23 +886,23 @@ services:
   agentgateway-stub:
     image: caddy
     restart: unless-stopped
-    networks: [ netbird ]
+    networks: [ netbirdy ]
     volumes:
       - ./agentgateway-stub.Caddyfile:/etc/caddy/Caddyfile
   # Signal is reached through Caddy by embedded clients in the reverse proxies.
   signal:
     image: ${SIGNAL_IMAGE}
     restart: unless-stopped
-    networks: [netbird]
+    networks: [netbirdy]
     command: ["--port", "10000", "--log-file", "console"]
   # Management
   management:
     image: ${MANAGEMENT_IMAGE}
     restart: unless-stopped
-    networks: [netbird]
+    networks: [netbirdy]
     environment:
-     - NETBIRD_STORE_ENGINE_POSTGRES_DSN=host=postgres user=netbird password=netbird dbname=netbird port=5432
-     - NB_TRAFFIC_EVENT_POSTGRES_DSN=host=postgres user=netbird password=netbird dbname=netbird port=5432
+     - NETBIRD_STORE_ENGINE_POSTGRES_DSN=host=postgres user=netbirdy password=netbirdy dbname=netbirdy port=5432
+     - NB_TRAFFIC_EVENT_POSTGRES_DSN=host=postgres user=netbirdy password=netbirdy dbname=netbirdy port=5432
      - NETBIRD_STORE_CONFIG_ENGINE=postgres
      - NB_TRAFFIC_EVENT_STORE_ENGINE=postgres
      - NB_LICENSE_KEY=${NB_LICENSE_KEY}
@@ -934,22 +934,22 @@ services:
   postgres:
     image: postgres:17
     restart: unless-stopped
-    networks: [netbird]
+    networks: [netbirdy]
     environment:
-      - POSTGRES_USER=netbird
-      - POSTGRES_PASSWORD=netbird
-      - POSTGRES_DB=netbird
+      - POSTGRES_USER=netbirdy
+      - POSTGRES_PASSWORD=netbirdy
+      - POSTGRES_DB=netbirdy
     volumes:
       - netbird_postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U netbird"]
+      test: ["CMD-SHELL", "pg_isready -U netbirdy"]
       interval: 10s
       timeout: 5s
       retries: 5
   # Zitadel - identity provider
   zitadel:
     restart: 'always'
-    networks: [netbird]
+    networks: [netbirdy]
     image: 'ghcr.io/zitadel/zitadel:v2.31.3'
     command: 'start-from-init --masterkeyFromEnv --tlsMode $ZITADEL_TLS_MODE'
     env_file:
@@ -964,7 +964,7 @@ services:
   reverse-proxy:
     image: ${REVERSE_PROXY_IMAGE}
     restart: unless-stopped
-    networks: [netbird]
+    networks: [netbirdy]
     ports:
       - '127.0.0.1:${REVERSE_PROXY_PORT}:8443'
     env_file:
@@ -1005,7 +1005,7 @@ services:
   reverse-proxy-no-ports:
     image: ${REVERSE_PROXY_IMAGE}
     restart: unless-stopped
-    networks: [netbird]
+    networks: [netbirdy]
     env_file:
       - ./proxy-no-ports.env
     environment:
@@ -1036,7 +1036,7 @@ services:
   # CockroachDB for zitadel
   crdb:
     restart: 'always'
-    networks: [netbird]
+    networks: [netbirdy]
     image: 'cockroachdb/cockroach:v22.2.2'
     command: 'start-single-node --advertise-addr crdb'
     volumes:
@@ -1059,7 +1059,7 @@ volumes:
   netbird_postgres_data:
 
 networks:
-  netbird:
+  netbirdy:
 EOF
 }
 

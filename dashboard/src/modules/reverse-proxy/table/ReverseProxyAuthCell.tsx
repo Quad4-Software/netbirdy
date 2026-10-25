@@ -1,5 +1,6 @@
 import Badge from "@components/Badge";
 import Button from "@components/Button";
+import FullTooltip from "@components/FullTooltip";
 import {
   HoverCard,
   HoverCardContent,
@@ -27,7 +28,6 @@ import { usePermissions } from "@/contexts/PermissionsProvider";
 import { useReverseProxies } from "@/contexts/ReverseProxiesProvider";
 import { Group } from "@/interfaces/Group";
 import { isL4Mode, ReverseProxy } from "@/interfaces/ReverseProxy";
-import FullTooltip from "@components/FullTooltip";
 
 const AUTH_METHODS: {
   key: "password_auth" | "pin_auth" | "bearer_auth";
@@ -57,8 +57,8 @@ const HEADER_AUTH_METHOD = {
 };
 
 const NETBIRD_ONLY_METHOD = {
-  label: "NetBird Only",
-  hoverLabel: "NetBird-Only Access",
+  label: "NetBirdy Only",
+  hoverLabel: "NetBirdy-Only Access",
   Icon: CircleUser,
 };
 

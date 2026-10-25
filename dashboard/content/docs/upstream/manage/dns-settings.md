@@ -1,0 +1,100 @@
+---
+title: "DNS Settings"
+description: "Control DNS management behavior for peer groups"
+order: 122
+upstream: "manage/dns/dns-settings.mdx@2382247"
+---
+
+> **Note** This page is adapted from the upstream NetBird documentation (BSD-3-Clause) and may describe features that NetBirdy does not include.
+
+# DNS Settings
+
+DNS Settings control whether NetBird manages DNS configuration for specific peer groups. This is useful when certain peers need to maintain their existing DNS setup.
+
+## DNS Management Modes
+
+NetBird supports two DNS management modes per peer:
+
+### Managed Mode (Default)
+
+NetBird configures the system's DNS settings. All DNS queries route through NetBird's local resolver, and configured nameservers apply to this peer.
+
+### Unmanaged Mode
+
+NetBird does not modify system DNS settings. The peer uses its pre-existing DNS configuration, and all configured nameservers and [Custom Zone](/manage/dns/custom-zones) records are ignored, including zones distributed to a group this peer belongs to.
+
+Use unmanaged mode when a peer has conflicting VPN or DNS requirements, corporate policy requires specific DNS settings, or you're troubleshooting DNS issues.
+
+> **Note** Even in unmanaged mode, peers can still communicate over the NetBird network. DNS management only affects name resolution, not connectivity.
+
+
+### Client-Side DNS Control
+
+You can also disable DNS management directly on a peer using the `--disable-dns` flag:
+
+```bash
+# Disable DNS management on this peer
+netbird up --disable-dns
+
+# Enable DNS management on this peer
+netbird up --disable-dns=false
+```
+
+> **Note** The `--disable-dns` flag takes precedence over server-side DNS settings. Even if the management server configures nameservers or Custom Zone records for this peer's group, the peer will ignore them when this flag is set. The flag persists across reconnects: a later plain `netbird up` keeps DNS management disabled until you run `netbird up --disable-dns=false`.
+
+
+## Configuring DNS Settings
+
+### Disable DNS Management for a Group
+
+1. Go to **DNS** → **DNS Settings**
+2. Click the groups selection box and select existing groups, or type a new group name and press enter to create one inline
+3. Click **Save Changes**
+
+<img src="" alt="DNS settings" className="imagewrapper-big"/>
+
+> **Note** Changes take effect within 10-30 seconds. Peers in disabled groups will revert to their original DNS settings.
+
+
+### Re-enable DNS Management
+
+1. Go to **DNS** → **DNS Settings**
+2. Remove the group from the disabled list
+3. Click **Save Changes**
+
+### Domain Controllers
+
+For guidance on running NetBird alongside Domain Controllers, including disabling DNS management for DC groups, see [Internal DNS Servers](/manage/dns/internal-dns-servers#active-directory--domain-controllers).
+
+---
+
+## API Configuration
+
+You can manage DNS settings programmatically:
+
+```bash
+# Get current settings
+curl -X GET https://api.netbird.io/api/dns/settings \
+  -H "Authorization: Token "
+
+# Update settings
+curl -X PUT https://api.netbird.io/api/dns/settings \
+  -H "Authorization: Token " \
+  -H "Content-Type: application/json" \
+  -d '{
+    "disabled_management_groups": [
+      "ch8i4ug6lnn4g9hqv7m0",
+      "ch8i4ug6lnn4g9hqv7m1"
+    ]
+  }'
+```
+
+See the full [API Reference](/api/resources/dns) for more details.
+
+---
+
+## Next Steps
+
+- **[Internal DNS Servers](/manage/dns/internal-dns-servers)** — Configure nameservers and internal DNS
+- **[Internal DNS Servers](/manage/dns/internal-dns-servers)** — Work with AD, BIND, and other internal DNS
+- **[Troubleshooting](/manage/dns/troubleshooting)** — Diagnose DNS issues

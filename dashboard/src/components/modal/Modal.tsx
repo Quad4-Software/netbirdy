@@ -35,7 +35,7 @@ const ModalOverlay = React.forwardRef<
     className={cn(
       "fixed top-0 left-0 bottom-0 right-0 grid z-50  data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 ",
       "mx-auto place-items-start overflow-y-auto md:py-16",
-      "bg-black/30 dark:bg-black/40 backdrop-blur-sm",
+      "bg-[rgba(29,35,32,0.35)] dark:bg-black/40 backdrop-blur-sm",
       className,
     )}
     style={{ scrollbarGutter: "stable both-edges" }}

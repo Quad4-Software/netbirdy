@@ -1,4 +1,4 @@
-import type { Announcement } from "@/contexts/AnnouncementProvider";
+export type Announcement = { id?: string; title?: string; content?: string; tag?: string; [k: string]: unknown };
 
 // deploymentAnnouncement turns the text an operator sets through
 // NETBIRD_ANNOUNCEMENT into the announcement the banner shows for it: up for

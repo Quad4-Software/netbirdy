@@ -41,7 +41,7 @@ import MultipleGroups from "@components/ui/MultipleGroups";
 import { ColumnDef, SortingState } from "@tanstack/react-table";
 import useFetchApi, { useApiCall } from "@utils/api";
 import { cn, generateColorFromString } from "@utils/helpers";
-import { isNetBirdCloud } from "@utils/netbird";
+import { isNetBirdCloud } from "@utils/netbirdy";
 import dayjs from "dayjs";
 import { MoreVertical, RefreshCw } from "lucide-react";
 import {
@@ -111,7 +111,7 @@ function InviteRoleCell({ invite }: { invite: UserInvite }) {
 
   return (
     <div className={cn("flex gap-3 items-center text-nb-gray-200")}>
-      <Badge variant={role === "owner" ? "netbird" : "gray"}>
+      <Badge variant={role === "owner" ? "netbirdy" : "gray"}>
         {role === Role.User && (
           <>
             <User2 size={14} />
@@ -471,7 +471,7 @@ export default function UserInvitesTable({
 
   // Default sorting state of the table
   const [sorting, setSorting] = useLocalStorage<SortingState>(
-    "netbird-table-sort-invites" + path,
+    "netbirdy-table-sort-invites" + path,
     [
       {
         id: "name",

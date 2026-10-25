@@ -9,14 +9,14 @@
  *
  * The kimi_api catalog entry ships with newer management builds. When the
  * backend under test predates it, the whole suite skips instead of failing —
- * same trade-off as the provider matrix in netbird's agent-network e2e
+ * same trade-off as the provider matrix in netbirdy's agent-network e2e
  * harness, which skips per-provider on missing credentials. The same applies
  * to the explicit settings bootstrap: connecting the first provider of an
  * account POSTs /agent-network/settings first, so on a build without that
  * endpoint the wizard cannot get as far as creating a provider.
  *
  * The Agent Network menu is deployment-gated; the test build honors the
- * localStorage override (see testAgentNetworkOverride in utils/netbird.ts),
+ * localStorage override (see testAgentNetworkOverride in utils/netbirdy.ts),
  * set via addInitScript on a dedicated context below.
  */
 import { type Browser, expect, type Page,test } from "@playwright/test";
@@ -36,7 +36,7 @@ import {
 import { loginToApp } from "../helpers/auth";
 import { generateRandomName } from "../helpers/utils";
 
-const AGENT_NETWORK_CONFIG_KEY = "netbird-test-agent-network";
+const AGENT_NETWORK_CONFIG_KEY = "netbirdy-test-agent-network";
 const KIMI_CATALOG_ID = "kimi_api";
 const KIMI_CATALOG_NAME = "Kimi (Moonshot AI) API";
 const PROVIDER_PREFIX = "e2e-kimi-";

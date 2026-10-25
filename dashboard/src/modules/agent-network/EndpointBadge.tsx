@@ -14,7 +14,7 @@ export const ENDPOINT_HELP_TEXT = (
     clients (e.g. OpenAI&apos;s
     <code className={"font-mono"}> base_url</code>, Anthropic&apos;s{" "}
     <code className={"font-mono"}>baseURL</code>, or any HTTP client). Calls hit
-    NetBird first, get authorised by your policies, and only then reach the
+    NetBirdy first, get authorised by your policies, and only then reach the
     upstream provider.
   </>
 );

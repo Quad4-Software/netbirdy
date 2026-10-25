@@ -13,7 +13,7 @@ type Props = {
 
 // ReverseProxyEventsUserCell renders the principal that authenticated
 // the request. The proxy stamps user_id as user.Id when the caller
-// resolves to a netbird user (OIDC, header, interactive auth, OR a
+// resolves to a netbirdy user (OIDC, header, interactive auth, OR a
 // tunnel-peer linked to a user) and as peer.ID for unlinked
 // tunnel-peers (machine agents). Look up users first, then peers, so
 // both human users and unattached agents render with their real

@@ -38,7 +38,7 @@ describe("onboarding request marker", () => {
   });
 
   it("reads a request stored before it could start as requested", () => {
-    localStorage.setItem("netbird-agent-network-onboarding:acc-1", "yes");
+    localStorage.setItem("netbirdy-agent-network-onboarding:acc-1", "yes");
     expect(readAgentNetworkOnboardingRequest("acc-1")).toBe("requested");
   });
 

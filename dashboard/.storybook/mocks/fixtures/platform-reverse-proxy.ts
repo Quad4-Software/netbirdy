@@ -109,7 +109,7 @@ const certified = {
 
 /*
  * One service per visual state: every mode (http/tcp/udp/tls), every status badge,
- * every auth method, NetBird-only access, a disabled row and a name long enough to truncate.
+ * every auth method, NetBirdy-only access, a disabled row and a name long enough to truncate.
  * Resource targets use the IDs from network.ts so the expanded rows resolve resource names.
  */
 const services = [

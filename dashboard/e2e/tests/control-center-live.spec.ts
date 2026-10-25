@@ -1,5 +1,4 @@
 import { expect, Locator, Page } from "@playwright/test";
-import { test } from "../helpers/fixtures";
 import {
   createGroup,
   createNetwork,
@@ -12,7 +11,6 @@ import {
   listNetworks,
   listPolicies,
 } from "../helpers/api";
-import { generateRandomName } from "../helpers/utils";
 import {
   canvasNode,
   clickContextMenuItem,
@@ -22,6 +20,8 @@ import {
   resetDraftState,
   switchFlowView,
 } from "../helpers/control-center";
+import { test } from "../helpers/fixtures";
+import { generateRandomName } from "../helpers/utils";
 
 async function openNodeMenu(page: Page, node: Locator) {
   await dismissBlockingOverlays(page);

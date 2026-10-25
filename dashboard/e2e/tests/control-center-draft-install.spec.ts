@@ -1,12 +1,10 @@
 import { expect } from "@playwright/test";
-import { test } from "../helpers/fixtures";
 import {
   deleteGroupsByPrefix,
   deletePeersByPrefix,
   deleteSetupKeysByPrefix,
   listPeers,
 } from "../helpers/api";
-import { generateRandomName } from "../helpers/utils";
 import {
   canvasNode,
   createViaCanvasMenu,
@@ -19,6 +17,8 @@ import {
   removeDockerContainer,
   runDockerPeerWithKey,
 } from "../helpers/docker-peer";
+import { test } from "../helpers/fixtures";
+import { generateRandomName } from "../helpers/utils";
 
 test.describe.serial("Control Center Draft Install @control-center", () => {
   test.beforeEach(async ({ dashboardAsOwner: page }) => {
@@ -37,9 +37,9 @@ test.describe.serial("Control Center Draft Install @control-center", () => {
     await placeholder.hover();
     await page.getByTestId("cc-peer-install").click({ force: true });
 
-    await expect(page.getByTestId("setup-netbird-modal")).toBeVisible();
+    await expect(page.getByTestId("setup-netbirdy-modal")).toBeVisible();
     await page.keyboard.press("Escape");
-    await expect(page.getByTestId("setup-netbird-modal")).not.toBeVisible();
+    await expect(page.getByTestId("setup-netbirdy-modal")).not.toBeVisible();
   });
 
   test("A Server install command omits --hostname (matched by its bound group)", async ({
@@ -53,7 +53,7 @@ test.describe.serial("Control Center Draft Install @control-center", () => {
     await placeholder.hover();
     await page.getByTestId("cc-peer-install").click({ force: true });
 
-    const modal = page.getByTestId("setup-netbird-modal");
+    const modal = page.getByTestId("setup-netbirdy-modal");
     await expect(modal).toBeVisible();
     // Placeholders match their machine by the hidden bound group, not a --hostname.
     await expect(modal).not.toContainText("--hostname");
@@ -94,7 +94,7 @@ test.describe.serial("Control Center Draft Install @control-center", () => {
       // The plaintext key is only in the POST response, so capture it there.
       await placeholder.hover();
       await page.getByTestId("cc-peer-install").click({ force: true });
-      await expect(page.getByTestId("setup-netbird-modal")).toBeVisible();
+      await expect(page.getByTestId("setup-netbirdy-modal")).toBeVisible();
 
       const keyResponse = page.waitForResponse(
         (r) =>

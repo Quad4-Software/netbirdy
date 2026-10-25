@@ -301,13 +301,13 @@ export function DataTable<TData, TValue>({
 
   const [localColumnFilters, setLocalColumnFilters] =
     useLocalStorage<ColumnFiltersState>(
-      `netbird-table-columns${uniqueKey ? "/" + (uniqueKey as string) : path}`,
+      `netbirdy-table-columns${uniqueKey ? "/" + (uniqueKey as string) : path}`,
       [],
       keepStateInLocalStorage && !manualColumnFiltering,
       initialFilters,
     );
   const [localGlobalSearch, setLocalGlobalSearch] = useLocalStorage(
-    `netbird-table-search${uniqueKey ? "/" + (uniqueKey as string) : path}`,
+    `netbirdy-table-search${uniqueKey ? "/" + (uniqueKey as string) : path}`,
     globalFilter || "",
     keepStateInLocalStorage && !manualFiltering,
     initialSearch,
@@ -315,7 +315,7 @@ export function DataTable<TData, TValue>({
 
   const [paginationState, setPaginationState] =
     useLocalStorage<PaginationState>(
-      `netbird-table-pagination${
+      `netbirdy-table-pagination${
         uniqueKey ? "/" + (uniqueKey as string) : path
       }`,
       {

@@ -7,7 +7,7 @@
  * storageState make re-auth fast (account selection, no credentials).
  *
  * Two IdPs are supported: Zitadel in the local test environment, and the
- * embedded Dex IdP of a self-hosted `netbird-server` (see `e2e/helpers/target.ts`).
+ * embedded Dex IdP of a self-hosted `netbirdy-server` (see `e2e/helpers/target.ts`).
  */
 import type { Page } from "@playwright/test";
 import { expect } from "@playwright/test";
@@ -51,7 +51,7 @@ export async function loginToApp(
   // The app either loads directly or redirects to the IdP.
   // Use locators that match either outcome — Playwright auto-waits.
   const appReady = page.getByTestId("left-navigation-item").first();
-  const setupModal = page.getByTestId("setup-netbird-modal");
+  const setupModal = page.getByTestId("setup-netbirdy-modal");
   const approvalPending = page.getByTestId("pending-approval");
   const onboarding = page.getByText("Add new device to your network");
   const selectAccount = page.getByText("Select account");
@@ -170,7 +170,7 @@ export async function navigateTo(page: Page, path: string) {
     if (!/ERR_ABORTED|ERR_NETWORK_CHANGED/.test(String(e))) throw e;
     await page.goto(path, { waitUntil: "domcontentloaded" });
   }
-  const modal = page.getByTestId("setup-netbird-modal");
+  const modal = page.getByTestId("setup-netbirdy-modal");
   try {
     await modal.waitFor({ state: "visible", timeout: 3_000 });
     await modal.getByTestId("modal-close").click();

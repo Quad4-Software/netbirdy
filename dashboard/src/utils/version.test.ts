@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { compareVersions, isNativeSSHSupported, isNewerVersion } from "./version";
+import { compareVersions, isNativeSSHSupported, isNewerVersion,isUpdateAvailable } from "./version";
 
 describe("isNativeSSHSupported", () => {
   it.each([
@@ -111,5 +111,21 @@ describe("isNewerVersion (update available)", () => {
     { current: "0.77.0", latest: "", expected: false, desc: "unknown latest" },
   ])("$current → $latest → $expected ($desc)", ({ current, latest, expected }) => {
     expect(isNewerVersion(current, latest)).toBe(expected);
+  });
+});
+
+describe("isUpdateAvailable", () => {
+  it("reports an update only for two release versions", () => {
+    expect(isUpdateAvailable("0.81.0", "0.81.1")).toBe(true);
+    expect(isUpdateAvailable("v0.80.0", "0.81.1")).toBe(true);
+    expect(isUpdateAvailable("0.81.1", "0.81.1")).toBe(false);
+    expect(isUpdateAvailable("0.82.0", "0.81.1")).toBe(false);
+  });
+
+  it("never reports an update for development or empty builds", () => {
+    expect(isUpdateAvailable("development", "0.81.1")).toBe(false);
+    expect(isUpdateAvailable("", "0.81.1")).toBe(false);
+    expect(isUpdateAvailable("0.81.0", "")).toBe(false);
+    expect(isUpdateAvailable("development", "development")).toBe(false);
   });
 });

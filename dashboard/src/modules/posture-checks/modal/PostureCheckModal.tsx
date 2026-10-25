@@ -21,6 +21,7 @@ import { PostureCheckOperatingSystem } from "@/modules/posture-checks/checks/Pos
 import { PostureCheckPeerNetworkRange } from "@/modules/posture-checks/checks/PostureCheckPeerNetworkRange";
 import { PostureCheckProcess } from "@/modules/posture-checks/checks/PostureCheckProcess";
 import { usePostureCheck } from "@/modules/posture-checks/usePostureCheck";
+import { docsLink } from "@/modules/docs/links";
 
 type Props = {
   open: boolean;
@@ -81,7 +82,7 @@ export default function PostureCheckModal({
             description={
               "Use posture checks to further restrict access in your network."
             }
-            color={"netbird"}
+            color={"netbirdy"}
           />
 
           <Tabs onValueChange={(v) => setTab(v)} defaultValue={tab} value={tab}>
@@ -98,7 +99,7 @@ export default function PostureCheckModal({
                 <Text
                   size={16}
                   className={
-                    "text-nb-gray-500 group-data-[state=active]/trigger:text-netbird transition-all"
+                    "text-nb-gray-500 group-data-[state=active]/trigger:text-netbirdy transition-all"
                   }
                 />
                 Name & Description
@@ -198,7 +199,7 @@ export default function PostureCheckModal({
                         payload: e.target.value,
                       })
                     }
-                    placeholder={"e.g., NetBird Version > 0.25.0"}
+                    placeholder={"e.g., NetBirdy Version > 0.25.0"}
                     disabled={
                       !permission.policies.create || !permission.policies.update
                     }
@@ -219,7 +220,7 @@ export default function PostureCheckModal({
                       })
                     }
                     placeholder={
-                      "e.g., Check if the NetBird version is bigger than 0.25.0"
+                      "e.g., Check if the NetBirdy version is bigger than 0.25.0"
                     }
                     rows={3}
                     disabled={
@@ -236,7 +237,7 @@ export default function PostureCheckModal({
               <Paragraph className={"text-sm mt-auto"}>
                 Learn more about
                 <InlineLink
-                  href={"https://docs.netbird.io/how-to/manage-posture-checks"}
+                  href={docsLink("https://docs.netbird.io/how-to/manage-posture-checks")}
                   target={"_blank"}
                 >
                   Posture Checks

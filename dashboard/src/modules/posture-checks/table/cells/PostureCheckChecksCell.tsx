@@ -46,7 +46,7 @@ export const PostureCheckChecksCell = ({
             >
               <div
                 className={cn(
-                  "bg-gradient-to-tr from-netbird-200 to-netbird-100 h-8 w-8 rounded-full flex items-center justify-center relative z-[10] hover:scale-[1.1] transition-all",
+                  "bg-gradient-to-tr from-netbirdy-200 to-netbirdy-100 h-8 w-8 rounded-full flex items-center justify-center relative z-[10] hover:scale-[1.1] transition-all",
                 )}
               >
                 <NetBirdIcon size={14} />

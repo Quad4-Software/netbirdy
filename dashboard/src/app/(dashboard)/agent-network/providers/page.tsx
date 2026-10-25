@@ -21,6 +21,7 @@ import EndpointBadge, {
   ENDPOINT_HELP_TEXT,
 } from "@/modules/agent-network/EndpointBadge";
 import AgentProvidersTable from "@/modules/agent-network/table/AgentProvidersTable";
+import { docsLink } from "@/modules/docs/links";
 
 function EndpointHeader() {
   const { settings, settingsLoading, openWizard } = useAIProviders();
@@ -104,9 +105,9 @@ export default function AgentNetworkProvidersPage() {
             <Paragraph>
               Connect AI providers and gateways like LiteLLM, OpenAI, and
               Anthropic through one keyless endpoint, accessible only via
-              NetBird’s tunnel.
+              NetBirdy’s tunnel.
               <InlineLink
-                href={"https://docs.netbird.io/agent-network/providers"}
+                href={docsLink("https://docs.netbird.io/agent-network/providers")}
                 target={"_blank"}
               >
                 Learn more

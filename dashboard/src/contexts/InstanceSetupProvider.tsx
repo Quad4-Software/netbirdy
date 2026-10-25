@@ -1,10 +1,10 @@
 "use client";
 
+import { isNetBirdCloud } from "@utils/netbirdy";
 import { usePathname, useRouter } from "next/navigation";
 import React, { createContext, useContext, useEffect, useState } from "react";
 import FullScreenLoading from "@/components/ui/FullScreenLoading";
 import { fetchInstanceStatus } from "@/utils/unauthenticatedApi";
-import { isNetBirdCloud } from "@utils/netbird";
 
 interface InstanceSetupContextType {
   setupRequired: boolean;
@@ -39,7 +39,7 @@ export default function InstanceSetupProvider({
   const bypassRoutes = ["/install"];
   const shouldBypass = bypassRoutes.includes(pathname) || isOIDCCallback();
 
-  // Skip setup check for NetBird hosted (cloud) deployments
+  // Skip setup check for NetBirdy hosted (cloud) deployments
   const isCloud = isNetBirdCloud();
   const isSetupPage = pathname === "/setup";
 

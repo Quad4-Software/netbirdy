@@ -8,7 +8,7 @@ import {
 } from "@components/DropdownMenu";
 import { notify } from "@components/Notification";
 import { useApiCall } from "@utils/api";
-import { isNetBirdCloud } from "@utils/netbird";
+import { isNetBirdCloud } from "@utils/netbirdy";
 import { Ban, MoreVertical, Trash2, UndoIcon, XCircle } from "lucide-react";
 import * as React from "react";
 import { useMemo } from "react";

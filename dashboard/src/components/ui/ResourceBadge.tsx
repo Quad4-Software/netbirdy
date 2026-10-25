@@ -4,8 +4,8 @@ import { cn } from "@utils/helpers";
 import { GlobeIcon, NetworkIcon, WorkflowIcon, XIcon } from "lucide-react";
 import * as React from "react";
 import { NetworkResource } from "@/interfaces/Network";
-import { Peer } from "@/interfaces/Peer";
 import { OperatingSystem } from "@/interfaces/OperatingSystem";
+import { Peer } from "@/interfaces/Peer";
 import { PeerOperatingSystemIcon } from "@/modules/peers/PeerOperatingSystemIcon";
 
 type Props = {

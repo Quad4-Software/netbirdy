@@ -15,15 +15,15 @@
 // Extra shots come from story tags:
 //   capture-hover  real pointer hover over [data-capture] (or the first button/link)
 //   capture-focus  keyboard focus on the same element (Tab focus, so :focus-visible applies)
-//   cloud          render with the NetBird Cloud config instead of self-hosted
+//   cloud          render with the NetBirdy Cloud config instead of self-hosted
 // Open menus, dialogs and other interactive states are separate stories with a
 // `play` function; the shot is taken after the play function has finished.
 // The clock is frozen so relative times ("3 days ago") never change.
+import { chromium } from "@playwright/test";
 import * as fs from "node:fs";
 import * as http from "node:http";
 import * as os from "node:os";
 import * as path from "node:path";
-import { chromium } from "@playwright/test";
 
 const [dir, out, ...rest] = process.argv.slice(2);
 const flag = (name, fallback) => {
@@ -142,7 +142,7 @@ async function openPage() {
     const RealDate = Date;
     const start = performance.now();
     const current = () => now + (performance.now() - start);
-    // eslint-disable-next-line no-global-assign
+     
     Date = class extends RealDate {
       constructor(...args) {
         super(...(args.length ? args : [current()]));

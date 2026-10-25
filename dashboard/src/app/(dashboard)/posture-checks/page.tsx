@@ -15,6 +15,7 @@ import { usePermissions } from "@/contexts/PermissionsProvider";
 import PoliciesProvider from "@/contexts/PoliciesProvider";
 import { PostureCheck } from "@/interfaces/PostureCheck";
 import PageContainer from "@/layouts/PageContainer";
+import { docsLink } from "@/modules/docs/links";
 
 const PostureCheckTable = lazy(
   () => import("@/modules/posture-checks/table/PostureCheckTable"),
@@ -48,7 +49,7 @@ export default function PostureChecksPage() {
           <Paragraph>
             Use posture checks to further restrict access in your network.{" "}
             <InlineLink
-              href={"https://docs.netbird.io/how-to/manage-posture-checks"}
+              href={docsLink("https://docs.netbird.io/how-to/manage-posture-checks")}
               target={"_blank"}
             >
               Learn more

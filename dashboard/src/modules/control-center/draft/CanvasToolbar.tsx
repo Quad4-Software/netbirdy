@@ -1,6 +1,6 @@
-import * as React from "react";
-import { useEffect } from "react";
+import { isMac } from "@hooks/useOperatingSystem";
 import { cn } from "@utils/helpers";
+import { useReactFlow } from "@xyflow/react";
 import {
   ArrowBigUpIcon,
   CommandIcon,
@@ -13,19 +13,19 @@ import {
   Redo2Icon,
   Undo2Icon,
 } from "lucide-react";
-import { useReactFlow } from "@xyflow/react";
+import * as React from "react";
+import { useEffect } from "react";
+import { useDraftHistory } from "@/modules/control-center/draft/DraftHistoryContext";
 import {
   CanvasTool,
   useDraftMode,
 } from "@/modules/control-center/draft/DraftModeContext";
-import { useDraftHistory } from "@/modules/control-center/draft/DraftHistoryContext";
-import { DEFAULT_MIN_ZOOM } from "@/modules/control-center/utils/layouts";
 import { applyDraftBuildLayout } from "@/modules/control-center/utils/draft-build-layout";
 import {
   applyDrilledLayout,
   getDrilledFrameAnchor,
 } from "@/modules/control-center/utils/drilled-layout";
-import { isMac } from "@hooks/useOperatingSystem";
+import { DEFAULT_MIN_ZOOM } from "@/modules/control-center/utils/layouts";
 
 // The big-arrow icon stands in for Shift in the shortcut badges.
 const UndoShortcut = isMac ? (

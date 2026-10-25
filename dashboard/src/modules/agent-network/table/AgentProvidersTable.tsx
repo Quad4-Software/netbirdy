@@ -22,6 +22,7 @@ import { useAIProviders } from "@/modules/agent-network/AIProvidersProvider";
 import { AIProvider } from "@/modules/agent-network/data/mockData";
 import AgentProviderActionCell from "@/modules/agent-network/table/AgentProviderActionCell";
 import { useProviderCatalog } from "@/modules/agent-network/useProviderCatalog";
+import { docsLink } from "@/modules/docs/links";
 
 function NameCell({ provider }: { provider: AIProvider }) {
   const { getById } = useProviderCatalog();
@@ -138,7 +139,7 @@ export default function AgentProvidersTable({
   const canUpdate = !!permission?.["agent_network.providers"]?.update;
 
   const [sorting, setSorting] = useLocalStorage<SortingState>(
-    "netbird-table-sort" + path,
+    "netbirdy-table-sort" + path,
     [{ id: "name", desc: false }],
   );
 
@@ -176,7 +177,7 @@ export default function AgentProvidersTable({
             }
             title={"Connect a provider"}
             description={
-              "Route OpenAI, Anthropic, and other LLM APIs through NetBird to enforce access control, track token spend, and capture prompts."
+              "Route OpenAI, Anthropic, and other LLM APIs through NetBirdy to enforce access control, track token spend, and capture prompts."
             }
             button={
               <div className={"gap-x-4 flex items-center justify-center"}>
@@ -187,7 +188,7 @@ export default function AgentProvidersTable({
               <>
                 Learn more about
                 <InlineLink
-                  href={"https://docs.netbird.io/agent-network/providers"}
+                  href={docsLink("https://docs.netbird.io/agent-network/providers")}
                   target={"_blank"}
                 >
                   Agent Network Providers

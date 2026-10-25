@@ -10,10 +10,10 @@
  * surfaces the day's cache buckets. Route mocks keep the spec hermetic, so it
  * passes against management builds that predate the cache fields.
  */
-import { test, expect, type Browser, type Page } from "@playwright/test";
+import { type Browser, expect, type Page,test } from "@playwright/test";
 import { loginToApp, navigateTo } from "../helpers/auth";
 
-const AGENT_NETWORK_CONFIG_KEY = "netbird-test-agent-network";
+const AGENT_NETWORK_CONFIG_KEY = "netbirdy-test-agent-network";
 
 // The reported field scenario: a session-start request that wrote a ~32k-token
 // prompt cache, and a follow-up that read it back.

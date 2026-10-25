@@ -1,5 +1,5 @@
-import type { Group } from "@/interfaces/Group";
 import type { DNSZone } from "@/interfaces/DNS";
+import type { Group } from "@/interfaces/Group";
 import type { NameserverGroup } from "@/interfaces/Nameserver";
 import type {
   Network,
@@ -208,14 +208,14 @@ export const policies: Policy[] = [
     ],
   },
   {
-    id: "pol-netbird-ssh",
-    name: "NetBird SSH for DevOps",
+    id: "pol-netbirdy-ssh",
+    name: "NetBirdy SSH for DevOps",
     description: "Limited SSH logins on servers",
     enabled: true,
     source_posture_checks: [],
     rules: [
       rule({
-        protocol: "netbird-ssh",
+        protocol: "netbirdy-ssh",
         bidirectional: false,
         sources: [group(GROUP.devops)],
         destinations: [group(GROUP.servers)],
@@ -259,7 +259,7 @@ export const policies: Policy[] = [
 export const postureChecks: PostureCheck[] = [
   {
     id: POSTURE.minVersion,
-    name: "NetBird 0.50 or newer",
+    name: "NetBirdy 0.50 or newer",
     description: "Older clients lack the latest security fixes",
     checks: { nb_version_check: { min_version: "0.50.0" } },
   },

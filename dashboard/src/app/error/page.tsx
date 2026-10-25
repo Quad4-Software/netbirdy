@@ -77,7 +77,7 @@ export default function ErrorPage() {
 
   const getDescription = () => {
     if (isBlockedUser) {
-      return "Your access has been blocked by the NetBird account administrator, possibly due to new user approval requirements or security policies. Please contact your administrator to regain access.";
+      return "Your access has been blocked by the NetBirdy account administrator, possibly due to new user approval requirements or security policies. Please contact your administrator to regain access.";
     }
     return "An error occurred while trying to access the dashboard. Please try again or contact your administrator.";
   };
@@ -96,7 +96,7 @@ export default function ErrorPage() {
 
       {error && (
         <div className="bg-nb-gray-930 border border-nb-gray-800 rounded-md p-4 mt-4 max-w-md font-mono mb-2">
-          <div className="text-center text-sm text-netbird">
+          <div className="text-center text-sm text-netbirdy">
             <div>response_message: {error.message}</div>
           </div>
         </div>

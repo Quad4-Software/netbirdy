@@ -40,6 +40,7 @@ import { matchAttributesReducer } from "@/modules/integrations/edr/sentinel-one/
 import { SentinelOneMatchSettings } from "@/modules/integrations/edr/sentinel-one/SentinelOneMatchSettings";
 import SentinelOneUrlInput from "@/modules/integrations/edr/sentinel-one/SentinelOneUrlInput";
 import { IntegrationModalHeader } from "@/modules/integrations/IntegrationModalHeader";
+import { docsLink } from "@/modules/docs/links";
 
 type Props = {
   open: boolean;
@@ -188,7 +189,7 @@ export function ConfigurationContent({
             <FolderGit2
               size={14}
               className={
-                "text-nb-gray-500 group-data-[state=active]/trigger:text-netbird transition-all"
+                "text-nb-gray-500 group-data-[state=active]/trigger:text-netbirdy transition-all"
               }
             />
             Peer Approval
@@ -197,7 +198,7 @@ export function ConfigurationContent({
             <ShieldCheckIcon
               size={14}
               className={
-                "text-nb-gray-500 group-data-[state=active]/trigger:text-netbird transition-all"
+                "text-nb-gray-500 group-data-[state=active]/trigger:text-netbirdy transition-all"
               }
             />
             Compliance
@@ -206,7 +207,7 @@ export function ConfigurationContent({
             <Cog
               size={14}
               className={
-                "text-nb-gray-500 group-data-[state=active]/trigger:text-netbird transition-all"
+                "text-nb-gray-500 group-data-[state=active]/trigger:text-netbirdy transition-all"
               }
             />
             Settings
@@ -215,7 +216,7 @@ export function ConfigurationContent({
             <AlertOctagon
               size={14}
               className={
-                "text-nb-gray-500 group-data-[state=active]/trigger:text-netbird transition-all"
+                "text-nb-gray-500 group-data-[state=active]/trigger:text-netbirdy transition-all"
               }
             />
             Danger Zone
@@ -350,7 +351,7 @@ export function ConfigurationContent({
             </Label>
             <HelpText className={"max-w-lg mt-2"}>
               Deleting this integration will remove the ability to sync users
-              and groups from your IdP to NetBird. If you delete the integration
+              and groups from your IdP to NetBirdy. If you delete the integration
               you will need to reconfigure it again to enable the
               synchronization.
             </HelpText>
@@ -372,7 +373,7 @@ export function ConfigurationContent({
           <Paragraph className={"text-sm mt-auto"}>
             Learn more about
             <InlineLink
-              href={"https://docs.netbird.io/how-to/sentinelone-edr"}
+              href={docsLink("https://docs.netbird.io/how-to/sentinelone-edr")}
               target={"_blank"}
             >
               SentinelOne Integration

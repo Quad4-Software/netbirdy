@@ -85,7 +85,7 @@ describe("resolveGatewayEntry", () => {
 
 describe("privateAccountClusters", () => {
   it("ignores shared clusters, even private ones", () => {
-    // A NetBird-operated private cluster is not one the account runs, and
+    // A NetBirdy-operated private cluster is not one the account runs, and
     // counting it would offer it to every Cloud account.
     expect(
       privateAccountClusters([

@@ -23,7 +23,7 @@ export const plans = [
   {
     name: "Free",
     description:
-      "For individuals and small teams getting started with NetBird.",
+      "For individuals and small teams getting started with NetBirdy.",
     features: ["5 users", "100 machines", "Peer-to-peer connections"],
     prices: [
       { currency: "eur", price: 0, price_id: "price_free_eur", unit: "user" },
@@ -116,7 +116,7 @@ export const mspInfo = {
   id: "acc-storybook",
   activated_at: "2026-01-10T10:00:00Z",
   domain: "netbird.io",
-  name: "NetBird Managed Services",
+  name: "NetBirdy Managed Services",
   status: "active",
 };
 
@@ -277,7 +277,7 @@ const accountUsage: Record<string, object> = {
 export const distributorInfo = {
   activated_at: "2025-11-01T10:00:00Z",
   domain: "netbird.io",
-  name: "NetBird Distribution GmbH",
+  name: "NetBirdy Distribution GmbH",
   parent_owner_email: "owner@netbird.io",
   parent_owner_name: "Olivia Owner",
 };
@@ -406,7 +406,7 @@ export const notificationChannels = [
     enabled: true,
     target: {
       url: "https://hooks.netbird.io/notifications/incoming/3f9a2c1e",
-      headers: { Authorization: "Bearer ••••••••", "X-Source": "netbird" },
+      headers: { Authorization: "Bearer ••••••••", "X-Source": "netbirdy" },
     },
     event_types: ["peer.add", "routing.peer.disconnect", "user.join"],
   },
@@ -441,7 +441,7 @@ export const edr = {
   },
   sentinelone: {
     api_token: "",
-    api_url: "https://euce1-netbird.sentinelone.net",
+    api_url: "https://euce1-netbirdy.sentinelone.net",
     last_synced_interval: 24,
     last_synced_at: "2026-10-08T09:15:00Z",
     groups: [GROUP.servers],
@@ -496,7 +496,7 @@ export const idp = {
       sync_interval: 300,
       enabled: true,
       group_prefixes: ["eng-", "ops-"],
-      user_group_prefixes: ["netbird-"],
+      user_group_prefixes: ["netbirdy-"],
     },
   ],
   azure: [
@@ -539,10 +539,10 @@ export const eventStreams = [
     created_at: "2026-08-01T10:00:00Z",
     updated_at: "2026-09-01T10:00:00Z",
     config: {
-      url: "https://siem.netbird.io/ingest/netbird",
+      url: "https://siem.netbird.io/ingest/netbirdy",
       headers: JSON.stringify({
         Authorization: "Bearer ••••••••",
-        "X-Tenant": "netbird",
+        "X-Tenant": "netbirdy",
       }),
       body_template: '{"event": {{.Event}}, "timestamp": "{{.Timestamp}}"}',
       api_key: "",
@@ -556,27 +556,27 @@ export const enterpriseConnections = [
   {
     id: "con-okta",
     enabled: true,
-    name: "netbird-okta",
+    name: "netbirdy-okta",
     strategy: "okta",
-    discovery_domain: "netbird.okta.com",
+    discovery_domain: "netbirdy.okta.com",
     client_id: "0oa1b2c3d4e5f6g7h8i9",
     scopes: ["openid", "profile", "email"],
     domains: [
       {
         name: "netbird.io",
-        validation_token: "netbird-verification=6c1f0a3e9b2d4e7f",
+        validation_token: "netbirdy-verification=6c1f0a3e9b2d4e7f",
         validation_status: "verified",
         validation_last_updated: "2026-09-02T10:00:00Z",
       },
       {
-        name: "netbird.dev",
-        validation_token: "netbird-verification=1a2b3c4d5e6f7a8b",
+        name: "netbirdy.dev",
+        validation_token: "netbirdy-verification=1a2b3c4d5e6f7a8b",
         validation_status: "pending",
         validation_last_updated: "2026-10-07T10:00:00Z",
       },
       {
-        name: "netbird-legacy.example",
-        validation_token: "netbird-verification=ffeeddccbbaa9988",
+        name: "netbirdy-legacy.example",
+        validation_token: "netbirdy-verification=ffeeddccbbaa9988",
         validation_status: "failed",
         validation_last_updated: "2026-10-01T10:00:00Z",
       },
@@ -593,7 +593,7 @@ export const serviceFixtures: Record<string, Handler> = {
       id: "con-okta",
       strategy: "okta",
       provider: "okta",
-      name: "netbird-okta",
+      name: "netbirdy-okta",
     },
   ],
   "GET /service/mfa": {

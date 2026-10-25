@@ -1,6 +1,7 @@
 "use client";
 
 import "../app/globals.css";
+import CommandPalette from "@components/CommandPalette";
 import { DisableDarkReader } from "@components/DisableDarkReader";
 import { TooltipProvider } from "@components/Tooltip";
 import { cn } from "@utils/helpers";
@@ -11,21 +12,20 @@ import localFont from "next/font/local";
 import React, { Suspense } from "react";
 import { Toaster } from "sonner";
 import OIDCProvider from "@/auth/OIDCProvider";
-import { useAWSMarketplace } from "@/cloud/aws/useAWSMarketplace";
 import FullScreenLoading from "@/components/ui/FullScreenLoading";
-import AnalyticsProvider, {
-  GoogleTagManagerHeadScript,
-} from "@/contexts/AnalyticsProvider";
 import DialogProvider from "@/contexts/DialogProvider";
 import ErrorBoundaryProvider from "@/contexts/ErrorBoundary";
 import InstanceSetupProvider from "@/contexts/InstanceSetupProvider";
 import { NavigationEvents } from "@/contexts/NavigationEvents";
 import { ThemeProvider } from "@/contexts/ThemeProvider";
-import { useSignupSource } from "@/hooks/useSignupSource";
 
-const inter = localFont({
-  src: "../assets/fonts/Inter.ttf",
-  display: "swap",
+const sans = localFont({
+  src: [{ path: "../assets/fonts/instrument-sans-latin-wght-normal.woff2", weight: "100 900" }],
+  variable: "--font-sans",
+});
+const mono = localFont({
+  src: [{ path: "../assets/fonts/jetbrains-mono-latin-wght-normal.woff2", weight: "100 800" }],
+  variable: "--font-mono",
 });
 
 // Extend dayjs with relativeTime plugin
@@ -39,17 +39,13 @@ export const viewport: Viewport = {
 export default function AppLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
-  useAWSMarketplace();
-  useSignupSource();
 
   return (
     <html lang="en" className="dark" style={{ colorScheme: "dark" }}>
       <head>
-        <GoogleTagManagerHeadScript />
       </head>
-      <body className={cn(inter.className)}>
+      <body className={cn(sans.className, sans.variable, mono.variable)}>
         <Suspense fallback={<FullScreenLoading />}>
-          <AnalyticsProvider>
             <DialogProvider>
               <ThemeProvider>
                 <ErrorBoundaryProvider>
@@ -57,6 +53,7 @@ export default function AppLayout({
                     <OIDCProvider>
                       <TooltipProvider delayDuration={0}>
                         {children}
+                        <CommandPalette />
                       </TooltipProvider>
                     </OIDCProvider>
                   </InstanceSetupProvider>
@@ -74,9 +71,8 @@ export default function AppLayout({
             />
             <NavigationEvents />
             <DisableDarkReader />
-          </AnalyticsProvider>
         </Suspense>
-      </body>
+      <noscript>NetBirdy requires JavaScript.</noscript></body>
     </html>
   );
 }

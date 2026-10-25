@@ -134,7 +134,7 @@ export function SetupContent({ onSuccess, account }: Readonly<ModalProps>) {
 
     notify({
       title: "FleetDM Integration",
-      description: `FleetDM was successfully connected to NetBird.`,
+      description: `FleetDM was successfully connected to NetBirdy.`,
       promise: fleetDMRequest
         .post({
           api_token: apiToken,
@@ -182,7 +182,7 @@ export function SetupContent({ onSuccess, account }: Readonly<ModalProps>) {
               key={index}
               className={cn(
                 "w-8 h-1 rounded-full bg-nb-gray-800",
-                step >= index + 1 && "bg-netbird",
+                step >= index + 1 && "bg-netbirdy",
               )}
             />
           ))}
@@ -191,7 +191,7 @@ export function SetupContent({ onSuccess, account }: Readonly<ModalProps>) {
 
       <IntegrationModalHeader
         image={integrationImage}
-        title={"Connect NetBird with FleetDM"}
+        title={"Connect NetBirdy with FleetDM"}
         description={
           "Restrict network access to devices managed by FleetDM based on their compliance policies."
         }

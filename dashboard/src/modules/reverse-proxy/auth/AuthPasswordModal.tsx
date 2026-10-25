@@ -2,8 +2,8 @@ import Button from "@components/Button";
 import { Input } from "@components/Input";
 import { Modal, ModalClose, ModalContent } from "@components/modal/Modal";
 import ModalHeader from "@components/modal/ModalHeader";
-import React, { useState } from "react";
 import { GradientFadedBackground } from "@components/ui/GradientFadedBackground";
+import React, { useState } from "react";
 
 type Props = {
   open: boolean;

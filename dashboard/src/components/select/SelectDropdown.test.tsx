@@ -1,9 +1,9 @@
 import {
+  cleanup,
+  fireEvent,
   render,
   screen,
-  fireEvent,
   waitFor,
-  cleanup,
 } from "@testing-library/react";
 import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 import { SelectDropdown, SelectOption } from "./SelectDropdown";
