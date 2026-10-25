@@ -34,6 +34,19 @@ const (
 var MgmtConfigPath string
 
 // Config of the Management service
+// UpdateMirrorConfig maps the `update_mirror:` config section.
+type UpdateMirrorConfig struct {
+	Enabled        bool
+	Repository     string
+	APIBaseURL     string `yaml:"api_base_url"`
+	CacheDir       string `yaml:"cache_dir"`
+	MaxCacheBytes  int64  `yaml:"max_cache_bytes"`
+	PollInterval   string `yaml:"poll_interval"`
+	GitHubTokenEnv string `yaml:"github_token_env"`
+	Platforms      []string
+	Prefetch       bool
+}
+
 // SecurityConfig maps the `security:` config section.
 type SecurityConfig struct {
 	Mode           string   `yaml:"mode" json:"mode"` // off|observe|prevent; empty = off
@@ -73,7 +86,8 @@ type Config struct {
 
 	// Security holds anomaly-detection settings. Absent means mode off: the
 	// engine is not constructed and hooks are never called.
-	Security *SecurityConfig
+	Security     *SecurityConfig
+	UpdateMirror *UpdateMirrorConfig `yaml:"update_mirror"`
 
 	PKCEAuthorizationFlow *PKCEAuthorizationFlow
 

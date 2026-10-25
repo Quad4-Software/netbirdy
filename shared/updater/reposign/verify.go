@@ -10,7 +10,7 @@ import (
 
 	log "github.com/sirupsen/logrus"
 
-	"github.com/netbirdio/netbird/client/internal/updater/downloader"
+	"github.com/netbirdio/netbird/shared/updater/downloader"
 )
 
 const (
@@ -185,3 +185,6 @@ func loadEmbeddedPublicKeys() ([]PublicKey, error) {
 
 	return allKeys, nil
 }
+
+// EmbeddedRootKeys returns the root public keys compiled into this binary.
+func EmbeddedRootKeys() ([]PublicKey, error) { return loadEmbeddedPublicKeys() }

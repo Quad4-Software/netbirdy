@@ -5,7 +5,7 @@ import (
 
 	log "github.com/sirupsen/logrus"
 
-	"github.com/netbirdio/netbird/client/internal/updater/installer"
+	"github.com/netbirdio/netbird/shared/updater/installer"
 	"github.com/netbirdio/netbird/client/proto"
 )
 

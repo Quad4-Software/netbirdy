@@ -188,6 +188,8 @@ func (s *BaseServer) APIHandler() http.Handler {
 		return apiv1Router
 	})
 
+	s.Router().PathPrefix("/updates/v1/").Handler(http.StripPrefix("/updates/v1", mountUpdateMirror(s)))
+
 	_ = CreateNamed(s, "http_v0api", func() http.Handler {
 		apiRouter := s.ApiRouter()
 		_, err := nbhttp.NewAPIHandler(

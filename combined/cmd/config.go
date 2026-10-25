@@ -75,6 +75,7 @@ type ServerConfig struct {
 	AuthStore               StoreConfig        `yaml:"authStore"`
 	ReverseProxy            ReverseProxyConfig `yaml:"reverseProxy"`
 	Security                *nbconfig.SecurityConfig `yaml:"security"`
+	UpdateMirror            *nbconfig.UpdateMirrorConfig `yaml:"update_mirror"`
 
 	SupportedSyncMessageVersions           *int           `yaml:"supportedSyncMessageVersions,omitempty"`
 	PerAccountSupportedSyncMessageVersions map[string]int `yaml:"perAccountSupportedSyncMessageVersions,omitempty"`
@@ -141,6 +142,7 @@ type ManagementConfig struct {
 	Store                   StoreConfig        `yaml:"store"`
 	ReverseProxy            ReverseProxyConfig `yaml:"reverseProxy"`
 	Security                *nbconfig.SecurityConfig `yaml:"security"`
+	UpdateMirror            *nbconfig.UpdateMirrorConfig `yaml:"update_mirror"`
 }
 
 // AuthConfig contains authentication/identity provider settings
@@ -726,6 +728,7 @@ func (c *CombinedConfig) ToManagementConfig() (*nbconfig.Config, error) {
 		Signal:                             signalConfig,
 		Datadir:                            mgmt.DataDir,
 		Security:                          c.Server.Security,
+		UpdateMirror:                     c.Server.UpdateMirror,
 		DataStoreEncryptionKey:             mgmt.Store.EncryptionKey,
 		HttpConfig:                         httpConfig,
 		StoreConfig:                        storeConfig,

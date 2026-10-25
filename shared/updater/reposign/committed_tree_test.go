@@ -12,7 +12,7 @@ func TestCommittedPublicKeysTree(t *testing.T) {
 	if err != nil {
 		t.Fatalf("prod root keys: %v", err)
 	}
-	keysDir := filepath.Join("..", "..", "..", "..", "publickeys", "artifact-signatures", "keys")
+	keysDir := filepath.Join("..", "..", "..", "publickeys", "artifact-signatures", "keys")
 
 	pubPEM, err := os.ReadFile(filepath.Join(keysDir, artifactPubKeysFileName))
 	if err != nil {
