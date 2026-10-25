@@ -95,7 +95,7 @@ These stay the same as upstream so existing setups keep working:
 | Package `Provides`, `Replaces` and `Conflicts: netbird` | package migration |
 
 Known gaps: NetBirdy does not ship its own phone apps (use the NetBird apps),
-the Windows installer is an exe without the desktop UI, and there is no MSI.
+the desktop app is not code-signed, and there is no Windows MSI.
 
 ## Documentation
 

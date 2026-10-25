@@ -54,10 +54,15 @@ Jobs:
 
 - goreleaser builds the archives, deb and rpm packages and the client, relay,
   signal, management, upload and server images, and creates the GitHub release.
-- windows-installer builds `netbirdy_<version>_windows_amd64` as an NSIS installer
-  named `netbirdy_installer_<version>_windows_amd64.exe`. The installer ships the
-  daemon and CLI without the desktop UI. No MSI is built.
-- macos-pkg builds `netbirdy_<version>_darwin_amd64.pkg` and `_arm64.pkg`.
+- desktop-linux builds the desktop app with `.goreleaser_ui.yaml`: the Linux
+  deb, rpm and tar.gz packages (`netbirdy-ui`) and the Windows desktop binary.
+  It needs the wails3 CLI, Node 24 and pnpm to build the frontend.
+- windows-installer builds the daemon and CLI, adds the desktop binary and
+  packages everything as an NSIS installer named
+  `netbirdy_installer_<version>_windows_amd64.exe`. No MSI is built.
+- macos-pkg builds `NetBirdy.app` (daemon plus desktop app) for amd64 and arm64
+  and packages it as `netbirdy_<version>_darwin_<arch>.pkg` with the scripts in
+  `release_files/darwin_pkg`. The app and package are not code-signed.
 - images builds and pushes the dashboard and updater images and writes
   `netbirdy_<version>_images.txt` (server, dashboard and updater by digest).
 - sign writes `netbirdy_<version>_checksums.txt`, signs every asset and the

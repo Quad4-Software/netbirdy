@@ -162,8 +162,90 @@ jobs:
           path: assets/
           if-no-files-found: error
 
-  windows-installer:
+  desktop-linux:
     needs: [meta]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      PUBLISH: ${{ needs.meta.outputs.publish }}
+      APPVER: ${{ needs.meta.outputs.appver }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Set up Go
+        uses: actions/setup-go@44694675825211faa026b3c33043df3e48a5fa00 # v6.0.0
+        with:
+          go-version-file: "go.mod"
+
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: "24"
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+        with:
+          version_file_path: "package.json"
+
+      - name: Install build dependencies
+        run: sudo apt-get update && sudo apt-get install -y -q libgtk-4-dev libwebkitgtk-6.0-dev libsoup-3.0-dev gcc-mingw-w64-x86-64
+
+      - name: Install wails3 and goversioninfo
+        run: |
+          WAILS_VERSION=$(go list -m -f '{{.Version}}' github.com/wailsapp/wails/v3)
+          go install "github.com/wailsapp/wails/v3/cmd/wails3@${WAILS_VERSION}"
+          go install github.com/josephspurrier/goversioninfo/cmd/goversioninfo@b66839b # v1.7.0
+
+      - name: Generate the Windows resource file
+        run: |
+          major=$(echo "$APPVER" | cut -d. -f1)
+          minor=$(echo "$APPVER" | cut -d. -f2)
+          patch=$(echo "$APPVER" | cut -d. -f3)
+          goversioninfo -64 -icon client/ui/build/windows/icon.ico -manifest client/ui/build/windows/wails.exe.manifest \
+            -product-name "NetBirdy UI" -copyright "NetBirdy Authors" \
+            -ver-major "$major" -ver-minor "$minor" -ver-patch "$patch" -ver-build 0 \
+            -file-version "$major.$minor.$patch.0" -product-version "$major.$minor.$patch.0" \
+            -o client/ui/resources_windows_amd64.syso
+
+      - name: Build the desktop app
+        uses: goreleaser/goreleaser-action@e435ccd777264be153ace6237001ef4d979d3a7a # v6.4.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SKIP_PUBLISH: "true"
+        with:
+          version: "~> v2"
+          args: ${{ needs.meta.outputs.publish == 'true' && 'release --config .goreleaser_ui.yaml --clean --skip=publish,sign' || 'release --config .goreleaser_ui.yaml --snapshot --clean --skip=publish,sign' }}
+
+      - name: Collect files
+        run: |
+          mkdir -p linux-ui windows-ui
+          find dist -maxdepth 1 -type f \( -name 'netbirdy-ui*.deb' -o -name 'netbirdy-ui*.rpm' -o -name 'netbirdy-ui-linux_*.tar.gz' \) -exec cp {} linux-ui/ \;
+          exe=$(find dist -type f -name netbirdy-ui.exe | head -n 1)
+          test -n "$exe"
+          cp "$exe" windows-ui/netbirdy-ui.exe
+          ls -l linux-ui windows-ui
+
+      - name: Upload Linux desktop packages
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        with:
+          name: desktop-linux
+          path: linux-ui/
+          if-no-files-found: error
+
+      - name: Upload Windows desktop binary
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        with:
+          name: desktop-windows-binary
+          path: windows-ui/netbirdy-ui.exe
+          if-no-files-found: error
+
+  windows-installer:
+    needs: [meta, desktop-linux]
     runs-on: windows-2022
     permissions:
       contents: read
@@ -184,6 +266,12 @@ jobs:
         with:
           go-version-file: "go.mod"
 
+      - name: Download the desktop binary
+        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
+        with:
+          name: desktop-windows-binary
+          path: desktop
+
       - name: Build the client
         run: |
           $dir = "dist/netbird_windows_amd64"
@@ -195,6 +283,7 @@ jobs:
           $env:GOARCH = "amd64"
           go build -trimpath -ldflags $ld -o "$dir/netbirdy.exe" ./client
           if ($LASTEXITCODE -ne 0) { throw "go build failed" }
+          Copy-Item "desktop/netbirdy-ui.exe" "$dir/netbirdy-ui.exe"
 
       - name: Fetch wintun
         run: |
@@ -206,24 +295,39 @@ jobs:
           Expand-Archive -Path $zip -DestinationPath $out
           Copy-Item "$out/wintun/bin/amd64/wintun.dll" "dist/netbird_windows_amd64/wintun.dll"
 
-      - name: Install the EnVar NSIS plugin
+      - name: Install the NSIS plugins
         run: |
-          $zip = Join-Path $env:RUNNER_TEMP "envar.zip"
-          Invoke-WebRequest -Uri "https://nsis.sourceforge.io/mediawiki/images/7/7f/EnVar_plugin.zip" -OutFile $zip
-          $hash = (Get-FileHash -Path $zip -Algorithm SHA256).Hash.ToLower()
-          if ($hash -ne "e9aa92de351345ed82795251d838f1ae9041ba35af9d381a5780c7843b01f56a") { throw "EnVar plugin checksum mismatch: $hash" }
-          $out = Join-Path $env:RUNNER_TEMP "envar"
-          Expand-Archive -Path $zip -DestinationPath $out
           $nsis = "C:\Program Files (x86)\NSIS"
           if (-not (Test-Path "$nsis\makensis.exe")) {
             choco install nsis -y --no-progress
             if ($LASTEXITCODE -ne 0) { throw "NSIS install failed" }
           }
+          $envar = Join-Path $env:RUNNER_TEMP "envar.zip"
+          Invoke-WebRequest -Uri "https://nsis.sourceforge.io/mediawiki/images/7/7f/EnVar_plugin.zip" -OutFile $envar
+          if ((Get-FileHash -Path $envar -Algorithm SHA256).Hash.ToLower() -ne "e9aa92de351345ed82795251d838f1ae9041ba35af9d381a5780c7843b01f56a") { throw "EnVar plugin checksum mismatch" }
+          $out = Join-Path $env:RUNNER_TEMP "envar"
+          Expand-Archive -Path $envar -DestinationPath $out
           Copy-Item "$out\Plugins\x86-unicode\EnVar.dll" "$nsis\Plugins\x86-unicode\EnVar.dll" -Force
+          $shell = Join-Path $env:RUNNER_TEMP "shellexec.7z"
+          Invoke-WebRequest -Uri "https://nsis.sourceforge.io/mediawiki/images/6/68/ShellExecAsUser_amd64-Unicode.7z" -OutFile $shell
+          if ((Get-FileHash -Path $shell -Algorithm SHA256).Hash.ToLower() -ne "0a55ea25c7330a92cec028eda8afcaf1b1a7092e0dfb77c21c8f654564b4ff9d") { throw "ShellExecAsUser plugin checksum mismatch" }
+          $out2 = Join-Path $env:RUNNER_TEMP "shellexec"
+          & "C:\Program Files\7-Zip\7z.exe" x "-o$out2" $shell -y | Out-Null
+          if ($LASTEXITCODE -ne 0) { throw "7z extraction failed" }
+          Copy-Item "$out2\Plugins\x86-unicode\ShellExecAsUser.dll" "$nsis\Plugins\x86-unicode\ShellExecAsUser.dll" -Force
+
+      - name: Stage the WebView2 bootstrapper
+        run: |
+          $ver = go list -m -f '{{.Version}}' github.com/wailsapp/wails/v3
+          go install "github.com/wailsapp/wails/v3/cmd/wails3@$ver"
+          if ($LASTEXITCODE -ne 0) { throw "wails3 install failed" }
+          wails3 generate webview2bootstrapper -dir client
+          if ($LASTEXITCODE -ne 0) { throw "webview2 bootstrapper generation failed" }
+          if (-not (Test-Path "client/MicrosoftEdgeWebview2Setup.exe")) { throw "bootstrapper missing" }
 
       - name: Build the installer
         run: |
-          & "C:\Program Files (x86)\NSIS\makensis.exe" /V3 "/DARCH=amd64" client\installer.nsis
+          & "C:\Program Files (x86)\NSIS\makensis.exe" /V3 "/DARCH=amd64" "/DWITH_UI" client\installer.nsis
           if ($LASTEXITCODE -ne 0) { throw "makensis failed with exit code $LASTEXITCODE" }
           New-Item -ItemType Directory -Force -Path out | Out-Null
           Move-Item netbirdy-installer.exe "out/netbirdy_installer_${env:VERSION}_windows_amd64.exe"
@@ -259,21 +363,45 @@ jobs:
         with:
           go-version-file: "go.mod"
 
-      - name: Build the package
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: "24"
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+        with:
+          version_file_path: "package.json"
+
+      - name: Build the desktop frontend
         run: |
-          root="$RUNNER_TEMP/pkgroot"
-          mkdir -p "$root/usr/local/bin" out
+          WAILS_VERSION=$(go list -m -f '{{.Version}}' github.com/wailsapp/wails/v3)
+          go install "github.com/wailsapp/wails/v3/cmd/wails3@${WAILS_VERSION}"
+          (cd client/ui && "$(go env GOPATH)/bin/wails3" generate bindings -clean=true -ts)
+          (cd client/ui/frontend && pnpm install --frozen-lockfile && pnpm build)
+
+      - name: Build the app bundle and package
+        run: |
+          app="$RUNNER_TEMP/pkgroot/Applications/NetBirdy.app"
+          mkdir -p "$app/Contents/MacOS" "$app/Contents/Resources" out
           date=$(date -u +%Y-%m-%dT%H:%M:%SZ)
-          CGO_ENABLED=0 GOOS=darwin GOARCH="$ARCH" go build -trimpath \
-            -ldflags "-s -w -X github.com/netbirdio/netbird/version.version=$VERSION -X main.commit=$GITHUB_SHA -X main.date=$date -X main.builtBy=github-actions" \
-            -o "$root/usr/local/bin/netbirdy" ./client
-          pkgbuild --root "$root" \
-            --scripts release_files/darwin_pkg_cli \
-            --identifier io.netbirdy.client \
+          ld="-s -w -X github.com/netbirdio/netbird/version.version=$VERSION -X main.commit=$GITHUB_SHA -X main.date=$date -X main.builtBy=github-actions"
+          CGO_ENABLED=0 GOOS=darwin GOARCH="$ARCH" go build -trimpath -ldflags "$ld" -o "$app/Contents/MacOS/netbirdy" ./client
+          CGO_ENABLED=1 GOOS=darwin GOARCH="$ARCH" MACOSX_DEPLOYMENT_TARGET=11.0 go build -trimpath -tags production -ldflags "$ld" -o "$app/Contents/MacOS/netbirdy-ui" ./client/ui
+          cp client/ui/build/darwin/Info.plist "$app/Contents/Info.plist"
+          cp client/ui/build/darwin/icons.icns "$app/Contents/Resources/icons.icns"
+          plutil -replace CFBundleVersion -string "$PKGVER" "$app/Contents/Info.plist"
+          plutil -replace CFBundleShortVersionString -string "$PKGVER" "$app/Contents/Info.plist"
+          plutil -replace NSHumanReadableCopyright -string "NetBirdy Authors" "$app/Contents/Info.plist"
+          plutil -lint "$app/Contents/Info.plist"
+          pkgbuild --root "$RUNNER_TEMP/pkgroot" \
+            --scripts release_files/darwin_pkg \
+            --identifier io.netbird.client \
             --version "$PKGVER" \
             --install-location / \
             "out/netbirdy_${VERSION}_darwin_${ARCH}.pkg"
-          pkgutil --payload-files "out/netbirdy_${VERSION}_darwin_${ARCH}.pkg" | grep -q 'usr/local/bin/netbirdy'
+          pkgutil --payload-files "out/netbirdy_${VERSION}_darwin_${ARCH}.pkg" | grep -q 'NetBirdy.app/Contents/MacOS/netbirdy-ui'
+          pkgutil --payload-files "out/netbirdy_${VERSION}_darwin_${ARCH}.pkg" | grep -q 'NetBirdy.app/Contents/MacOS/netbirdy$'
 
       - name: Upload package
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
@@ -354,7 +482,7 @@ jobs:
           if-no-files-found: error
 
   sign:
-    needs: [meta, goreleaser, windows-installer, macos-pkg, images]
+    needs: [meta, goreleaser, desktop-linux, windows-installer, macos-pkg, images]
     runs-on: ubuntu-latest
     permissions:
       contents: read

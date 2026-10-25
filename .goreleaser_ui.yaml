@@ -44,24 +44,6 @@ builds:
     tags:
       - production
 
-  - id: netbirdy-ui-windows-arm64
-    dir: client/ui
-    binary: netbirdy-ui
-    env:
-      - CGO_ENABLED=1
-      - CC=aarch64-w64-mingw32-clang
-      - CXX=aarch64-w64-mingw32-clang++
-    goos:
-      - windows
-    goarch:
-      - arm64
-    ldflags:
-      - -s -w -X github.com/netbirdio/netbird/version.version={{.Version}} -X main.commit={{.Commit}} -X main.date={{.CommitDate}} -X main.builtBy=goreleaser
-      - -H windowsgui
-    mod_timestamp: "{{ .CommitTimestamp }}"
-    tags:
-      - production
-
 archives:
   - id: linux-arch
     name_template: "{{ .ProjectName }}-linux_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
@@ -71,7 +53,6 @@ archives:
     name_template: "{{ .ProjectName }}-windows_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
     builds:
       - netbirdy-ui-windows-amd64
-      - netbirdy-ui-windows-arm64
 
 nfpms:
   - maintainer: NetBirdy <https://github.com/Sudo-Ivan/netbirdy>
@@ -135,25 +116,6 @@ nfpms:
     rpm:
       signature:
         key_file: '{{ if index .Env "GPG_RPM_KEY_FILE" }}{{ .Env.GPG_RPM_KEY_FILE }}{{ end }}'
-
-uploads:
-  - name: debian
-    skip: "{{ .Env.SKIP_PUBLISH }}"
-    ids:
-      - netbird_ui_deb
-    mode: archive
-    target: https://pkgs.wiretrustee.com/debian/pool/{{ .ArtifactName }};deb.distribution=stable;deb.component=main;deb.architecture={{ if .Arm }}armhf{{ else }}{{ .Arch }}{{ end }};deb.package=
-    username: dev@wiretrustee.com
-    method: PUT
-
-  - name: yum
-    skip: "{{ .Env.SKIP_PUBLISH }}"
-    ids:
-      - netbird_ui_rpm
-    mode: archive
-    target: https://pkgs.wiretrustee.com/yum/{{ .Arch }}{{ if .Arm }}{{ .Arm }}{{ end }}
-    username: dev@wiretrustee.com
-    method: PUT
 
 release:
   # Uploads into the release created by the main .goreleaser.yaml run.
