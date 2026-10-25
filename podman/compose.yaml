@@ -49,5 +49,22 @@ services:
       AUTH_SILENT_REDIRECT_URI: "/nb-silent-auth"
       LETSENCRYPT_DOMAIN: "none"
 
+  # Optional: local Pocket ID for passkey login testing.
+  # First-run admin setup happens in the browser at http://localhost:1411
+  # (requires a secure context; localhost works).
+  pocketid:
+    profiles: ["pocketid"]
+    image: ghcr.io/pocket-id/pocket-id:v2.18.0
+    restart: unless-stopped
+    ports:
+      - "1411:1411"
+    environment:
+      APP_URL: "http://localhost:1411"
+      TRUST_PROXY: "true"
+      ENCRYPTION_KEY: "${POCKETID_ENCRYPTION_KEY:-change-me-please-32-bytes!!}"
+    volumes:
+      - pocketid-data:/app/backend/data
+
 volumes:
   netbirdy-server-data:
+  pocketid-data:

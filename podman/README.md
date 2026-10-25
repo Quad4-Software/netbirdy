@@ -36,3 +36,5 @@ the make command line if needed.
   config (`disableAnonymousMetrics`, `disableGeoliteUpdate`).
 - The OIDC client id `netbird-dashboard` is part of the embedded IdP
   configuration and is intentionally not renamed.
+
+HTTP/3 on the proxy additionally needs UDP published on its listen port; the bundled compose does not run the proxy.

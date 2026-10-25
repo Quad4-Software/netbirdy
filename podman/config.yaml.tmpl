@@ -16,6 +16,11 @@ server:
   disableAnonymousMetrics: true
   disableGeoliteUpdate: true
 
+  security:
+    mode: "observe"
+    learning_period: "168h"
+    audit_log_file: "audit-events.jsonl"
+
   auth:
     issuer: "http://localhost:8081/oauth2"
     signKeyRefreshEnabled: true
