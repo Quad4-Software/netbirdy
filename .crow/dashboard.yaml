@@ -1,0 +1,28 @@
+name: dashboard
+
+when:
+  - event: push
+    branch: main
+    path:
+      include: ["dashboard/**", "pnpm-lock.yaml", "pnpm-workspace.yaml"]
+  - event: pull_request
+    path:
+      include: ["dashboard/**", "pnpm-lock.yaml", "pnpm-workspace.yaml"]
+  - event: manual
+
+depends_on:
+  - repo-hygiene
+
+steps:
+  - name: build-and-test
+    image: node:24
+    commands:
+      - PNPM_VERSION=$(node -p "require('./package.json').packageManager.split('@')[1]")
+      - npm i -g "pnpm@$PNPM_VERSION"
+      - pnpm install --frozen-lockfile --filter netbirdy-dashboard...
+      - sh scripts/check-frontend-lock.sh
+      - pnpm --filter netbirdy-dashboard docs:build
+      - pnpm --filter netbirdy-dashboard exec tsc --noEmit
+      - pnpm --filter netbirdy-dashboard lint
+      - pnpm --filter netbirdy-dashboard test:unit
+      - pnpm --filter netbirdy-dashboard build

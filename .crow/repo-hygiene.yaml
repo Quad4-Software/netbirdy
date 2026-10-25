@@ -1,0 +1,46 @@
+name: repo-hygiene
+
+when:
+  - event: push
+    branch: main
+  - event: pull_request
+  - event: tag
+  - event: manual
+
+steps:
+  - name: shell-syntax
+    image: alpine:3.21
+    commands:
+      - apk add --no-cache bash git
+      - git config --global --add safe.directory '*'
+      - git ls-files '*.sh' > /tmp/shell-files.txt
+      - |
+        rc=0
+        while IFS= read -r f; do
+          shebang=$(head -1 "$f")
+          case "$shebang" in
+            *bash*) bash -n "$f" || rc=1 ;;
+            *) sh -n "$f" || rc=1 ;;
+          esac
+        done < /tmp/shell-files.txt
+        exit $rc
+
+  - name: rebrand-check
+    image: alpine:3.21
+    commands:
+      - sh tools/rebrand/rebrand.sh --check
+
+  - name: no-private-keys
+    image: alpine:3.21
+    commands:
+      - apk add --no-cache git
+      - git config --global --add safe.directory '*'
+      - |
+        found=$(git ls-files | grep -vE '(^|/)(test_data|testdata|fixtures)/' | xargs grep -lE '^-----BEGIN [A-Z ]*PRIVATE KEY-----' || true)
+        if [ -n "$found" ]; then printf '%s\n' "$found"; exit 1; fi
+
+  - name: govulncheck
+    image: golang:1.27
+    commands:
+      - go run golang.org/x/vuln/cmd/govulncheck@v1.1.4 -format json ./... > vuln.json || true
+      - sh scripts/govulncheck-filter.sh vuln.json

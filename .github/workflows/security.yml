@@ -35,28 +35,7 @@ jobs:
         run: |
           set -e
           go run golang.org/x/vuln/cmd/govulncheck@v1.1.4 -format json ./... > vuln.json || true
-          python3 - <<'PYEOF'
-          import json, sys
-          ignore = {l.split("#")[0].strip() for l in open(".github/govulncheck-ignore.txt") if l.split("#")[0].strip()}
-          buf, depth, ids = "", 0, set()
-          for ch in open("vuln.json").read():
-              buf += ch
-              depth += {"{":1,"}":-1}.get(ch,0)
-              if depth == 0 and buf.strip():
-                  try:
-                      obj = json.loads(buf)
-                  except Exception:
-                      sys.exit("govulncheck output unreadable")
-                  f = obj.get("finding")
-                  if f and f.get("osv"):
-                      ids.add(f["osv"])
-                  buf = ""
-          bad = sorted(ids - ignore)
-          if bad:
-              print("unignored findings:", bad)
-              sys.exit(1)
-          print("govulncheck clean (ignored:", sorted(ignore), ")")
-          PYEOF
+          sh scripts/govulncheck-filter.sh vuln.json
 
   zizmor:
     runs-on: ubuntu-latest

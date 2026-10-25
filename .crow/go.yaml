@@ -1,0 +1,45 @@
+name: go
+
+when:
+  - event: push
+    branch: main
+  - event: pull_request
+  - event: tag
+  - event: manual
+
+depends_on:
+  - repo-hygiene
+
+variables:
+  - GOTOOLCHAIN: "local"
+
+steps:
+  - name: build
+    image: golang:1.27
+    commands:
+      - go build ./client/... ./management/... ./combined/... ./proxy/... ./signal/... ./relay/... ./shared/... ./idp/... ./util/...
+    environment:
+      GOTOOLCHAIN: local
+
+  - name: vet
+    image: golang:1.27
+    commands:
+      - go vet ./client/internal ./management/... ./proxy/... ./combined/...
+
+  - name: mod-tidy
+    image: golang:1.27
+    commands:
+      - go mod tidy
+      - git diff --exit-code go.mod go.sum
+
+  - name: test-management
+    image: golang:1.27
+    commands:
+      - go test -count=1 -short -timeout 10m ./management/... ./shared/management/...
+    environment:
+      GOTOOLCHAIN: local
+
+  - name: test-others
+    image: golang:1.27
+    commands:
+      - go test -count=1 -short -timeout 10m ./proxy/... ./signal/... ./relay/... ./client/internal/updater/...

@@ -88,6 +88,7 @@ Report vulnerabilities privately: see `SECURITY.md`. Hardening notes:
 | `docs/frontend-supply-chain.md` | Frontend dependency policies |
 | `docs/testing-privileged.md` | Privileged test setup |
 | `docs/custom-domain-validation.md` | Custom domains on the reverse proxy |
+| `docs/ci-crow.md` | Self-hosted Crow CI pipelines |
 | `podman/README.md` | Podman preview stack reference |
 | `proxy/docs/` | Reverse proxy, shield, protocol matrix |
 | `integrations/wazuh/README.md` | Wazuh pack install |

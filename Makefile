@@ -96,3 +96,9 @@ offline-e2e:
 	./scripts/offline-e2e.sh scenario server-back
 	./scripts/offline-e2e.sh scenario revoke
 	./scripts/offline-e2e.sh down
+
+crow-lint:
+	crow lint --strict .crow/
+
+crow-exec:
+	crow exec --workflow .crow/$(WORKFLOW)
