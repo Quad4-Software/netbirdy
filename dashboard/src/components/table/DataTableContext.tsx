@@ -1,6 +1,6 @@
 "use client";
 
-import type { Table as TanStackTable } from "@tanstack/table-core";
+import type { Table as TanStackTable } from "@tanstack/react-table";
 import React, { createContext, useContext } from "react";
 
 const DataTableInstanceContext = createContext<TanStackTable<any> | null>(null);

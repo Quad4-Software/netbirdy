@@ -3,7 +3,7 @@
 import FullTooltip from "@components/FullTooltip";
 import { useDataTable } from "@components/table/DataTableContext";
 import { IconSortAscending, IconSortDescending } from "@tabler/icons-react";
-import type { Column } from "@tanstack/table-core";
+import type { Column } from "@tanstack/react-table";
 import { cn } from "@utils/helpers";
 import React from "react";
 import { useOptionalServerPagination } from "@/contexts/ServerPaginationProvider";

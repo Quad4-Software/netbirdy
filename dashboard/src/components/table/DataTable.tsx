@@ -35,7 +35,7 @@ import {
   useReactTable,
   VisibilityState,
 } from "@tanstack/react-table";
-import { FilterFn } from "@tanstack/table-core";
+import { FilterFn } from "@tanstack/react-table";
 import { cn, removeAllSpaces } from "@utils/helpers";
 import dayjs from "dayjs";
 import { isEqual, trim } from "lodash";

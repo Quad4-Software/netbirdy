@@ -36,3 +36,10 @@ use the same string.
 podman/setup.sh generates podman/.env and podman/config.yaml.
 make podman-build builds both images, make podman-up starts the stack:
 dashboard on :8080, combined server on :8081.
+
+## Published image flag
+
+`test-docker-compose` in test-infrastructure-files.yml pulls the published
+`ghcr.io/sudo-ivan/netbirdy-*` images. The job is gated behind the repository
+variable `NETBIRDY_PUBLISHED_IMAGES=true`; set it after the first image
+release so the job runs again.

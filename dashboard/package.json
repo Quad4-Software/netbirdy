@@ -122,6 +122,9 @@
     "tailwindcss": "^4.3.3",
     "typescript-eslint": "^8.71.1",
     "vite": "^8.3.4",
-    "vitest": "^4.1.10"
+    "vitest": "^4.1.10",
+    "@storybook/react": "10.6.2",
+    "@testing-library/user-event": "14.6.8",
+    "@radix-ui/react-visually-hidden": "1.2.13"
   }
 }

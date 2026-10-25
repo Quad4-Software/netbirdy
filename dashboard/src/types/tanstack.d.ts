@@ -5,9 +5,9 @@ import type {
   RankingInfo,
   RowData,
   SortingFn,
-} from "@tanstack/table-core";
+} from "@tanstack/react-table";
 
-declare module "@tanstack/table-core" {
+declare module "@tanstack/react-table" {
   interface FilterFns {
     fuzzy: FilterFn<unknown>;
     dateRange: FilterFn<unknown>;
