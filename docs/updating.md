@@ -71,3 +71,41 @@ go run ./client/cmd/signer extend-revocation-list \
   --revocation-list-file publickeys/artifact-signatures/keys/revocation-list.json \
   --private-root-key ~/.config/netbirdy-signing/root.key
 ```
+
+## Server updates from the dashboard
+
+The updater sidecar upgrades the Podman stack in place from the Settings
+Updates page or the management API.
+
+### What it does
+
+verify the signed image list against the release root, pull each image
+by digest, stop the server and dashboard in reverse order, back up the
+data volume with a checksum manifest, recreate the containers from the
+new images keeping labels, env, command and healthcheck, wait for
+healthy, and on any failure roll back: remove the new containers,
+rename the previous ones back, restore the data volume, start the old
+set and mark the run rolled_back. The updater never updates itself.
+
+### Enabling it
+
+The updater ships as an optional compose profile:
+
+    podman compose -f podman/compose.yaml --profile updater up -d
+
+setup.sh generates NETBIRDY_UPDATER_TOKEN into podman/.env. The
+management config can point at it via the commented server.updater
+block (url http://netbirdy-updater:8089, token_env
+NETBIRDY_UPDATER_TOKEN). The default socket is the rootless Podman
+socket at ${XDG_RUNTIME_DIR}/podman/podman.sock; on a Docker host use
+the Docker socket path.
+
+### Security model
+
+The socket mount gives the updater host-root equivalent for the user,
+so treat the token as high value. The container publishes no ports and
+only serves the management host. Only images under the configured
+prefix and digests from the root signed list are applied. Backups live
+in the netbirdy-updater-backups volume, pruned to the newest 5, and can
+be restored by hand from the manifest. Status persists in
+backups/status.json.

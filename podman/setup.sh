@@ -75,3 +75,10 @@ echo "  Dashboard:  http://localhost:8080"
 echo "  Server:     http://localhost:8081"
 echo "  OIDC:       http://localhost:8081/oauth2/.well-known/openid-configuration"
 echo "  Owner:      $NB_OWNER_EMAIL / $NB_OWNER_PASSWORD"
+# Generate the updater bearer token once, never printed.
+if ! grep -q '^NETBIRDY_UPDATER_TOKEN=' .env 2>/dev/null; then
+  tok=$(LC_ALL=C tr -dc 'A-Za-z0-9' </dev/urandom | head -c 32)
+  printf 'NETBIRDY_UPDATER_TOKEN=%s\n' "$tok" >> .env
+  echo "generated NETBIRDY_UPDATER_TOKEN in .env"
+fi
+echo "to enable the updater profile: podman compose -f podman/compose.yaml --profile updater up -d"

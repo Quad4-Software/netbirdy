@@ -1,0 +1,17 @@
+# Multi-stage build of the NetBirdy sidecar updater.
+# Build context is the repository root.
+FROM docker.io/library/golang:1.27.2-bookworm AS builder
+WORKDIR /app
+COPY go.mod go.sum ./
+RUN --mount=type=cache,target=/go/pkg/mod go mod download
+COPY . .
+RUN CGO_ENABLED=0 go build -trimpath -ldflags="-s -w" -o /netbirdy-updater ./updater/cmd/netbirdy-updater
+
+# Final stage is scratch: the updater only needs the container socket and CA
+# roots. It runs as the mounted user under rootless Podman.
+FROM scratch
+COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
+COPY --from=builder /netbirdy-updater /netbirdy-updater
+USER 0
+EXPOSE 8089
+ENTRYPOINT ["/netbirdy-updater"]

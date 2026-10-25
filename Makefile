@@ -102,3 +102,6 @@ crow-lint:
 
 crow-exec:
 	crow exec --workflow .crow/$(WORKFLOW)
+
+podman-updater-build:
+	podman build -f podman/Containerfile.updater -t localhost/netbirdy-updater:latest .

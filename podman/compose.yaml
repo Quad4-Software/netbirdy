@@ -65,6 +65,40 @@ services:
     volumes:
       - pocketid-data:/app/backend/data
 
+  updater:
+    profiles: ["updater"]
+    image: localhost/netbirdy-updater:latest
+    build:
+      context: ..
+      dockerfile: podman/Containerfile.updater
+    container_name: netbirdy-updater
+    restart: unless-stopped
+    environment:
+      - UPDATER_TOKEN=${NETBIRDY_UPDATER_TOKEN:?set NETBIRDY_UPDATER_TOKEN}
+      - UPDATER_PROJECT=netbirdy
+      - UPDATER_SERVICES=server,dashboard
+      - UPDATER_IMAGE_PREFIX=${NETBIRDY_IMAGE_PREFIX:-ghcr.io/sudo-ivan/netbirdy-}
+      - UPDATER_DATA_DIR=/data
+      - UPDATER_BACKUP_DIR=/backups
+    volumes:
+      # rootless Podman socket; socket mount is host-root equivalent for the user
+      - ${XDG_RUNTIME_DIR:-/run/user/1000}/podman/podman.sock:/run/podman/podman.sock
+      - netbirdy-server-data:/data
+      - netbirdy-updater-backups:/backups
+    security_opt:
+      - no-new-privileges:true
+      - label=disable # SELinux: socket access needs an unconfined domain
+    cap_drop: ["ALL"]
+    read_only: true
+    tmpfs: ["/tmp"]
+    healthcheck:
+      test: ["CMD", "/netbirdy-updater", "healthcheck"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 5s
+
 volumes:
   netbirdy-server-data:
   pocketid-data:
+  netbirdy-updater-backups:
