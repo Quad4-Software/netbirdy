@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NetBirdy: a self-hosted WireGuard mesh network</title>
+<meta name="description" content="NetBirdy is a self-hosted WireGuard mesh network that stays compatible with NetBird. Black dark theme, offline reconnect, sign-in alarms and a web shield.">
+<link rel="canonical" href="https://sudo-ivan.github.io/netbirdy/">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="color-scheme" content="dark light">
+<meta name="theme-color" content="#0b0a09" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f6f2ea" media="(prefers-color-scheme: light)">
+<meta name="application-name" content="NetBirdy">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="NetBirdy">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="NetBirdy: a self-hosted WireGuard mesh network">
+<meta property="og:description" content="Connect your devices directly and securely with a server you run yourself. Compatible with NetBird clients.">
+<meta property="og:url" content="https://sudo-ivan.github.io/netbirdy/">
+<meta property="og:image" content="https://sudo-ivan.github.io/netbirdy/assets/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="NetBirdy wordmark with the three-node mark on a black background">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="NetBirdy: a self-hosted WireGuard mesh network">
+<meta name="twitter:description" content="Connect your devices directly and securely with a server you run yourself. Compatible with NetBird clients.">
+<meta name="twitter:image" content="https://sudo-ivan.github.io/netbirdy/assets/og-image.png">
+<link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+<link rel="icon" href="assets/icon-192.png" sizes="192x192" type="image/png">
+<link rel="apple-touch-icon" href="assets/apple-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="preload" href="fonts/instrument-sans-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="style.css">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "NetBirdy",
+  "description": "A self-hosted WireGuard mesh network, compatible with NetBird.",
+  "url": "https://sudo-ivan.github.io/netbirdy/",
+  "applicationCategory": "NetworkingApplication",
+  "operatingSystem": "Linux, Windows, macOS",
+  "license": "https://github.com/Sudo-Ivan/netbirdy/blob/main/NOTICE.md",
+  "codeRepository": "https://github.com/Sudo-Ivan/netbirdy",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+}
+</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="nav">
+  <div class="container nav__row">
+    <a class="nav__brand" href="./" aria-label="NetBirdy home">
+      <svg class="nav__mark" viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="M8.5 22.5 14.2 9.4 23.5 22.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="8.5" cy="23.5" r="4.4" fill="currentColor"/><circle cx="14.6" cy="8" r="4.4" fill="currentColor"/><circle cx="23.5" cy="23.5" r="4.4" fill="currentColor"/></svg>
+      NetBirdy
+    </a>
+    <nav class="nav__links" aria-label="Main">
+      <a href="#compare">Compare</a>
+      <a href="#features">Features</a>
+      <a href="https://github.com/Sudo-Ivan/netbirdy">GitHub</a>
+      <a class="btn" href="#start">Get started</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+  <section class="hero">
+    <div class="container hero__grid">
+      <div>
+        <h1>Your own private network</h1>
+        <p class="lead">A self-hosted WireGuard mesh for your devices, compatible with NetBird.</p>
+        <div class="hero__actions">
+          <a class="btn" href="#start">Get started</a>
+          <a class="btn btn--quiet" href="#compare">Compare with NetBird</a>
+        </div>
+      </div>
+      <figure class="well ticks mesh" style="margin:0">
+        <svg viewBox="0 0 560 430" role="img" aria-labelledby="mesh-title mesh-desc">
+          <title id="mesh-title">Four devices linked directly to each other</title>
+          <desc id="mesh-desc">A laptop, a phone, a home lab machine and a cloud server each connect straight to the other three. A dashed line from your NetBirdy server to each device shows coordination only.</desc>
+          <g class="mesh__direct">
+            <path d="M100 215 L460 215"/>
+            <path d="M100 215 L100 345"/>
+            <path d="M460 215 L460 345"/>
+            <path d="M100 345 L460 345"/>
+            <path d="M100 215 L460 345"/>
+            <path d="M460 215 L100 345"/>
+          </g>
+          <g class="mesh__control">
+            <path d="M280 90 L100 190"/>
+            <path d="M280 90 L460 190"/>
+            <path d="M280 90 L280 190 L100 320"/>
+            <path d="M280 90 L460 320"/>
+          </g>
+          <rect class="mesh__server" x="190" y="30" width="180" height="60"/>
+          <text class="mesh__label" x="280" y="56">Your server</text>
+          <text class="mesh__small" x="280" y="76">control panel and sign-in</text>
+          <rect class="mesh__box" x="40" y="190" width="120" height="50"/><text class="mesh__label" x="100" y="220">Laptop</text>
+          <rect class="mesh__box" x="400" y="190" width="120" height="50"/><text class="mesh__label" x="460" y="220">Phone</text>
+          <rect class="mesh__box" x="40" y="320" width="120" height="50"/><text class="mesh__label" x="100" y="350">Home lab</text>
+          <rect class="mesh__box" x="400" y="320" width="120" height="50"/><text class="mesh__label" x="460" y="350">Cloud server</text>
+        </svg>
+        <figcaption class="mesh__caption">
+          <span><i class="mesh__key"></i> Device to device, encrypted</span>
+          <span><i class="mesh__key mesh__key--dashed"></i> Coordination only</span>
+        </figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section class="section" id="how">
+    <div class="container">
+      <div class="section__head">
+        <h2>Three steps to a working network</h2>
+        <p>One server, one client per machine, and rules for access.</p>
+      </div>
+      <ol class="steps">
+        <li><h3>Run the server</h3><p>One stack: panel, sign-in, relay.</p></li>
+        <li><h3>Add your devices</h3><p>Install the client and sign in with a setup key.</p></li>
+        <li><h3>Set the rules</h3><p>Choose which groups can reach which machines.</p></li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="section" id="features">
+    <div class="container">
+      <div class="section__head">
+        <h2>What NetBirdy adds</h2>
+        <p>Everything NetBird does, plus tools for self-hosters.</p>
+      </div>
+      <ul class="rows">
+        <li><h3>Control panel</h3><p>Dark or light theme, a command palette, offline help pages.</p></li>
+        <li><h3>Web shield</h3><p>The reverse proxy slows or blocks scanners and AI crawlers.</p></li>
+        <li><h3>Sign-in alarms</h3><p>Flags new device locations, failed login bursts and key misuse.</p></li>
+        <li><h3>Offline reconnect</h3><p>Clients reconnect to peers after a restart while the server is down.</p></li>
+        <li><h3>Signed updates</h3><p>Signed releases. The server caches client updates and can update itself.</p></li>
+        <li><h3>Run it your way</h3><p>Podman stack, Pocket ID passkeys, Wazuh rules, no usage reports.</p></li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="section section--band" id="compare">
+    <div class="container">
+      <div class="section__head">
+        <h2>NetBirdy and NetBird side by side</h2>
+        <p>Same protocol and clients. The difference is what sits around them.</p>
+      </div>
+      <div class="table-wrap">
+        <table class="compare">
+          <caption>Self-hosted editions, NetBird 0.81.</caption>
+          <thead>
+            <tr><th scope="col">Feature</th><th scope="col" class="us">NetBirdy</th><th scope="col">NetBird</th></tr>
+          </thead>
+          <tbody>
+            <tr><th scope="row">Self-hosted WireGuard mesh</th><td class="us yes" data-label="NetBirdy">Yes</td><td class="yes" data-label="NetBird">Yes</td></tr>
+            <tr><th scope="row">Usage reports to the project</th><td class="us yes" data-label="NetBirdy">Off</td><td data-label="NetBird">On unless disabled</td></tr>
+            <tr><th scope="row">Built-in help in the dashboard</th><td class="us yes" data-label="NetBirdy">Yes, works offline</td><td class="no" data-label="NetBird">Hosted docs site</td></tr>
+            <tr><th scope="row">Reverse proxy shield for scanners and crawlers</th><td class="us yes" data-label="NetBirdy">Yes</td><td class="no" data-label="NetBird">Not included</td></tr>
+            <tr><th scope="row">HTTP/3 on the reverse proxy</th><td class="us yes" data-label="NetBirdy">Yes</td><td class="no" data-label="NetBird">Not included</td></tr>
+            <tr><th scope="row">Sign-in and key anomaly detection</th><td class="us yes" data-label="NetBirdy">Watch or prevent</td><td class="no" data-label="NetBird">Not included</td></tr>
+            <tr><th scope="row">Clients reconnect while the server is down</th><td class="us yes" data-label="NetBirdy">Yes, with limits</td><td class="no" data-label="NetBird">No</td></tr>
+            <tr><th scope="row">Client updates cached on your server</th><td class="us yes" data-label="NetBirdy">Yes, signed</td><td class="no" data-label="NetBird">No</td></tr>
+            <tr><th scope="row">Server updates itself with backup and rollback</th><td class="us yes" data-label="NetBirdy">Optional helper</td><td class="no" data-label="NetBird">Manual</td></tr>
+            <tr><th scope="row">Hosted cloud service</th><td class="us no" data-label="NetBirdy">No</td><td class="yes" data-label="NetBird">Yes</td></tr>
+            <tr><th scope="row">Desktop and phone apps</th><td class="us no" data-label="NetBirdy">NetBird phone apps only</td><td class="yes" data-label="NetBird">Yes</td></tr>
+            <tr><th scope="row">Commercial support</th><td class="us no" data-label="NetBirdy">Community only</td><td class="yes" data-label="NetBird">Yes</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="note">NetBird may add features later. NetBirdy is a young community fork, not affiliated with the NetBird company.</p>
+    </div>
+  </section>
+
+  <section class="section" id="start">
+    <div class="container">
+      <div class="section__head">
+        <h2>Try it on your machine</h2>
+        <p>You need Podman and make.</p>
+      </div>
+      <div class="start__grid">
+        <div class="start__item">
+          <h3>Start the server</h3>
+          <div class="well ticks"><pre class="code" tabindex="0"><code>git clone https://github.com/Sudo-Ivan/netbirdy.git
+cd netbirdy
+make podman-build
+make podman-up
+<span class="c"># panel at http://localhost:8080</span></code></pre></div>
+          <p>Your admin email and password are saved in <code>podman/.env</code>.</p>
+        </div>
+        <div class="start__item">
+          <h3>Connect a device</h3>
+          <div class="well ticks"><pre class="code" tabindex="0"><code>sudo netbirdy up \
+  --management-url http://YOUR-SERVER:8081 \
+  --setup-key YOUR-KEY
+netbirdy status</code></pre></div>
+          <p>Create the key under Setup Keys. Get clients from <a href="https://github.com/Sudo-Ivan/netbirdy/releases">releases</a>.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="container footer__grid">
+    <div>
+      <span class="footer__brand">
+        <svg viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="M8.5 22.5 14.2 9.4 23.5 22.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="8.5" cy="23.5" r="4.4" fill="currentColor"/><circle cx="14.6" cy="8" r="4.4" fill="currentColor"/><circle cx="23.5" cy="23.5" r="4.4" fill="currentColor"/></svg>
+        NetBirdy
+      </span>
+      <p class="footer__fine">An independent fork of NetBird. BSD-3-Clause, with the server and dashboard under AGPL-3.0.</p>
+    </div>
+    <ul class="footer__links">
+      <li><a href="https://github.com/Sudo-Ivan/netbirdy">Source code</a></li>
+      <li><a href="https://github.com/Sudo-Ivan/netbirdy/releases">Releases</a></li>
+      <li><a href="https://github.com/Sudo-Ivan/netbirdy/issues">Issues</a></li>
+      <li><a href="https://github.com/Sudo-Ivan/netbirdy/tree/main/docs">Documentation</a></li>
+      <li><a href="https://github.com/Sudo-Ivan/netbirdy/blob/main/docs/migrating-from-netbird.md">Move from NetBird</a></li>
+      <li><a href="https://github.com/Sudo-Ivan/netbirdy/blob/main/SECURITY.md">Security policy</a></li>
+      <li><a href="https://github.com/Sudo-Ivan/netbirdy/blob/main/NOTICE.md">Licenses</a></li>
+      <li><a href="https://github.com/netbirdio/netbird">NetBird upstream</a></li>
+    </ul>
+  </div>
+</footer>
+
+<script>
+document.querySelectorAll('.code').forEach(function (pre) {
+  if (!navigator.clipboard) return;
+  var btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'copy';
+  btn.textContent = 'Copy';
+  btn.addEventListener('click', function () {
+    navigator.clipboard.writeText(pre.textContent.replace(/\n$/, '')).then(function () {
+      btn.textContent = 'Copied';
+      setTimeout(function () { btn.textContent = 'Copy'; }, 1600);
+    });
+  });
+  pre.parentElement.appendChild(btn);
+});
+</script>
+</body>
+</html>

@@ -61,6 +61,7 @@ hits=$(grep -rn $EXCLUDE '\bNetBird\b\|\bNetbird\b' . \
     | grep -v 'netbird install' \
     | grep -v 'NetBird install' \
     | grep -v '^./README\.md:' \
+    | grep -v '^./site/' \
     | grep -v 'official NetBird mobile apps' \
     || true)
 

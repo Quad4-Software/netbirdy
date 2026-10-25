@@ -6,204 +6,146 @@
   </picture>
 </p>
 
-<p align="center">
-  <b>A private network for your devices that you run yourself.</b><br>
-  Laptops, servers, phones and home lab machines talk to each other directly and securely, from anywhere.
-</p>
+# NetBirdy
 
-<p align="center">
-  <a href="https://github.com/Sudo-Ivan/netbirdy/actions/workflows/golang-test-linux.yml"><img src="https://github.com/Sudo-Ivan/netbirdy/actions/workflows/golang-test-linux.yml/badge.svg" alt="CI"></a>
-</p>
+NetBirdy is a self-hosted WireGuard mesh VPN. It is a fork of
+[NetBird](https://github.com/netbirdio/netbird) that uses the same protocol, so
+NetBird clients can connect to a NetBirdy server and an existing NetBird setup
+can be moved over without re-enrolling devices.
 
-## What is this?
+[![CI](https://github.com/Sudo-Ivan/netbirdy/actions/workflows/golang-test-linux.yml/badge.svg)](https://github.com/Sudo-Ivan/netbirdy/actions/workflows/golang-test-linux.yml)
 
-Imagine all your computers sitting on the same home network, even when one is
-in a datacenter, one is at the office and one is in your backpack. That is what
-NetBirdy gives you. Each device runs a small program, signs in once, and then
-connects straight to your other devices over encrypted WireGuard tunnels. You
-decide who can reach what with simple access rules.
+Website: <https://sudo-ivan.github.io/netbirdy/>
 
-NetBirdy is a community fork of [NetBird](https://github.com/netbirdio/netbird).
-It keeps everything that makes NetBird work, and adds a nicer control panel,
-more protection for your server, and tools for people who run their own
-infrastructure.
+## Differences from NetBird
 
-**Already using NetBird?** You do not have to start over. NetBirdy is a drop-in
-replacement. Your devices, keys and settings keep working, and the official
-NetBird clients can connect to a NetBirdy server because it speaks the same protocol.
+- Dashboard with a black dark theme and a light theme, a command palette, and
+  built-in documentation that works offline. Cloud-only and license-gated
+  pages are removed.
+- Usage reports to the NetBird project are disabled and update checks are opt-in.
+- Reverse proxy shield that detects scanners and crawlers by behavior and
+  slows or blocks them. See [proxy/docs/shield.md](proxy/docs/shield.md).
+- HTTP/3, WebSocket, SSE and gRPC (unary) support in the reverse proxy.
+- Clients cache the network map and management addresses so they can reconnect
+  to peers after a restart while the server is unreachable. See
+  [docs/offline-mode.md](docs/offline-mode.md).
+- Anomaly detection for peer IP changes, concurrent connections, failed logins
+  and setup key misuse, with off, observe and prevent modes. See
+  [docs/security-monitoring.md](docs/security-monitoring.md).
+- JSON audit and security logs, an optional syslog sink, and a Wazuh 4.x rule
+  pack. See [docs/wazuh.md](docs/wazuh.md).
+- Pocket ID setup helper in the dashboard, a compose profile and a script. See
+  [docs/pocket-id.md](docs/pocket-id.md).
+- Signed releases, a server-side cache for client updates, and an optional
+  updater container that backs up and rolls back. See
+  [docs/updating.md](docs/updating.md) and [docs/update-mirror.md](docs/update-mirror.md).
+- Podman stack for local use and testing.
 
-## Why people pick NetBirdy
+## Quick start
 
-**A control panel that is pleasant to use**
-A clean black dark theme and a warm light theme, a quick search and keyboard
-shortcuts (press `?` in the panel to see them), and built-in help pages that
-work without internet access.
-
-**Protection built in**
-- A web shield for services you publish. It spots scanners and crawlers by how
-  they behave and slows them down or blocks them, without bothering real visitors.
-- An alarm for suspicious sign-ins. It notices things like a device suddenly
-  appearing from a new place or many failed logins. It can just tell you, or it
-  can ask for approval before a device is allowed back in.
-- Ready-made rules for [Wazuh](https://wazuh.com), if you already run it for
-  security monitoring.
-
-**Keeps working when the server does not**
-If your server goes offline, devices that are already connected stay connected.
-After a restart they can reconnect to their peers using what they remembered,
-instead of going dark until the server comes back.
-
-**Easy to run yourself**
-- One command starts a complete test setup on your own machine with Podman.
-- Signing in with [Pocket ID](https://pocket-id.org) (passkeys) has a guided setup.
-- NetBirdy turns off the usage reports that NetBird sends to its own servers, and update checks are
-  opt-in. Nothing is sent anywhere unless you turn it on.
-- Updates come from signed releases, and the server can update itself with an
-  optional helper container that makes a backup first and rolls back if
-  something goes wrong.
-
-**Fast, modern web access**
-Publish internal web apps through the built-in reverse proxy, with HTTP/3,
-WebSockets and streaming support.
-
-## Try it in five minutes
-
-You need [Podman](https://podman.io) and `make`.
+The local stack needs Podman and make.
 
 ```sh
 git clone https://github.com/Sudo-Ivan/netbirdy.git
 cd netbirdy
-make podman-build   # builds the server and the control panel
-make podman-up      # creates your settings and starts everything
+make podman-build
+make podman-up
 ```
 
-Then open the control panel at **http://localhost:8080**. Your admin email and a
-generated password are saved in `podman/.env` on your machine.
-
-When you are done:
+The dashboard is at <http://localhost:8080> and the server at
+<http://localhost:8081>. The owner email and password are written to
+`podman/.env`. Other targets:
 
 ```sh
-make podman-down    # stop it
-make podman-clean   # stop it and remove everything it created
+make podman-logs    # follow logs
+make podman-down    # stop the stack
+make podman-clean   # stop and remove containers, volumes and images
 ```
 
-More options (other ports, resetting, running the tests) are in
-[podman/README.md](podman/README.md).
+See [podman/README.md](podman/README.md) for ports, resetting and tests.
 
-## Connect your first device
+## Install the client
 
-1. In the control panel, open **Setup Keys** and create a key.
-2. Install the client on the device. Packages and installers are on the
-   [Releases page](https://github.com/Sudo-Ivan/netbirdy/releases). The program is
-   called `netbirdy`.
-3. Connect it:
-   ```sh
-   sudo netbirdy up --management-url http://YOUR-SERVER:8081 --setup-key YOUR-KEY
-   ```
-4. Run `netbirdy status` to see your other devices.
+Packages and installers are published on the
+[releases page](https://github.com/Sudo-Ivan/netbirdy/releases). The binary is
+named `netbirdy`.
 
-Repeat on every device. Use the **Access Control** page to choose who can talk to whom.
+Create a setup key in the dashboard, then on the device:
 
-Coming from NetBird? Read [Moving from NetBird](docs/migrating-from-netbird.md).
-Installing the NetBirdy package replaces the NetBird one and keeps your existing
-settings.
+```sh
+sudo netbirdy up --management-url http://YOUR-SERVER:8081 --setup-key YOUR-KEY
+netbirdy status
+```
 
-## Questions people ask
+Installing the NetBirdy Linux package replaces the NetBird package and keeps
+`/etc/netbird` and `/var/lib/netbird`. See
+[docs/migrating-from-netbird.md](docs/migrating-from-netbird.md).
 
-**Is this the same as NetBird?**
-It is built on NetBird and speaks the same protocol, so the two work together.
-NetBirdy adds its own look, extra security features and fork-specific tooling.
-It is an independent project and is not affiliated with the NetBird company.
+## Compatibility
 
-**Can I mix NetBird and NetBirdy?**
-Yes. Stock NetBird clients can join a NetBirdy server. Some NetBirdy-only
-features, like offline reconnect and update downloads through your server, only
-work with the NetBirdy client.
+These stay the same as upstream so existing setups keep working:
 
-**Does it send data to anyone?**
-Not by default. The usage reports to NetBird's servers are off, and update
-checking is opt-in. Fonts and help pages are bundled, so the control panel does
-not load anything from third-party sites.
-
-**Is it free?**
-Yes. See the license section below.
-
-**Where do I report a security problem?**
-Privately, as described in [SECURITY.md](SECURITY.md).
-
-## Guides
-
-| I want to | Read |
+| Item | Reason |
 | --- | --- |
-| Move from NetBird | [Moving from NetBird](docs/migrating-from-netbird.md) |
-| Understand what happens when the server is down | [Offline mode](docs/offline-mode.md) |
-| Get alerts about suspicious sign-ins | [Security monitoring](docs/security-monitoring.md) |
-| Send events to Wazuh | [Wazuh](docs/wazuh.md) |
-| Sign in with passkeys | [Pocket ID](docs/pocket-id.md) |
-| Keep the server and clients up to date | [Updating](docs/updating.md) and [Update mirror](docs/update-mirror.md) |
-| Protect published web apps from scanners | [Web shield](proxy/docs/shield.md) |
-| Use my own domain for published apps | [Custom domains](docs/custom-domain-validation.md) |
-| Run the CI checks on my own server | [Crow CI](docs/ci-crow.md) |
-| Maintain a fork or cut a release | [Maintaining](docs/maintaining.md) |
+| Go module path `github.com/netbirdio/netbird` | existing imports |
+| `NB_*` environment variables | existing configuration |
+| `/etc/netbird`, `/var/lib/netbird`, the `netbird` service and user | in-place upgrades |
+| Wire protocol, REST API, setup keys | interoperability with NetBird clients |
+| `X-NetBird-Fwd-*` headers | forwarded identity protocol |
+| Package `Provides`, `Replaces` and `Conflicts: netbird` | package migration |
 
-The full list is in [docs/README.md](docs/README.md). The control panel also has
-built-in help under **Docs**, so many of these guides are one click away.
+Known gaps: NetBirdy does not ship its own phone apps (use the NetBird apps),
+the Windows installer is an exe without the desktop UI, and there is no MSI.
 
-## For developers
+## Documentation
 
-<details>
-<summary>What stays the same as NetBird, and why</summary>
-
-NetBirdy changes names and looks, but keeps the parts that other software
-depends on so upgrades never break:
-
-| Kept as in NetBird | Why |
+| Document | Contents |
 | --- | --- |
-| Go module path `github.com/netbirdio/netbird` | existing imports keep compiling |
-| `NB_*` environment variables | existing configs keep working |
-| `/etc/netbird`, the `netbird` service and user | in-place upgrades |
-| Wire protocol, API and setup keys | works with stock clients |
-| `X-NetBird-Fwd-*` headers | forwarded-identity protocol |
-| Package `Provides`, `Replaces` and `Conflicts: netbird` | package-level migration |
-| `docs.netbird.io` and `pkgs.netbird.io` links where there is no fork equivalent | upstream links keep working |
+| [docs/migrating-from-netbird.md](docs/migrating-from-netbird.md) | Moving from NetBird |
+| [docs/offline-mode.md](docs/offline-mode.md) | Client offline mode and its limits |
+| [docs/security-monitoring.md](docs/security-monitoring.md) | Anomaly detection, audit log, syslog |
+| [docs/wazuh.md](docs/wazuh.md) | Wazuh integration |
+| [docs/pocket-id.md](docs/pocket-id.md) | Pocket ID sign-in |
+| [docs/updating.md](docs/updating.md) | Updating servers, packages and clients |
+| [docs/update-mirror.md](docs/update-mirror.md) | Client update cache on the server |
+| [proxy/docs/](proxy/docs/) | Reverse proxy, shield, protocol support |
+| [docs/custom-domain-validation.md](docs/custom-domain-validation.md) | Custom domains |
+| [docs/maintaining.md](docs/maintaining.md) | Releases and fork maintenance |
+| [docs/ci-crow.md](docs/ci-crow.md) | Crow CI pipelines |
 
-</details>
+The full index is [docs/README.md](docs/README.md).
 
-<details>
-<summary>Repository layout</summary>
+## Repository layout
 
 ```
-client/         the agent that runs on each device (netbirdy)
-client/ui/      desktop app
-management/     control plane with REST and gRPC APIs
-signal/         helps devices find each other
-relay/          carries traffic when devices cannot connect directly
+client/         agent (netbirdy) and desktop UI sources
+management/     control plane, REST and gRPC APIs
+signal/         peer signaling
+relay/          traffic relay
 combined/       all-in-one server binary
-dashboard/      the control panel (Next.js)
-proxy/          reverse proxy with the web shield
-idp/            built-in identity provider (Dex)
-updater/        optional helper that updates the server stack
+dashboard/      web dashboard (Next.js)
+proxy/          reverse proxy and shield
+idp/            embedded identity provider (Dex)
+updater/        optional server updater
 shared/         shared API types and update verification
-podman/         local stack (Containerfiles, compose, setup)
-integrations/   third-party integrations (Wazuh)
+podman/         local stack
+integrations/   Wazuh pack
+site/           project website (GitHub Pages)
 ```
 
-</details>
+## Contributing
 
-Issues and pull requests are welcome at
-[github.com/Sudo-Ivan/netbirdy](https://github.com/Sudo-Ivan/netbirdy). Before
-pushing, run `tools/rebrand/rebrand.sh --check` for naming changes and
-`docs/brand/generate.sh --check` for brand assets.
+Issues and pull requests go to
+[github.com/Sudo-Ivan/netbirdy](https://github.com/Sudo-Ivan/netbirdy). Run
+`tools/rebrand/rebrand.sh --check` after naming changes and
+`docs/brand/generate.sh --check` after brand asset changes. Report security
+problems as described in [SECURITY.md](SECURITY.md).
 
 ## License
 
-NetBirdy is open source. Most of the code is BSD-3-Clause. The server pieces
-(`management/`, `signal/`, `relay/`, `combined/`) and the control panel
-(`dashboard/`) are AGPL-3.0. If you modify and run those parts as a service, you
-must offer your users the source. [NOTICE.md](NOTICE.md) and the `LICENSES/`
-folder have the full texts, the list of changes from NetBird and the source offer.
-
-## Trademark
+BSD-3-Clause, except `management/`, `signal/`, `relay/`, `combined/` and
+`dashboard/`, which are AGPL-3.0. See [NOTICE.md](NOTICE.md) and `LICENSES/` for
+the license texts, the list of changes from NetBird and the AGPL source offer.
 
 NetBird is a trademark of its owner. NetBirdy is an independent fork and is not
 affiliated with or endorsed by the upstream project.
