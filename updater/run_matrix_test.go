@@ -20,6 +20,8 @@ type recEngine struct {
 	calls     []string
 	failOn    map[string]error // method -> error
 	healthBad bool
+	strictCtx bool
+	onHealthy func()
 }
 
 func (r *recEngine) rec(s string) { r.calls = append(r.calls, s) }
@@ -43,11 +45,17 @@ func (r *recEngine) FindContainer(ctx context.Context, p, s string) (ContainerIn
 }
 func (r *recEngine) Stop(ctx context.Context, id string) error {
 	r.rec("stop:" + id)
+	if r.strictCtx && ctx.Err() != nil {
+		return ctx.Err()
+	}
 	return r.failOn["stop"]
 }
 func (r *recEngine) Rename(ctx context.Context, id, n string) error {
 	r.rec("rename:" + n)
-	return r.failOn["rename"]
+	if r.strictCtx && ctx.Err() != nil {
+		return ctx.Err()
+	}
+	return r.failOn["rename:"+n]
 }
 func (r *recEngine) CreateLike(ctx context.Context, o ContainerInfo, img, n string) (string, error) {
 	r.rec("create:" + n)
@@ -58,16 +66,28 @@ func (r *recEngine) CreateLike(ctx context.Context, o ContainerInfo, img, n stri
 }
 func (r *recEngine) Start(ctx context.Context, id string) error {
 	r.rec("start:" + id)
+	if r.strictCtx && ctx.Err() != nil {
+		return ctx.Err()
+	}
 	return r.failOn["start:"+id]
 }
 func (r *recEngine) WaitHealthy(ctx context.Context, id string, d time.Duration) error {
 	r.rec("healthy:" + id)
+	if r.onHealthy != nil {
+		r.onHealthy()
+	}
 	if r.healthBad {
 		return errors.New("unhealthy")
 	}
 	return nil
 }
-func (r *recEngine) Remove(ctx context.Context, id string) error { r.rec("remove:" + id); return nil }
+func (r *recEngine) Remove(ctx context.Context, id string) error {
+	r.rec("remove:" + id)
+	if r.strictCtx && ctx.Err() != nil {
+		return ctx.Err()
+	}
+	return nil
+}
 
 func deps(cfg Config, eng *recEngine, imgs map[string]string) Deps {
 	return Deps{
@@ -94,8 +114,8 @@ func TestHappyPathOrder(t *testing.T) {
 	RunUpdate(context.Background(), st, "v2.0.0", deps(cfg, eng, imgs))
 	got := eng.calls
 	// reverse stop order, forward create/start
-	wantOrder := []string{"exists", "exists", "find:dashboard", "stop:id-dashboard", "rename:p-dashboard-prev",
-		"find:server", "stop:id-server", "rename:p-server-prev",
+	wantOrder := []string{"exists", "exists", "find:dashboard", "stop:id-dashboard",
+		"find:server", "stop:id-server", "rename:p-dashboard-prev", "rename:p-server-prev",
 		"create:p-server", "start:new-id-server", "create:p-dashboard", "start:new-id-dashboard",
 		"healthy:new-id-server", "healthy:new-id-dashboard", "remove:id-server", "remove:id-dashboard"}
 	if fmt.Sprint(got) != fmt.Sprint(wantOrder) {
