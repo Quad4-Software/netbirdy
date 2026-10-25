@@ -42,13 +42,13 @@ assert_network() {
   fi
 }
 
-assert_network deployment_netbird
-COMPOSE_PROJECT_NAME=env-project assert_network env-project_netbird
+assert_network deployment_netbirdy
+COMPOSE_PROJECT_NAME=env-project assert_network env-project_netbirdy
 echo 'COMPOSE_PROJECT_NAME=file-project' >.env
-assert_network file-project_netbird
-COMPOSE_PROJECT_NAME=env-project assert_network cli-project_netbird -p cli-project
+assert_network file-project_netbirdy
+COMPOSE_PROJECT_NAME=env-project assert_network cli-project_netbirdy -p cli-project
 : >.env
 echo 'name: config-project' >>docker-compose.yml
-assert_network config-project_netbird
+assert_network config-project_netbirdy
 
 echo "Passed 5 Compose network scoping cases."

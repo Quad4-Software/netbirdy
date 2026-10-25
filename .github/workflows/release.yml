@@ -443,10 +443,10 @@ jobs:
   redhat_certification:
     name: "Red Hat"
     needs: release
-    if: (|) && github.repository == 'netbirdio/netbird'
-      github.repository == 'netbirdio/netbird' &&
-      startsWith(github.ref, 'refs/tags/v') &&
-      !contains(github.ref_name, '-')
+    if: >-
+      github.repository == 'netbirdio/netbird'
+      && startsWith(github.ref, 'refs/tags/v')
+      && !contains(github.ref_name, '-')
     permissions:
       contents: read
     uses: ./.github/workflows/redhat-certify.yml

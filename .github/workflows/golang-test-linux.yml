@@ -343,7 +343,6 @@ jobs:
           cache: false
 
       - name: Install dependencies
-        if: steps.cache.outputs.cache-hit != 'true'
         run: sudo apt update && sudo apt install -y gcc-multilib g++-multilib libc6-dev-i386
 
       - name: Get Go environment
@@ -460,7 +459,6 @@ jobs:
           cache: false
 
       - name: Install dependencies
-        if: steps.cache.outputs.cache-hit != 'true'
         run: sudo apt update && sudo apt install -y gcc-multilib g++-multilib libc6-dev-i386
 
       - name: Get Go environment
