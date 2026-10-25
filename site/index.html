@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>NetBirdy: a self-hosted WireGuard mesh network</title>
-<meta name="description" content="NetBirdy is a self-hosted WireGuard mesh network that stays compatible with NetBird. Black dark theme, offline reconnect, sign-in alarms and a web shield.">
+<title>NetBirdy: self-hosted WireGuard mesh VPN, a NetBird fork</title>
+<meta name="description" content="NetBirdy is a self-hosted WireGuard mesh VPN. It is a fork of NetBird and works with NetBird clients. A personal project.">
 <link rel="canonical" href="https://sudo-ivan.github.io/netbirdy/">
 <meta name="robots" content="index, follow, max-image-preview:large">
 <meta name="color-scheme" content="dark light">
@@ -14,16 +14,16 @@
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="NetBirdy">
 <meta property="og:locale" content="en_US">
-<meta property="og:title" content="NetBirdy: a self-hosted WireGuard mesh network">
-<meta property="og:description" content="Connect your devices directly and securely with a server you run yourself. Compatible with NetBird clients.">
+<meta property="og:title" content="NetBirdy: self-hosted WireGuard mesh VPN, a NetBird fork">
+<meta property="og:description" content="A fork of NetBird that works with NetBird clients. Personal project.">
 <meta property="og:url" content="https://sudo-ivan.github.io/netbirdy/">
 <meta property="og:image" content="https://sudo-ivan.github.io/netbirdy/assets/og-image.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="NetBirdy wordmark with the three-node mark on a black background">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="NetBirdy: a self-hosted WireGuard mesh network">
-<meta name="twitter:description" content="Connect your devices directly and securely with a server you run yourself. Compatible with NetBird clients.">
+<meta name="twitter:title" content="NetBirdy: self-hosted WireGuard mesh VPN, a NetBird fork">
+<meta name="twitter:description" content="A fork of NetBird that works with NetBird clients. Personal project.">
 <meta name="twitter:image" content="https://sudo-ivan.github.io/netbirdy/assets/og-image.png">
 <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
 <link rel="icon" href="assets/icon-192.png" sizes="192x192" type="image/png">
@@ -36,7 +36,7 @@
   "@context": "https://schema.org",
   "@type": "SoftwareApplication",
   "name": "NetBirdy",
-  "description": "A self-hosted WireGuard mesh network, compatible with NetBird.",
+  "description": "A self-hosted WireGuard mesh VPN. A fork of NetBird.",
   "url": "https://sudo-ivan.github.io/netbirdy/",
   "applicationCategory": "NetworkingApplication",
   "operatingSystem": "Linux, Windows, macOS",
@@ -68,12 +68,13 @@
   <section class="hero">
     <div class="container hero__grid">
       <div>
-        <h1>Your own private network</h1>
-        <p class="lead">A self-hosted WireGuard mesh for your devices, compatible with NetBird.</p>
+        <h1>A self-hosted WireGuard mesh VPN</h1>
+        <p class="lead">A fork of NetBird that works with NetBird clients.</p>
         <div class="hero__actions">
           <a class="btn" href="download/">Download</a>
           <a class="btn btn--quiet" href="#compare">Compare with NetBird</a>
         </div>
+        <p class="fine">Personal fork made with LLM help, for me, friends and family.</p>
       </div>
       <figure class="well ticks mesh" style="margin:0">
         <svg viewBox="0 0 560 430" role="img" aria-labelledby="mesh-title mesh-desc">
@@ -112,13 +113,13 @@
   <section class="section" id="how">
     <div class="container">
       <div class="section__head">
-        <h2>Three steps to a working network</h2>
-        <p>One server, one client per machine, and rules for access.</p>
+        <h2>Setup</h2>
+        <p>One server, one client per machine.</p>
       </div>
       <ol class="steps">
-        <li><h3>Run the server</h3><p>One stack: panel, sign-in, relay.</p></li>
-        <li><h3>Add your devices</h3><p>Install the client and sign in with a setup key.</p></li>
-        <li><h3>Set the rules</h3><p>Choose which groups can reach which machines.</p></li>
+        <li><h3>Run the server</h3><p>Start the container stack.</p></li>
+        <li><h3>Install the client</h3><p>Install netbirdy and join with a setup key.</p></li>
+        <li><h3>Set access rules</h3><p>Choose which groups reach which machines.</p></li>
       </ol>
     </div>
   </section>
@@ -126,16 +127,16 @@
   <section class="section" id="features">
     <div class="container">
       <div class="section__head">
-        <h2>What NetBirdy adds</h2>
-        <p>Everything NetBird does, plus tools for self-hosters.</p>
+        <h2>Differences from NetBird</h2>
+        <p>The rest matches NetBird.</p>
       </div>
       <ul class="rows">
-        <li><h3>Control panel</h3><p>Dark or light theme, a command palette, offline help pages.</p></li>
-        <li><h3>Web shield</h3><p>The reverse proxy slows or blocks scanners and AI crawlers.</p></li>
-        <li><h3>Sign-in alarms</h3><p>Flags new device locations, failed login bursts and key misuse.</p></li>
+        <li><h3>Dashboard</h3><p>Dark and light themes, a command palette and built-in help that works offline.</p></li>
+        <li><h3>Reverse proxy</h3><p>Slows or blocks scanners and AI crawlers. Supports HTTP/3.</p></li>
+        <li><h3>Anomaly detection</h3><p>Flags new peer locations, failed login bursts and setup key misuse. Can require approval.</p></li>
         <li><h3>Offline reconnect</h3><p>Clients reconnect to peers after a restart while the server is down.</p></li>
-        <li><h3>Signed updates</h3><p>Signed releases. The server caches client updates and can update itself.</p></li>
-        <li><h3>Run it your way</h3><p>Podman stack, Pocket ID passkeys, Wazuh rules, no usage reports.</p></li>
+        <li><h3>Updates</h3><p>Releases are signed. The server can cache client updates and update itself.</p></li>
+        <li><h3>Other</h3><p>Podman stack, Pocket ID setup, Wazuh rules. No usage reports are sent upstream.</p></li>
       </ul>
     </div>
   </section>
@@ -143,8 +144,8 @@
   <section class="section section--band" id="compare">
     <div class="container">
       <div class="section__head">
-        <h2>NetBirdy and NetBird side by side</h2>
-        <p>Same protocol and clients. The difference is what sits around them.</p>
+        <h2>NetBirdy and NetBird</h2>
+        <p>Same protocol and clients.</p>
       </div>
       <div class="table-wrap">
         <table class="compare">
@@ -153,7 +154,6 @@
             <tr><th scope="col">Feature</th><th scope="col" class="us">NetBirdy</th><th scope="col">NetBird</th></tr>
           </thead>
           <tbody>
-            <tr><th scope="row">Self-hosted WireGuard mesh</th><td class="us yes" data-label="NetBirdy">Yes</td><td class="yes" data-label="NetBird">Yes</td></tr>
             <tr><th scope="row">Usage reports to the project</th><td class="us yes" data-label="NetBirdy">Off</td><td data-label="NetBird">On unless disabled</td></tr>
             <tr><th scope="row">Built-in help in the dashboard</th><td class="us yes" data-label="NetBirdy">Yes, works offline</td><td class="no" data-label="NetBird">Hosted docs site</td></tr>
             <tr><th scope="row">Reverse proxy shield for scanners and crawlers</th><td class="us yes" data-label="NetBirdy">Yes</td><td class="no" data-label="NetBird">Not included</td></tr>
@@ -168,14 +168,14 @@
           </tbody>
         </table>
       </div>
-      <p class="note">NetBird may add features later. NetBirdy is a young community fork, not affiliated with the NetBird company.</p>
+      <p class="note">NetBird may add features later. NetBirdy is a small personal fork and is not affiliated with the NetBird company.</p>
     </div>
   </section>
 
   <section class="section" id="start">
     <div class="container">
       <div class="section__head">
-        <h2>Try it on your machine</h2>
+        <h2>Install</h2>
         <p>You need Podman and make.</p>
       </div>
       <div class="start__grid">

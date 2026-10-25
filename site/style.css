@@ -28,9 +28,10 @@
 
 .hero { padding-block: var(--space-3xl) var(--section-gap-s); }
 .hero__grid { display: grid; grid-template-columns: minmax(0, 6fr) minmax(0, 6fr); gap: var(--space-2xl); align-items: center; }
-.hero h1 { max-width: 11ch; }
+.hero h1 { max-width: 14ch; font-size: var(--text-display-s); }
 .hero .lead { margin-top: var(--space-lg); color: var(--color-ink-2); }
 .hero__actions { display: flex; flex-wrap: wrap; gap: var(--space-sm); margin-top: var(--space-xl); }
+.fine { margin-top: var(--space-lg); color: var(--color-muted); font-size: var(--text-sm); max-width: 44ch; }
 
 .well { position: relative; background: var(--color-paper-2); border: var(--rule-hair) solid var(--color-rule); }
 .ticks::before, .ticks::after { content: ""; position: absolute; width: 12px; height: 12px; border: 0 solid var(--color-muted); pointer-events: none; z-index: var(--z-raised); }
