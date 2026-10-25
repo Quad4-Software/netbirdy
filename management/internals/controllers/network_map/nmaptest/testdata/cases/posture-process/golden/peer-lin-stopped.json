@@ -3,7 +3,7 @@
   "peerConfig": {
     "address": "100.64.0.2/10",
     "sshConfig": {},
-    "fqdn": "peer-lin-stopped.netbird.test",
+    "fqdn": "peer-lin-stopped.netbirdy.test",
     "autoUpdate": {}
   },
   "remotePeersIsEmpty": true,
@@ -11,10 +11,10 @@
     "ServiceEnable": true,
     "CustomZones": [
       {
-        "Domain": "netbird.test.",
+        "Domain": "netbirdy.test.",
         "Records": [
           {
-            "Name": "peer-lin-stopped.netbird.test",
+            "Name": "peer-lin-stopped.netbirdy.test",
             "Type": "1",
             "Class": "IN",
             "TTL": "300",

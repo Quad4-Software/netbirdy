@@ -61,7 +61,7 @@ func parseOpenAIData(body []byte) ([]listedModel, error) {
 // profiles alongside its regional ones.
 //
 // Only ACTIVE profiles are offered: AWS reports others, and registering one
-// would produce a model that routes inside NetBird and fails at AWS.
+// would produce a model that routes inside NetBirdy and fails at AWS.
 func parseBedrockInferenceProfiles(body []byte) ([]listedModel, error) {
 	var doc struct {
 		Summaries []struct {

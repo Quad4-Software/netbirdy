@@ -258,7 +258,7 @@ func TestProcessCheck_Validate(t *testing.T) {
 					{
 						LinuxPath:   "/usr/local/bin/netbird",
 						MacPath:     "/usr/local/bin/netbird",
-						WindowsPath: "C:\\ProgramData\\NetBird\\netbird.exe",
+						WindowsPath: "C:\\ProgramData\\NetBirdy\\netbird.exe",
 					},
 				},
 			},
@@ -280,7 +280,7 @@ func TestProcessCheck_Validate(t *testing.T) {
 			check: ProcessCheck{
 				Processes: []Process{
 					{
-						MacPath: "/Applications/NetBird.app/Contents/MacOS/netbird",
+						MacPath: "/Applications/NetBirdy.app/Contents/MacOS/netbird",
 					},
 				},
 			},
@@ -291,7 +291,7 @@ func TestProcessCheck_Validate(t *testing.T) {
 			check: ProcessCheck{
 				Processes: []Process{
 					{
-						WindowsPath: "C:\\ProgramData\\NetBird\\netbird.exe",
+						WindowsPath: "C:\\ProgramData\\NetBirdy\\netbird.exe",
 					},
 				},
 			},

@@ -27,12 +27,13 @@ func (m *mockRoundTripper) RoundTrip(req *http.Request) (*http.Response, error) 
 	m.callCount.Add(1)
 
 	var body string
-	if strings.Contains(req.URL.String(), "pkgs.netbird.io") {
-		// Plain text response for management version
-		body = m.managementVersion
-	} else if strings.Contains(req.URL.String(), "github.com") {
+	if strings.Contains(req.URL.String(), "dashboard") {
 		// JSON response for dashboard version
 		jsonResp, _ := json.Marshal(githubRelease{TagName: "v" + m.dashboardVersion})
+		body = string(jsonResp)
+	} else if strings.Contains(req.URL.String(), "github.com") || strings.Contains(req.URL.String(), "netbirdy") {
+		// JSON response for management version
+		jsonResp, _ := json.Marshal(githubRelease{TagName: "v" + m.managementVersion})
 		body = string(jsonResp)
 	}
 

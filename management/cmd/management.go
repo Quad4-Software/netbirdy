@@ -45,7 +45,7 @@ var (
 
 	mgmtCmd = &cobra.Command{
 		Use:   "management",
-		Short: "start NetBird Management Server",
+		Short: "start NetBirdy Management Server",
 		PreRunE: func(cmd *cobra.Command, args []string) error {
 			flag.Parse()
 
@@ -278,7 +278,7 @@ func ApplyEmbeddedIdPConfig(ctx context.Context, cfg *nbconfig.Config) error {
 	cfg.HttpConfig.AuthIssuer = issuer
 	cfg.HttpConfig.AuthAudience = "netbird-dashboard"
 	cfg.HttpConfig.AuthClientID = cfg.HttpConfig.AuthAudience
-	cfg.HttpConfig.CLIAuthAudience = "netbird-cli"
+	cfg.HttpConfig.CLIAuthAudience = "netbirdy-cli"
 	cfg.HttpConfig.AuthUserIDClaim = "sub"
 	cfg.HttpConfig.AuthKeysLocation = issuer + "/keys"
 	cfg.HttpConfig.OIDCConfigEndpoint = issuer + "/.well-known/openid-configuration"

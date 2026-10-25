@@ -4,15 +4,15 @@ ARG TARGETPLATFORM
 ARG VERSION=dev
 ARG RELEASE=1
 
-LABEL name="netbird-signal" \
-      maintainer="NetBird <dev@netbird.io>" \
+LABEL name="netbirdy-signal" \
+      maintainer="NetBirdy <dev@netbird.io>" \
       vendor="NetBird GmbH" \
       version="${VERSION}" \
       release="${RELEASE}" \
-      summary="NetBird Signal" \
-      description="NetBird Signal brokers the connection handshakes between peers in NetBird networks."
+      summary="NetBirdy Signal" \
+      description="NetBirdy Signal brokers the connection handshakes between peers in NetBirdy networks."
 
-COPY --chmod=0555 ${TARGETPLATFORM}/netbird-signal /go/bin/netbird-signal
+COPY --chmod=0555 ${TARGETPLATFORM}/netbirdy-signal /go/bin/netbirdy-signal
 COPY licenses/ /licenses/
 # Only the data directory shares the root group for arbitrary non-root UIDs.
 # Runtime-created Let's Encrypt keys retain the application's restrictive modes.
@@ -34,5 +34,5 @@ ENV NB_LETSENCRYPT_LISTEN_ADDRESS=""
 EXPOSE 10000 9090
 # The signal server only handles SIGINT for a graceful stop.
 STOPSIGNAL SIGINT
-ENTRYPOINT ["/go/bin/netbird-signal", "run"]
+ENTRYPOINT ["/go/bin/netbirdy-signal", "run"]
 CMD ["--log-file", "console"]

@@ -3,7 +3,7 @@ servers:
   - url: /api/v1alpha1
     description: Default server
 info:
-  title: NetBird REST API
+  title: NetBirdy REST API
   description: API to manipulate groups, rules, policies and retrieve information about peers and users
   version: 1.0.0-alpha1
 tags:
@@ -295,7 +295,7 @@ components:
               type: boolean
               example: true
             last_seen:
-              description: Last time peer connected to Netbird's management service
+              description: Last time peer connected to NetBirdy's management service
               type: string
               format: date-time
               example: "2023-05-05T10:05:26.420578Z"
@@ -464,7 +464,7 @@ components:
           type: string
           example: Tom Schulz
         role:
-          description: User's NetBird account role
+          description: User's NetBirdy account role
           type: string
           example: admin
         status:
@@ -535,7 +535,7 @@ components:
           type: string
           example: Tom Schulz
         role:
-          description: User's NetBird account role
+          description: User's NetBirdy account role
           type: string
           example: admin
         auto_groups:
@@ -556,7 +556,7 @@ components:
       type: object
       properties:
         role:
-          description: User's NetBird account role
+          description: User's NetBirdy account role
           type: string
           example: admin
         auto_groups:

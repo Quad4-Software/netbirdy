@@ -226,7 +226,7 @@ func synthZoneRData(sync *nbproto.SyncResponse, clusterAddr, fqdn string) string
 }
 
 // seedPrivateProxyCluster registers a connected proxy with private capabilities in a
-// netbird client for clusterAddr, matching what a real deployment looks like
+// netbirdy client for clusterAddr, matching what a real deployment looks like
 // when the account bootstraps: the agent-network gateway service is always
 // private, so its cluster has to be one that can serve private services.
 func seedPrivateProxyCluster(t *testing.T, st store.Store, clusterAddr string) {

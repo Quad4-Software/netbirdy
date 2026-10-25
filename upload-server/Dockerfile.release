@@ -1,4 +1,4 @@
 FROM gcr.io/distroless/base:debug
-ENTRYPOINT [ "/go/bin/netbird-upload" ]
+ENTRYPOINT [ "/go/bin/netbirdy-upload" ]
 ARG TARGETPLATFORM
-COPY ${TARGETPLATFORM}/netbird-upload /go/bin/netbird-upload
+COPY ${TARGETPLATFORM}/netbirdy-upload /go/bin/netbirdy-upload

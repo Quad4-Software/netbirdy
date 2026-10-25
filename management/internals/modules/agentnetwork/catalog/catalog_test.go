@@ -57,13 +57,13 @@ func TestAgentgatewayCatalogEntry(t *testing.T) {
 	assert.Equal(t, "/v1/models", entry.Discovery.Path)
 	assert.Equal(t, ShapeOpenAIData, entry.Discovery.Shape)
 	assert.True(t, entry.Discovery.ExactModelsOnly,
-		"wildcard model semantics are not supported by NetBird")
+		"wildcard model semantics are not supported by NetBirdy")
 
 	require.NotNil(t, entry.IdentityInjection)
 	require.NotNil(t, entry.IdentityInjection.HeaderPair)
 	assert.Nil(t, entry.IdentityInjection.JSONMetadata)
 	assert.False(t, entry.IdentityInjection.HeaderPair.Customizable,
-		"NetBird identity header names are part of the integration contract")
+		"NetBirdy identity header names are part of the integration contract")
 	assert.Equal(t, "x-netbird-user-id", entry.IdentityInjection.HeaderPair.EndUserIDHeader)
 	assert.Equal(t, "x-netbird-groups", entry.IdentityInjection.HeaderPair.TagsHeader)
 	assert.False(t, entry.IdentityInjection.HeaderPair.EndUserIDInBody)

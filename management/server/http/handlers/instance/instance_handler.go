@@ -90,7 +90,7 @@ func (h *handler) setup(w http.ResponseWriter, r *http.Request) {
 	util.WriteJSONObject(ctx, w, resp)
 }
 
-// getVersionInfo returns version information for NetBird components.
+// getVersionInfo returns version information for NetBirdy components.
 // This endpoint requires authentication.
 func (h *handler) getVersionInfo(w http.ResponseWriter, r *http.Request) {
 	versionInfo, err := h.instanceManager.GetVersionInfo(r.Context())

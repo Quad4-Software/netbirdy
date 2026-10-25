@@ -3,7 +3,7 @@
   "peerConfig": {
     "address": "100.64.0.2/10",
     "sshConfig": {},
-    "fqdn": "peer-badgeo.netbird.test",
+    "fqdn": "peer-badgeo.netbirdy.test",
     "autoUpdate": {}
   },
   "remotePeersIsEmpty": true,
@@ -11,10 +11,10 @@
     "ServiceEnable": true,
     "CustomZones": [
       {
-        "Domain": "netbird.test.",
+        "Domain": "netbirdy.test.",
         "Records": [
           {
-            "Name": "peer-badgeo.netbird.test",
+            "Name": "peer-badgeo.netbirdy.test",
             "Type": "1",
             "Class": "IN",
             "TTL": "300",

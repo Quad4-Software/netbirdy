@@ -1440,7 +1440,7 @@ func TestValidateTargetReferences_ClusterTargetSkipsLookup(t *testing.T) {
 // TestValidateTargetReferences_ClusterTargetRequiresDirectUpstream pins the
 // store-side check that cluster targets must opt into the host-stack dial
 // path. Without DirectUpstream the proxy would route this target through
-// the embedded NetBird client and fail on every request.
+// the embedded NetBirdy client and fail on every request.
 func TestValidateTargetReferences_ClusterTargetRequiresDirectUpstream(t *testing.T) {
 	ctx := context.Background()
 	ctrl := gomock.NewController(t)

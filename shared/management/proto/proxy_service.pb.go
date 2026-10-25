@@ -337,8 +337,8 @@ type ProxyCapabilities struct {
 	RequireSubdomain *bool `protobuf:"varint,2,opt,name=require_subdomain,json=requireSubdomain,proto3,oneof" json:"require_subdomain,omitempty"`
 	// Whether the proxy has CrowdSec configured and can enforce IP reputation checks.
 	SupportsCrowdsec *bool `protobuf:"varint,3,opt,name=supports_crowdsec,json=supportsCrowdsec,proto3,oneof" json:"supports_crowdsec,omitempty"`
-	// Whether the proxy is running embedded in the netbird client and serving
-	// exclusively over the WireGuard tunnel (i.e. `netbird proxy` rather than
+	// Whether the proxy is running embedded in the netbirdy client and serving
+	// exclusively over the WireGuard tunnel (i.e. `netbirdy proxy` rather than
 	// the standalone netbird-proxy binary). Surfaces upstream so dashboards can
 	// distinguish per-peer / private clusters from centralised ones.
 	Private *bool `protobuf:"varint,4,opt,name=private,proto3,oneof" json:"private,omitempty"`

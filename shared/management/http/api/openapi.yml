@@ -3,7 +3,7 @@ servers:
   - url: https://api.netbird.io
     description: Default server
 info:
-  title: NetBird REST API
+  title: NetBirdy REST API
   description: API to manipulate groups, rules, policies and retrieve information about peers and users
   version: 0.0.1
 tags:
@@ -385,7 +385,7 @@ components:
           type: boolean
           example: false
         agent_network_only:
-          description: Limits the dashboard to the Agent Network surface for this account. Set for accounts created via netbird.ai signups and can be disabled later. Enabling this requires dashboard_features.agent_network to be true in the same request.
+          description: Limits the dashboard to the Agent Network surface for this account. Set for accounts created via netbirdy.ai signups and can be disabled later. Enabling this requires dashboard_features.agent_network to be true in the same request.
           type: boolean
           example: false
         dashboard_features:
@@ -486,7 +486,7 @@ components:
           type: string
           example: Tom Schulz
         role:
-          description: User's NetBird account role
+          description: User's NetBirdy account role
           type: string
           example: admin
         status:
@@ -568,7 +568,7 @@ components:
       type: object
       properties:
         role:
-          description: User's NetBird account role
+          description: User's NetBirdy account role
           type: string
           example: admin
         auto_groups:
@@ -597,7 +597,7 @@ components:
           type: string
           example: Tom Schulz
         role:
-          description: User's NetBird account role
+          description: User's NetBirdy account role
           type: string
           example: admin
         auto_groups:
@@ -627,7 +627,7 @@ components:
           type: string
           example: John Doe
         role:
-          description: User's NetBird account role
+          description: User's NetBirdy account role
           type: string
           example: user
         auto_groups:
@@ -662,7 +662,7 @@ components:
           type: string
           example: John Doe
         role:
-          description: User's NetBird account role
+          description: User's NetBirdy account role
           type: string
           example: user
         auto_groups:
@@ -874,7 +874,7 @@ components:
               type: boolean
               example: true
             last_seen:
-              description: Last time peer connected to Netbird's management service
+              description: Last time peer connected to NetBirdy's management service
               type: string
               format: date-time
               example: "2023-05-05T10:05:26.420578Z"
@@ -1116,7 +1116,7 @@ components:
               type: boolean
               example: true
             last_seen:
-              description: Last time peer connected to Netbird's management service
+              description: Last time peer connected to NetBirdy's management service
               type: string
               format: date-time
               example: "2023-05-05T10:05:26.420578Z"
@@ -1462,7 +1462,7 @@ components:
         protocol:
           description: Policy rule type of the traffic
           type: string
-          enum: [ "all", "tcp", "udp", "icmp", "netbird-ssh" ]
+          enum: [ "all", "tcp", "udp", "icmp", "netbirdy-ssh" ]
           example: "tcp"
         ports:
           description: Policy rule affected ports. Mutually exclusive with `port_ranges`. A rule accepts either individual ports or port ranges, not both.
@@ -1674,7 +1674,7 @@ components:
         description:
           description: Posture check friendly description
           type: string
-          example: This checks if the peer is running required NetBird's version
+          example: This checks if the peer is running required NetBirdy's version
         checks:
           $ref: '#/components/schemas/Checks'
       required:
@@ -1698,7 +1698,7 @@ components:
         certificate_check:
           $ref: '#/components/schemas/CertificateCheck'
     NBVersionCheck:
-      description: Posture check for the version of NetBird
+      description: Posture check for the version of NetBirdy
       type: object
       $ref: '#/components/schemas/MinVersionCheck'
     OSVersionCheck:
@@ -1805,15 +1805,15 @@ components:
         linux_path:
           description: Path to the process executable file in a Linux operating system
           type: string
-          example: "/usr/local/bin/netbird"
+          example: "/usr/local/bin/netbirdy"
         mac_path:
           description: Path to the process executable file in a Mac operating system
           type: string
-          example: "/Applications/NetBird.app/Contents/MacOS/netbird"
+          example: "/Applications/NetBirdy.app/Contents/MacOS/netbirdy"
         windows_path:
           description: Path to the process executable file in a Windows operating system
           type: string
-          example: "C:\ProgramData\NetBird\netbird.exe"
+          example: "C:\ProgramData\NetBirdy\netbirdy.exe"
     CertificateCheck:
       description: Posture check for a certificate held by the peer that chains to one of the given CA certificates. Not supported on mobile devices (iOS and Android), which always fail this check and are denied access
       type: object
@@ -1883,7 +1883,7 @@ components:
         description:
           description: Posture check friendly description
           type: string
-          example: This checks if the peer is running required NetBird's version
+          example: This checks if the peer is running required NetBirdy's version
         checks:
           $ref: '#/components/schemas/Checks'
       required:
@@ -2946,14 +2946,14 @@ components:
           $ref: '#/components/schemas/ServiceMeta'
         private:
           type: boolean
-          description: When true, the service is NetBird-only — its target points at a proxy cluster, inbound peers authenticate via their WireGuard tunnel identity (no OIDC), and an ACL policy is auto-generated from access_groups to the cluster's proxy-peer group. Requires mode=http.
+          description: When true, the service is NetBirdy-only — its target points at a proxy cluster, inbound peers authenticate via their WireGuard tunnel identity (no OIDC), and an ACL policy is auto-generated from access_groups to the cluster's proxy-peer group. Requires mode=http.
           default: false
           example: false
         access_groups:
           type: array
           items:
             type: string
-          description: NetBird group IDs whose peers may reach this private service over the tunnel. Required when private=true; ignored otherwise. Mutually exclusive with bearer auth (SSO).
+          description: NetBirdy group IDs whose peers may reach this private service over the tunnel. Required when private=true; ignored otherwise. Mutually exclusive with bearer auth (SSO).
           example: ["group-engineering"]
       required:
         - id
@@ -3037,14 +3037,14 @@ components:
           $ref: '#/components/schemas/AccessRestrictions'
         private:
           type: boolean
-          description: When true, the service is NetBird-only — its target points at a proxy cluster, inbound peers authenticate via their WireGuard tunnel identity (no OIDC), and an ACL policy is auto-generated from access_groups to the cluster's proxy-peer group. Requires mode=http.
+          description: When true, the service is NetBirdy-only — its target points at a proxy cluster, inbound peers authenticate via their WireGuard tunnel identity (no OIDC), and an ACL policy is auto-generated from access_groups to the cluster's proxy-peer group. Requires mode=http.
           default: false
           example: false
         access_groups:
           type: array
           items:
             type: string
-          description: NetBird group IDs whose peers may reach this private service over the tunnel. Required when private=true; ignored otherwise. Mutually exclusive with bearer auth (SSO).
+          description: NetBirdy group IDs whose peers may reach this private service over the tunnel. Required when private=true; ignored otherwise. Mutually exclusive with bearer auth (SSO).
           example: ["group-engineering"]
       required:
         - name
@@ -3088,7 +3088,7 @@ components:
           type: boolean
           description: |
             When true, the proxy dials this target via the host's network stack
-            instead of through its embedded NetBird client. Use for upstreams
+            instead of through its embedded NetBirdy client. Use for upstreams
             reachable without WireGuard (public APIs, LAN services, localhost
             sidecars).
           default: false
@@ -3355,7 +3355,7 @@ components:
           example: false
         private:
           type: boolean
-          description: True when at least one connected proxy in this cluster is running embedded in a netbird client (`netbird proxy`) and serving over a WireGuard tunnel. Lets the dashboard distinguish per-peer / private clusters from centralised ones.
+          description: True when at least one connected proxy in this cluster is running embedded in a netbirdy client (`netbirdy proxy`) and serving over a WireGuard tunnel. Lets the dashboard distinguish per-peer / private clusters from centralised ones.
           example: false
       required:
         - id
@@ -3367,7 +3367,7 @@ components:
       type: string
       description: |
         Source of the proxy cluster. `account` clusters are owned and operated by the account (BYOP);
-        `shared` clusters are operated by NetBird and shared across accounts.
+        `shared` clusters are operated by NetBirdy and shared across accounts.
       enum:
         - account
         - shared
@@ -3414,7 +3414,7 @@ components:
           example: false
         supports_private:
           type: boolean
-          description: Whether the proxy cluster supports private (NetBird-only) services. True when at least one connected proxy in the cluster runs embedded in a netbird client.
+          description: Whether the proxy cluster supports private (NetBirdy-only) services. True when at least one connected proxy in the cluster runs embedded in a netbirdy client.
           example: false
       required:
         - id
@@ -3501,7 +3501,7 @@ components:
         - email
     InstanceVersionInfo:
       type: object
-      description: Version information for NetBird components
+      description: Version information for NetBirdy components
       properties:
         management_current_version:
           description: The current running version of the management server
@@ -4897,7 +4897,7 @@ components:
           type: string
           format: uri
           description: The webhook endpoint URL to send notifications to.
-          example: "https://hooks.example.com/netbird"
+          example: "https://hooks.example.com/netbirdy"
         headers:
           type: object
           additionalProperties:
@@ -5014,7 +5014,7 @@ components:
           example: "OpenAI API"
         upstream_url:
           type: string
-          description: Full upstream URL (with scheme) that NetBird forwards traffic to.
+          description: Full upstream URL (with scheme) that NetBirdy forwards traffic to.
           example: "https://api.openai.com"
         models:
           type: array
@@ -5037,7 +5037,7 @@ components:
         identity_header_groups:
           type: string
           description: |
-            Wire header name the proxy stamps with the caller's NetBird groups as a comma-separated list (sorted) when the catalog entry's HeaderPair is `customizable`. Always present in responses; empty disables stamping for this dimension. Same per-catalog semantics as `identity_header_user_id`.
+            Wire header name the proxy stamps with the caller's NetBirdy groups as a comma-separated list (sorted) when the catalog entry's HeaderPair is `customizable`. Always present in responses; empty disables stamping for this dimension. Same per-catalog semantics as `identity_header_user_id`.
           example: "x-bf-dim-netbird_groups"
         enabled:
           type: boolean
@@ -5089,7 +5089,7 @@ components:
           example: "OpenAI API"
         upstream_url:
           type: string
-          description: Full upstream URL (with scheme) that NetBird forwards traffic to.
+          description: Full upstream URL (with scheme) that NetBirdy forwards traffic to.
           example: "https://api.openai.com"
         api_key:
           type: string
@@ -5155,17 +5155,17 @@ components:
         cached_input_per_1k:
           type: number
           format: double
-          description: OpenAI-shape cache rate — cost per 1k cached prompt tokens (a subset of input tokens), in USD. Omitted means inherit NetBird's default rate for this model when one exists; 0 means no discount (cached tokens bill at input_per_1k).
+          description: OpenAI-shape cache rate — cost per 1k cached prompt tokens (a subset of input tokens), in USD. Omitted means inherit NetBirdy's default rate for this model when one exists; 0 means no discount (cached tokens bill at input_per_1k).
           example: 0.000075
         cache_read_per_1k:
           type: number
           format: double
-          description: Anthropic-shape cache rate — cost per 1k cache-read tokens (additive to input tokens), in USD. Omitted means inherit NetBird's default rate for this model when one exists; 0 means cache reads bill at input_per_1k.
+          description: Anthropic-shape cache rate — cost per 1k cache-read tokens (additive to input tokens), in USD. Omitted means inherit NetBirdy's default rate for this model when one exists; 0 means cache reads bill at input_per_1k.
           example: 0.0003
         cache_creation_per_1k:
           type: number
           format: double
-          description: Anthropic-shape cache rate — cost per 1k cache-creation tokens (additive to input tokens), in USD. Omitted means inherit NetBird's default rate for this model when one exists; 0 means cache writes bill at input_per_1k.
+          description: Anthropic-shape cache rate — cost per 1k cache-creation tokens (additive to input tokens), in USD. Omitted means inherit NetBirdy's default rate for this model when one exists; 0 means cache writes bill at input_per_1k.
           example: 0.00375
       required:
         - id
@@ -5263,7 +5263,7 @@ components:
           example: "EU Anthropic Claude Haiku 4.5"
         pricing_known:
           type: boolean
-          description: Whether NetBird's shipped pricing table can price this model. When false the rates below are all zero and the operator must set them, or requests to this model would record a cost of zero.
+          description: Whether NetBirdy's shipped pricing table can price this model. When false the rates below are all zero and the operator must set them, or requests to this model would record a cost of zero.
           example: true
         input_per_1k:
           type: number
@@ -5331,7 +5331,7 @@ components:
           description: |
             Presentation grouping for the provider Select on the dashboard.
             "provider" — first-party vendor API (OpenAI, Anthropic, …); the upstream is the model itself.
-            "gateway" — routing/aggregation layer in front of multiple providers (LiteLLM, Portkey, …); typically pairs with NetBird identity stamping.
+            "gateway" — routing/aggregation layer in front of multiple providers (LiteLLM, Portkey, …); typically pairs with NetBirdy identity stamping.
             "custom" — generic OpenAI-compatible self-hosted endpoint catch-all.
           enum: [provider, gateway, custom]
           example: "provider"
@@ -5346,7 +5346,7 @@ components:
         pricing_surfaces:
           type: array
           description: |
-            Cost-meter pricing surfaces this provider's traffic is metered under ("openai", "anthropic", "bedrock"). Tells the dashboard which cache-rate fields apply to this provider's models: "openai" → cached_input_per_1k (cached prompt tokens are a subset of input); "anthropic"/"bedrock" → cache_read_per_1k + cache_creation_per_1k (additive buckets). Absent/empty for gateway and custom entries, whose upstream shape NetBird cannot know ahead of time — surface all cache fields for those.
+            Cost-meter pricing surfaces this provider's traffic is metered under ("openai", "anthropic", "bedrock"). Tells the dashboard which cache-rate fields apply to this provider's models: "openai" → cached_input_per_1k (cached prompt tokens are a subset of input); "anthropic"/"bedrock" → cache_read_per_1k + cache_creation_per_1k (additive buckets). Absent/empty for gateway and custom entries, whose upstream shape NetBirdy cannot know ahead of time — surface all cache fields for those.
           items:
             type: string
           example: ["openai"]
@@ -5368,7 +5368,7 @@ components:
     AgentNetworkCatalogIdentityInjection:
       type: object
       description: |
-        Catalog-declared identity-injection shape. Present when this provider supports stamping the caller's NetBird identity onto upstream requests. Exactly one of `header_pair` or `json_metadata` is set per provider entry. The dashboard reads the `customizable` flag on whichever shape is present to decide whether to surface the labels as editable inputs (true → editable with the catalog values shown as placeholders; false → fixed and read-only).
+        Catalog-declared identity-injection shape. Present when this provider supports stamping the caller's NetBirdy identity onto upstream requests. Exactly one of `header_pair` or `json_metadata` is set per provider entry. The dashboard reads the `customizable` flag on whichever shape is present to decide whether to surface the labels as editable inputs (true → editable with the catalog values shown as placeholders; false → fixed and read-only).
       properties:
         header_pair:
           $ref: '#/components/schemas/AgentNetworkCatalogHeaderPairInjection'
@@ -5450,7 +5450,7 @@ components:
           example: true
         source_groups:
           type: array
-          description: NetBird group ids whose members are allowed to call the destination providers.
+          description: NetBirdy group ids whose members are allowed to call the destination providers.
           items:
             type: string
           example: ["ch8vp3o6lnna9hg0sd8g"]
@@ -5508,7 +5508,7 @@ components:
           example: true
         source_groups:
           type: array
-          description: NetBird group ids whose members are allowed to call the destination providers.
+          description: NetBirdy group ids whose members are allowed to call the destination providers.
           items:
             type: string
           minItems: 1
@@ -5698,7 +5698,7 @@ components:
           description: False only when the account has no Agent Network set up. A caller that no policy covers yet still reads as configured, with an empty providers list.
         endpoint:
           type: string
-          description: The account's Agent Network base URL, reachable over the NetBird tunnel only. Returned to every member of a configured account - it authorizes nothing on its own, since the gateway still refuses every request no policy permits. Empty when configured is false.
+          description: The account's Agent Network base URL, reachable over the NetBirdy tunnel only. Returned to every member of a configured account - it authorizes nothing on its own, since the gateway still refuses every request no policy permits. Empty when configured is false.
           example: https://calm-otter.proxy.example.com
         providers:
           type: array
@@ -5750,7 +5750,7 @@ components:
           description: Whether this row counts a single end user or a single source group across every member.
         dimension_id:
           type: string
-          description: NetBird user id (when `dimension_kind=user`) or NetBird group id (when `dimension_kind=group`).
+          description: NetBirdy user id (when `dimension_kind=user`) or NetBirdy group id (when `dimension_kind=group`).
           example: "grp-engineers"
         window_seconds:
           type: integer
@@ -5817,7 +5817,7 @@ components:
           example: 850
         user_id:
           type: string
-          description: NetBird user id of the authenticated caller, if applicable.
+          description: NetBirdy user id of the authenticated caller, if applicable.
         source_ip:
           type: string
           description: Source IP of the request. Empty when log collection is disabled.
@@ -5845,7 +5845,7 @@ components:
           example: "019eeb72-ab7c-7cd2-aa05-6e8eb834afcb"
         resolved_provider_id:
           type: string
-          description: NetBird agent-network provider id that served the request.
+          description: NetBirdy agent-network provider id that served the request.
         selected_policy_id:
           type: string
           description: Agent-network policy id that authorised (or denied) the request.
@@ -5918,7 +5918,7 @@ components:
           type: array
           items:
             type: string
-          description: NetBird group ids that authorised the request (the caller's groups intersected with the policy's source groups).
+          description: NetBirdy group ids that authorised the request (the caller's groups intersected with the policy's source groups).
         request_prompt:
           type: string
           description: Captured request prompt. Present only when prompt collection is enabled.
@@ -5982,7 +5982,7 @@ components:
           example: "019eeb72-ab7c-7cd2-aa05-6e8eb834afcb"
         user_id:
           type: string
-          description: NetBird user id of the session's caller.
+          description: NetBirdy user id of the session's caller.
         group_ids:
           type: array
           items:
@@ -6315,7 +6315,7 @@ components:
         - access_log_retention_days
     AgentNetworkManagedProxy:
       type: object
-      description: A NetBird-managed Agent Network gateway deployment.
+      description: A NetBirdy-managed Agent Network gateway deployment.
       properties:
         id:
           type: string
@@ -6369,13 +6369,13 @@ components:
           example: true
         target_groups:
           type: array
-          description: NetBird group ids the rule binds. Empty plus empty target_users means account-wide.
+          description: NetBirdy group ids the rule binds. Empty plus empty target_users means account-wide.
           items:
             type: string
           example: ["ch8vp3o6lnna9hg0sd8g"]
         target_users:
           type: array
-          description: NetBird user ids the rule binds directly.
+          description: NetBirdy user ids the rule binds directly.
           items:
             type: string
           example: []
@@ -6413,13 +6413,13 @@ components:
           example: true
         target_groups:
           type: array
-          description: NetBird group ids the rule binds. Empty plus empty target_users means account-wide.
+          description: NetBirdy group ids the rule binds. Empty plus empty target_users means account-wide.
           items:
             type: string
           example: ["ch8vp3o6lnna9hg0sd8g"]
         target_users:
           type: array
-          description: NetBird user ids the rule binds directly.
+          description: NetBirdy user ids the rule binds directly.
           items:
             type: string
           example: []
@@ -6521,7 +6521,7 @@ paths:
   /api/instance/version:
     get:
       summary: Get Version Info
-      description: Returns version information for NetBird components including the current management server version and latest available versions from GitHub.
+      description: Returns version information for NetBirdy components including the current management server version and latest available versions from GitHub.
       tags: [ Instance ]
       security:
         - BearerAuth: [ ]
@@ -6545,7 +6545,7 @@ paths:
       description: |
         Creates the initial admin user for the instance. This endpoint does not require authentication but only works when setup is required (no accounts exist and embedded IDP is enabled).
 
-        When the management server is started with `NB_SETUP_PAT_ENABLED=true` and the request includes `create_pat: true`, the endpoint also provisions the NetBird account for the new owner user and returns the plain text Personal Access Token in `personal_access_token`. The optional `pat_expire_in` value applies only when `create_pat` is true and defaults to 1 day when omitted. If a post-user step fails, setup-created resources are rolled back when safe; if account cleanup fails, the owner user is left in place to avoid leaving an account without its admin user.
+        When the management server is started with `NB_SETUP_PAT_ENABLED=true` and the request includes `create_pat: true`, the endpoint also provisions the NetBirdy account for the new owner user and returns the plain text Personal Access Token in `personal_access_token`. The optional `pat_expire_in` value applies only when `create_pat` is true and defaults to 1 day when omitted. If a post-user step fails, setup-created resources are rolled back when safe; if account cleanup fails, the owner user is left in place to avoid leaving an account without its admin user.
       tags: [ Instance ]
       security: [ ]
       requestBody:
@@ -13140,7 +13140,7 @@ paths:
   /api/integrations/agent-network/managed-proxy:
     post:
       summary: Provision a managed Agent Network gateway
-      description: Starts provisioning of a NetBird-managed Agent Network gateway for the account, allocating its endpoint under the managed zone on the first call. Idempotent — answers 202 when this call started (or, after a failure, restarted) provisioning and 200 when a deployment already exists, reporting current state either way. A disabled deployment answers 200 with state `disabled` and stays disabled. Returns 409 when the account already has an Agent Network endpoint that managed provisioning does not own, and 503 when endpoint allocation is temporarily exhausted.
+      description: Starts provisioning of a NetBirdy-managed Agent Network gateway for the account, allocating its endpoint under the managed zone on the first call. Idempotent — answers 202 when this call started (or, after a failure, restarted) provisioning and 200 when a deployment already exists, reporting current state either way. A disabled deployment answers 200 with state `disabled` and stays disabled. Returns 409 when the account already has an Agent Network endpoint that managed provisioning does not own, and 503 when endpoint allocation is temporarily exhausted.
       tags: [ Agent Network ]
       security:
         - BearerAuth: [ ]

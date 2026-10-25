@@ -1561,7 +1561,7 @@ type AccessiblePeer struct {
 	// Ipv6 Peer's IPv6 overlay address
 	Ipv6 *string `json:"ipv6,omitempty"`
 
-	// LastSeen Last time peer connected to Netbird's management service
+	// LastSeen Last time peer connected to NetBirdy's management service
 	LastSeen time.Time `json:"last_seen"`
 
 	// Name Peer's hostname
@@ -1744,7 +1744,7 @@ type AgentNetworkAccessLog struct {
 	// DurationMs Duration of the request in milliseconds.
 	DurationMs int `json:"duration_ms"`
 
-	// GroupIds NetBird group ids that authorised the request (the caller's groups intersected with the policy's source groups).
+	// GroupIds NetBirdy group ids that authorised the request (the caller's groups intersected with the policy's source groups).
 	GroupIds *[]string `json:"group_ids,omitempty"`
 
 	// Host Upstream host the request was routed to. Empty when log collection is disabled.
@@ -1780,7 +1780,7 @@ type AgentNetworkAccessLog struct {
 	// RequestPrompt Captured request prompt. Present only when prompt collection is enabled.
 	RequestPrompt *string `json:"request_prompt,omitempty"`
 
-	// ResolvedProviderId NetBird agent-network provider id that served the request.
+	// ResolvedProviderId NetBirdy agent-network provider id that served the request.
 	ResolvedProviderId *string `json:"resolved_provider_id,omitempty"`
 
 	// ResponseCompletion Captured response completion. Present only when prompt collection is enabled.
@@ -1810,7 +1810,7 @@ type AgentNetworkAccessLog struct {
 	// TotalTokens Total tokens consumed, including prompt-cache tokens.
 	TotalTokens int64 `json:"total_tokens"`
 
-	// UserId NetBird user id of the authenticated caller, if applicable.
+	// UserId NetBirdy user id of the authenticated caller, if applicable.
 	UserId *string `json:"user_id,omitempty"`
 }
 
@@ -1876,7 +1876,7 @@ type AgentNetworkAccessLogSession struct {
 	// TotalTokens Total tokens across the session, including prompt-cache tokens.
 	TotalTokens int64 `json:"total_tokens"`
 
-	// UserId NetBird user id of the session's caller.
+	// UserId NetBirdy user id of the session's caller.
 	UserId *string `json:"user_id,omitempty"`
 }
 
@@ -1921,7 +1921,7 @@ type AgentNetworkAgentConfig struct {
 	// Configured False only when the account has no Agent Network set up. A caller that no policy covers yet still reads as configured, with an empty providers list.
 	Configured bool `json:"configured"`
 
-	// Endpoint The account's Agent Network base URL, reachable over the NetBird tunnel only. Returned to every member of a configured account - it authorizes nothing on its own, since the gateway still refuses every request no policy permits. Empty when configured is false.
+	// Endpoint The account's Agent Network base URL, reachable over the NetBirdy tunnel only. Returned to every member of a configured account - it authorizes nothing on its own, since the gateway still refuses every request no policy permits. Empty when configured is false.
 	Endpoint string `json:"endpoint"`
 
 	// Providers The providers at least one of the caller's policies authorizes, in creation order. Empty when no policy covers the caller.
@@ -1962,10 +1962,10 @@ type AgentNetworkBudgetRule struct {
 	// Name Display name for the budget rule.
 	Name string `json:"name"`
 
-	// TargetGroups NetBird group ids the rule binds. Empty plus empty target_users means account-wide.
+	// TargetGroups NetBirdy group ids the rule binds. Empty plus empty target_users means account-wide.
 	TargetGroups []string `json:"target_groups"`
 
-	// TargetUsers NetBird user ids the rule binds directly.
+	// TargetUsers NetBirdy user ids the rule binds directly.
 	TargetUsers []string   `json:"target_users"`
 	UpdatedAt   *time.Time `json:"updated_at,omitempty"`
 }
@@ -1981,10 +1981,10 @@ type AgentNetworkBudgetRuleRequest struct {
 	// Name Display name for the budget rule.
 	Name string `json:"name"`
 
-	// TargetGroups NetBird group ids the rule binds. Empty plus empty target_users means account-wide.
+	// TargetGroups NetBirdy group ids the rule binds. Empty plus empty target_users means account-wide.
 	TargetGroups *[]string `json:"target_groups,omitempty"`
 
-	// TargetUsers NetBird user ids the rule binds directly.
+	// TargetUsers NetBirdy user ids the rule binds directly.
 	TargetUsers *[]string `json:"target_users,omitempty"`
 }
 
@@ -2006,7 +2006,7 @@ type AgentNetworkCatalogHeaderPairInjection struct {
 	TagsHeader string `json:"tags_header"`
 }
 
-// AgentNetworkCatalogIdentityInjection Catalog-declared identity-injection shape. Present when this provider supports stamping the caller's NetBird identity onto upstream requests. Exactly one of `header_pair` or `json_metadata` is set per provider entry. The dashboard reads the `customizable` flag on whichever shape is present to decide whether to surface the labels as editable inputs (true → editable with the catalog values shown as placeholders; false → fixed and read-only).
+// AgentNetworkCatalogIdentityInjection Catalog-declared identity-injection shape. Present when this provider supports stamping the caller's NetBirdy identity onto upstream requests. Exactly one of `header_pair` or `json_metadata` is set per provider entry. The dashboard reads the `customizable` flag on whichever shape is present to decide whether to surface the labels as editable inputs (true → editable with the catalog values shown as placeholders; false → fixed and read-only).
 type AgentNetworkCatalogIdentityInjection struct {
 	// HeaderPair HeaderPair identity-injection shape — separate per-dimension headers (LiteLLM-style, Bifrost).
 	HeaderPair *AgentNetworkCatalogHeaderPairInjection `json:"header_pair,omitempty"`
@@ -2080,12 +2080,12 @@ type AgentNetworkCatalogProvider struct {
 	// Id Catalog provider identifier (referenced by AgentNetworkProvider.provider_id).
 	Id string `json:"id"`
 
-	// IdentityInjection Catalog-declared identity-injection shape. Present when this provider supports stamping the caller's NetBird identity onto upstream requests. Exactly one of `header_pair` or `json_metadata` is set per provider entry. The dashboard reads the `customizable` flag on whichever shape is present to decide whether to surface the labels as editable inputs (true → editable with the catalog values shown as placeholders; false → fixed and read-only).
+	// IdentityInjection Catalog-declared identity-injection shape. Present when this provider supports stamping the caller's NetBirdy identity onto upstream requests. Exactly one of `header_pair` or `json_metadata` is set per provider entry. The dashboard reads the `customizable` flag on whichever shape is present to decide whether to surface the labels as editable inputs (true → editable with the catalog values shown as placeholders; false → fixed and read-only).
 	IdentityInjection *AgentNetworkCatalogIdentityInjection `json:"identity_injection,omitempty"`
 
 	// Kind Presentation grouping for the provider Select on the dashboard.
 	// "provider" — first-party vendor API (OpenAI, Anthropic, …); the upstream is the model itself.
-	// "gateway" — routing/aggregation layer in front of multiple providers (LiteLLM, Portkey, …); typically pairs with NetBird identity stamping.
+	// "gateway" — routing/aggregation layer in front of multiple providers (LiteLLM, Portkey, …); typically pairs with NetBirdy identity stamping.
 	// "custom" — generic OpenAI-compatible self-hosted endpoint catch-all.
 	Kind AgentNetworkCatalogProviderKind `json:"kind"`
 
@@ -2095,13 +2095,13 @@ type AgentNetworkCatalogProvider struct {
 	// Name Display name for the provider.
 	Name string `json:"name"`
 
-	// PricingSurfaces Cost-meter pricing surfaces this provider's traffic is metered under ("openai", "anthropic", "bedrock"). Tells the dashboard which cache-rate fields apply to this provider's models: "openai" → cached_input_per_1k (cached prompt tokens are a subset of input); "anthropic"/"bedrock" → cache_read_per_1k + cache_creation_per_1k (additive buckets). Absent/empty for gateway and custom entries, whose upstream shape NetBird cannot know ahead of time — surface all cache fields for those.
+	// PricingSurfaces Cost-meter pricing surfaces this provider's traffic is metered under ("openai", "anthropic", "bedrock"). Tells the dashboard which cache-rate fields apply to this provider's models: "openai" → cached_input_per_1k (cached prompt tokens are a subset of input); "anthropic"/"bedrock" → cache_read_per_1k + cache_creation_per_1k (additive buckets). Absent/empty for gateway and custom entries, whose upstream shape NetBirdy cannot know ahead of time — surface all cache fields for those.
 	PricingSurfaces *[]string `json:"pricing_surfaces,omitempty"`
 }
 
 // AgentNetworkCatalogProviderKind Presentation grouping for the provider Select on the dashboard.
 // "provider" — first-party vendor API (OpenAI, Anthropic, …); the upstream is the model itself.
-// "gateway" — routing/aggregation layer in front of multiple providers (LiteLLM, Portkey, …); typically pairs with NetBird identity stamping.
+// "gateway" — routing/aggregation layer in front of multiple providers (LiteLLM, Portkey, …); typically pairs with NetBirdy identity stamping.
 // "custom" — generic OpenAI-compatible self-hosted endpoint catch-all.
 type AgentNetworkCatalogProviderKind string
 
@@ -2110,7 +2110,7 @@ type AgentNetworkConsumption struct {
 	// CostUsd Total USD spend booked against this dimension for the window.
 	CostUsd float64 `json:"cost_usd"`
 
-	// DimensionId NetBird user id (when `dimension_kind=user`) or NetBird group id (when `dimension_kind=group`).
+	// DimensionId NetBirdy user id (when `dimension_kind=user`) or NetBirdy group id (when `dimension_kind=group`).
 	DimensionId string `json:"dimension_id"`
 
 	// DimensionKind Whether this row counts a single end user or a single source group across every member.
@@ -2158,7 +2158,7 @@ type AgentNetworkDiscoveredModel struct {
 	// OutputPer1k Default output token price per 1k tokens, in USD. Zero when pricing_known is false.
 	OutputPer1k float64 `json:"output_per_1k"`
 
-	// PricingKnown Whether NetBird's shipped pricing table can price this model. When false the rates below are all zero and the operator must set them, or requests to this model would record a cost of zero.
+	// PricingKnown Whether NetBirdy's shipped pricing table can price this model. When false the rates below are all zero and the operator must set them, or requests to this model would record a cost of zero.
 	PricingKnown bool `json:"pricing_known"`
 }
 
@@ -2209,7 +2209,7 @@ type AgentNetworkGuardrailRequest struct {
 	Name string `json:"name"`
 }
 
-// AgentNetworkManagedProxy A NetBird-managed Agent Network gateway deployment.
+// AgentNetworkManagedProxy A NetBirdy-managed Agent Network gateway deployment.
 type AgentNetworkManagedProxy struct {
 	// Endpoint The account's gateway hostname.
 	Endpoint string `json:"endpoint"`
@@ -2283,7 +2283,7 @@ type AgentNetworkPolicy struct {
 	// Name Display name for the policy.
 	Name string `json:"name"`
 
-	// SourceGroups NetBird group ids whose members are allowed to call the destination providers.
+	// SourceGroups NetBirdy group ids whose members are allowed to call the destination providers.
 	SourceGroups []string `json:"source_groups"`
 
 	// UpdatedAt Timestamp when the policy was last updated.
@@ -2333,7 +2333,7 @@ type AgentNetworkPolicyRequest struct {
 	// Name Display name for the policy.
 	Name string `json:"name"`
 
-	// SourceGroups NetBird group ids whose members are allowed to call the destination providers.
+	// SourceGroups NetBirdy group ids whose members are allowed to call the destination providers.
 	SourceGroups []string `json:"source_groups"`
 }
 
@@ -2365,7 +2365,7 @@ type AgentNetworkProvider struct {
 	// Id Provider ID
 	Id string `json:"id"`
 
-	// IdentityHeaderGroups Wire header name the proxy stamps with the caller's NetBird groups as a comma-separated list (sorted) when the catalog entry's HeaderPair is `customizable`. Always present in responses; empty disables stamping for this dimension. Same per-catalog semantics as `identity_header_user_id`.
+	// IdentityHeaderGroups Wire header name the proxy stamps with the caller's NetBirdy groups as a comma-separated list (sorted) when the catalog entry's HeaderPair is `customizable`. Always present in responses; empty disables stamping for this dimension. Same per-catalog semantics as `identity_header_user_id`.
 	IdentityHeaderGroups string `json:"identity_header_groups"`
 
 	// IdentityHeaderUserId Wire header name the proxy stamps with the caller's display identity (user email or peer name) when the catalog entry's HeaderPair is `customizable`. Always present in responses; empty disables stamping for this dimension. Ignored when the catalog entry has a fixed HeaderPair (e.g. LiteLLM, Portkey). Used today by Bifrost: typical values are `x-bf-lh-netbird_user_id` (always-on log metadata) or `x-bf-dim-netbird_user_id` (Prometheus / OTEL — requires the label to be pre-declared in the gateway's `client.prometheus_labels` config).
@@ -2389,19 +2389,19 @@ type AgentNetworkProvider struct {
 	// UpdatedAt Timestamp when the provider was last updated.
 	UpdatedAt *time.Time `json:"updated_at,omitempty"`
 
-	// UpstreamUrl Full upstream URL (with scheme) that NetBird forwards traffic to.
+	// UpstreamUrl Full upstream URL (with scheme) that NetBirdy forwards traffic to.
 	UpstreamUrl string `json:"upstream_url"`
 }
 
 // AgentNetworkProviderModel A model exposed by the provider, with the operator's per-1k input/output prices in USD.
 type AgentNetworkProviderModel struct {
-	// CacheCreationPer1k Anthropic-shape cache rate — cost per 1k cache-creation tokens (additive to input tokens), in USD. Omitted means inherit NetBird's default rate for this model when one exists; 0 means cache writes bill at input_per_1k.
+	// CacheCreationPer1k Anthropic-shape cache rate — cost per 1k cache-creation tokens (additive to input tokens), in USD. Omitted means inherit NetBirdy's default rate for this model when one exists; 0 means cache writes bill at input_per_1k.
 	CacheCreationPer1k *float64 `json:"cache_creation_per_1k,omitempty"`
 
-	// CacheReadPer1k Anthropic-shape cache rate — cost per 1k cache-read tokens (additive to input tokens), in USD. Omitted means inherit NetBird's default rate for this model when one exists; 0 means cache reads bill at input_per_1k.
+	// CacheReadPer1k Anthropic-shape cache rate — cost per 1k cache-read tokens (additive to input tokens), in USD. Omitted means inherit NetBirdy's default rate for this model when one exists; 0 means cache reads bill at input_per_1k.
 	CacheReadPer1k *float64 `json:"cache_read_per_1k,omitempty"`
 
-	// CachedInputPer1k OpenAI-shape cache rate — cost per 1k cached prompt tokens (a subset of input tokens), in USD. Omitted means inherit NetBird's default rate for this model when one exists; 0 means no discount (cached tokens bill at input_per_1k).
+	// CachedInputPer1k OpenAI-shape cache rate — cost per 1k cached prompt tokens (a subset of input tokens), in USD. Omitted means inherit NetBirdy's default rate for this model when one exists; 0 means no discount (cached tokens bill at input_per_1k).
 	CachedInputPer1k *float64 `json:"cached_input_per_1k,omitempty"`
 
 	// Id Model identifier (e.g. "gpt-4o-mini").
@@ -2446,7 +2446,7 @@ type AgentNetworkProviderRequest struct {
 	// SkipTlsVerification Skip upstream TLS certificate verification when the proxy dials this provider's URL. For self-hosted / internal gateways behind a private or self-signed certificate. Defaults to false.
 	SkipTlsVerification *bool `json:"skip_tls_verification,omitempty"`
 
-	// UpstreamUrl Full upstream URL (with scheme) that NetBird forwards traffic to.
+	// UpstreamUrl Full upstream URL (with scheme) that NetBirdy forwards traffic to.
 	UpstreamUrl string `json:"upstream_url"`
 }
 
@@ -3458,7 +3458,7 @@ type InstanceStatus struct {
 	SetupRequired bool `json:"setup_required"`
 }
 
-// InstanceVersionInfo Version information for NetBird components
+// InstanceVersionInfo Version information for NetBirdy components
 type InstanceVersionInfo struct {
 	// DashboardAvailableVersion The latest available version of the dashboard (from GitHub releases)
 	DashboardAvailableVersion *string `json:"dashboard_available_version,omitempty"`
@@ -4132,7 +4132,7 @@ type Peer struct {
 	// LastLogin Last time this peer performed log in (authentication). E.g., user authenticated.
 	LastLogin time.Time `json:"last_login"`
 
-	// LastSeen Last time peer connected to Netbird's management service
+	// LastSeen Last time peer connected to NetBirdy's management service
 	LastSeen   time.Time       `json:"last_seen"`
 	LocalFlags *PeerLocalFlags `json:"local_flags,omitempty"`
 
@@ -4229,7 +4229,7 @@ type PeerBatch struct {
 	// LastLogin Last time this peer performed log in (authentication). E.g., user authenticated.
 	LastLogin time.Time `json:"last_login"`
 
-	// LastSeen Last time peer connected to Netbird's management service
+	// LastSeen Last time peer connected to NetBirdy's management service
 	LastSeen   time.Time       `json:"last_seen"`
 	LocalFlags *PeerLocalFlags `json:"local_flags,omitempty"`
 
@@ -4778,7 +4778,7 @@ type ProxyCluster struct {
 	// Online Whether at least one proxy in the cluster has heartbeated within the active window
 	Online bool `json:"online"`
 
-	// Private True when at least one connected proxy in this cluster is running embedded in a netbird client (`netbird proxy`) and serving over a WireGuard tunnel. Lets the dashboard distinguish per-peer / private clusters from centralised ones.
+	// Private True when at least one connected proxy in this cluster is running embedded in a netbirdy client (`netbirdy proxy`) and serving over a WireGuard tunnel. Lets the dashboard distinguish per-peer / private clusters from centralised ones.
 	Private *bool `json:"private,omitempty"`
 
 	// RequireSubdomain Whether services on this cluster must include a subdomain label
@@ -4791,12 +4791,12 @@ type ProxyCluster struct {
 	SupportsCustomPorts *bool `json:"supports_custom_ports,omitempty"`
 
 	// Type Source of the proxy cluster. `account` clusters are owned and operated by the account (BYOP);
-	// `shared` clusters are operated by NetBird and shared across accounts.
+	// `shared` clusters are operated by NetBirdy and shared across accounts.
 	Type ProxyClusterType `json:"type"`
 }
 
 // ProxyClusterType Source of the proxy cluster. `account` clusters are owned and operated by the account (BYOP);
-// `shared` clusters are operated by NetBird and shared across accounts.
+// `shared` clusters are operated by NetBirdy and shared across accounts.
 type ProxyClusterType string
 
 // ProxyToken defines model for ProxyToken.
@@ -4858,7 +4858,7 @@ type ReverseProxyDomain struct {
 	// SupportsCustomPorts Whether the cluster supports binding arbitrary TCP/UDP ports
 	SupportsCustomPorts *bool `json:"supports_custom_ports,omitempty"`
 
-	// SupportsPrivate Whether the proxy cluster supports private (NetBird-only) services. True when at least one connected proxy in the cluster runs embedded in a netbird client.
+	// SupportsPrivate Whether the proxy cluster supports private (NetBirdy-only) services. True when at least one connected proxy in the cluster runs embedded in a netbirdy client.
 	SupportsPrivate *bool `json:"supports_private,omitempty"`
 
 	// TargetCluster The proxy cluster this domain is validated against (only for custom domains)
@@ -5050,7 +5050,7 @@ type SentinelOneMatchAttributesNetworkStatus string
 
 // Service defines model for Service.
 type Service struct {
-	// AccessGroups NetBird group IDs whose peers may reach this private service over the tunnel. Required when private=true; ignored otherwise. Mutually exclusive with bearer auth (SSO).
+	// AccessGroups NetBirdy group IDs whose peers may reach this private service over the tunnel. Required when private=true; ignored otherwise. Mutually exclusive with bearer auth (SSO).
 	AccessGroups *[]string `json:"access_groups,omitempty"`
 
 	// AccessRestrictions Connection-level access restrictions based on IP address or geography. Applies to both HTTP and L4 services.
@@ -5082,7 +5082,7 @@ type Service struct {
 	// PortAutoAssigned Whether the listen port was auto-assigned
 	PortAutoAssigned *bool `json:"port_auto_assigned,omitempty"`
 
-	// Private When true, the service is NetBird-only — its target points at a proxy cluster, inbound peers authenticate via their WireGuard tunnel identity (no OIDC), and an ACL policy is auto-generated from access_groups to the cluster's proxy-peer group. Requires mode=http.
+	// Private When true, the service is NetBirdy-only — its target points at a proxy cluster, inbound peers authenticate via their WireGuard tunnel identity (no OIDC), and an ACL policy is auto-generated from access_groups to the cluster's proxy-peer group. Requires mode=http.
 	Private *bool `json:"private,omitempty"`
 
 	// ProxyCluster The proxy cluster handling this service (derived from domain)
@@ -5127,7 +5127,7 @@ type ServiceMetaStatus string
 
 // ServiceRequest defines model for ServiceRequest.
 type ServiceRequest struct {
-	// AccessGroups NetBird group IDs whose peers may reach this private service over the tunnel. Required when private=true; ignored otherwise. Mutually exclusive with bearer auth (SSO).
+	// AccessGroups NetBirdy group IDs whose peers may reach this private service over the tunnel. Required when private=true; ignored otherwise. Mutually exclusive with bearer auth (SSO).
 	AccessGroups *[]string `json:"access_groups,omitempty"`
 
 	// AccessRestrictions Connection-level access restrictions based on IP address or geography. Applies to both HTTP and L4 services.
@@ -5152,7 +5152,7 @@ type ServiceRequest struct {
 	// PassHostHeader When true, the original client Host header is passed through to the backend instead of being rewritten to the backend's address
 	PassHostHeader *bool `json:"pass_host_header,omitempty"`
 
-	// Private When true, the service is NetBird-only — its target points at a proxy cluster, inbound peers authenticate via their WireGuard tunnel identity (no OIDC), and an ACL policy is auto-generated from access_groups to the cluster's proxy-peer group. Requires mode=http.
+	// Private When true, the service is NetBirdy-only — its target points at a proxy cluster, inbound peers authenticate via their WireGuard tunnel identity (no OIDC), and an ACL policy is auto-generated from access_groups to the cluster's proxy-peer group. Requires mode=http.
 	Private *bool `json:"private,omitempty"`
 
 	// RewriteRedirects When true, Location headers in backend responses are rewritten to replace the backend address with the public-facing domain
@@ -5208,7 +5208,7 @@ type ServiceTargetOptions struct {
 	CustomHeaders *map[string]string `json:"custom_headers,omitempty"`
 
 	// DirectUpstream When true, the proxy dials this target via the host's network stack
-	// instead of through its embedded NetBird client. Use for upstreams
+	// instead of through its embedded NetBirdy client. Use for upstreams
 	// reachable without WireGuard (public APIs, LAN services, localhost
 	// sidecars).
 	DirectUpstream *bool `json:"direct_upstream,omitempty"`
@@ -5639,7 +5639,7 @@ type User struct {
 	PendingApproval bool             `json:"pending_approval"`
 	Permissions     *UserPermissions `json:"permissions,omitempty"`
 
-	// Role User's NetBird account role
+	// Role User's NetBirdy account role
 	Role string `json:"role"`
 
 	// Status User's status
@@ -5663,7 +5663,7 @@ type UserCreateRequest struct {
 	// Name User's full name
 	Name *string `json:"name,omitempty"`
 
-	// Role User's NetBird account role
+	// Role User's NetBirdy account role
 	Role string `json:"role"`
 }
 
@@ -5693,7 +5693,7 @@ type UserInvite struct {
 	// Name User's full name
 	Name string `json:"name"`
 
-	// Role User's NetBird account role
+	// Role User's NetBirdy account role
 	Role string `json:"role"`
 }
 
@@ -5723,7 +5723,7 @@ type UserInviteCreateRequest struct {
 	// Name User's full name
 	Name string `json:"name"`
 
-	// Role User's NetBird account role
+	// Role User's NetBirdy account role
 	Role string `json:"role"`
 }
 
@@ -5775,7 +5775,7 @@ type UserRequest struct {
 	// IsBlocked If set to true then user is blocked and can't use the system
 	IsBlocked bool `json:"is_blocked"`
 
-	// Role User's NetBird account role
+	// Role User's NetBirdy account role
 	Role string `json:"role"`
 }
 

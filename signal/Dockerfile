@@ -1,5 +1,5 @@
 FROM gcr.io/distroless/base:debug
-ENTRYPOINT [ "/go/bin/netbird-signal","run" ]
+ENTRYPOINT [ "/go/bin/netbirdy-signal","run" ]
 CMD ["--log-file", "console"]
 ARG TARGETPLATFORM
-COPY ${TARGETPLATFORM}/netbird-signal /go/bin/netbird-signal
+COPY ${TARGETPLATFORM}/netbirdy-signal /go/bin/netbirdy-signal

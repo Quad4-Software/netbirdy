@@ -38,113 +38,113 @@ type Client struct {
 	httpClient    HttpClient
 	userAgent     string
 
-	// Accounts NetBird account APIs
+	// Accounts NetBirdy account APIs
 	// see more: https://docs.netbird.io/api/resources/accounts
 	Accounts *AccountsAPI
 
-	// Users NetBird users APIs
+	// Users NetBirdy users APIs
 	// see more: https://docs.netbird.io/api/resources/users
 	Users *UsersAPI
 
-	// Tokens NetBird tokens APIs
+	// Tokens NetBirdy tokens APIs
 	// see more: https://docs.netbird.io/api/resources/tokens
 	Tokens *TokensAPI
 
-	// Peers NetBird peers APIs
+	// Peers NetBirdy peers APIs
 	// see more: https://docs.netbird.io/api/resources/peers
 	Peers *PeersAPI
 
-	// SetupKeys NetBird setup keys APIs
+	// SetupKeys NetBirdy setup keys APIs
 	// see more: https://docs.netbird.io/api/resources/setup-keys
 	SetupKeys *SetupKeysAPI
 
-	// Groups NetBird groups APIs
+	// Groups NetBirdy groups APIs
 	// see more: https://docs.netbird.io/api/resources/groups
 	Groups *GroupsAPI
 
-	// Policies NetBird policies APIs
+	// Policies NetBirdy policies APIs
 	// see more: https://docs.netbird.io/api/resources/policies
 	Policies *PoliciesAPI
 
-	// PostureChecks NetBird posture checks APIs
+	// PostureChecks NetBirdy posture checks APIs
 	// see more: https://docs.netbird.io/api/resources/posture-checks
 	PostureChecks *PostureChecksAPI
 
-	// Networks NetBird networks APIs
+	// Networks NetBirdy networks APIs
 	// see more: https://docs.netbird.io/api/resources/networks
 	Networks *NetworksAPI
 
-	// Routes NetBird routes APIs
+	// Routes NetBirdy routes APIs
 	// see more: https://docs.netbird.io/api/resources/routes
 	Routes *RoutesAPI
 
-	// DNS NetBird DNS APIs
+	// DNS NetBirdy DNS APIs
 	// see more: https://docs.netbird.io/api/resources/dns
 	DNS *DNSAPI
 
-	// DNSZones NetBird DNS Zones APIs
+	// DNSZones NetBirdy DNS Zones APIs
 	// see more: https://docs.netbird.io/api/resources/dns-zones
 	DNSZones *DNSZonesAPI
 
-	// GeoLocation NetBird Geo Location APIs
+	// GeoLocation NetBirdy Geo Location APIs
 	// see more: https://docs.netbird.io/api/resources/geo-locations
 	GeoLocation *GeoLocationAPI
 
-	// Events NetBird Events APIs
+	// Events NetBirdy Events APIs
 	// see more: https://docs.netbird.io/api/resources/events
 	Events *EventsAPI
 
-	// Billing NetBird Billing APIs for subscriptions, plans, and invoices
+	// Billing NetBirdy Billing APIs for subscriptions, plans, and invoices
 	// see more: https://docs.netbird.io/api/resources/billing
 	Billing *BillingAPI
 
-	// MSP NetBird MSP tenant management APIs
+	// MSP NetBirdy MSP tenant management APIs
 	// see more: https://docs.netbird.io/api/resources/msp
 	MSP *MSPAPI
 
-	// EDR NetBird EDR integration APIs (Intune, SentinelOne, Falcon, Huntress)
+	// EDR NetBirdy EDR integration APIs (Intune, SentinelOne, Falcon, Huntress)
 	// see more: https://docs.netbird.io/api/resources/edr
 	EDR *EDRAPI
 
-	// SCIM NetBird SCIM IDP integration APIs
+	// SCIM NetBirdy SCIM IDP integration APIs
 	// see more: https://docs.netbird.io/api/resources/scim
 	SCIM *SCIMAPI
 
-	// GoogleIDP NetBird Google Workspace IDP integration APIs
+	// GoogleIDP NetBirdy Google Workspace IDP integration APIs
 	GoogleIDP *GoogleIDPAPI
 
-	// AzureIDP NetBird Azure AD IDP integration APIs
+	// AzureIDP NetBirdy Azure AD IDP integration APIs
 	AzureIDP *AzureIDPAPI
 
-	// OktaScimIDP NetBird Okta SCIM IDP integration APIs
+	// OktaScimIDP NetBirdy Okta SCIM IDP integration APIs
 	OktaScimIDP *OktaScimIDPAPI
 
-	// EventStreaming NetBird Event Streaming integration APIs
+	// EventStreaming NetBirdy Event Streaming integration APIs
 	// see more: https://docs.netbird.io/api/resources/event-streaming
 	EventStreaming *EventStreamingAPI
 
-	// IdentityProviders NetBird Identity Providers APIs
+	// IdentityProviders NetBirdy Identity Providers APIs
 	// see more: https://docs.netbird.io/api/resources/identity-providers
 	IdentityProviders *IdentityProvidersAPI
 
-	// Instance NetBird Instance API
+	// Instance NetBirdy Instance API
 	// see more: https://docs.netbird.io/api/resources/instance
 	Instance *InstanceAPI
 
-	// ReverseProxyServices NetBird reverse proxy services APIs
+	// ReverseProxyServices NetBirdy reverse proxy services APIs
 	ReverseProxyServices *ReverseProxyServicesAPI
 
-	// ReverseProxyClusters NetBird reverse proxy clusters APIs
+	// ReverseProxyClusters NetBirdy reverse proxy clusters APIs
 	ReverseProxyClusters *ReverseProxyClustersAPI
 
-	// ReverseProxyDomains NetBird reverse proxy domains APIs
+	// ReverseProxyDomains NetBirdy reverse proxy domains APIs
 	ReverseProxyDomains *ReverseProxyDomainsAPI
 
 	// ReverseProxyTokens account-scoped proxy access tokens used to register
-	// self-hosted (bring-your-own-proxy) `netbird proxy` instances.
+	// self-hosted (bring-your-own-proxy) `netbirdy proxy` instances.
 	ReverseProxyTokens *ReverseProxyTokensAPI
 
-	// AgentNetwork NetBird Agent Network (AI/LLM gateway) APIs: catalog,
+	// AgentNetwork NetBirdy Agent Network (AI/LLM gateway) APIs: catalog,
 	// providers, policies, guardrails, budget rules and account settings.
 	AgentNetwork *AgentNetworkAPI
 }

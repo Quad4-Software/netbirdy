@@ -22,7 +22,7 @@ var (
 	logFile        string
 
 	rootCmd = &cobra.Command{
-		Use:     "netbird-signal",
+		Use:     "netbirdy-signal",
 		Short:   "",
 		Long:    "",
 		Version: version.NetbirdVersion(),
@@ -43,11 +43,11 @@ func init() {
 	defaultLogFile = "/var/log/netbird/signal.log"
 
 	if runtime.GOOS == "windows" {
-		defaultLogFile = os.Getenv("PROGRAMDATA") + "\\Netbird\\" + "signal.log"
+		defaultLogFile = os.Getenv("PROGRAMDATA") + "\\NetBirdy\\" + "signal.log"
 	}
 
 	rootCmd.PersistentFlags().StringVar(&logLevel, "log-level", "info", "")
-	rootCmd.PersistentFlags().StringVar(&logFile, "log-file", defaultLogFile, "sets Netbird log path. If console is specified the log will be output to stdout")
+	rootCmd.PersistentFlags().StringVar(&logFile, "log-file", defaultLogFile, "sets NetBirdy log path. If console is specified the log will be output to stdout")
 	rootCmd.AddCommand(runCmd)
 }
 

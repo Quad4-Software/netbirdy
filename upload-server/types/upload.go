@@ -4,7 +4,7 @@ const (
 	// ClientHeader is the header used to identify the client
 	ClientHeader = "x-nb-client"
 	// ClientHeaderValue is the value of the ClientHeader
-	ClientHeaderValue = "netbird"
+	ClientHeaderValue = "netbirdy"
 	// GetURLPath is the path for the GetURL request
 	GetURLPath = "/upload-url"
 

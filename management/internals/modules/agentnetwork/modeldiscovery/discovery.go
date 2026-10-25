@@ -328,7 +328,7 @@ func isPublic(addr netip.Addr) bool {
 		addr.IsUnspecified():
 		return false
 	}
-	// 100.64.0.0/10 (carrier NAT) is where NetBird's own overlay addresses
+	// 100.64.0.0/10 (carrier NAT) is where NetBirdy's own overlay addresses
 	// live, so it is emphatically not somewhere to send a provider credential.
 	if addr.Is4() {
 		b := addr.As4()

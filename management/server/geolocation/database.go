@@ -15,13 +15,19 @@ import (
 	"gorm.io/gorm/logger"
 )
 
+var (
+	// GeoLite database download URLs. Empty by default on NetBirdy so installs
+	// never fetch from upstream infrastructure. Set NB_GEOLOCATION_*_URL to
+	// point at a mirror to enable.
+	geoLiteCityTarGZURL     = os.Getenv("NB_GEOLOCATION_CITY_TAR_URL")
+	geoLiteCityZipURL       = os.Getenv("NB_GEOLOCATION_CITY_ZIP_URL")
+	geoLiteCitySha256TarURL = os.Getenv("NB_GEOLOCATION_CITY_TAR_SHA256_URL")
+	geoLiteCitySha256ZipURL = os.Getenv("NB_GEOLOCATION_CITY_ZIP_SHA256_URL")
+)
+
 const (
-	geoLiteCityTarGZURL     = "https://pkgs.netbird.io/geolocation-dbs/GeoLite2-City/download?suffix=tar.gz"
-	geoLiteCityZipURL       = "https://pkgs.netbird.io/geolocation-dbs/GeoLite2-City-CSV/download?suffix=zip"
-	geoLiteCitySha256TarURL = "https://pkgs.netbird.io/geolocation-dbs/GeoLite2-City/download?suffix=tar.gz.sha256"
-	geoLiteCitySha256ZipURL = "https://pkgs.netbird.io/geolocation-dbs/GeoLite2-City-CSV/download?suffix=zip.sha256"
-	geoLiteCityMMDB         = "GeoLite2-City.mmdb"
-	geoLiteCityCSV          = "GeoLite2-City-Locations-en.csv"
+	geoLiteCityMMDB = "GeoLite2-City.mmdb"
+	geoLiteCityCSV  = "GeoLite2-City-Locations-en.csv"
 
 	geonamesCsvFields = 14
 )
@@ -38,6 +44,10 @@ func loadGeolocationDatabases(ctx context.Context, dataDir string, mmdbFile stri
 
 		switch file {
 		case mmdbFile:
+			if geoLiteCityTarGZURL == "" {
+				log.WithContext(ctx).Infof("geolocation database download disabled: set NB_GEOLOCATION_CITY_TAR_URL and NB_GEOLOCATION_CITY_TAR_SHA256_URL to enable")
+				continue
+			}
 			extractFunc := func(src string, dst string) error {
 				if err := decompressTarGzFile(src, dst); err != nil {
 					return err

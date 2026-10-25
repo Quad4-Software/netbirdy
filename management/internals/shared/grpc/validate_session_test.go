@@ -721,7 +721,7 @@ func TestValidateSession_InvalidSessionCode(t *testing.T) {
 
 // TestGenerateSessionToken_EmailFallsBackToIdP covers users whose stored email
 // column is empty: the token's email claim comes from the IdP so the proxy can
-// still stamp X-NetBird-User.
+// still stamp X-NetBirdy-User.
 func TestGenerateSessionToken_EmailFallsBackToIdP(t *testing.T) {
 	setup := setupValidateSessionTest(t)
 	defer setup.cleanup()

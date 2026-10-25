@@ -1,8 +1,8 @@
-# NetBird Agent Network
+# NetBirdy Agent Network
 
-Agent Network is NetBird's access control layer for AI agents and the people who run them. 
+Agent Network is NetBirdy's access control layer for AI agents and the people who run them. 
 It gives every agent a real identity, tied to an identity provider (IdP), and governs what it can reach: LLM APIs and 
-AI gateways it can call, and the internal resources it can access. Traffic flows only over the encrypted NetBird tunnel, 
+AI gateways it can call, and the internal resources it can access. Traffic flows only over the encrypted NetBirdy tunnel, 
 scoped by policy, with no API keys or other credentials to leak. It also gives you control over cost and token usage.
 
 Because every LLM request passes through an
@@ -29,10 +29,10 @@ https://github.com/user-attachments/assets/44d18286-d8ab-49f8-a457-98ccd66f3268
 Say you have a simple use case: your Engineering or IT team needs access to Claude Code or Codex, and you want visibility into usage plus the ability to enforce budgets.
 How can you do that without creating a dedicated API key for every team?
 
-With Agent Network you get a private endpoint inside your network, for example: https://mirror.netbird.ai
+With Agent Network you get a private endpoint inside your network, for example: https://mirror.netbirdy.ai
 Teams configure their agents to point to that endpoint instead of using individual API keys directly. 
 
-This endpoint is only reachable when users are connected to your NetBird network and authenticated through your IdP. Otherwise, it is not accessible from the public internet.
+This endpoint is only reachable when users are connected to your NetBirdy network and authenticated through your IdP. Otherwise, it is not accessible from the public internet.
 You can then use this private endpoint to configure your AI agents, whether that is Claude Code, Codex, or another tool.
 
 ## Quickstart
@@ -71,10 +71,10 @@ the agent presents a proxy-issued key.
 
 ## Architecture 
 
-Agent Network is built on two existing NetBird capabilities:
+Agent Network is built on two existing NetBirdy capabilities:
 
 - **Overlay network** — the encrypted WireGuard mesh between peers.
-- **Reverse proxy** — a NetBird peer that terminates LLM requests, establishes the
+- **Reverse proxy** — a NetBirdy peer that terminates LLM requests, establishes the
   caller's identity, evaluates policies/limits/guardrails, injects the upstream provider
   key server-side, forwards to the API or gateway, and records usage.
 
@@ -90,7 +90,7 @@ peer-to-peer WireGuard tunnels, governed by the same identities and access polic
 There is no separate "agent-network" service — it reuses the reverse-proxy and management
 components:
 
-- [`proxy/`](../proxy) — the NetBird reverse proxy that serves the agent network endpoint
+- [`proxy/`](../proxy) — the NetBirdy reverse proxy that serves the agent network endpoint
   and runs the per-request middleware pipeline.
 - [`management/internals/modules/reverseproxy/`](../management/internals/modules/reverseproxy)
   — the management-side control plane: providers, policies, guardrails, limits, routing,

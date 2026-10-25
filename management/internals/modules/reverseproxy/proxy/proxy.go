@@ -56,7 +56,7 @@ const (
 	// ClusterTypeAccount is a cluster operated by the account itself (BYOP) —
 	// at least one proxy row in the cluster carries a non-NULL account_id.
 	ClusterTypeAccount ClusterType = "account"
-	// ClusterTypeShared is a cluster operated by NetBird and shared across
+	// ClusterTypeShared is a cluster operated by NetBirdy and shared across
 	// accounts — all proxy rows in the cluster have account_id IS NULL.
 	ClusterTypeShared ClusterType = "shared"
 )

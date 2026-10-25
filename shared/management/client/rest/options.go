@@ -23,12 +23,12 @@ func WithBearerToken(token string) option {
 }
 
 // WithPAT uses provided Personal Access Token
-// (created from NetBird Management Dashboard) for authentication
+// (created from NetBirdy Management Dashboard) for authentication
 func WithPAT(token string) option {
 	return WithAuthHeader("Token " + token)
 }
 
-// WithManagementURL overrides target NetBird Management server
+// WithManagementURL overrides target NetBirdy Management server
 func WithManagementURL(url string) option {
 	return func(c *Client) {
 		c.managementURL = url

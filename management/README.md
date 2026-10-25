@@ -1,13 +1,13 @@
-# netbird Management Server
-netbird management server will control and synchronize peers configuration within your Netbird account and network.
+# netbirdy Management Server
+netbirdy management server will control and synchronize peers configuration within your NetBirdy account and network.
 
 ## Command Options
 The CLI accepts the command **management** with the following options:
 ```shell
-start Netbird Management Server
+start NetBirdy Management Server
 
 Usage:
-  netbird-mgmt management [flags]
+  netbirdy-mgmt management [flags]
 
 Flags:
       --cert-file string            Location of your SSL certificate. Can be used when you have an existing certificate and don't want a new certificate be generated automatically. If letsencrypt-domain is specified this property has no effect
@@ -18,8 +18,8 @@ Flags:
       --port int                    server port to listen on (default 33073)
 
 Global Flags:
-      --config string      Netbird config file location to write new config to (default "/etc/netbird")
-      --log-file string    sets Netbird log path. If console is specified the the log will be output to stdout (default "/var/log/netbird/management.log")
+      --config string      NetBirdy config file location to write new config to (default "/etc/netbird")
+      --log-file string    sets NetBirdy log path. If console is specified the the log will be output to stdout (default "/var/log/netbird/management.log")
       --log-level string    (default "info")
 ```
 ## Run Management service (Docker)
@@ -36,12 +36,12 @@ Replace <YOUR-DOMAIN> with your server's public domain (e.g. mydomain.com or sub
 
 ```bash
 # create a volume
-docker volume create netbird-mgmt
+docker volume create netbirdy-mgmt
 # run the docker container
-docker run -d --name netbird-management \
+docker run -d --name netbirdy-management \
 -p 33073:33073  \
 -p 443:443  \
--v netbird-mgmt:/var/lib/netbird  \
+-v netbirdy-mgmt:/var/lib/netbird  \
 -v ./config.json:/etc/netbird/config.json  \
 netbirdio/management:latest \
 --letsencrypt-domain <YOUR-DOMAIN>
@@ -57,14 +57,14 @@ The certificate will be persisted in the ```datadir/letsencrypt/``` folder (e.g.
 
 Make sure that the ```datadir``` is mapped to some folder on a host machine. In case you used the volume command, you can run the following to retrieve the Mountpoint:
 ```shell
-docker volume inspect netbird-mgmt
+docker volume inspect netbirdy-mgmt
 [
     {
         "CreatedAt": "2021-07-25T20:45:28Z",
         "Driver": "local",
         "Labels": {},
         "Mountpoint": "/var/lib/docker/volumes/mgmt/_data",
-        "Name": "netbird-mgmt",
+        "Name": "netbirdy-mgmt",
         "Options": {},
         "Scope": "local"
     }
@@ -76,24 +76,24 @@ Consequent restarts of the container will pick up previously generated certifica
 
 ```bash
 # create a volume
-docker volume create netbird-mgmt
+docker volume create netbirdy-mgmt
 # run the docker container
-docker run -d --name netbird-management \
+docker run -d --name netbirdy-management \
 -p 33073:33073  \
--v netbird-mgmt:/var/lib/netbird  \
+-v netbirdy-mgmt:/var/lib/netbird  \
 -v ./config.json:/etc/netbird/config.json  \
 netbirdio/management:latest
 ```
 ### Debug tag
 We also publish a docker image with the debug tag which has the log-level set to default, plus it uses the ```gcr.io/distroless/base:debug``` image that can be used with docker exec in order to run some commands in the Management container.
 ```shell
-shell $ docker run -d --name netbird-management-debug \
+shell $ docker run -d --name netbirdy-management-debug \
 -p 33073:33073  \
--v netbird-mgmt:/var/lib/netbird  \
+-v netbirdy-mgmt:/var/lib/netbird  \
 -v ./config.json:/etc/netbird/config.json  \
 netbirdio/management:debug-latest
 
-shell $ docker exec -ti netbird-management-debug /bin/sh
+shell $ docker exec -ti netbirdy-management-debug /bin/sh
 container-shell $ 
 ```
 ## For development purposes:

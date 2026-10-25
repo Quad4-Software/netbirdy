@@ -36,7 +36,7 @@ func newAdminCommands() *cobra.Command {
 func newLegacyTokenCommand() *cobra.Command {
 	cmd := tokencmd.NewCommands(tokencmd.StoreOpener(withAdminStoreOnly))
 	cmd.Deprecated = "use 'admin token' instead"
-	cmd.PersistentFlags().StringVar(&nbconfig.MgmtConfigPath, "config", defaultMgmtConfig, "Netbird config file location")
+	cmd.PersistentFlags().StringVar(&nbconfig.MgmtConfigPath, "config", defaultMgmtConfig, "NetBirdy config file location")
 	return cmd
 }
 

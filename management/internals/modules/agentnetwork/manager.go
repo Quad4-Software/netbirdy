@@ -1080,7 +1080,7 @@ func (m *managerImpl) bootstrapSelfAddressed(ctx context.Context, settings *type
 // its single target is the cluster itself with DirectUpstream. Only a cluster
 // with private capabilities can serve that. Management reports it per cluster
 // as the `private` capability, the same flag the dashboard renders as
-// supports_private when it gates NetBird-only services.
+// supports_private when it gates NetBirdy-only services.
 //
 // Without this check the bootstrap happily pins to any cluster the caller
 // names, including one without private capabilities — and the endpoint it

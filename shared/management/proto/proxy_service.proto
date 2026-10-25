@@ -121,7 +121,7 @@ message PathTargetOptions {
   // Idle timeout before a UDP session is reaped.
   google.protobuf.Duration session_idle_timeout = 6;
   // When true, the proxy dials this target via the host's network stack
-  // instead of through the embedded NetBird client. Useful for upstreams
+  // instead of through the embedded NetBirdy client. Useful for upstreams
   // reachable without WireGuard (public APIs, LAN services, localhost
   // sidecars). Defaults to false — embedded client is the standard path.
   bool direct_upstream = 7;
@@ -237,7 +237,7 @@ message ProxyMapping {
   // For L4/TLS: the port the proxy listens on.
   int32 listen_port = 11;
   AccessRestrictions access_restrictions = 12;
-  // NetBird-only: the proxy MUST call ValidateTunnelPeer and fail closed; operator auth schemes are bypassed.
+  // NetBirdy-only: the proxy MUST call ValidateTunnelPeer and fail closed; operator auth schemes are bypassed.
   bool private = 13;
 }
 
@@ -386,7 +386,7 @@ message ValidateSessionResponse {
   repeated string peer_group_ids = 5;
   // peer_group_names carries the human-readable display names for the
   // ids in peer_group_ids, ordered identically (positional pairing).
-  // Stamped onto upstream requests as X-NetBird-Groups so downstream
+  // Stamped onto upstream requests as X-NetBirdy-Groups so downstream
   // services can read names rather than opaque ids.
   repeated string peer_group_names = 6;
   // session_token contains the durable token issued when session_code is redeemed.
@@ -425,7 +425,7 @@ message ValidateTunnelPeerResponse {
   repeated string peer_group_ids = 6;
   // peer_group_names carries the human-readable display names for the
   // ids in peer_group_ids, ordered identically (positional pairing).
-  // Stamped onto upstream requests as X-NetBird-Groups so downstream
+  // Stamped onto upstream requests as X-NetBirdy-Groups so downstream
   // services can read names rather than opaque ids.
   repeated string peer_group_names = 7;
 }

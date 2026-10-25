@@ -16,7 +16,7 @@ import (
 // model identifier the upstream provider expects on the wire.
 //
 // The three cache rates are pointers because absence is meaningful: nil
-// means "inherit NetBird's default rate for this model" (folded in at
+// means "inherit NetBirdy's default rate for this model" (folded in at
 // synthesis time), while an explicit 0 means "no discount — bill this
 // cache bucket at the input rate".
 type ProviderModel struct {

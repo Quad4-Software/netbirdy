@@ -16,7 +16,7 @@
 #   VARIANT=release|debug  debug swaps the base for Chainguard busybox (a shell)
 #   VERSION                stamped into the binary the same way goreleaser does
 #
-# Images are pinned by digest alone. The builder is golang:1.26.10-bookworm and
+# Images are pinned by digest alone. The builder is golang:1.27.2-bookworm and
 # the bases are Chainguard's :latest, the only free tag; bump them by hand with
 # docker buildx imagetools inspect <image:tag>.
 
@@ -37,7 +37,7 @@ RUN --mount=type=cache,target=/go/pkg/mod \
     --mount=type=cache,target=/root/.cache/go-build \
     CGO_ENABLED=0 GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build -trimpath \
       -ldflags "-s -w -X github.com/netbirdio/netbird/version.version=${VERSION}" \
-      -o /out/netbird-upload ./upload-server \
+      -o /out/netbirdy-upload ./upload-server \
     && mkdir -p /out/var/lib/netbird
 
 FROM cgr.dev/chainguard/static@sha256:17367e4d3ae2b46c3290858e483fac09be085c92b372360fe3bf6a6150848fde AS base-release
@@ -46,7 +46,7 @@ FROM cgr.dev/chainguard/busybox@sha256:98e9e7306c899a8af252ef1ff50c54def91c2fe04
 # hadolint ignore=DL3006
 FROM base-${VARIANT}
 COPY --from=builder --chown=65532:65532 /out/var/lib/netbird /var/lib/netbird
-COPY --from=builder /out/netbird-upload /go/bin/netbird-upload
+COPY --from=builder /out/netbirdy-upload /go/bin/netbirdy-upload
 WORKDIR /var/lib/netbird
 USER 65532:65532
-ENTRYPOINT ["/go/bin/netbird-upload"]
+ENTRYPOINT ["/go/bin/netbirdy-upload"]

@@ -1,17 +1,17 @@
-# netbird Signal Server
+# netbirdy Signal Server
 
-This is a netbird signal-exchange server and client library to exchange
-connection information between netbird peers
+This is a netbirdy signal-exchange server and client library to exchange
+connection information between netbirdy peers
 
 ## Command Options
 
 The CLI accepts the the following options:
 
 ```shell
-start Netbird Signal Server daemon
+start NetBirdy Signal Server daemon
 
 Usage:
-  netbird-signal run [flags]
+  netbirdy-signal run [flags]
 
 Flags:
   -h, --help                        help for run
@@ -23,7 +23,7 @@ Flags:
       --cert-key string             Location of your SSL certificate private key. Can be used when you have an existing certificate and don't want a new certificate be generated automatically. If letsencrypt-domain is specified this property has no effect
 
 Global Flags:
-      --log-file string    sets Netbird log path. If console is specified the the log will be output to stdout (default "/var/log/netbird/signal.log")
+      --log-file string    sets NetBirdy log path. If console is specified the the log will be output to stdout (default "/var/log/netbird/signal.log")
       --log-level string    (default "info")
 ```
 
@@ -35,14 +35,14 @@ following commands:
 
 ````shell
 docker pull netbirdio/signal:latest
-docker run -d --name netbird-signal -p 10000:10000 netbirdio/signal:latest
+docker run -d --name netbirdy-signal -p 10000:10000 netbirdio/signal:latest
 ````
 
 The default log-level is set to INFO, if you need you can change it using by
 updating the docker cmd as followed:
 
 ````shell
-docker run -d --name netbird-signal -p 10000:10000 netbirdio/signal:latest --log-level DEBUG
+docker run -d --name netbirdy-signal -p 10000:10000 netbirdio/signal:latest --log-level DEBUG
 ````
 
 ### Run with TLS (Let's Encrypt).
@@ -61,12 +61,12 @@ subdomain sub.mydomain.com).
 
 ```bash
 # create a volume
-docker volume create netbird-signal
+docker volume create netbirdy-signal
 # run the docker container
-docker run -d --name netbird-signal \
+docker run -d --name netbirdy-signal \
 -p 10000:10000  \
 -p 443:443  \
--v netbird-signal:/var/lib/netbird  \
+-v netbirdy-signal:/var/lib/netbird  \
 netbirdio/signal:latest \
 --letsencrypt-domain <YOUR-DOMAIN>
 ```

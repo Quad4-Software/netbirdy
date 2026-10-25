@@ -423,7 +423,7 @@ func (dm *DexManager) getAllUsers(ctx context.Context) ([]*UserData, error) {
 	users := make([]*UserData, 0, len(resp.Passwords))
 	for _, p := range resp.Passwords {
 		// Encode the user ID in Dex's composite format (base64-encoded protobuf)
-		// to match how NetBird stores user IDs from Dex JWT tokens.
+		// to match how NetBirdy stores user IDs from Dex JWT tokens.
 		// The connector ID "local" is used for Dex's password database.
 		encodedID := encodeDexUserID(p.UserId, "local")
 		users = append(users, &UserData{

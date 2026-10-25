@@ -41,7 +41,7 @@ func newTestIDPStorage(t *testing.T) storage.Storage {
 			idp.DefaultTOTPAuthenticatorID: {
 				AuthenticatorID: idp.DefaultTOTPAuthenticatorID,
 				Type:            "TOTP",
-				Secret:          "otpauth://totp/NetBird:user@example.com?secret=ABC",
+				Secret:          "otpauth://totp/NetBirdy:user@example.com?secret=ABC",
 				Confirmed:       true,
 				CreatedAt:       time.Now(),
 			},

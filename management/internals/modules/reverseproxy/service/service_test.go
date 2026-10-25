@@ -1570,7 +1570,7 @@ func TestValidate_HTTPClusterTarget_RequiresHost(t *testing.T) {
 // TestValidate_HTTPClusterTarget_RequiresDirectUpstream pins the second
 // half of the cluster-target rule: DirectUpstream must be true so the
 // stdlib transport branch in MultiTransport is taken. Without it the
-// embedded NetBird client would try to dial the cluster address through
+// embedded NetBirdy client would try to dial the cluster address through
 // the WG tunnel, which is the wrong network for a cluster upstream.
 func TestValidate_HTTPClusterTarget_RequiresDirectUpstream(t *testing.T) {
 	rp := validProxy()

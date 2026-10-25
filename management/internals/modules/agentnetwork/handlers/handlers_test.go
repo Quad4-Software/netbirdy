@@ -280,7 +280,7 @@ func TestConsumptionHandler_PopulatedAccountListsRows(t *testing.T) {
 		"rows recorded in the same window must share the aligned window_start_utc")
 }
 
-// seedSharedPrivateCluster registers a connected, NetBird-operated proxy
+// seedSharedPrivateCluster registers a connected, NetBirdy-operated proxy
 // with private capabilities (the `private` capability) so
 // clusterAddr is a cluster any account may pin its agent-network gateway to.
 func seedSharedPrivateCluster(t *testing.T, st store.Store, clusterAddr string) {

@@ -3,7 +3,7 @@ servers:
   - url: /api/v1alpha1
     description: Default server
 info:
-  title: NetBird REST API
+  title: NetBirdy REST API
   description: API to manipulate groups, rules, policies and retrieve information about peers and users
   version: 1.0.0-alpha1
 tags:

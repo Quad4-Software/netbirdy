@@ -23,7 +23,7 @@
     "Relay":{
       "Addresses":["rel://test.com:3535"],
       "CredentialsTTL":"2h",
-      "Secret":"netbird"
+      "Secret":"netbirdy"
   },
     "Signal": {
         "Proto": "http",

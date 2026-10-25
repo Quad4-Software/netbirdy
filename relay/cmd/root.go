@@ -95,9 +95,9 @@ func (c Config) HasLetsEncrypt() bool {
 var (
 	cobraConfig *Config
 	rootCmd     = &cobra.Command{
-		Use:           "relay",
+		Use:           "netbirdy-relay",
 		Short:         "Relay service",
-		Long:          "Relay service for Netbird agents",
+		Long:          "Relay service for NetBirdy agents",
 		SilenceUsage:  true,
 		SilenceErrors: true,
 		RunE:          execute,

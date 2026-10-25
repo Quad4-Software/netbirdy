@@ -76,7 +76,7 @@ components:
               type: boolean
               example: true
             last_seen:
-              description: Last time peer connected to Netbird's management service
+              description: Last time peer connected to NetBirdy's management service
               type: string
               format: date-time
               example: "2023-05-05T10:05:26.420578Z"

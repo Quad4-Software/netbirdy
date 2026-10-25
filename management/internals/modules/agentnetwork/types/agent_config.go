@@ -12,7 +12,7 @@ type AgentConfig struct {
 	// and the empty list is what tells them to ask for access.
 	Configured bool
 	// Endpoint is the account's proxy base URL
-	// ("https://<subdomain>.<cluster>"), reachable over the NetBird tunnel
+	// ("https://<subdomain>.<cluster>"), reachable over the NetBirdy tunnel
 	// only. Empty when Configured is false. Handing it to a member the
 	// policies do not cover authorizes nothing on its own — the proxy
 	// still refuses every request no policy permits.

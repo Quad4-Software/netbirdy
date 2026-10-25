@@ -40,7 +40,7 @@ openai:
   gpt-4o:
     input_per_1k: 0.9
     output_per_1k: 1.8
-  # A model NetBird doesn't know at all.
+  # A model NetBirdy doesn't know at all.
   my-private-ft:
     input_per_1k: 0.01
     output_per_1k: 0.02

@@ -710,7 +710,7 @@ func (c *CombinedConfig) ToManagementConfig() (*nbconfig.Config, error) {
 	httpConfig.AuthIssuer = mgmt.Auth.Issuer
 	httpConfig.AuthAudience = "netbird-dashboard"
 	httpConfig.AuthClientID = httpConfig.AuthAudience
-	httpConfig.CLIAuthAudience = "netbird-cli"
+	httpConfig.CLIAuthAudience = "netbirdy-cli"
 	httpConfig.AuthUserIDClaim = "sub"
 	httpConfig.AuthKeysLocation = mgmt.Auth.Issuer + "/keys"
 	httpConfig.OIDCConfigEndpoint = mgmt.Auth.Issuer + "/.well-known/openid-configuration"
@@ -770,7 +770,7 @@ func ApplyEmbeddedIdPConfig(ctx context.Context, cfg *nbconfig.Config, mgmtPort 
 	// Set HttpConfig values from EmbeddedIdP
 	cfg.HttpConfig.AuthIssuer = issuer
 	cfg.HttpConfig.AuthAudience = "netbird-dashboard"
-	cfg.HttpConfig.CLIAuthAudience = "netbird-cli"
+	cfg.HttpConfig.CLIAuthAudience = "netbirdy-cli"
 	cfg.HttpConfig.AuthUserIDClaim = "sub"
 	cfg.HttpConfig.AuthKeysLocation = issuer + "/keys"
 	cfg.HttpConfig.OIDCConfigEndpoint = issuer + "/.well-known/openid-configuration"

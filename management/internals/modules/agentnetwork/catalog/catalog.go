@@ -34,11 +34,11 @@ type Model struct {
 // ProviderKind groups catalog entries for UI presentation. The split
 // is semantic, not technical:
 //   - KindProvider: the upstream is a vendor's first-party API (OpenAI,
-//     Anthropic, Mistral, Bedrock, etc.) — NetBird talks straight to
+//     Anthropic, Mistral, Bedrock, etc.) — NetBirdy talks straight to
 //     the model provider.
 //   - KindGateway: the upstream is itself a routing / aggregation layer
 //     in front of multiple providers (LiteLLM, Portkey, Helicone, …).
-//     These typically need NetBird identity stamped onto upstream
+//     These typically need NetBirdy identity stamped onto upstream
 //     requests so the gateway's analytics and budgets attribute to the
 //     real caller; that's what IdentityInjection is for.
 //   - KindCustom: the catch-all "OpenAI-compatible self-hosted endpoint"
@@ -97,7 +97,7 @@ type Provider struct {
 	// pricing package's tests enforce that.
 	PricingSurfaces []string
 	// IdentityInjection, when non-nil, instructs the proxy to stamp
-	// the caller's NetBird identity onto upstream requests under the
+	// the caller's NetBirdy identity onto upstream requests under the
 	// configured header names. Used for gateways like LiteLLM that
 	// key budgets and attribution off request headers (the gateway
 	// otherwise has no way to learn which user / group made the call).
@@ -161,7 +161,7 @@ type Discovery struct {
 	Path            string
 	Query           string
 	Shape           ListingShape
-	// ExactModelsOnly omits wildcard patterns from listings when NetBird's
+	// ExactModelsOnly omits wildcard patterns from listings when NetBirdy's
 	// provider model rows cannot represent the vendor's matching semantics.
 	ExactModelsOnly bool
 	// Headers are static headers the vendor requires beyond the credential
@@ -190,7 +190,7 @@ type ExtraHeader struct {
 	Name string
 }
 
-// IdentityInjection describes how the proxy stamps NetBird identity onto
+// IdentityInjection describes how the proxy stamps NetBirdy identity onto
 // upstream gateway requests. Exactly one shape must be set — they're
 // mutually exclusive and dispatched by the inject middleware.
 //
@@ -226,7 +226,7 @@ type HeaderPairInjection struct {
 	// email when the peer is attached to a user, else peer.Name),
 	// e.g. "x-litellm-end-user-id".
 	EndUserIDHeader string
-	// TagsHeader receives the caller's NetBird group display names
+	// TagsHeader receives the caller's NetBirdy group display names
 	// as a CSV, e.g. "x-litellm-tags".
 	TagsHeader string
 	// TagsInBody, when true, additionally writes the tag list into
@@ -253,7 +253,7 @@ type HeaderPairInjection struct {
 }
 
 // JSONMetadataInjection is the Portkey-style wire convention: a single
-// header carrying a JSON object. NetBird identity fields land under the
+// header carrying a JSON object. NetBirdy identity fields land under the
 // configured reserved keys; missing keys (empty string) are skipped at
 // emit time.
 type JSONMetadataInjection struct {
@@ -276,7 +276,7 @@ type JSONMetadataInjection struct {
 	// UserKey is the JSON key for the caller's display identity.
 	// Portkey reserves "_user" for this dimension.
 	UserKey string
-	// GroupsKey is the JSON key for the caller's NetBird groups,
+	// GroupsKey is the JSON key for the caller's NetBirdy groups,
 	// emitted as a CSV string value (Portkey requires string values).
 	GroupsKey string
 	// MaxValueLength caps each emitted JSON value, in bytes. Portkey
@@ -618,7 +618,7 @@ var providers = []Provider{
 		ID:                 "litellm_proxy",
 		Kind:               KindGateway,
 		Name:               "LiteLLM Proxy",
-		Description:        "Bring your own LiteLLM proxy with NetBird identity stamped on every request",
+		Description:        "Bring your own LiteLLM proxy with NetBirdy identity stamped on every request",
 		DefaultHost:        "",
 		AuthHeaderName:     "Authorization",
 		AuthHeaderTemplate: "Bearer ${API_KEY}",
@@ -645,7 +645,7 @@ var providers = []Provider{
 		ID:                 "agentgateway",
 		Kind:               KindGateway,
 		Name:               "agentgateway",
-		Description:        "Bring your own agentgateway with trusted NetBird identity stamped on every request",
+		Description:        "Bring your own agentgateway with trusted NetBirdy identity stamped on every request",
 		DefaultHost:        "",
 		AuthHeaderName:     "Authorization",
 		AuthHeaderTemplate: "Bearer ${API_KEY}",
@@ -673,7 +673,7 @@ var providers = []Provider{
 		ID:          "portkey",
 		Kind:        KindGateway,
 		Name:        "Portkey AI Gateway",
-		Description: "Portkey AI Gateway with NetBird identity stamped via x-portkey-metadata",
+		Description: "Portkey AI Gateway with NetBirdy identity stamped via x-portkey-metadata",
 		DefaultHost: "api.portkey.ai",
 		// Portkey hosted requires x-portkey-api-key (account key)
 		// plus a routing decision per request. The simplest routing
@@ -752,7 +752,7 @@ var providers = []Provider{
 		ID:                 "cloudflare_ai_gateway",
 		Kind:               KindGateway,
 		Name:               "Cloudflare AI Gateway",
-		Description:        "Cloudflare AI Gateway. Operator pastes the gateway URL (with the upstream provider slug like /openai or /anthropic so the URL sniffer dispatches to the right parser) and a per-gateway authentication token. Recommended setup is BYOK / Stored Keys: Cloudflare manages the upstream provider credential and the gateway token is the only secret NetBird needs.",
+		Description:        "Cloudflare AI Gateway. Operator pastes the gateway URL (with the upstream provider slug like /openai or /anthropic so the URL sniffer dispatches to the right parser) and a per-gateway authentication token. Recommended setup is BYOK / Stored Keys: Cloudflare manages the upstream provider credential and the gateway token is the only secret NetBirdy needs.",
 		DefaultHost:        "",
 		AuthHeaderName:     "cf-aig-authorization",
 		AuthHeaderTemplate: "Bearer ${API_KEY}",
@@ -767,11 +767,11 @@ var providers = []Provider{
 		// (skipMissingProvider) but the request still flows.
 		ParserID: "",
 		// cf-aig-metadata is a single header carrying a JSON object;
-		// up to five string/number/boolean values per request. NetBird
+		// up to five string/number/boolean values per request. NetBirdy
 		// occupies two slots (user id + groups CSV) and leaves three
 		// for operator-added context. JSON keys are operator-
 		// customisable so Cloudflare-side log filters can use the
-		// operator's existing label conventions instead of NetBird's
+		// operator's existing label conventions instead of NetBirdy's
 		// defaults — hence Customizable=true. The dashboard surfaces
 		// the catalog values as placeholders; only the values stored
 		// on the provider record's IdentityHeader* fields land on the
@@ -814,7 +814,7 @@ var providers = []Provider{
 		// Caveats operators should know:
 		//   - up to 10 tags total per request (deduped); 11+ → HTTP 400
 		//   - each tag must be 1-64 chars
-		//   - user up to 256 chars (NetBird user emails fit)
+		//   - user up to 256 chars (NetBirdy user emails fit)
 		//   - $0.075 per 1k unique user/tag values written
 		// We don't enforce the caps in the inject middleware today;
 		// operators in groups beyond the 10-tag limit will see Vercel

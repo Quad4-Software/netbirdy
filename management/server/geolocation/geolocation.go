@@ -68,6 +68,19 @@ const (
 )
 
 func NewGeolocation(ctx context.Context, dataDir string, autoUpdate bool) (Geolocation, error) {
+	// No configured source and no local files: run without geolocation
+	// instead of failing server startup. Lookups will report the database
+	// as unavailable.
+	noSources := geoLiteCityTarGZURL == "" && geoLiteCityZipURL == ""
+	if noSources {
+		mmdbFiles := getExistingDatabases(filepath.Join(dataDir, mmdbPattern))
+		geonamesFiles := getExistingDatabases(filepath.Join(dataDir, geonamesdbPattern))
+		if len(mmdbFiles) == 0 || len(geonamesFiles) == 0 {
+			log.WithContext(ctx).Info("no geolocation database configured or present; geolocation disabled")
+			return &Mock{}, nil
+		}
+	}
+
 	mmdbGlobPattern := filepath.Join(dataDir, mmdbPattern)
 	mmdbFile, err := getDatabaseFilename(ctx, geoLiteCityTarGZURL, mmdbGlobPattern, autoUpdate)
 	if err != nil {

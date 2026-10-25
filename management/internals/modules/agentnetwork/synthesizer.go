@@ -544,7 +544,7 @@ func providerVendors(p *types.Provider) []string {
 // slice when no models are configured — the router treats that as
 // "claim every model" so gateway-style providers (LiteLLM, custom
 // OpenAI-compatible endpoints) work without the operator enumerating
-// the upstream's full model catalog in NetBird.
+// the upstream's full model catalog in NetBirdy.
 func providerModelIDs(p *types.Provider) []string {
 	if len(p.Models) == 0 {
 		return []string{}
@@ -751,7 +751,7 @@ func buildIdentityExtraHeaders(p *types.Provider, extras []catalog.ExtraHeader) 
 // management to keep the consumption counters fresh.
 //
 // llm_identity_inject runs immediately after the router so the
-// resolved provider id is available; it stamps NetBird identity onto
+// resolved provider id is available; it stamps NetBirdy identity onto
 // requests bound for gateways like LiteLLM that key budgets and
 // attribution off request headers. CanMutate is required so its
 // HeadersAdd / HeadersRemove pass the framework's mutation gate.
@@ -801,7 +801,7 @@ func buildMiddlewareChain(routerCfgJSON, identityInjectJSON, guardrailJSON, cost
 			Slot:       rpservice.MiddlewareSlotOnRequest,
 			ConfigJSON: identityInjectJSON,
 			// CanMutate is required so HeadersAdd / HeadersRemove
-			// emitted to stamp NetBird identity onto the upstream
+			// emitted to stamp NetBirdy identity onto the upstream
 			// request actually land — without it the framework
 			// drops every header mutation.
 			CanMutate: true,

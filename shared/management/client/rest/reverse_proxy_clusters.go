@@ -31,7 +31,7 @@ func (a *ReverseProxyClustersAPI) List(ctx context.Context) ([]api.ProxyCluster,
 
 // Delete removes every self-hosted (BYOP) proxy registration for the given
 // cluster address owned by the calling account. Shared clusters operated by
-// NetBird cannot be deleted via this endpoint; the server returns 404 / 400
+// NetBirdy cannot be deleted via this endpoint; the server returns 404 / 400
 // for cluster addresses the account does not own.
 func (a *ReverseProxyClustersAPI) Delete(ctx context.Context, clusterAddress string) error {
 	// Guard against the empty input: url.PathEscape("") returns "" which

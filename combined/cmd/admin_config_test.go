@@ -14,15 +14,15 @@ import (
 func TestApplyAdminDefaultsCopiesServerStoreWithoutExposedAddress(t *testing.T) {
 	cfg := DefaultConfig()
 	cfg.Server.ExposedAddress = ""
-	cfg.Server.DataDir = "/srv/netbird"
+	cfg.Server.DataDir = "/srv/netbirdy"
 	cfg.Server.Store = StoreConfig{
 		Engine: "postgres",
-		DSN:    "postgres://user:pass@example.com/netbird",
+		DSN:    "postgres://user:pass@example.com/netbirdy",
 	}
 
 	cfg.ApplyAdminDefaults()
 
-	require.Equal(t, "/srv/netbird", cfg.Management.DataDir)
+	require.Equal(t, "/srv/netbirdy", cfg.Management.DataDir)
 	require.Equal(t, "postgres", cfg.Management.Store.Engine)
 	require.Equal(t, cfg.Server.Store.DSN, cfg.Management.Store.DSN)
 }

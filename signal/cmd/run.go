@@ -67,7 +67,7 @@ var (
 
 	runCmd = &cobra.Command{
 		Use:          "run",
-		Short:        "start NetBird Signal Server daemon",
+		Short:        "start NetBirdy Signal Server daemon",
 		SilenceUsage: true,
 		PreRunE: func(cmd *cobra.Command, args []string) error {
 			err := util.InitLog(logLevel, logFile)

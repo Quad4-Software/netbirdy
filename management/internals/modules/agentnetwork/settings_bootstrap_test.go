@@ -76,7 +76,7 @@ func ptrTo[T any](v T) *T { return &v }
 
 // seedProxy registers a proxy in clusterAddr, heartbeating now, so the labeled
 // bootstrap path has a real cluster to validate against. accountID empty makes
-// it a shared (NetBird-operated) cluster; private mirrors the capability an
+// it a shared (NetBirdy-operated) cluster; private mirrors the capability an
 // proxy with private capabilities reports, nil an unreported one.
 func (f *bootstrapFixture) seedProxy(t *testing.T, proxyID, accountID, clusterAddr string, private *bool) {
 	t.Helper()
@@ -429,7 +429,7 @@ func TestCreateSettingsRejectsForeignCluster(t *testing.T) {
 }
 
 // TestCreateSettingsSharedClusterStaysPinnable pins the constraint the
-// ownership check must respect: a shared (NetBird-operated) cluster is not
+// ownership check must respect: a shared (NetBirdy-operated) cluster is not
 // anybody's, so any number of accounts pin their gateways to it — including
 // an account that also runs a proxy of its own elsewhere.
 func TestCreateSettingsSharedClusterStaysPinnable(t *testing.T) {

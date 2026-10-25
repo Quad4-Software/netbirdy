@@ -1,4 +1,4 @@
-// Package metrics gather anonymous information about the usage of NetBird management
+// Package metrics gather anonymous information about the usage of NetBirdy management
 package metrics
 
 import (
@@ -26,7 +26,7 @@ const (
 	// PayloadEvent identifies an event type
 	PayloadEvent = "self-hosted stats"
 	// payloadEndpoint metrics defaultEndpoint to send anonymous data
-	payloadEndpoint = "https://metrics.netbird.io"
+	payloadEndpoint = ""
 	// defaultPushInterval default interval to push metrics
 	defaultPushInterval = 12 * time.Hour
 	// requestTimeout http request timeout
@@ -122,6 +122,11 @@ func getMetricsInterval(ctx context.Context) time.Duration {
 }
 
 func (w *Worker) sendMetrics(ctx context.Context) error {
+	// NetBirdy has no metrics endpoint. The endpoint stays empty unless a
+	// downstream build provides one, so this is a no-op.
+	if payloadEndpoint == "" {
+		return nil
+	}
 	apiKey, err := getAPIKey(w.ctx)
 	if err != nil {
 		return err
@@ -226,7 +231,7 @@ func (w *Worker) generateProperties(ctx context.Context) properties {
 		servicesAuthPassword      int
 		servicesAuthPin           int
 		servicesAuthOIDC          int
-		// Private-service signals — track adoption of NetBird-only mode
+		// Private-service signals — track adoption of NetBirdy-only mode
 		// (services backed by an embedded proxy peer + access groups).
 		servicesPrivate                int
 		servicesPrivateWithGroups      int

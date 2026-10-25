@@ -26,7 +26,7 @@ type Claims struct {
 	// round-trip on every cookie-bearing request.
 	Email string `json:"email,omitempty"`
 	// Groups carries the user's group IDs so the proxy can stamp them
-	// onto upstream requests (X-NetBird-Groups) from the cookie path
+	// onto upstream requests (X-NetBirdy-Groups) from the cookie path
 	// without an extra management round-trip.
 	Groups []string `json:"groups,omitempty"`
 	// GroupNames carries the human-readable display names for the ids

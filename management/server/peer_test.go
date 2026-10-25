@@ -1244,7 +1244,7 @@ func TestToSyncResponse(t *testing.T) {
 	assert.Equal(t, "192.168.1.1/24", response.PeerConfig.Address)
 	assert.Equal(t, "peer1.example.com", response.PeerConfig.Fqdn)
 	assert.Equal(t, true, response.PeerConfig.SshConfig.SshEnabled)
-	// assert netbird config
+	// assert netbirdy config
 	assert.Equal(t, "signal.uri", response.NetbirdConfig.Signal.Uri)
 	assert.Equal(t, proto.HostConfig_HTTPS, response.NetbirdConfig.Signal.GetProtocol())
 	assert.Equal(t, "stun.uri", response.NetbirdConfig.Stuns[0].Uri)

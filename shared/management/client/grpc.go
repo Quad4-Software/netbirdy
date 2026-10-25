@@ -55,6 +55,7 @@ type ConnStateNotifier interface {
 }
 
 type GrpcClient struct {
+	serverName string
 	key                   wgtypes.Key
 	realClient            proto.ManagementServiceClient
 	ctx                   context.Context
@@ -124,6 +125,13 @@ func WithNetEvents(events *netevents.Manager) Option {
 	return func(c *GrpcClient) { c.netMgr = events }
 }
 
+// WithServerName overrides the TLS server name and gRPC authority used for
+// the connection, so a cached IP can be dialed while certificates keep
+// verifying against the original hostname.
+func WithServerName(name string) Option {
+	return func(c *GrpcClient) { c.serverName = name }
+}
+
 // NewClient creates a new client to Management service
 func NewClient(ctx context.Context, addr string, ourPrivateKey wgtypes.Key, tlsEnabled bool, opts ...Option) (*GrpcClient, error) {
 	// Options apply before dialing: the sweeper must wrap the first connection too.
@@ -144,6 +152,9 @@ func NewClient(ctx context.Context, addr string, ourPrivateKey wgtypes.Key, tlsE
 	}
 	if c.netMgr != nil {
 		extraOpts = append(extraOpts, nbgrpc.WithSweeper(c.netMgr))
+	if c.serverName != "" {
+		extraOpts = append(extraOpts, grpc.WithAuthority(c.serverName))
+	}
 	}
 
 	var conn *grpc.ClientConn

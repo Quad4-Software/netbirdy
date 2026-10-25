@@ -120,9 +120,9 @@ func TestFetchAgentgatewayListing(t *testing.T) {
 	assert.Equal(t, "Bearer virtual-key", tr.got.Header.Get("Authorization"),
 		"agentgateway model discovery must use the configured virtual key")
 	assert.Equal(t, []string{"gpt-4o-mini", "claude-haiku-4-5"}, ids(models),
-		"model patterns must not be offered as exact NetBird authorization rows")
+		"model patterns must not be offered as exact NetBirdy authorization rows")
 	for _, m := range models {
-		assert.True(t, m.PricingKnown, "known upstream model must use NetBird catalog pricing: %s", m.ID)
+		assert.True(t, m.PricingKnown, "known upstream model must use NetBirdy catalog pricing: %s", m.ID)
 	}
 }
 

@@ -20,7 +20,7 @@ components:
           type: string
           example: Tom Schulz
         role:
-          description: User's NetBird account role
+          description: User's NetBirdy account role
           type: string
           example: admin
         status:
@@ -102,7 +102,7 @@ components:
       type: object
       properties:
         role:
-          description: User's NetBird account role
+          description: User's NetBirdy account role
           type: string
           example: admin
         auto_groups:
@@ -131,7 +131,7 @@ components:
           type: string
           example: Tom Schulz
         role:
-          description: User's NetBird account role
+          description: User's NetBirdy account role
           type: string
           example: admin
         auto_groups:

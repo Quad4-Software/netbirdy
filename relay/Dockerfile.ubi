@@ -4,15 +4,15 @@ ARG TARGETPLATFORM
 ARG VERSION=dev
 ARG RELEASE=1
 
-LABEL name="netbird-relay" \
-      maintainer="NetBird <dev@netbird.io>" \
+LABEL name="netbirdy-relay" \
+      maintainer="NetBirdy <dev@netbird.io>" \
       vendor="NetBird GmbH" \
       version="${VERSION}" \
       release="${RELEASE}" \
-      summary="NetBird Relay" \
-      description="NetBird Relay carries traffic between peers when a direct connection is unavailable."
+      summary="NetBirdy Relay" \
+      description="NetBirdy Relay carries traffic between peers when a direct connection is unavailable."
 
-COPY --chmod=0555 ${TARGETPLATFORM}/netbird-relay /go/bin/netbird-relay
+COPY --chmod=0555 ${TARGETPLATFORM}/netbirdy-relay /go/bin/netbirdy-relay
 COPY licenses/ /licenses/
 # Only the data directory shares the root group for arbitrary non-root UIDs.
 # Runtime-created Let's Encrypt keys retain the application's restrictive modes.
@@ -30,4 +30,4 @@ ENV NB_LOG_FILE=console
 ENV NB_LISTEN_ADDRESS=":8443"
 EXPOSE 8443 8443/udp
 STOPSIGNAL SIGTERM
-ENTRYPOINT ["/go/bin/netbird-relay"]
+ENTRYPOINT ["/go/bin/netbirdy-relay"]

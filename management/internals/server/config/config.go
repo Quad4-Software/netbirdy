@@ -129,7 +129,7 @@ type HttpServerConfig struct {
 	AuthCallbackURL string
 }
 
-// Host represents a Netbird host (e.g. STUN, TURN, Signal)
+// Host represents a NetBirdy host (e.g. STUN, TURN, Signal)
 type Host struct {
 	Proto Protocol
 	// URI e.g. turns://stun.netbird.io:4430 or signal.netbird.io:10000

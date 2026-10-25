@@ -406,11 +406,11 @@ type ProxyMetrics struct {
 	Clusters int64
 	// ClustersBYOP counts distinct cluster_address values that are owned
 	// by an account (account_id IS NOT NULL). These are bring-your-own-proxy
-	// installations as opposed to NetBird-operated shared clusters.
+	// installations as opposed to NetBirdy-operated shared clusters.
 	ClustersBYOP int64
 	// ClustersPrivate counts distinct cluster_address values where at
 	// least one proxy reported the private capability (embedded
-	// `netbird proxy` running inside a client).
+	// `netbirdy proxy` running inside a client).
 	ClustersPrivate int64
 	// Proxies is the total number of proxy rows currently persisted.
 	Proxies int64

@@ -1,4 +1,4 @@
-# NetBird Combined Server Configuration
+# NetBirdy Combined Server Configuration
 # Copy this file to config.yaml and customize for your deployment
 #
 # This is a Management server with optional embedded Signal, Relay, and STUN services.

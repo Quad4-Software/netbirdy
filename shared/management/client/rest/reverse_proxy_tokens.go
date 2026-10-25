@@ -12,7 +12,7 @@ import (
 
 // ReverseProxyTokensAPI exposes the account-scoped proxy access tokens that
 // self-hosted (bring-your-own-proxy) deployments use to register a
-// `netbird proxy` instance with management. Tokens are bound to the
+// `netbirdy proxy` instance with management. Tokens are bound to the
 // calling account; revoking a token disconnects every proxy that
 // authenticated with it.
 type ReverseProxyTokensAPI struct {

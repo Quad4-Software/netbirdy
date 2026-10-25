@@ -24,7 +24,7 @@ import (
 
 const (
 	// Version endpoints
-	managementVersionURL = "https://pkgs.netbird.io/releases/latest/version"
+	managementVersionURL = "https://api.github.com/repos/Sudo-Ivan/netbirdy/releases/latest"
 	dashboardReleasesURL = "https://api.github.com/repos/netbirdio/dashboard/releases/latest"
 
 	// Cache TTL for version information
@@ -34,7 +34,7 @@ const (
 	httpTimeout = 5 * time.Second
 )
 
-// VersionInfo contains version information for NetBird components
+// VersionInfo contains version information for NetBirdy components
 type VersionInfo struct {
 	// CurrentVersion is the running management server version
 	CurrentVersion string
@@ -68,7 +68,7 @@ type Manager interface {
 	// clean slate.
 	RollbackSetup(ctx context.Context, userID string) error
 
-	// GetVersionInfo returns version information for NetBird components.
+	// GetVersionInfo returns version information for NetBirdy components.
 	GetVersionInfo(ctx context.Context) (*VersionInfo, error)
 }
 
@@ -122,7 +122,7 @@ func NewManager(ctx context.Context, store store.Store, idpManager idp.Manager) 
 }
 
 func (m *DefaultManager) loadSetupRequired(ctx context.Context) error {
-	// Check if there are any accounts in the NetBird store
+	// Check if there are any accounts in the NetBirdy store
 	numAccounts, err := m.store.GetAccountsCounter(ctx)
 	if err != nil {
 		return err
@@ -283,7 +283,7 @@ func (m *DefaultManager) validateSetupInfo(email, password, name string) error {
 	return nil
 }
 
-// GetVersionInfo returns version information for NetBird components.
+// GetVersionInfo returns version information for NetBirdy components.
 func (m *DefaultManager) GetVersionInfo(ctx context.Context) (*VersionInfo, error) {
 	m.versionMu.RLock()
 	if m.cachedVersions != nil && time.Since(m.lastVersionFetch) < versionCacheTTL {
@@ -310,10 +310,11 @@ func (m *DefaultManager) fetchVersionInfo(ctx context.Context) (*VersionInfo, er
 		CurrentVersion: version.NetbirdVersion(),
 	}
 
-	// Fetch management version from pkgs.netbird.io (plain text)
-	mgmtVersion, err := m.fetchPlainTextVersion(ctx, managementVersionURL)
+	// Fetch the latest fork release from GitHub
+	mgmtVersion, err := m.fetchGitHubRelease(ctx, managementVersionURL)
 	if err != nil {
-		log.WithContext(ctx).Warnf("failed to fetch management version: %v", err)
+		// Fork has no releases yet; not a warning worth repeating.
+		log.WithContext(ctx).Debugf("management version fetch skipped: %v", err)
 	} else {
 		info.ManagementVersion = mgmtVersion
 		info.ManagementUpdateAvailable = isNewerVersion(info.CurrentVersion, mgmtVersion)
@@ -322,7 +323,7 @@ func (m *DefaultManager) fetchVersionInfo(ctx context.Context) (*VersionInfo, er
 	// Fetch dashboard version from GitHub
 	dashVersion, err := m.fetchGitHubRelease(ctx, dashboardReleasesURL)
 	if err != nil {
-		log.WithContext(ctx).Warnf("failed to fetch dashboard version from GitHub: %v", err)
+		log.WithContext(ctx).Debugf("failed to fetch dashboard version from GitHub: %v", err)
 	} else {
 		info.DashboardVersion = dashVersion
 	}
@@ -357,7 +358,7 @@ func (m *DefaultManager) fetchPlainTextVersion(ctx context.Context, url string) 
 		return "", fmt.Errorf("create request: %w", err)
 	}
 
-	req.Header.Set("User-Agent", "NetBird-Management/"+version.NetbirdVersion())
+	req.Header.Set("User-Agent", "NetBirdy-Management/"+version.NetbirdVersion())
 
 	resp, err := m.httpClient.Do(req)
 	if err != nil {
@@ -384,7 +385,7 @@ func (m *DefaultManager) fetchGitHubRelease(ctx context.Context, url string) (st
 	}
 
 	req.Header.Set("Accept", "application/vnd.github.v3+json")
-	req.Header.Set("User-Agent", "NetBird-Management/"+version.NetbirdVersion())
+	req.Header.Set("User-Agent", "NetBirdy-Management/"+version.NetbirdVersion())
 
 	resp, err := m.httpClient.Do(req)
 	if err != nil {

@@ -438,8 +438,8 @@ func TestPostureCheckUpdate(t *testing.T) {
 							"processes": [
 								{ 
 									"linux_path": "/usr/local/bin/netbird",
-									"mac_path": "/Applications/NetBird.app/Contents/MacOS/netbird",
-									"windows_path": "C:\\ProgramData\\NetBird\\netbird.exe"
+									"mac_path": "/Applications/NetBirdy.app/Contents/MacOS/netbird",
+									"windows_path": "C:\\ProgramData\\NetBirdy\\netbird.exe"
 								}
 							]
 						}
@@ -456,8 +456,8 @@ func TestPostureCheckUpdate(t *testing.T) {
 						Processes: []api.Process{
 							{
 								LinuxPath:   str("/usr/local/bin/netbird"),
-								MacPath:     str("/Applications/NetBird.app/Contents/MacOS/netbird"),
-								WindowsPath: str("C:\\ProgramData\\NetBird\\netbird.exe"),
+								MacPath:     str("/Applications/NetBirdy.app/Contents/MacOS/netbird"),
+								WindowsPath: str("C:\\ProgramData\\NetBirdy\\netbird.exe"),
 							},
 						},
 					},
@@ -496,7 +496,7 @@ func TestPostureCheckUpdate(t *testing.T) {
 			expectedBody:   false,
 		},
 		{
-			name:        "Create Posture Checks Invalid NetBird's Min Version",
+			name:        "Create Posture Checks Invalid NetBirdy's Min Version",
 			requestType: http.MethodPost,
 			requestPath: "/api/posture-checks",
 			requestBody: bytes.NewBuffer(
@@ -729,7 +729,7 @@ func TestPostureCheckUpdate(t *testing.T) {
 			expectedBody:   false,
 		},
 		{
-			name:        "Update Posture Checks Invalid NetBird's Min Version",
+			name:        "Update Posture Checks Invalid NetBirdy's Min Version",
 			requestType: http.MethodPut,
 			requestPath: "/api/posture-checks/postureCheck",
 			requestBody: bytes.NewBuffer(

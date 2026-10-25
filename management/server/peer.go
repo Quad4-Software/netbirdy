@@ -1472,7 +1472,7 @@ func processPeerPostureChecks(policy *types.Policy, peerID string, peerGroupIDs 
 
 // checkIFPeerNeedsLoginWithoutLock checks if the peer needs login without acquiring the account lock. The check validate if the peer was not added via SSO
 // and if the peer login is expired.
-// The NetBird client doesn't have a way to check if the peer needs login besides sending a login request
+// The NetBirdy client doesn't have a way to check if the peer needs login besides sending a login request
 // with no JWT token and usually no setup-key. As the client can send up to two login request to check if it is expired
 // and before starting the engine, we do the checks without an account lock to avoid piling up requests.
 func (am *DefaultAccountManager) checkIFPeerNeedsLoginWithoutLock(ctx context.Context, accountID string, login types.PeerLogin) error {

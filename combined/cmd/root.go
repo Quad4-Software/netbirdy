@@ -50,9 +50,9 @@ var (
 	config     *CombinedConfig
 
 	rootCmd = &cobra.Command{
-		Use:   "combined",
-		Short: "Combined Netbird server (Management + Signal + Relay + STUN)",
-		Long: `Combined Netbird server for self-hosted deployments.
+		Use:   "netbirdy-server",
+		Short: "Combined NetBirdy server (Management + Signal + Relay + STUN)",
+		Long: `Combined NetBirdy server for self-hosted deployments.
 
 All services (Management, Signal, Relay) are multiplexed on a single port.
 Optional STUN server runs on separate UDP ports.
@@ -189,7 +189,7 @@ func initializeConfig() error {
 	}
 	applyAccessLogStoreEnv(config.Server.AccessLogStore)
 
-	log.Infof("Starting combined NetBird server")
+	log.Infof("Starting combined NetBirdy server")
 	logConfig(config)
 	logEnvVars()
 	return nil

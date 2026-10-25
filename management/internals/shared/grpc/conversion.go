@@ -26,7 +26,7 @@ import (
 )
 
 const (
-	// deprecatedRemotePeersVersion is the version of Netbird that introduced the NetworkMap.RemotePeers field, deprecated in favor of RemotePeers.
+	// deprecatedRemotePeersVersion is the version of NetBirdy that introduced the NetworkMap.RemotePeers field, deprecated in favor of RemotePeers.
 	deprecatedRemotePeersVersion = "0.29.3"
 )
 

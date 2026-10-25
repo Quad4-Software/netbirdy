@@ -175,7 +175,7 @@ func (am *DefaultAccountManager) createNewIdpUser(ctx context.Context, accountID
 	}
 
 	if user != nil {
-		return nil, status.Errorf(status.UserAlreadyExists, "can't invite a user with an existing NetBird account")
+		return nil, status.Errorf(status.UserAlreadyExists, "can't invite a user with an existing NetBirdy account")
 	}
 
 	users, err := am.idpManager.GetUserByEmail(ctx, invite.Email)
@@ -184,7 +184,7 @@ func (am *DefaultAccountManager) createNewIdpUser(ctx context.Context, accountID
 	}
 
 	if len(users) > 0 {
-		return nil, status.Errorf(status.UserAlreadyExists, "can't invite a user with an existing NetBird account")
+		return nil, status.Errorf(status.UserAlreadyExists, "can't invite a user with an existing NetBirdy account")
 	}
 
 	return am.idpManager.CreateUser(ctx, invite.Email, invite.Name, accountID, inviterUser.Email)
@@ -215,7 +215,7 @@ func (am *DefaultAccountManager) createEmbeddedIdpUser(ctx context.Context, acco
 
 	for _, user := range existingUsers {
 		if strings.EqualFold(user.Email, invite.Email) {
-			return nil, status.Errorf(status.UserAlreadyExists, "can't invite a user with an existing NetBird account")
+			return nil, status.Errorf(status.UserAlreadyExists, "can't invite a user with an existing NetBirdy account")
 		}
 	}
 
@@ -384,7 +384,7 @@ func (am *DefaultAccountManager) InviteUser(ctx context.Context, accountID strin
 	// check if user account is already invited and account is not activated
 	pendingInvite := user.AppMetadata.WTPendingInvite
 	if pendingInvite == nil || !*pendingInvite {
-		return status.Errorf(status.PreconditionFailed, "can't invite a user with an activated NetBird account")
+		return status.Errorf(status.PreconditionFailed, "can't invite a user with an activated NetBirdy account")
 	}
 
 	err = am.idpManager.InviteUserByID(ctx, user.ID)
@@ -1670,7 +1670,7 @@ func (am *DefaultAccountManager) CreateUserInvite(ctx context.Context, accountID
 		return nil, status.NewPermissionDeniedError()
 	}
 
-	// Check if user already exists in NetBird DB
+	// Check if user already exists in NetBirdy DB
 	existingUsers, err := am.Store.GetAccountUsers(ctx, store.LockingStrengthNone, accountID)
 	if err != nil {
 		return nil, err
@@ -1811,7 +1811,7 @@ func (am *DefaultAccountManager) ListUserInvites(ctx context.Context, accountID,
 	return invites, nil
 }
 
-// AcceptUserInvite accepts an invite and creates the user in both IdP and NetBird DB.
+// AcceptUserInvite accepts an invite and creates the user in both IdP and NetBirdy DB.
 func (am *DefaultAccountManager) AcceptUserInvite(ctx context.Context, token, password string) error {
 	if !IsEmbeddedIdp(am.idpManager) {
 		return status.Errorf(status.PreconditionFailed, "invite links are only available with embedded identity provider")
@@ -1854,7 +1854,7 @@ func (am *DefaultAccountManager) AcceptUserInvite(ctx context.Context, token, pa
 		return fmt.Errorf("failed to create user in IdP: %w", err)
 	}
 
-	// Create user in NetBird DB
+	// Create user in NetBirdy DB
 	newUser := &types.User{
 		Id:         idpUser.ID,
 		AccountID:  invite.AccountID,

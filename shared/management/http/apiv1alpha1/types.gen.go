@@ -144,7 +144,7 @@ type Peer struct {
 	// Connected Peer to Management connection status.
 	// Connected example value is defined in the OpenAPI schema.
 	Connected bool `json:"connected"`
-	// LastSeen Last time peer connected to Netbird's management service.
+	// LastSeen Last time peer connected to NetBirdy's management service.
 	// LastSeen example value is defined in the OpenAPI schema.
 	LastSeen time.Time `json:"last_seen"`
 	// Os Peer's operating system and version.
@@ -249,7 +249,7 @@ type User struct {
 	// Name User's name from idp provider.
 	// Name example value is defined in the OpenAPI schema.
 	Name string `json:"name"`
-	// Role User's NetBird account role.
+	// Role User's NetBirdy account role.
 	// Role example value is defined in the OpenAPI schema.
 	Role string `json:"role"`
 	// Status User's status.
@@ -290,7 +290,7 @@ type UserCreateRequest struct {
 	// Name User's full name.
 	// Name example value is defined in the OpenAPI schema.
 	Name *string `json:"name,omitempty"`
-	// Role User's NetBird account role.
+	// Role User's NetBirdy account role.
 	// Role example value is defined in the OpenAPI schema.
 	Role string `json:"role"`
 	// AutoGroups Group IDs to auto-assign to peers registered by this user.
@@ -301,7 +301,7 @@ type UserCreateRequest struct {
 }
 
 type UserRequest struct {
-	// Role User's NetBird account role.
+	// Role User's NetBirdy account role.
 	// Role example value is defined in the OpenAPI schema.
 	Role string `json:"role"`
 	// AutoGroups Group IDs to auto-assign to peers registered by this user.

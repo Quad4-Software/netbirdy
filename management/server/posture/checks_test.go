@@ -278,8 +278,8 @@ func TestChecks_Copy(t *testing.T) {
 			ProcessCheck: &ProcessCheck{
 				Processes: []Process{
 					{
-						MacPath:     "/Applications/NetBird.app/Contents/MacOS/netbird",
-						WindowsPath: "C:\\ProgramData\\NetBird\\netbird.exe",
+						MacPath:     "/Applications/NetBirdy.app/Contents/MacOS/netbird",
+						WindowsPath: "C:\\ProgramData\\NetBirdy\\netbird.exe",
 					},
 				},
 			},

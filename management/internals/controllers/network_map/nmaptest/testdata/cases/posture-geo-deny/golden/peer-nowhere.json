@@ -3,7 +3,7 @@
   "peerConfig": {
     "address": "100.64.0.3/10",
     "sshConfig": {},
-    "fqdn": "peer-nowhere.netbird.test",
+    "fqdn": "peer-nowhere.netbirdy.test",
     "autoUpdate": {}
   },
   "remotePeersIsEmpty": true,
@@ -11,10 +11,10 @@
     "ServiceEnable": true,
     "CustomZones": [
       {
-        "Domain": "netbird.test.",
+        "Domain": "netbirdy.test.",
         "Records": [
           {
-            "Name": "peer-nowhere.netbird.test",
+            "Name": "peer-nowhere.netbirdy.test",
             "Type": "1",
             "Class": "IN",
             "TTL": "300",
