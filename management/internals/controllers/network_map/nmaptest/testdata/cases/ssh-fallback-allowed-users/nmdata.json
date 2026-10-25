@@ -18,7 +18,7 @@
         {
           "Enabled": true,
           "Action": "accept",
-          "Protocol": "netbirdy-ssh",
+          "Protocol": "netbird-ssh",
           "PortRanges": [{"Start": 22022, "End": 22022}],
           "Sources": ["grp-dev"],
           "Destinations": ["grp-srv"]

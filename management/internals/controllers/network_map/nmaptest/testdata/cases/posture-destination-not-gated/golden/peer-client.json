@@ -3,7 +3,7 @@
   "peerConfig": {
     "address": "100.64.0.1/10",
     "sshConfig": {},
-    "fqdn": "peer-client.netbirdy.test",
+    "fqdn": "peer-client.netbird.test",
     "autoUpdate": {}
   },
   "remotePeers": [
@@ -13,7 +13,7 @@
         "100.64.0.12/32"
       ],
       "sshConfig": {},
-      "fqdn": "peer-srv-new.netbirdy.test",
+      "fqdn": "peer-srv-new.netbird.test",
       "agentVersion": "1.0.0"
     },
     {
@@ -22,7 +22,7 @@
         "100.64.0.11/32"
       ],
       "sshConfig": {},
-      "fqdn": "peer-srv-old.netbirdy.test",
+      "fqdn": "peer-srv-old.netbird.test",
       "agentVersion": "0.30.0"
     }
   ],
@@ -30,24 +30,24 @@
     "ServiceEnable": true,
     "CustomZones": [
       {
-        "Domain": "netbirdy.test.",
+        "Domain": "netbird.test.",
         "Records": [
           {
-            "Name": "peer-client.netbirdy.test",
+            "Name": "peer-client.netbird.test",
             "Type": "1",
             "Class": "IN",
             "TTL": "300",
             "RData": "100.64.0.1"
           },
           {
-            "Name": "peer-srv-new.netbirdy.test",
+            "Name": "peer-srv-new.netbird.test",
             "Type": "1",
             "Class": "IN",
             "TTL": "300",
             "RData": "100.64.0.12"
           },
           {
-            "Name": "peer-srv-old.netbirdy.test",
+            "Name": "peer-srv-old.netbird.test",
             "Type": "1",
             "Class": "IN",
             "TTL": "300",

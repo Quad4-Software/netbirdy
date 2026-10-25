@@ -3,7 +3,7 @@
   "peerConfig": {
     "address": "100.64.0.1/10",
     "sshConfig": {},
-    "fqdn": "peer-a.netbirdy.test",
+    "fqdn": "peer-a.netbird.test",
     "RoutingPeerDnsResolutionEnabled": true,
     "autoUpdate": {}
   },
@@ -12,10 +12,10 @@
     "ServiceEnable": true,
     "CustomZones": [
       {
-        "Domain": "netbirdy.test.",
+        "Domain": "netbird.test.",
         "Records": [
           {
-            "Name": "peer-a.netbirdy.test",
+            "Name": "peer-a.netbird.test",
             "Type": "1",
             "Class": "IN",
             "TTL": "300",

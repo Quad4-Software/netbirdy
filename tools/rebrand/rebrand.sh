@@ -17,7 +17,7 @@ cd "$(dirname "$0")/../.."
 CHECK=0
 [ "${1:-}" = "--check" ] && CHECK=1
 
-EXCLUDE='--exclude-dir=.git --exclude-dir=node_modules --exclude-dir=vendor --exclude=*.pb.go --exclude-dir=frontend-ui'
+EXCLUDE='--exclude-dir=.git --exclude-dir=node_modules --exclude-dir=vendor --exclude=*.pb.go --exclude-dir=frontend-ui --exclude-dir=testdata --exclude-dir=fixtures --exclude-dir=golden --exclude=*_golden.* --exclude=*.golden'
 
 # Word-boundary display name rewrite in user-visible text. Identifiers such as
 # isNetBirdCloud stay untouched because of the word boundaries.
