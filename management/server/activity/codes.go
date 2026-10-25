@@ -292,6 +292,15 @@ const (
 	// AccountPeerHostnameCollisionRejectionDisabled indicates that a user disabled rejecting peer hostname collisions for the account
 	AccountPeerHostnameCollisionRejectionDisabled Activity = 145
 
+	PeerNewIPDetected        Activity = 146
+	PeerConcurrentConnection Activity = 147
+	PeerIPFlapping           Activity = 148
+	PeerMetaMismatch         Activity = 149
+	AuthFailureBurst         Activity = 150
+	SetupKeyMisuseDetected   Activity = 151
+	UserLoginAnomaly         Activity = 152
+	PATAnomaly               Activity = 153
+
 	AccountDeleted Activity = 99999
 )
 
@@ -475,6 +484,15 @@ var activityMap = map[Activity]Code{
 	DomainDeleted:                 {"Domain deleted", "domain.delete"},
 	DomainValidated:               {"Domain validated", "domain.validate"},
 	CustomDomainValidationExpired: {"Unvalidated domain registration expired", "domain.validation.expire"},
+
+	PeerNewIPDetected:        {"Peer logged in from a new IP address", "peer.ip.new"},
+	PeerConcurrentConnection: {"Concurrent connections for one peer key", "peer.connection.concurrent"},
+	PeerIPFlapping:           {"Peer source IP flapping", "peer.ip.flap"},
+	PeerMetaMismatch:         {"Peer machine metadata changed", "peer.meta.mismatch"},
+	AuthFailureBurst:         {"Authentication failure burst", "auth.failure.burst"},
+	SetupKeyMisuseDetected:   {"Setup key used unusually", "setupkey.misuse"},
+	UserLoginAnomaly:         {"User login from a new location", "user.login.anomaly"},
+	PATAnomaly:               {"Access token used from a new address", "pat.anomaly"},
 }
 
 // StringCode returns a string code of the activity

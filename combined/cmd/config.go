@@ -74,6 +74,7 @@ type ServerConfig struct {
 	AccessLogStore          StoreConfig        `yaml:"accessLogStore"`
 	AuthStore               StoreConfig        `yaml:"authStore"`
 	ReverseProxy            ReverseProxyConfig `yaml:"reverseProxy"`
+	Security                *nbconfig.SecurityConfig `yaml:"security"`
 
 	SupportedSyncMessageVersions           *int           `yaml:"supportedSyncMessageVersions,omitempty"`
 	PerAccountSupportedSyncMessageVersions map[string]int `yaml:"perAccountSupportedSyncMessageVersions,omitempty"`
@@ -139,6 +140,7 @@ type ManagementConfig struct {
 	SignalURI               string             `yaml:"signalUri"`
 	Store                   StoreConfig        `yaml:"store"`
 	ReverseProxy            ReverseProxyConfig `yaml:"reverseProxy"`
+	Security                *nbconfig.SecurityConfig `yaml:"security"`
 }
 
 // AuthConfig contains authentication/identity provider settings
@@ -723,6 +725,7 @@ func (c *CombinedConfig) ToManagementConfig() (*nbconfig.Config, error) {
 		Relay:                              relayConfig,
 		Signal:                             signalConfig,
 		Datadir:                            mgmt.DataDir,
+		Security:                          c.Server.Security,
 		DataStoreEncryptionKey:             mgmt.Store.EncryptionKey,
 		HttpConfig:                         httpConfig,
 		StoreConfig:                        storeConfig,

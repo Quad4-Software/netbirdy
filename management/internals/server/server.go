@@ -310,6 +310,9 @@ func (s *BaseServer) Stop() error {
 	if s.GeoLocationManager() != nil {
 		_ = s.GeoLocationManager().Stop()
 	}
+	if sec := s.SecurityEngine(); sec != nil {
+		sec.Close()
+	}
 	s.EphemeralManager().Stop()
 	_ = s.Metrics().Close()
 	if s.listener != nil {

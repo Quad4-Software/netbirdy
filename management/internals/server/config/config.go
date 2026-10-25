@@ -34,6 +34,28 @@ const (
 var MgmtConfigPath string
 
 // Config of the Management service
+// SecurityConfig maps the `security:` config section.
+type SecurityConfig struct {
+	Mode           string   `yaml:"mode" json:"mode"` // off|observe|prevent; empty = off
+	LearningPeriod string   `yaml:"learning_period" json:"learning_period"`
+	TrustedCIDRs   []string `yaml:"trusted_cidrs" json:"trusted_cidrs"`
+	LogFile        string   `yaml:"log_file" json:"log_file"`
+	AuditLogFile   string   `yaml:"audit_log_file" json:"audit_log_file"`
+	Syslog         *struct {
+		Enabled    bool   `yaml:"enabled" json:"enabled"`
+		Network    string `yaml:"network" json:"network"`
+		Address    string `yaml:"address" json:"address"`
+		Facility   int    `yaml:"facility" json:"facility"`
+		CAFile     string `yaml:"ca_file" json:"ca_file"`
+		ServerName string `yaml:"server_name" json:"server_name"`
+		Framing    string `yaml:"framing" json:"framing"`
+	} `yaml:"syslog" json:"syslog"`
+	Rules map[string]struct {
+		Enabled *bool  `yaml:"enabled" json:"enabled"`
+		Action  string `yaml:"action" json:"action"`
+	} `yaml:"rules" json:"rules"`
+}
+
 type Config struct {
 	Stuns      []*Host
 	TURNConfig *TURNConfig
@@ -48,6 +70,10 @@ type Config struct {
 	IdpManagerConfig *idp.Config
 
 	DeviceAuthorizationFlow *DeviceAuthorizationFlow
+
+	// Security holds anomaly-detection settings. Absent means mode off: the
+	// engine is not constructed and hooks are never called.
+	Security *SecurityConfig
 
 	PKCEAuthorizationFlow *PKCEAuthorizationFlow
 

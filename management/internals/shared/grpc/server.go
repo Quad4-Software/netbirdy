@@ -2,8 +2,11 @@ package grpc
 
 import (
 	"context"
+	"crypto/sha256"
+	"encoding/hex"
 	"errors"
 	"fmt"
+	"github.com/netbirdio/netbird/management/server/security"
 	"io"
 	"net"
 	"net/netip"
@@ -75,6 +78,7 @@ type Server struct {
 
 	logBlockedPeers          bool
 	blockPeersWithSameConfig bool
+	security                 *security.Engine
 	integratedPeerValidator  integrated_validator.IntegratedValidator
 
 	loginFilter *loginFilter
@@ -159,6 +163,22 @@ func NewServer(
 		syncLim:        syncLim,
 		syncLimEnabled: syncLimEnabled,
 	}, nil
+}
+
+// SetSecurityEngine attaches the anomaly engine; nil disables the hooks.
+func (s *Server) SetSecurityEngine(e *security.Engine) { s.security = e }
+
+// securityMeta converts server-side peer meta into the engine shape.
+func securityKeyHash(raw string) string {
+	sum := sha256.Sum256([]byte(raw))
+	return hex.EncodeToString(sum[:6])
+}
+
+func securityMeta(m nbpeer.PeerSystemMeta) security.PeerMeta {
+	return security.PeerMeta{
+		Hostname: m.Hostname, OS: m.GoOS, Kernel: m.KernelVersion,
+		Serial: m.SystemSerialNumber,
+	}
 }
 
 func (s *Server) GetServerKey(ctx context.Context, req *proto.Empty) (*proto.ServerKeyResponse, error) {
@@ -314,8 +334,24 @@ func (s *Server) Sync(req *proto.EncryptedMessage, srv proto.ManagementService_S
 	peer, netMap, postureChecks, dnsFwdPort, err := s.accountManager.SyncAndMarkPeer(ctx, accountID, peerKey.String(), peerMeta, realIP, syncStart)
 	if err != nil {
 		log.WithContext(ctx).Debugf("error while syncing peer %s: %v", peerKey.String(), err)
+		if s.security != nil {
+			s.security.ObserveAuthFailure(ctx, security.AuthFailure{
+				Kind: security.AuthKindPeerLogin, SourceIP: netip.MustParseAddr(sRealIP),
+				AccountID: accountID, Subject: peerKey.String(),
+			})
+		}
 		s.syncSem.Add(-1)
 		return mapError(ctx, err)
+	}
+	if s.security != nil && realIP != nil {
+		srcIP, _ := netip.ParseAddr(sRealIP)
+		obs := security.PeerObservation{
+			AccountID: accountID, PeerID: peer.ID, PeerKey: peerKey.String(),
+			PeerName: peer.Name, SrcIP: srcIP, Meta: securityMeta(peerMeta),
+		}
+		s.security.ObservePeerSync(ctx, obs)
+		s.security.ObserveStreamOpen(ctx, peerKey.String(), srcIP.String(), accountID, peer.ID, peer.Name)
+		defer s.security.ObserveStreamClose(peerKey.String(), srcIP.String())
 	}
 
 	trackChallenge := func() { s.accountManager.TrackCertificateChallenges(ctx, accountID, peer.ID, syncStart) }
@@ -714,6 +750,14 @@ func (s *Server) Login(ctx context.Context, req *proto.EncryptedMessage) (*proto
 		sshKey = loginReq.GetPeerKeys().GetSshPubKey()
 	}
 
+	if s.security != nil && realIP != nil && loginReq.GetSetupKey() != "" {
+		if src, perr := netip.ParseAddr(sRealIP); perr == nil {
+			s.security.ObserveSetupKeyUse(ctx, security.SetupKeyObservation{
+				KeyID:     securityKeyHash(loginReq.GetSetupKey()),
+				AccountID: accountID, SourceIP: src,
+			})
+		}
+	}
 	peer, network, postureChecks, enableSSH, err := s.accountManager.LoginPeer(ctx, types.PeerLogin{
 		WireGuardPubKey: peerKey.String(),
 		SSHKey:          cleanClientString(string(sshKey)),
@@ -729,7 +773,24 @@ func (s *Server) Login(ctx context.Context, req *proto.EncryptedMessage) (*proto
 		} else {
 			log.WithContext(ctx).Warnf("failed logging in peer %s: %s", peerKey, err)
 		}
+		if s.security != nil && realIP != nil {
+			src, perr := netip.ParseAddr(sRealIP)
+			if perr == nil {
+				s.security.ObserveAuthFailure(ctx, security.AuthFailure{
+					Kind: security.AuthKindPeerLogin, SourceIP: src,
+					AccountID: accountID, Subject: peerKey.String(),
+				})
+			}
+		}
 		return nil, mapError(ctx, err)
+	}
+	if s.security != nil && realIP != nil {
+		if src, perr := netip.ParseAddr(sRealIP); perr == nil {
+			s.security.ObservePeerLogin(ctx, security.PeerObservation{
+				AccountID: accountID, PeerID: peer.ID, PeerKey: peerKey.String(),
+				PeerName: peer.Name, SrcIP: src, Meta: securityMeta(peerMeta),
+			})
+		}
 	}
 
 	loginResp, err := s.prepareLoginResponse(ctx, peer, network, postureChecks, enableSSH)

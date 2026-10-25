@@ -2,11 +2,18 @@ package middleware
 
 import (
 	"context"
+	"crypto/sha256"
+	"encoding/hex"
 	"errors"
 	"fmt"
+	"net"
 	"net/http"
+	"net/netip"
 	"strings"
+	"sync"
 	"time"
+
+	"github.com/netbirdio/netbird/management/server/security"
 
 	log "github.com/sirupsen/logrus"
 	"go.opentelemetry.io/otel/metric"
@@ -34,6 +41,8 @@ type AuthMiddleware struct {
 	syncUserJWTGroups   SyncUserJWTGroupsFunc
 	rateLimiter         *ratelimit.APIRateLimiter
 	patUsageTracker     *PATUsageTracker
+	security            *security.Engine
+	userLoginDedup      *dedupCache
 }
 
 // NewAuthMiddleware instance constructor
@@ -61,8 +70,79 @@ func NewAuthMiddleware(
 		getUserFromUserAuth: getUserFromUserAuth,
 		rateLimiter:         rateLimiter,
 		patUsageTracker:     patUsageTracker,
+		userLoginDedup:      newDedupCache(),
 	}
 }
+
+var packageSecurity *security.Engine
+
+// SetSecurityEngine attaches the anomaly engine for middleware built
+// through BuildMiddleware, which does not return the instance.
+func SetSecurityEngine(e *security.Engine) { packageSecurity = e }
+
+// SetSecurityEngine attaches the anomaly engine; nil disables the hooks.
+func (m *AuthMiddleware) SetSecurityEngine(e *security.Engine) {
+	m.security = e
+	if e != nil && m.userLoginDedup == nil {
+		m.userLoginDedup = newDedupCache()
+	}
+}
+
+// dedupCache bounds first-observation-per-hour for user logins.
+type dedupCache struct {
+	mu   sync.Mutex
+	seen map[string]time.Time
+}
+
+func newDedupCache() *dedupCache {
+	return &dedupCache{seen: make(map[string]time.Time)}
+}
+
+// firstInHour returns true once per key per hour.
+func (d *dedupCache) firstInHour(key string, now time.Time) bool {
+	d.mu.Lock()
+	defer d.mu.Unlock()
+	if t, ok := d.seen[key]; ok && now.Sub(t) < time.Hour {
+		return false
+	}
+	if len(d.seen) > 100000 {
+		for k := range d.seen {
+			delete(d.seen, k) // crude eviction when at the bound
+			break
+		}
+	}
+	d.seen[key] = now
+	return true
+}
+
+// requestIP parses the remote address (no XFF trust here: only the trusted
+// proxy path sets it, which this middleware does not consume).
+func requestIP(r *http.Request) (netip.Addr, bool) {
+	host, _, err := net.SplitHostPort(r.RemoteAddr)
+	if err != nil {
+		host = r.RemoteAddr
+	}
+	ip, err := netip.ParseAddr(host)
+	return ip, err == nil
+}
+
+// tokenID returns a stable non-reversible identifier for a PAT.
+func securityTokenID(raw string) string {
+	sum := sha256.Sum256([]byte(raw))
+	return hex.EncodeToString(sum[:6])
+}
+
+// SetSecurityEngine kept above; hooks below.
+
+// engine resolves the attached engine (instance field wins, else package).
+func (m *AuthMiddleware) engine() *security.Engine {
+	if m.security != nil {
+		return m.security
+	}
+	return packageSecurity
+}
+
+func _unused() {}
 
 // Handler method of the middleware which authenticates a user either by JWT claims or by PAT
 func (m *AuthMiddleware) Handler(h http.Handler) http.Handler {
@@ -84,19 +164,43 @@ func (m *AuthMiddleware) Handler(h http.Handler) http.Handler {
 		case "bearer":
 			if err := m.checkJWTFromRequest(r, authHeader); err != nil {
 				log.WithContext(r.Context()).Errorf("Error when validating JWT: %s", err.Error())
+				if sec := m.engine(); sec != nil {
+					if src, ok := requestIP(r); ok {
+						sec.ObserveAuthFailure(r.Context(), security.AuthFailure{
+							Kind: security.AuthKindAPI, SourceIP: src, Subject: securityTokenID(authHeader[1]),
+						})
+					}
+				}
 				util.WriteError(r.Context(), status.Errorf(status.Unauthorized, "token invalid"), w)
 				return
+			}
+			if m.security != nil {
+				if src, ok := requestIP(r); ok && m.userLoginDedup.firstInHour(securityTokenID(authHeader[1]), time.Now()) {
+					m.security.ObserveUserLogin(r.Context(), "", securityTokenID(authHeader[1]), src)
+				}
 			}
 			h.ServeHTTP(w, r)
 		case "token":
 			if err := m.checkPATFromRequest(r, authHeader); err != nil {
 				log.WithContext(r.Context()).Debugf("Error when validating PAT: %s", err.Error())
+				if sec := m.engine(); sec != nil {
+					if src, ok := requestIP(r); ok {
+						sec.ObserveAuthFailure(r.Context(), security.AuthFailure{
+							Kind: security.AuthKindAPI, SourceIP: src, Subject: securityTokenID(authHeader[1]),
+						})
+					}
+				}
 				// Check if it's a status error, otherwise default to Unauthorized
 				if _, ok := status.FromError(err); !ok {
 					err = status.Errorf(status.Unauthorized, "token invalid")
 				}
 				util.WriteError(r.Context(), err, w)
 				return
+			}
+			if m.security != nil {
+				if src, ok := requestIP(r); ok {
+					m.security.ObservePATUse(r.Context(), "", securityTokenID(authHeader[1]), src)
+				}
 			}
 			h.ServeHTTP(w, r)
 		default:

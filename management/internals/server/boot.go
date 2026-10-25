@@ -3,9 +3,12 @@ package server
 // @note this file includes all the lower level dependencies, db, http and grpc BaseServer, metrics, logger, etc.
 
 import (
+	"path/filepath"
+
 	"context"
 	"crypto/tls"
 	"errors"
+	"github.com/netbirdio/netbird/management/server/security"
 	"net/http"
 	"net/netip"
 	"slices"
@@ -157,6 +160,18 @@ func (s *BaseServer) EventStore() activity.Store {
 		if err != nil {
 			log.Fatalf("failed to initialize event store: %v", err)
 		}
+		if sc := s.Config.Security; sc != nil && sc.AuditLogFile != "" {
+			path := sc.AuditLogFile
+			if !filepath.IsAbs(path) {
+				path = filepath.Join(s.Config.Datadir, path)
+			}
+			as, err := security.NewAuditStore(eventStore, path)
+			if err != nil {
+				log.Warnf("audit log mirror %s unavailable: %v", path, err)
+			} else {
+				return as
+			}
+		}
 
 		return eventStore
 	})
@@ -205,6 +220,7 @@ func (s *BaseServer) IDPHandler() http.Handler {
 func (s *BaseServer) Router() *mux.Router {
 	return Create(s, func() *mux.Router {
 		router := mux.NewRouter()
+		middleware.SetSecurityEngine(s.SecurityEngine())
 		router.Use(middleware.BuildMiddleware(s.RateLimiter(), s.AuthManager(), s.AccountManager(), s.Metrics())...)
 		return router
 	})
@@ -274,6 +290,7 @@ func (s *BaseServer) GRPCServer() *grpc.Server {
 		}
 		serviceMgr := s.ServiceManager()
 		srv.SetReverseProxyManager(serviceMgr)
+		srv.SetSecurityEngine(s.SecurityEngine())
 		if serviceMgr != nil {
 			serviceMgr.StartExposeReaper(context.Background())
 		}

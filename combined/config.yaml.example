@@ -80,6 +80,26 @@ server:
   disableAnonymousMetrics: false
   disableGeoliteUpdate: false
 
+  # Anomaly detection for peers, agents and users: suspicious IP changes,
+  # concurrent connections on one peer key, auth failure bursts, credential
+  # anomalies. Optional prevention.
+  # security:
+  #   mode: "observe"          # off|observe|prevent; absent = off
+  #   learning_period: "168h"  # baseline learning before any prevention
+  #   trusted_cidrs: []        # IPs that never trigger findings
+  #   log_file: ""             # jsonl path, default <dataDir>/security-events.jsonl
+  #   rules:                   # per-rule toggles; action overrides for prevent
+  #     peer_new_ip: {enabled: true}
+  #   audit_log_file: ""       # mirror all activity events to jsonl; empty disables
+  #   syslog:                  # forward security events as RFC 5424
+  #     enabled: false
+  #     network: "udp"         # udp|tcp|tcp+tls
+  #     address: "wazuh:514"
+  #     facility: 16           # local0
+  #     ca_file: ""            # TLS CA for tcp+tls
+  #     server_name: ""        # TLS server name
+  #     framing: "newline"     # newline|octet
+
   # Embedded authentication/identity provider (Dex) configuration (always enabled)
   auth:
     # OIDC issuer URL - must be publicly accessible

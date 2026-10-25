@@ -322,6 +322,7 @@ require (
 	github.com/prometheus/common v0.69.0 // indirect
 	github.com/prometheus/otlptranslator v1.0.0 // indirect
 	github.com/prometheus/procfs v0.20.1 // indirect
+	github.com/quic-go/qpack v0.6.0 // indirect
 	github.com/rogpeppe/go-internal v1.16.0 // indirect
 	github.com/russellhaering/goxmldsig v1.6.1 // indirect
 	github.com/ryanuber/go-glob v1.0.0 // indirect
