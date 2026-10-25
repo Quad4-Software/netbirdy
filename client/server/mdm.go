@@ -76,7 +76,7 @@ func (s *Server) onMDMPolicyChange(_, _ *mdm.Policy) error {
 		proto.SystemEvent_INFO,
 		proto.SystemEvent_SYSTEM,
 		"MDM policy applied",
-		"NetBird configuration was updated by your IT policy.",
+		"NetBirdy configuration was updated by your IT policy.",
 		map[string]string{
 			proto.MetadataSourceKey: proto.MetadataSourceMDM,
 			proto.MetadataTypeKey:   proto.MetadataTypePolicyApplied,

@@ -25,7 +25,7 @@ func fakeLocales() fstest.MapFS {
 		"en/common.json": {Data: []byte(`{
             "tray.menu.connect": {"message": "Connect", "description": "Tray menu item"},
             "tray.menu.installVersion": {"message": "Install version {version}"},
-            "notify.update.body": {"message": "NetBird {version} is available."}
+            "notify.update.body": {"message": "NetBirdy {version} is available."}
         }`)},
 		"hu/common.json": {Data: []byte(`{
             "tray.menu.connect": {"message": "Csatlakozás"},
@@ -71,7 +71,7 @@ func TestBundle_TranslateFallsBackToEnglish(t *testing.T) {
 	// applies so the user always sees a populated label rather than the
 	// raw key.
 	got := b.Translate("hu", "notify.update.body", "version", "9.9.9")
-	assert.Equal(t, "NetBird 9.9.9 is available.", got, "missing hu key should fall back to en bundle")
+	assert.Equal(t, "NetBirdy 9.9.9 is available.", got, "missing hu key should fall back to en bundle")
 }
 
 func TestBundle_TranslateUnknownKeyReturnsKey(t *testing.T) {

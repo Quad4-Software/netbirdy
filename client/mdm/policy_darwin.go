@@ -14,7 +14,7 @@ import (
 )
 
 // policyPlistPath is the well-known location where macOS writes the
-// device-level mandatory MDM payload for NetBird. The path is fixed by
+// device-level mandatory MDM payload for NetBirdy. The path is fixed by
 // Apple convention: when an MDM provider (Jamf / Kandji / Mosyle /
 // Intune for Mac / Workspace ONE) pushes a Configuration Profile that
 // contains a com.apple.ManagedClient.preferences payload targeting the
@@ -29,7 +29,7 @@ const policyPlistPath = "/Library/Managed Preferences/io.netbird.client.plist"
 // managed-preferences plist at policyPlistPath, unless a fetcher was
 // injected, in which case its values are returned instead. Returns:
 //   - (nil, nil)  when the plist is absent (device not MDM-enrolled for
-//     NetBird, or admin has not yet pushed a payload)
+//     NetBirdy, or admin has not yet pushed a payload)
 //   - (map, nil)  with N entries when N managed values are present
 //     (N may be 0 — empty plist still signals enrollment to the caller)
 //   - (nil, err)  on permission / parse / safety errors (including
@@ -50,7 +50,7 @@ func (l *Loader) loadPlatform() (map[string]any, error) {
 	f, err := os.Open(policyPlistPath)
 	if err != nil {
 		if errors.Is(err, fs.ErrNotExist) {
-			// Not enrolled for NetBird. Caller treats nil as
+			// Not enrolled for NetBirdy. Caller treats nil as
 			// "no MDM source present".
 			//nolint:nilnil // (nil, nil) is the documented platform-absent sentinel; see Loader.Load.
 			return nil, nil

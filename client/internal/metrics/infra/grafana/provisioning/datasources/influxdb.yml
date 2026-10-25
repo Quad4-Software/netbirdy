@@ -9,7 +9,7 @@ datasources:
     editable: true
     jsonData:
       version: Flux
-      organization: netbird
+      organization: netbirdy
       defaultBucket: metrics
     secureJsonData:
       token: ${INFLUXDB_ADMIN_TOKEN}

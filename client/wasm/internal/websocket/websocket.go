@@ -36,7 +36,7 @@ type bufferedConn struct {
 
 func (c *bufferedConn) Read(p []byte) (int, error) { return c.r.Read(p) }
 
-// Conn wraps a WebSocket connection over a NetBird TCP connection.
+// Conn wraps a WebSocket connection over a NetBirdy TCP connection.
 type Conn struct {
 	conn      net.Conn
 	mu        sync.Mutex
@@ -45,7 +45,7 @@ type Conn struct {
 	closeErr  error
 }
 
-// Dial establishes a WebSocket connection to the given URL through the NetBird network.
+// Dial establishes a WebSocket connection to the given URL through the NetBirdy network.
 // Optional protocols are sent via the Sec-WebSocket-Protocol header.
 func Dial(ctx context.Context, client *netbird.Client, rawURL string, protocols []string) (*Conn, error) {
 	d := ws.Dialer{

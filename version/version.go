@@ -29,7 +29,7 @@ var (
 	SemverRegexp  = regexp.MustCompile("^" + v.SemverRegexpRaw + "$")
 )
 
-// NetbirdVersion returns the Netbird version. For non-release builds the
+// NetbirdVersion returns the NetBirdy version. For non-release builds the
 // value is the literal DevelopmentVersion constant; the VCS revision is
 // exposed separately via NetbirdCommit so the wire format stays stable.
 func NetbirdVersion() string {

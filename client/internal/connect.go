@@ -66,10 +66,12 @@ type ConnectClient struct {
 	config         *profilemanager.Config
 	statusRecorder *peer.Status
 
-	engine        *Engine
-	engineMutex   sync.Mutex
-	clientMetrics *metrics.ClientMetrics
-	updateManager *updater.Manager
+	engine              *Engine
+	engineMutex         sync.Mutex
+	offlineSnapshotPath string
+	offlineCancel       context.CancelFunc
+	clientMetrics       *metrics.ClientMetrics
+	updateManager       *updater.Manager
 
 	persistSyncResponse bool
 	// inMemoryState keeps the state manager off disk, for clients that change
@@ -209,7 +211,7 @@ func (c *ConnectClient) run(mobileDependency MobileDependency, runningChan chan 
 				rec.PublishEvent(
 					cProto.SystemEvent_CRITICAL, cProto.SystemEvent_SYSTEM,
 					"panic occurred",
-					"The Netbird service panicked. Please restart the service and submit a bug report with the client logs.",
+					"The NetBirdy service panicked. Please restart the service and submit a bug report with the client logs.",
 					nil,
 				)
 			}
@@ -225,7 +227,7 @@ func (c *ConnectClient) run(mobileDependency MobileDependency, runningChan chan 
 		}
 	}()
 
-	log.Infof("starting NetBird client version %s on %s/%s", version.NetbirdVersion(), runtime.GOOS, runtime.GOARCH)
+	log.Infof("starting NetBirdy client version %s on %s/%s", version.NetbirdVersion(), runtime.GOOS, runtime.GOARCH)
 
 	nbnet.Init()
 
@@ -347,8 +349,19 @@ func (c *ConnectClient) run(mobileDependency MobileDependency, runningChan chan 
 		}()
 
 		log.Debugf("connecting to the Management service %s", c.config.ManagementURL.Host)
-		mgmClient, err := mgm.NewClient(engineCtx, c.config.ManagementURL.Host, myPrivateKey, mgmTlsEnabled,
-			mgm.WithNetEvents(c.netMgr))
+		// Cached management IPs first: after leaving offline mode the
+		// hostname may still be unresolvable.
+		var mgmClient *mgm.GrpcClient
+		for _, target := range mgmtDialTargets(c.config.ManagementURL.Host, LastMgmtAddrs()) {
+			dialOpts := []mgm.Option{mgm.WithNetEvents(c.netMgr)}
+			if target != c.config.ManagementURL.Host {
+				dialOpts = append(dialOpts, mgm.WithServerName(c.config.ManagementURL.Hostname()))
+			}
+			mgmClient, err = mgm.NewClient(engineCtx, target, myPrivateKey, mgmTlsEnabled, dialOpts...)
+			if err == nil {
+				break
+			}
+		}
 		if err != nil {
 			// On daemon shutdown / Down() the parent context is cancelled
 			// and the dial fails with "context canceled". Wrapping that
@@ -359,7 +372,13 @@ func (c *ConnectClient) run(mobileDependency MobileDependency, runningChan chan 
 			if c.ctx.Err() != nil {
 				return nil
 			}
-			return wrapErr(gstatus.Errorf(codes.FailedPrecondition, "failed connecting to Management Service : %s", err))
+			if done := c.maybeStartOffline(engineCtx, cancel, gstatus.Errorf(codes.Unavailable, "failed connecting to Management Service : %s", err), runningChan, mobileDependency, logPath, path); done {
+				// Offline mode ended (management reachable again, auth
+				// refusal, or shutdown): return a retryable error so the
+				// backoff loop re-enters the normal connect path.
+				return wrapErr(errOfflineLeft)
+			}
+			return wrapErr(gstatus.Errorf(codes.Unavailable, "failed connecting to Management Service : %s", err))
 		}
 		mgmNotifier := statusRecorderToMgmConnStateNotifier(c.statusRecorder)
 		mgmClient.SetConnStateListener(mgmNotifier)
@@ -381,21 +400,28 @@ func (c *ConnectClient) run(mobileDependency MobileDependency, runningChan chan 
 			}
 		}()
 
-		// connect (just a connection, no stream yet) and login to Management Service to get an initial global Netbird config
+		// connect (just a connection, no stream yet) and login to Management Service to get an initial global NetBirdy config
 		loginStarted := time.Now()
 		loginResp, err := loginToManagement(engineCtx, mgmClient, publicSSHKey, c.config)
 		if err != nil {
 			c.clientMetrics.RecordLoginDuration(engineCtx, time.Since(loginStarted), false)
 			log.Debug(err)
 			if s, ok := gstatus.FromError(err); ok && (s.Code() == codes.PermissionDenied) {
+				// The server answered with an auth refusal: the cached
+				// network map must not survive a revoked or deleted peer.
+				_ = deleteOfflineSnapshot(offlineSnapshotPath(path))
 				state.Set(StatusNeedsLogin)
 				c.runCancel()
 				return backoff.Permanent(wrapErr(err)) // unrecoverable error
+			}
+			if done := c.maybeStartOffline(engineCtx, cancel, err, runningChan, mobileDependency, logPath, path); done {
+				return wrapErr(errOfflineLeft)
 			}
 			return wrapErr(err)
 		}
 		c.clientMetrics.RecordLoginDuration(engineCtx, time.Since(loginStarted), true)
 		c.statusRecorder.MarkManagementConnected()
+		captureMgmtAddrs(engineCtx, c.config.ManagementURL.Hostname(), offlineSnapshotPath(path))
 
 		if metricsConfig := loginResp.GetNetbirdConfig().GetMetrics(); metricsConfig != nil {
 			c.clientMetrics.UpdatePushFromMgm(c.ctx, metricsConfig.GetEnabled())
@@ -422,7 +448,7 @@ func (c *ConnectClient) run(mobileDependency MobileDependency, runningChan chan 
 			c.statusRecorder.MarkSignalDisconnected(err)
 		}()
 
-		// with the global Netbird config in hand connect (just a connection, no stream yet) Signal
+		// with the global NetBirdy config in hand connect (just a connection, no stream yet) Signal
 		signalClient, err := connectToSignal(engineCtx, loginResp.GetNetbirdConfig(), myPrivateKey, c.netMgr)
 		if err != nil {
 			log.Error(err)
@@ -497,7 +523,7 @@ func (c *ConnectClient) run(mobileDependency MobileDependency, runningChan chan 
 		c.engineMutex.Unlock()
 
 		if err := engine.Start(loginResp.GetNetbirdConfig(), c.config.ManagementURL); err != nil {
-			log.Errorf("error while starting Netbird Connection Engine: %s", err)
+			log.Errorf("error while starting NetBirdy Connection Engine: %s", err)
 			return wrapErr(err)
 		}
 
@@ -505,7 +531,7 @@ func (c *ConnectClient) run(mobileDependency MobileDependency, runningChan chan 
 		// changes flow in through SyncResponse and are applied in handleSync.
 		engine.ApplySessionDeadline(loginResp.GetSessionExpiresAt())
 
-		log.Infof("Netbird engine started, the IP is: %s", peerConfig.GetAddress())
+		log.Infof("NetBirdy engine started, the IP is: %s", peerConfig.GetAddress())
 		state.Set(StatusConnected)
 
 		if runningChan != nil {
@@ -522,7 +548,7 @@ func (c *ConnectClient) run(mobileDependency MobileDependency, runningChan chan 
 		c.engine = nil
 		c.engineMutex.Unlock()
 
-		log.Infof("ensuring wg interface is removed, Netbird engine context cancelled")
+		log.Infof("ensuring wg interface is removed, NetBirdy engine context cancelled")
 
 		if err := engine.Stop(); err != nil {
 			log.Errorf("Failed to stop engine: %v", err)
@@ -531,7 +557,7 @@ func (c *ConnectClient) run(mobileDependency MobileDependency, runningChan chan 
 
 		backOff.Reset()
 
-		log.Info("stopped NetBird client")
+		log.Info("stopped NetBirdy client")
 
 		if _, err := state.Status(); errors.Is(err, ErrResetConnection) {
 			return err
@@ -545,7 +571,18 @@ func (c *ConnectClient) run(mobileDependency MobileDependency, runningChan chan 
 	// inter-attempt sleep — otherwise a 15s MaxInterval can keep the retry
 	// loop alive long after the caller asked to give up, leaving the
 	// status stream stuck at Connecting.
-	err = backoff.Retry(operation, backoff.WithContext(backOff, c.ctx))
+	for {
+		err = backoff.Retry(operation, backoff.WithContext(backOff, c.ctx))
+		if !errors.Is(err, errOfflineLeft) {
+			break
+		}
+		// Offline mode ended: reset the budget and re-enter the normal
+		// connect path instead of giving up.
+		backOff.Reset()
+		if c.ctx.Err() != nil {
+			return nil
+		}
+	}
 	if err != nil {
 		// Once the client context is cancelled backoff.WithContext surfaces the
 		// bare context error, and any attempt torn down mid-flight reports the
@@ -787,7 +824,7 @@ func connectToSignal(ctx context.Context, wtConfig *mgmProto.NetbirdConfig, ourP
 	return signalClient, nil
 }
 
-// loginToManagement creates Management ServiceDependencies client, establishes a connection, logs-in and gets a global Netbird config (signal, turn, stun hosts, etc)
+// loginToManagement creates Management ServiceDependencies client, establishes a connection, logs-in and gets a global NetBirdy config (signal, turn, stun hosts, etc)
 func loginToManagement(ctx context.Context, client mgm.Client, pubSSHKey []byte, config *profilemanager.Config) (*mgmProto.LoginResponse, error) {
 	sysInfo := system.GetInfo(ctx)
 	sysInfo.SetFlags(
@@ -854,7 +891,7 @@ func closeConnWithLog(conn *net.UDPConn) {
 	startClosing := time.Now()
 	err := conn.Close()
 	if err != nil {
-		log.Warnf("closing probe port %d failed: %v. NetBird will still attempt to use this port for connection.", conn.LocalAddr().(*net.UDPAddr).Port, err)
+		log.Warnf("closing probe port %d failed: %v. NetBirdy will still attempt to use this port for connection.", conn.LocalAddr().(*net.UDPAddr).Port, err)
 	}
 	if time.Since(startClosing) > time.Second {
 		log.Warnf("closing the testing port %d took %s. Usually it is safe to ignore, but continuous warnings may indicate a problem.", conn.LocalAddr().(*net.UDPAddr).Port, time.Since(startClosing))

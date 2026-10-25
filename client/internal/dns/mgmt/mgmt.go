@@ -32,7 +32,7 @@ const (
 )
 
 // ChainResolver lets the cache refresh stale entries through the DNS handler
-// chain instead of net.DefaultResolver, avoiding loopback when NetBird is the
+// chain instead of net.DefaultResolver, avoiding loopback when NetBirdy is the
 // system resolver.
 type ChainResolver interface {
 	ResolveInternal(ctx context.Context, msg *dns.Msg, maxPriority int) (*dns.Msg, error)
@@ -50,7 +50,7 @@ type cachedRecord struct {
 	consecFailures    int
 }
 
-// Resolver caches critical NetBird infrastructure domains.
+// Resolver caches critical NetBirdy infrastructure domains.
 // records, refreshing, failedResolves, mgmtDomain and serverDomains are all
 // guarded by mutex.
 type Resolver struct {
@@ -139,7 +139,7 @@ func (m *Resolver) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
 	}
 
 	if inflight != nil && inflight.CompareAndSwap(false, true) {
-		log.Warnf("mgmt cache: possible resolver loop for domain=%s: served stale while an OS-fallback refresh was inflight (if NetBird is the system resolver, the OS-path predicate is wrong)",
+		log.Warnf("mgmt cache: possible resolver loop for domain=%s: served stale while an OS-fallback refresh was inflight (if NetBirdy is the system resolver, the OS-path predicate is wrong)",
 			question.Name)
 	}
 
@@ -164,7 +164,7 @@ func (m *Resolver) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
 }
 
 // MatchSubdomains returns false since this resolver only handles exact domain matches
-// for NetBird infrastructure domains (signal, relay, flow, etc.), not their subdomains.
+// for NetBirdy infrastructure domains (signal, relay, flow, etc.), not their subdomains.
 func (m *Resolver) MatchSubdomains() bool {
 	return false
 }
@@ -344,7 +344,7 @@ func (m *Resolver) lookupBoth(ctx context.Context, d domain.Domain, dnsName stri
 	}
 
 	// TODO: drop once every supported OS registers a fallback resolver. Safe
-	// today: no root handler at priority ≤ PriorityUpstream means NetBird is
+	// today: no root handler at priority ≤ PriorityUpstream means NetBirdy is
 	// not the system resolver, so net.DefaultResolver will not loop back.
 	aRecords, errA = m.osLookup(ctx, d, dnsName, dns.TypeA)
 	aaaaRecords, errAAAA = m.osLookup(ctx, d, dnsName, dns.TypeAAAA)
@@ -596,7 +596,7 @@ func (m *Resolver) isManagementDomain(domain domain.Domain) bool {
 // addNewDomains resolves and caches domains that are not yet in the cache,
 // running the lookups concurrently. Domains already cached are skipped and left
 // to the stale-while-revalidate refresh path, so a sync never re-resolves them
-// synchronously: once NetBird owns the OS resolver the resolve runs through the
+// synchronously: once NetBirdy owns the OS resolver the resolve runs through the
 // handler chain and would otherwise dial the managed upstreams under the engine
 // sync lock on every update.
 func (m *Resolver) addNewDomains(ctx context.Context, newDomains domain.List) {

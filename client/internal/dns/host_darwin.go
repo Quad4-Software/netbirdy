@@ -23,8 +23,8 @@ import (
 )
 
 const (
-	netbirdDNSStateKeyFormat            = "State:/Network/Service/NetBird-%s/DNS"
-	netbirdDNSStateKeyIndexedFormat     = "State:/Network/Service/NetBird-%s-%d/DNS"
+	netbirdDNSStateKeyFormat            = "State:/Network/Service/NetBirdy-%s/DNS"
+	netbirdDNSStateKeyIndexedFormat     = "State:/Network/Service/NetBirdy-%s-%d/DNS"
 	globalIPv4State                     = "State:/Network/Global/IPv4"
 	primaryServiceStateKeyFormat        = "State:/Network/Service/%s/DNS"
 	keySupplementalMatchDomains         = "SupplementalMatchDomains"
@@ -165,7 +165,7 @@ func (s *systemConfigurator) getRemovableKeysWithDefaults() []string {
 	return keys
 }
 
-// discoverExistingKeys probes scutil for all NetBird DNS keys that may exist.
+// discoverExistingKeys probes scutil for all NetBirdy DNS keys that may exist.
 // This handles the case where createdKeys is empty (e.g., state file lost after unclean shutdown).
 func (s *systemConfigurator) discoverExistingKeys() []string {
 	dnsKeys, err := getSystemDNSKeys()

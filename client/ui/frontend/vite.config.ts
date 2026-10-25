@@ -8,7 +8,7 @@ import wails from "@wailsio/runtime/plugins/vite";
 export default defineConfig({
   resolve: {
     alias: {
-      "@": path.resolve(__dirname, "./src"),
+      "@": path.resolve(import.meta.dirname, "./src"),
       "@bindings": path.resolve(
         __dirname,
         "./bindings/github.com/netbirdio/netbird/client/ui",
@@ -23,7 +23,7 @@ export default defineConfig({
     fs: {
       // The i18n bundles live at ../i18n/locales (shared with the Go tray).
       // Whitelist the parent dir so Vite's dev server serves them.
-      allow: [path.resolve(__dirname, ".."), __dirname],
+      allow: [path.resolve(import.meta.dirname, ".."), __dirname],
     },
   },
 });

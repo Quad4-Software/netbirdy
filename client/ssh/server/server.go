@@ -31,7 +31,7 @@ import (
 	"github.com/netbirdio/netbird/version"
 )
 
-// DefaultSSHPort is the default SSH port of the NetBird's embedded SSH server
+// DefaultSSHPort is the default SSH port of the NetBirdy's embedded SSH server
 const DefaultSSHPort = 22
 
 // InternalSSHPort is the port SSH server listens on and is redirected to
@@ -854,11 +854,11 @@ func (s *Server) connectionValidator(_ ssh.Context, conn net.Conn) net.Conn {
 	inV4 := wgAddr.Network.Contains(remoteIP)
 	inV6 := wgAddr.IPv6Net.IsValid() && wgAddr.IPv6Net.Contains(remoteIP)
 	if !inV4 && !inV6 {
-		log.Warnf("SSH connection rejected from non-NetBird IP %s", remoteIP)
+		log.Warnf("SSH connection rejected from non-NetBirdy IP %s", remoteIP)
 		return nil
 	}
 
-	log.Infof("SSH connection from NetBird peer %s allowed", tcpAddr)
+	log.Infof("SSH connection from NetBirdy peer %s allowed", tcpAddr)
 	return &trackedConn{
 		Conn:       conn,
 		server:     s,

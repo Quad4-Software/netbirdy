@@ -16,32 +16,32 @@
   hence one action per path.
 -->
 <policyconfig>
-  <vendor>NetBird</vendor>
-  <vendor_url>https://netbird.io</vendor_url>
+  <vendor>NetBirdy</vendor>
+  <vendor_url>https://netbirdy.io</vendor_url>
 
-  <action id="io.netbird.settings.apply-privileged">
-    <description>Change privileged NetBird settings</description>
-    <message>Authentication is required to change NetBird settings that grant SSH access to this computer.</message>
-    <icon_name>netbird</icon_name>
+  <action id="io.netbirdy.settings.apply-privileged">
+    <description>Change privileged NetBirdy settings</description>
+    <message>Authentication is required to change NetBirdy settings that grant SSH access to this computer.</message>
+    <icon_name>netbirdy</icon_name>
     <defaults>
       <allow_any>auth_admin</allow_any>
       <allow_inactive>auth_admin</allow_inactive>
       <allow_active>auth_admin</allow_active>
     </defaults>
-    <annotate key="org.freedesktop.policykit.exec.path">/usr/bin/netbird-ui</annotate>
+    <annotate key="org.freedesktop.policykit.exec.path">/usr/bin/netbirdy-ui</annotate>
     <annotate key="org.freedesktop.policykit.exec.argv1">--apply-privileged-settings</annotate>
   </action>
 
-  <action id="io.netbird.settings.apply-privileged-local">
-    <description>Change privileged NetBird settings</description>
-    <message>Authentication is required to change NetBird settings that grant SSH access to this computer.</message>
-    <icon_name>netbird</icon_name>
+  <action id="io.netbirdy.settings.apply-privileged-local">
+    <description>Change privileged NetBirdy settings</description>
+    <message>Authentication is required to change NetBirdy settings that grant SSH access to this computer.</message>
+    <icon_name>netbirdy</icon_name>
     <defaults>
       <allow_any>auth_admin</allow_any>
       <allow_inactive>auth_admin</allow_inactive>
       <allow_active>auth_admin</allow_active>
     </defaults>
-    <annotate key="org.freedesktop.policykit.exec.path">/usr/local/bin/netbird-ui</annotate>
+    <annotate key="org.freedesktop.policykit.exec.path">/usr/local/bin/netbirdy-ui</annotate>
     <annotate key="org.freedesktop.policykit.exec.argv1">--apply-privileged-settings</annotate>
   </action>
 </policyconfig>

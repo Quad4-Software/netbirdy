@@ -6,11 +6,11 @@ import (
 )
 
 const (
-	urlWinExe    = "https://pkgs.netbird.io/windows/x64"
-	urlWinExeArm = "https://pkgs.netbird.io/windows/arm64"
+	urlWinExe    = "https://github.com/Sudo-Ivan/netbirdy/releases/latest"
+	urlWinExeArm = "https://github.com/Sudo-Ivan/netbirdy/releases/latest"
 )
 
-var regKeyAppPath = "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\App Paths\\Netbird"
+var regKeyAppPath = "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\App Paths\\NetBirdy"
 
 // DownloadUrl return with the proper download link
 func DownloadUrl() string {

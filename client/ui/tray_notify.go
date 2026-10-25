@@ -11,7 +11,7 @@ import (
 	"github.com/netbirdio/netbird/client/ui/services"
 )
 
-const notifyIDDaemonOutdated = "netbird-daemon-outdated"
+const notifyIDDaemonOutdated = "netbirdy-daemon-outdated"
 
 // sendFn fits both NotificationService.SendNotification and SendNotificationWithActions.
 type sendFn func(notifications.NotificationOptions) error

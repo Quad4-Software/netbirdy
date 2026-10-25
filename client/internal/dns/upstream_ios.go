@@ -84,7 +84,7 @@ func (u *upstreamResolverIOS) exchange(ctx context.Context, upstream string, r *
 	return ExchangeWithFallback(ctx, client, r, upstream)
 }
 
-// GetClientPrivate returns a new DNS client bound to the local IP of the Netbird interface.
+// GetClientPrivate returns a new DNS client bound to the local IP of the NetBirdy interface.
 // It selects the v6 bind address when the upstream is IPv6 and the interface has one, otherwise v4.
 func GetClientPrivate(iface privateClientIface, upstreamIP netip.Addr, dialTimeout time.Duration) (*dns.Client, error) {
 	index, err := getInterfaceIndex(iface.Name())

@@ -23,7 +23,7 @@ import (
 
 // TestMain handles package-level setup and cleanup
 func TestMain(m *testing.M) {
-	// Guard against infinite recursion when test binary is called as "netbird ssh exec"
+	// Guard against infinite recursion when test binary is called as "netbirdy ssh exec"
 	// This happens when running tests as non-privileged user with fallback
 	if len(os.Args) > 2 && os.Args[1] == "ssh" && os.Args[2] == "exec" {
 		// Just exit with error to break the recursion

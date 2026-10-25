@@ -79,7 +79,7 @@ func (t *TunNetstackDevice) create() (WGConfigurer, error) {
 	t.device = wgbackend.NewDevice(
 		t.filteredDevice,
 		t.bind,
-		wgbackend.NewLogger(wgLogLevel(), "[netbird] "),
+		wgbackend.NewLogger(wgLogLevel(), "[netbirdy] "),
 	)
 
 	t.configurer = configurer.NewUSPConfigurerNoUAPI(t.device, t.name, t.bind.ActivityRecorder())

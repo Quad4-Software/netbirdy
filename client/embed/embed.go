@@ -78,7 +78,7 @@ type Options struct {
 	LogLevel string
 	// NoUserspace disables the userspace networking mode. Needs admin/root privileges
 	NoUserspace bool
-	// ConfigPath is the path to the netbird config file. If empty, the config will be stored in memory and not persisted.
+	// ConfigPath is the path to the netbirdy config file. If empty, the config will be stored in memory and not persisted.
 	ConfigPath string
 	// StatePath is the path to the netbird state file. When empty in netstack
 	// mode, state is kept in memory; with NoUserspace the default path is used.
@@ -385,7 +385,7 @@ func (c *Client) GetConfig() (profilemanager.Config, error) {
 	return *c.config, nil
 }
 
-// Dial dials a network address in the netbird network.
+// Dial dials a network address in the netbirdy network.
 // Not applicable if the userspace networking mode is disabled.
 func (c *Client) Dial(ctx context.Context, network, address string) (net.Conn, error) {
 	engine, err := c.getEngine()
@@ -401,12 +401,12 @@ func (c *Client) Dial(ctx context.Context, network, address string) (net.Conn, e
 	return nsnet.DialContext(ctx, network, address)
 }
 
-// DialContext dials a network address in the netbird network with context
+// DialContext dials a network address in the netbirdy network with context
 func (c *Client) DialContext(ctx context.Context, network, address string) (net.Conn, error) {
 	return c.Dial(ctx, network, address)
 }
 
-// ListenTCP listens on the given address in the netbird network.
+// ListenTCP listens on the given address in the netbirdy network.
 // Not applicable if the userspace networking mode is disabled.
 func (c *Client) ListenTCP(address string) (net.Listener, error) {
 	nsnet, addr, err := c.getNet()
@@ -427,7 +427,7 @@ func (c *Client) ListenTCP(address string) (net.Listener, error) {
 	return nsnet.ListenTCP(tcpAddr)
 }
 
-// ListenUDP listens on the given address in the netbird network.
+// ListenUDP listens on the given address in the netbirdy network.
 // Not applicable if the userspace networking mode is disabled.
 func (c *Client) ListenUDP(address string) (net.PacketConn, error) {
 	nsnet, addr, err := c.getNet()
@@ -449,7 +449,7 @@ func (c *Client) ListenUDP(address string) (net.PacketConn, error) {
 	return nsnet.ListenUDP(udpAddr)
 }
 
-// NewHTTPClient returns a configured http.Client that uses the netbird network for requests.
+// NewHTTPClient returns a configured http.Client that uses the netbirdy network for requests.
 // Not applicable if the userspace networking mode is disabled.
 func (c *Client) NewHTTPClient() *http.Client {
 	transport := &http.Transport{
@@ -461,7 +461,7 @@ func (c *Client) NewHTTPClient() *http.Client {
 	}
 }
 
-// Expose exposes a local service via the NetBird reverse proxy, making it accessible through a public URL.
+// Expose exposes a local service via the NetBirdy reverse proxy, making it accessible through a public URL.
 // It returns an ExposeSession. Call Wait on the session to keep it alive.
 func (c *Client) Expose(ctx context.Context, req ExposeRequest) (*ExposeSession, error) {
 	engine, err := c.getEngine()

@@ -1,6 +1,6 @@
 # nblink
 
-`nblink` forwards local ports into a NetBird network from an unprivileged
+`nblink` forwards local ports into a NetBirdy network from an unprivileged
 process. It runs the client in userspace mode, so there is no TUN device to
 create and no elevated privileges to grant. That lets it run on managed
 machines and in rootless containers where the normal agent cannot.
@@ -165,7 +165,7 @@ an Ingress.
 | --- | --- | --- | --- |
 | `--forward` | `NB_FORWARD` | | Forward spec, repeatable. Comma separated in the environment. |
 | `--setup-key` | `NB_SETUP_KEY` | | Non-interactive login. Accepts a `file:` prefix. |
-| `--management-url` | `NB_MANAGEMENT_URL` | NetBird cloud | Management server. |
+| `--management-url` | `NB_MANAGEMENT_URL` | NetBirdy cloud | Management server. |
 | `--hostname` | `NB_HOSTNAME` | host name | Peer name in the network. |
 | `--state-dir` | `NB_STATE_DIR` | memory | Where identity and state persist. |
 | `--log-level` | `NB_LOG_LEVEL` | `info` | Log level. |

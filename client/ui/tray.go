@@ -24,10 +24,10 @@ import (
 // Notification IDs are OS dedup keys that coalesce duplicate toasts;
 // statusError is a tray-only sentinel for the error-icon state.
 const (
-	notifyIDUpdatePrefix = "netbird-update-"
-	notifyIDEvent        = "netbird-event-"
-	notifyIDTrayError    = "netbird-tray-error"
-	notifyIDMDMPolicy    = "netbird-mdm-policy"
+	notifyIDUpdatePrefix = "netbirdy-update-"
+	notifyIDEvent        = "netbirdy-event-"
+	notifyIDTrayError    = "netbirdy-tray-error"
+	notifyIDMDMPolicy    = "netbirdy-mdm-policy"
 
 	statusError = "Error"
 

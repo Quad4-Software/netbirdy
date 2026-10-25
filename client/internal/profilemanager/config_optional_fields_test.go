@@ -39,7 +39,7 @@ func requireNoUnsetOptionalBool(t *testing.T, config *Config, context string) {
 // An optional bool must not be tristate. While one can be nil, true or false,
 // every reader has to invent the meaning of nil, and — the reason this test
 // exists — a diff of the config ends up comparing presence rather than value:
-// that is what made the update-settings gate refuse `netbird up` for a client
+// that is what made the update-settings gate refuse `netbirdy up` for a client
 // restating its own defaults. apply() is where a config becomes complete, so
 // the invariant belongs to it: no *bool may come out of apply() unset.
 func TestApplyLeavesNoOptionalBoolUnset(t *testing.T) {

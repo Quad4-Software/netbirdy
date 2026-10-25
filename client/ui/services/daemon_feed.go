@@ -20,19 +20,19 @@ import (
 )
 
 const (
-	EventStatusSnapshot = "netbird:status"
+	EventStatusSnapshot = "netbirdy:status"
 	// EventDaemonNotification carries each SubscribeEvents message. Auto-update
 	// SystemEvents are also forwarded to updater.Holder.OnSystemEvent so the typed
 	// update state needs no second daemon subscription.
-	EventDaemonNotification = "netbird:event"
+	EventDaemonNotification = "netbirdy:event"
 	// EventProfileChanged fires after a daemon-side switch (payload: the new
 	// ProfileRef). The daemon emits no profile event, so this is the only signal
 	// that lets a flip driven from one surface paint in the others.
-	EventProfileChanged = "netbird:profile:changed"
+	EventProfileChanged = "netbirdy:profile:changed"
 	// EventSessionWarning is a typed sibling of EventDaemonNotification so
 	// subscribers needn't filter the notification firehose. Consumers branch on
 	// SessionWarning.Final to tell the T-10 event from the T-2 fallback.
-	EventSessionWarning = "netbird:session:warning"
+	EventSessionWarning = "netbirdy:session:warning"
 
 	// StatusDaemonUnavailable is the synthetic Status emitted when the daemon's
 	// gRPC socket is unreachable. No internal.Status* collides with this label.

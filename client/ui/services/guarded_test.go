@@ -81,7 +81,7 @@ func privilegeRefusal(t *testing.T) error {
 			Domain: ipcauth.ErrorDomain,
 			Metadata: map[string]string{
 				ipcauth.ErrorMetaSummary: "Changing the management URL requires root.",
-				ipcauth.ErrorMetaCommand: "sudo netbird down; sudo netbird up -m https://mgmt.example.com",
+				ipcauth.ErrorMetaCommand: "sudo netbirdy down; sudo netbirdy up -m https://mgmt.example.com",
 			},
 		})
 	require.NoError(t, err, "build the refusal detail")
@@ -211,7 +211,7 @@ func TestSetGuardedSettingsMapsFailures(t *testing.T) {
 		},
 		{
 			name:     "a failed run falls back to the command",
-			outcome:  errors.New("elevated netbird exited with 1"),
+			outcome:  errors.New("elevated netbirdy exited with 1"),
 			wantCode: CodeElevationFailed,
 		},
 	}
@@ -231,7 +231,7 @@ func TestSetGuardedSettingsMapsFailures(t *testing.T) {
 			assert.Equal(t, tt.wantCode, clientErr.Code, "error code")
 			assert.Contains(t, clientErr.Command, "--"+FlagEnableSSHRoot+"=true",
 				"the setting in the fallback command")
-			assert.Contains(t, clientErr.Command, "netbird up", "the fallback command")
+			assert.Contains(t, clientErr.Command, "netbirdy up", "the fallback command")
 		})
 	}
 }
@@ -289,7 +289,7 @@ func TestSetConfigReportsTheRefusalWhenItCannotElevate(t *testing.T) {
 	var clientErr *ClientError
 	require.ErrorAs(t, err, &clientErr)
 	assert.Equal(t, "privilege_required", clientErr.Code, "error code")
-	assert.Contains(t, clientErr.Command, "netbird up -m https://mgmt.example.com",
+	assert.Contains(t, clientErr.Command, "netbirdy up -m https://mgmt.example.com",
 		"the daemon's own command")
 	assert.Empty(t, elev.calls, "no prompt where there is none to raise")
 }

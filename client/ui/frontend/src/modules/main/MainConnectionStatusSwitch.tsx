@@ -19,8 +19,8 @@ import { contentTop } from "@/components/empty-state/EmptyState";
 import { useFocusVisible } from "@/hooks/useFocusVisible";
 import { Check as CheckIcon, ChevronDownIcon, Copy as CopyIcon } from "lucide-react";
 import * as Popover from "@radix-ui/react-popover";
-import netbirdFullLogo from "@/assets/logos/netbird-full.svg";
-import netbirdFullLogoLight from "@/assets/logos/netbird-full-light.svg";
+import netbirdFullLogo from "@/assets/logos/netbirdy-full.svg";
+import netbirdFullLogoLight from "@/assets/logos/netbirdy-full-light.svg";
 
 enum ConnectionState {
     Disconnected = "disconnected",
@@ -227,13 +227,13 @@ export const MainConnectionStatusSwitch = () => {
         >
             <img
                 src={netbirdFullLogoLight}
-                alt={"NetBird"}
+                alt={"NetBirdy"}
                 className={"wails-no-draggable mb-4 h-7 w-auto select-none dark:hidden"}
                 draggable={false}
             />
             <img
                 src={netbirdFullLogo}
-                alt={"NetBird"}
+                alt={"NetBirdy"}
                 className={"wails-no-draggable mb-4 hidden h-7 w-auto select-none dark:block"}
                 draggable={false}
             />

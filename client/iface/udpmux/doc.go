@@ -1,7 +1,7 @@
 // Package udpmux provides a custom implementation of a UDP multiplexer
 // that allows multiple logical ICE connections to share a single underlying
 // UDP socket. This is based on Pion's ICE library, with modifications for
-// NetBird's requirements.
+// NetBirdy's requirements.
 //
 // # Background
 //

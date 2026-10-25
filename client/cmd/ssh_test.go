@@ -210,7 +210,7 @@ func TestSSHCommand_NonInteractiveExecution(t *testing.T) {
 }
 
 func TestSSHCommand_FlagHandling(t *testing.T) {
-	// Test that flags after hostname are not parsed by netbird but passed to SSH command
+	// Test that flags after hostname are not parsed by netbirdy but passed to SSH command
 	tests := []struct {
 		name         string
 		args         []string
@@ -220,20 +220,20 @@ func TestSSHCommand_FlagHandling(t *testing.T) {
 		description  string
 	}{
 		{
-			name:         "ls with -la flag should not be parsed by netbird",
+			name:         "ls with -la flag should not be parsed by netbirdy",
 			args:         []string{"debian2", "ls", "-la"},
 			expectedHost: "debian2",
 			expectedCmd:  "ls -la",
 			expectError:  false,
-			description:  "ls -la should be passed as SSH command, not parsed as netbird flags",
+			description:  "ls -la should be passed as SSH command, not parsed as netbirdy flags",
 		},
 		{
-			name:         "command with netbird-like flags should be passed through",
+			name:         "command with netbirdy-like flags should be passed through",
 			args:         []string{"hostname", "echo", "--help"},
 			expectedHost: "hostname",
 			expectedCmd:  "echo --help",
 			expectError:  false,
-			description:  "--help should be passed to echo, not parsed by netbird",
+			description:  "--help should be passed to echo, not parsed by netbirdy",
 		},
 		{
 			name:         "command with -p flag should not conflict with SSH port flag",
@@ -277,8 +277,8 @@ func TestSSHCommand_FlagHandling(t *testing.T) {
 }
 
 func TestSSHCommand_RegressionFlagParsing(t *testing.T) {
-	// Regression test for the specific issue: "sudo ./netbird ssh debian2 ls -la"
-	// should not parse -la as netbird flags but pass them to the SSH command
+	// Regression test for the specific issue: "sudo ./netbirdy ssh debian2 ls -la"
+	// should not parse -la as netbirdy flags but pass them to the SSH command
 	tests := []struct {
 		name         string
 		args         []string

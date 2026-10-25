@@ -83,7 +83,7 @@ func profileFixture(t *testing.T) string {
 	return defaultConfig
 }
 
-// A profile carries its own NetBird account, so a token obtained under the
+// A profile carries its own NetBirdy account, so a token obtained under the
 // previous one must not survive the switch even for the local user who
 // obtained it.
 func TestSwitchProfile_ClearsJWTCache(t *testing.T) {
@@ -124,7 +124,7 @@ func TestSwitchProfile_ClearsJWTCache(t *testing.T) {
 }
 
 // Down ends the connection, not the session: the peer stays enrolled and the
-// token still belongs to the same NetBird identity, so `down` followed by `up`
+// token still belongs to the same NetBirdy identity, so `down` followed by `up`
 // must not cost the owner a fresh device-code flow.
 //
 // The logout handlers do call cleanupConnection, and SwitchProfile does not;

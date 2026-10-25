@@ -5,10 +5,10 @@
 	"info": {
 		"0000": {
 			"ProductVersion": "0.0.1",
-			"CompanyName": "NetBird",
-			"FileDescription": "NetBird desktop client",
+			"CompanyName": "NetBirdy",
+			"FileDescription": "NetBirdy desktop client",
 			"LegalCopyright": "NetBird GmbH",
-			"ProductName": "NetBird",
+			"ProductName": "NetBirdy",
 			"Comments": "This is a comment"
 		}
 	}

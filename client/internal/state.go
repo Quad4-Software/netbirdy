@@ -13,6 +13,7 @@ const (
 	StatusConnecting     StatusType = "Connecting"
 	StatusConnected      StatusType = "Connected"
 	StatusNeedsLogin     StatusType = "NeedsLogin"
+	StatusOffline        StatusType = "Offline"
 	StatusLoginFailed    StatusType = "LoginFailed"
 	StatusSessionExpired StatusType = "SessionExpired"
 )

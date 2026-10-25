@@ -1,4 +1,4 @@
-FROM golang:1.26.10-alpine AS build
+FROM golang:1.27.2-alpine AS build
 WORKDIR /app
 COPY go.mod main.go ./
 RUN CGO_ENABLED=0 go build -o ingest .

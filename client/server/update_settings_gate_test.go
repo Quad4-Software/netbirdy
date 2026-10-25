@@ -21,7 +21,7 @@ import (
 const storedManagementURL = "https://api.netbird.io:443"
 
 // A client configured by environment re-sends its whole configuration on every
-// `netbird up`: the CLI fills the request from its flags and env regardless of
+// `netbirdy up`: the CLI fills the request from its flags and env regardless of
 // what changed. With the update-settings kill switch on, such a request must
 // pass — nothing about the configuration moves.
 func TestSetConfig_RestatingTheStoredConfigPassesTheGate(t *testing.T) {

@@ -132,7 +132,7 @@ func (i *Info) SetFlags(
 }
 
 // removeAddresses drops network addresses whose IP matches any of the given
-// addresses, regardless of prefix length. Used to exclude the NetBird overlay
+// addresses, regardless of prefix length. Used to exclude the NetBirdy overlay
 // address, which otherwise churns the meta as the interface comes and goes.
 func (i *Info) removeAddresses(ips ...netip.Addr) {
 	if len(ips) == 0 {
@@ -148,7 +148,7 @@ func (i *Info) removeAddresses(ips ...netip.Addr) {
 	i.NetworkAddresses = filtered
 }
 
-// extractUserAgent extracts Netbird's agent (client) name and version from the outgoing context
+// extractUserAgent extracts NetBirdy's agent (client) name and version from the outgoing context
 func extractUserAgent(ctx context.Context) string {
 	md, hasMeta := metadata.FromOutgoingContext(ctx)
 	if hasMeta {

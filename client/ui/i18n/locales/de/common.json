@@ -1,6 +1,6 @@
 {
     "tray.tooltip": {
-        "message": "NetBird"
+        "message": "NetBirdy"
     },
     "tray.status.disconnected": {
         "message": "Nicht verbunden"
@@ -51,7 +51,7 @@
         "message": "{count} Tagen"
     },
     "tray.menu.open": {
-        "message": "NetBird öffnen"
+        "message": "NetBirdy öffnen"
     },
     "tray.menu.connect": {
         "message": "Verbinden"
@@ -105,19 +105,19 @@
         "message": "—"
     },
     "tray.menu.quit": {
-        "message": "NetBird beenden"
+        "message": "NetBirdy beenden"
     },
     "notify.daemonOutdated.title": {
-        "message": "NetBird-Dienst ist veraltet"
+        "message": "NetBirdy-Dienst ist veraltet"
     },
     "notify.daemonOutdated.body": {
-        "message": "Aktualisieren Sie den NetBird-Dienst, um diese App zu verwenden."
+        "message": "Aktualisieren Sie den NetBirdy-Dienst, um diese App zu verwenden."
     },
     "notify.update.title": {
-        "message": "NetBird-Update verfügbar"
+        "message": "NetBirdy-Update verfügbar"
     },
     "notify.update.body": {
-        "message": "NetBird {version} ist verfügbar."
+        "message": "NetBirdy {version} ist verfügbar."
     },
     "notify.update.enforcedSuffix": {
         "message": " Ihr Administrator verlangt dieses Update."
@@ -138,19 +138,19 @@
         "message": "Exit Node {name} konnte nicht aktualisiert werden"
     },
     "notify.sessionExpired.title": {
-        "message": "NetBird-Sitzung abgelaufen"
+        "message": "NetBirdy-Sitzung abgelaufen"
     },
     "notify.sessionExpired.body": {
-        "message": "Ihre NetBird-Sitzung ist abgelaufen. Bitte melden Sie sich erneut an."
+        "message": "Ihre NetBirdy-Sitzung ist abgelaufen. Bitte melden Sie sich erneut an."
     },
     "notify.sessionWarning.title": {
         "message": "Sitzung läuft bald ab"
     },
     "notify.sessionWarning.body": {
-        "message": "Ihre NetBird-Sitzung läuft in {remaining} ab. Klicken Sie auf Jetzt verlängern, um zu erneuern."
+        "message": "Ihre NetBirdy-Sitzung läuft in {remaining} ab. Klicken Sie auf Jetzt verlängern, um zu erneuern."
     },
     "notify.sessionWarning.bodyGeneric": {
-        "message": "Ihre NetBird-Sitzung läuft bald ab. Klicken Sie auf Jetzt verlängern, um zu erneuern."
+        "message": "Ihre NetBirdy-Sitzung läuft bald ab. Klicken Sie auf Jetzt verlängern, um zu erneuern."
     },
     "notify.sessionWarning.extend": {
         "message": "Jetzt verlängern"
@@ -159,10 +159,10 @@
         "message": "Verwerfen"
     },
     "notify.sessionWarning.failed": {
-        "message": "NetBird-Sitzung konnte nicht verlängert werden"
+        "message": "NetBirdy-Sitzung konnte nicht verlängert werden"
     },
     "notify.sessionWarning.successTitle": {
-        "message": "NetBird-Sitzung verlängert"
+        "message": "NetBirdy-Sitzung verlängert"
     },
     "notify.sessionWarning.successBody": {
         "message": "Ihre Sitzung wurde erneuert."
@@ -174,10 +174,10 @@
         "message": "Der Server hat eine ungültige Sitzungsablaufzeit übermittelt. Bitte melden Sie sich erneut an."
     },
     "notify.mdm.policyApplied.title": {
-        "message": "NetBird-Einstellungen aktualisiert"
+        "message": "NetBirdy-Einstellungen aktualisiert"
     },
     "notify.mdm.policyApplied.body": {
-        "message": "Ihre NetBird-Konfiguration wurde durch Ihre IT-Richtlinie aktualisiert."
+        "message": "Ihre NetBirdy-Konfiguration wurde durch Ihre IT-Richtlinie aktualisiert."
     },
     "common.cancel": {
         "message": "Abbrechen"
@@ -224,8 +224,8 @@
     "common.loading": {
         "message": "Lädt…"
     },
-    "common.netbird": {
-        "message": "NetBird"
+    "common.netbirdy": {
+        "message": "NetBirdy"
     },
     "common.noResults.title": {
         "message": "Keine Ergebnisse gefunden"
@@ -237,7 +237,7 @@
         "message": "Nicht verbunden"
     },
     "notConnected.description": {
-        "message": "Verbinden Sie sich zuerst mit NetBird, um detaillierte Informationen zu Ihren Peers, Netzwerkressourcen und Exit Nodes einzusehen."
+        "message": "Verbinden Sie sich zuerst mit NetBirdy, um detaillierte Informationen zu Ihren Peers, Netzwerkressourcen und Exit Nodes einzusehen."
     },
     "connect.status.disconnected": {
         "message": "Nicht verbunden"
@@ -351,7 +351,7 @@
         "message": "Bitte geben Sie einen Profilnamen ein, z. B. Arbeit, Privat"
     },
     "profile.dialog.managementHelp": {
-        "message": "NetBird Cloud oder Ihr eigener Server."
+        "message": "NetBirdy Cloud oder Ihr eigener Server."
     },
     "profile.dialog.urlUnreachable": {
         "message": "Server nicht erreichbar. Überprüfen Sie die URL, oder fügen Sie das Profil trotzdem hinzu, wenn Sie sicher sind, dass sie korrekt ist."
@@ -375,7 +375,7 @@
         "message": "Profil wechseln"
     },
     "connect.toggle.label": {
-        "message": "NetBird-Verbindung umschalten"
+        "message": "NetBirdy-Verbindung umschalten"
     },
     "connect.localIp.label": {
         "message": "Lokale IP-Adressen"
@@ -471,7 +471,7 @@
         "message": "Profile"
     },
     "settings.profiles.intro": {
-        "message": "Verwalten Sie mehrere NetBird-Profile parallel, zum Beispiel berufliche und private Konten oder verschiedene Management-Server. Fügen Sie unten Profile hinzu, melden Sie sie ab oder löschen Sie sie."
+        "message": "Verwalten Sie mehrere NetBirdy-Profile parallel, zum Beispiel berufliche und private Konten oder verschiedene Management-Server. Fügen Sie unten Profile hinzu, melden Sie sie ab oder löschen Sie sie."
     },
     "settings.profiles.addProfile": {
         "message": "Profil hinzufügen"
@@ -483,7 +483,7 @@
         "message": "Keine Profile"
     },
     "settings.profiles.emptyDescription": {
-        "message": "Erstellen Sie ein Profil, um sich mit einem NetBird-Management-Server zu verbinden."
+        "message": "Erstellen Sie ein Profil, um sich mit einem NetBirdy-Management-Server zu verbinden."
     },
     "settings.error.loadTitle": {
         "message": "Laden der Einstellungen fehlgeschlagen"
@@ -543,10 +543,10 @@
         "message": "Desktop-Benachrichtigungen für neue Updates und Verbindungsereignisse anzeigen."
     },
     "settings.general.autostart.label": {
-        "message": "NetBird-UI beim Anmelden starten"
+        "message": "NetBirdy-UI beim Anmelden starten"
     },
     "settings.general.autostart.help": {
-        "message": "Die NetBird-Oberfläche beim Anmelden automatisch starten. Dies betrifft nur die grafische Oberfläche, nicht den Hintergrunddienst."
+        "message": "Die NetBirdy-Oberfläche beim Anmelden automatisch starten. Dies betrifft nur die grafische Oberfläche, nicht den Hintergrunddienst."
     },
     "settings.general.autostart.errorTitle": {
         "message": "Ändern des Autostarts fehlgeschlagen"
@@ -555,13 +555,13 @@
         "message": "Nach dem Beenden verbunden bleiben"
     },
     "settings.general.keepConnectedOnQuit.help": {
-        "message": "Die Verbindung bleibt im Hintergrund bestehen, nachdem Sie NetBird schließen. Sie endet erst, wenn Sie sie selbst trennen."
+        "message": "Die Verbindung bleibt im Hintergrund bestehen, nachdem Sie NetBirdy schließen. Sie endet erst, wenn Sie sie selbst trennen."
     },
     "settings.general.language.label": {
         "message": "Anzeigesprache"
     },
     "settings.general.language.help": {
-        "message": "Wählen Sie die Sprache der NetBird-Oberfläche."
+        "message": "Wählen Sie die Sprache der NetBirdy-Oberfläche."
     },
     "settings.general.language.search": {
         "message": "Sprache suchen…"
@@ -588,7 +588,7 @@
         "message": "Management-Server"
     },
     "settings.general.management.help": {
-        "message": "Mit NetBird Cloud oder Ihrem eigenen self-hosted Management-Server verbinden. Änderungen lösen eine Neuverbindung des Clients aus."
+        "message": "Mit NetBirdy Cloud oder Ihrem eigenen self-hosted Management-Server verbinden. Änderungen lösen eine Neuverbindung des Clients aus."
     },
     "settings.general.management.cloud": {
         "message": "Cloud"
@@ -606,7 +606,7 @@
         "message": "Server nicht erreichbar. Überprüfen Sie die URL, oder speichern Sie trotzdem, wenn Sie sicher sind, dass sie korrekt ist."
     },
     "settings.general.management.switchCloudTitle": {
-        "message": "Zu NetBird Cloud wechseln?"
+        "message": "Zu NetBirdy Cloud wechseln?"
     },
     "settings.general.management.switchCloudMessage": {
         "message": "Dies trennt die Verbindung zu Ihrem self-hosted Server.\nMöglicherweise müssen Sie sich erneut anmelden."
@@ -630,7 +630,7 @@
         "message": "DNS aktivieren"
     },
     "settings.network.dns.help": {
-        "message": "NetBird-verwaltete DNS-Einstellungen auf den Host-Resolver anwenden."
+        "message": "NetBirdy-verwaltete DNS-Einstellungen auf den Host-Resolver anwenden."
     },
     "settings.network.clientRoutes.label": {
         "message": "Client-Routen aktivieren"
@@ -648,7 +648,7 @@
         "message": "IPv6 aktivieren"
     },
     "settings.network.ipv6.help": {
-        "message": "IPv6-Adressierung für das NetBird-Overlay-Netzwerk verwenden."
+        "message": "IPv6-Adressierung für das NetBirdy-Overlay-Netzwerk verwenden."
     },
     "settings.security.section.firewall": {
         "message": "Firewall"
@@ -693,7 +693,7 @@
         "message": "SSH-Server aktivieren"
     },
     "settings.ssh.server.help": {
-        "message": "Den NetBird SSH-Server auf diesem Host ausführen, damit andere Peers sich verbinden können."
+        "message": "Den NetBirdy SSH-Server auf diesem Host ausführen, damit andere Peers sich verbinden können."
     },
     "settings.ssh.root.label": {
         "message": "Root-Login erlauben"
@@ -768,7 +768,7 @@
         "message": "Pre-shared Key"
     },
     "settings.advanced.psk.help": {
-        "message": "Optionaler WireGuard-PSK für zusätzliche symmetrische Verschlüsselung. Nicht identisch mit einem NetBird Setup-Key. Sie kommunizieren nur mit Peers, die denselben Pre-shared Key verwenden."
+        "message": "Optionaler WireGuard-PSK für zusätzliche symmetrische Verschlüsselung. Nicht identisch mit einem NetBirdy Setup-Key. Sie kommunizieren nur mit Peers, die denselben Pre-shared Key verwenden."
     },
     "settings.troubleshooting.section.title": {
         "message": "Debug-Paket"
@@ -798,10 +798,10 @@
         "message": "OS, Kernel, Netzwerkschnittstellen und Routing-Tabellen einschließen."
     },
     "settings.troubleshooting.upload.label": {
-        "message": "Paket an NetBird-Server hochladen"
+        "message": "Paket an NetBirdy-Server hochladen"
     },
     "settings.troubleshooting.upload.help": {
-        "message": "Gibt einen Upload-Schlüssel zurück, den Sie mit dem NetBird-Support teilen können."
+        "message": "Gibt einen Upload-Schlüssel zurück, den Sie mit dem NetBirdy-Support teilen können."
     },
     "settings.troubleshooting.trace.label": {
         "message": "Trace-Logs aktivieren"
@@ -846,7 +846,7 @@
         "message": "Paket gespeichert"
     },
     "settings.troubleshooting.done.uploadedDescription": {
-        "message": "Teilen Sie den unten angezeigten Upload-Schlüssel mit dem <docs>NetBird-Support</docs>. Eine lokale Kopie wurde ebenfalls auf Ihrem Gerät gespeichert."
+        "message": "Teilen Sie den unten angezeigten Upload-Schlüssel mit dem <docs>NetBirdy-Support</docs>. Eine lokale Kopie wurde ebenfalls auf Ihrem Gerät gespeichert."
     },
     "settings.troubleshooting.done.savedDescription": {
         "message": "Ihr Debug-Paket wurde lokal gespeichert."
@@ -867,7 +867,7 @@
         "message": "Upload fehlgeschlagen. Das Paket wurde trotzdem lokal gespeichert."
     },
     "settings.troubleshooting.stage.reconnecting": {
-        "message": "NetBird wird neu verbunden…"
+        "message": "NetBirdy wird neu verbunden…"
     },
     "settings.troubleshooting.stage.capturing": {
         "message": "Debug-Logs werden erfasst"
@@ -876,16 +876,16 @@
         "message": "Debug-Paket wird erstellt…"
     },
     "settings.troubleshooting.stage.uploading": {
-        "message": "Wird zu NetBird hochgeladen…"
+        "message": "Wird zu NetBirdy hochgeladen…"
     },
     "settings.troubleshooting.stage.cancelling": {
         "message": "Wird abgebrochen…"
     },
     "settings.about.client": {
-        "message": "NetBird Client v{version}"
+        "message": "NetBirdy Client v{version}"
     },
     "settings.about.clientName": {
-        "message": "NetBird Client"
+        "message": "NetBirdy Client"
     },
     "settings.about.development": {
         "message": "[Entwicklung]"
@@ -897,7 +897,7 @@
         "message": "GUI"
     },
     "settings.about.copyright": {
-        "message": "© {year} NetBird. Alle Rechte vorbehalten."
+        "message": "© {year} NetBirdy. Alle Rechte vorbehalten."
     },
     "settings.about.links.imprint": {
         "message": "Impressum"
@@ -927,7 +927,7 @@
         "message": "Feedback"
     },
     "update.banner.message": {
-        "message": "NetBird {version} ist installationsbereit."
+        "message": "NetBirdy {version} ist installationsbereit."
     },
     "update.banner.later": {
         "message": "Später"
@@ -951,7 +951,7 @@
         "message": "Herunterladen"
     },
     "update.card.autoCheckInterval": {
-        "message": "NetBird sucht im Hintergrund nach Updates."
+        "message": "NetBirdy sucht im Hintergrund nach Updates."
     },
     "update.card.changelog": {
         "message": "Changelog"
@@ -963,13 +963,13 @@
         "message": "Update verfügbar"
     },
     "update.overlay.updatingVersion": {
-        "message": "NetBird wird auf v{version} aktualisiert"
+        "message": "NetBirdy wird auf v{version} aktualisiert"
     },
     "update.overlay.updating": {
-        "message": "NetBird wird aktualisiert"
+        "message": "NetBirdy wird aktualisiert"
     },
     "update.overlay.description": {
-        "message": "Eine neuere Version ist verfügbar und wird installiert. NetBird startet nach Abschluss des Updates automatisch neu."
+        "message": "Eine neuere Version ist verfügbar und wird installiert. NetBirdy startet nach Abschluss des Updates automatisch neu."
     },
     "update.overlay.error.timeoutTitle": {
         "message": "Update dauert zu lange"
@@ -1059,22 +1059,22 @@
         "message": "Aktualisierung"
     },
     "window.title.welcome": {
-        "message": "Willkommen bei NetBird"
+        "message": "Willkommen bei NetBirdy"
     },
     "window.title.error": {
         "message": "Fehler"
     },
     "welcome.title": {
-        "message": "Suchen Sie NetBird in der Taskleiste"
+        "message": "Suchen Sie NetBirdy in der Taskleiste"
     },
     "welcome.titleMac": {
-        "message": "Suchen Sie NetBird in der Menüleiste"
+        "message": "Suchen Sie NetBirdy in der Menüleiste"
     },
     "welcome.description": {
-        "message": "NetBird läuft in Ihrer Taskleiste. Klicken Sie auf das Symbol, um sich zu verbinden, Profile zu wechseln oder die Einstellungen zu öffnen."
+        "message": "NetBirdy läuft in Ihrer Taskleiste. Klicken Sie auf das Symbol, um sich zu verbinden, Profile zu wechseln oder die Einstellungen zu öffnen."
     },
     "welcome.descriptionMac": {
-        "message": "NetBird läuft in Ihrer Menüleiste. Klicken Sie auf das Symbol, um sich zu verbinden, Profile zu wechseln oder die Einstellungen zu öffnen."
+        "message": "NetBirdy läuft in Ihrer Menüleiste. Klicken Sie auf das Symbol, um sich zu verbinden, Profile zu wechseln oder die Einstellungen zu öffnen."
     },
     "welcome.continue": {
         "message": "Weiter"
@@ -1083,13 +1083,13 @@
         "message": "Zurück"
     },
     "welcome.management.title": {
-        "message": "NetBird einrichten"
+        "message": "NetBirdy einrichten"
     },
     "welcome.management.description": {
-        "message": "Klicken Sie auf „Weiter“, um loszulegen, oder wählen Sie „Self-hosted“, wenn Sie einen eigenen NetBird-Server haben."
+        "message": "Klicken Sie auf „Weiter“, um loszulegen, oder wählen Sie „Self-hosted“, wenn Sie einen eigenen NetBirdy-Server haben."
     },
     "welcome.management.cloud.title": {
-        "message": "NetBird Cloud"
+        "message": "NetBirdy Cloud"
     },
     "welcome.management.cloud.description": {
         "message": "Nutzen Sie unseren gehosteten Dienst. Keine Einrichtung nötig."
@@ -1185,10 +1185,10 @@
         "message": "Domain"
     },
     "peers.details.netbirdIp": {
-        "message": "NetBird-IP"
+        "message": "NetBirdy-IP"
     },
     "peers.details.netbirdIpv6": {
-        "message": "NetBird-IPv6"
+        "message": "NetBirdy-IPv6"
     },
     "peers.details.publicKey": {
         "message": "Öffentlicher Schlüssel"
@@ -1323,7 +1323,7 @@
         "message": "Trennen"
     },
     "daemon.unavailable.title": {
-        "message": "NetBird-Dienst läuft nicht"
+        "message": "NetBirdy-Dienst läuft nicht"
     },
     "daemon.unavailable.description": {
         "message": "Die App stellt automatisch die Verbindung wieder her, sobald der Dienst läuft."
@@ -1332,7 +1332,7 @@
         "message": "Dokumentation"
     },
     "daemon.outdated.title": {
-        "message": "NetBird Client ist veraltet"
+        "message": "NetBirdy Client ist veraltet"
     },
     "daemon.outdated.description": {
         "message": "Die neue GUI ist nicht mit Ihrem älteren Client kompatibel. Aktualisieren Sie Ihren Client, um die neue Anwendung zu verwenden."
@@ -1359,7 +1359,7 @@
         "message": "Die Anmeldung wurde vom Server abgelehnt."
     },
     "error.daemon_unreachable": {
-        "message": "Der NetBird-Dienst antwortet nicht. Bitte prüfen Sie, ob der Dienst läuft."
+        "message": "Der NetBirdy-Dienst antwortet nicht. Bitte prüfen Sie, ob der Dienst läuft."
     },
     "error.settings_locked": {
         "message": "Die Einstellungen können auf diesem Gerät nicht geändert werden: Ein Administrator hat sie gesperrt."
@@ -1371,7 +1371,7 @@
         "message": "Vorgang fehlgeschlagen."
     },
     "error.elevation_unavailable": {
-        "message": "NetBird konnte auf diesem System nicht die nötigen Rechte anfordern. Führen Sie stattdessen dies aus:"
+        "message": "NetBirdy konnte auf diesem System nicht die nötigen Rechte anfordern. Führen Sie stattdessen dies aus:"
     },
     "error.elevation_failed": {
         "message": "Die Änderung konnte mit erhöhten Rechten nicht angewendet werden. Führen Sie stattdessen dies aus:"

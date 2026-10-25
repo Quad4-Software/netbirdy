@@ -14,6 +14,7 @@ import (
 	"github.com/pion/turn/v3"
 	log "github.com/sirupsen/logrus"
 
+	stdnetv4 "github.com/pion/transport/v4/stdnet"
 	"github.com/netbirdio/netbird/client/internal/stdnet"
 	nbnet "github.com/netbirdio/netbird/client/net"
 )
@@ -201,10 +202,14 @@ func (p *StunTurnProbe) probeSTUN(ctx context.Context, uri *stun.URI) (addr stri
 		}
 	}()
 
-	net := stdnet.NewNet(ctx, nil, nil)
+	v4net, netErr := stdnetv4.NewNet()
+	if netErr != nil {
+		probeErr = fmt.Errorf("net: %w", netErr)
+		return
+	}
 
 	client, err := stun.DialURI(uri, &stun.DialConfig{
-		Net: net,
+		Net: v4net,
 	})
 	if err != nil {
 		probeErr = fmt.Errorf("dial: %w", err)

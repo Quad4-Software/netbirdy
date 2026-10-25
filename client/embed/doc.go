@@ -1,5 +1,5 @@
-// Package embed provides a way to embed the NetBird client directly
-// into Go programs without requiring a separate NetBird client installation.
+// Package embed provides a way to embed the NetBirdy client directly
+// into Go programs without requiring a separate NetBirdy client installation.
 package embed
 
 // Basic Usage:
@@ -62,7 +62,7 @@ package embed
 //	        fmt.Fprintf(w, "Hello from netbird!")
 //	    })
 //
-//	    // Listen on netbird network
+//	    // Listen on netbirdy network
 //	    l, err := client.ListenTCP(":8080")
 //	    if err != nil {
 //	        log.Fatal(err)
@@ -75,7 +75,7 @@ package embed
 //	        }
 //	    }()
 //
-//	    log.Printf("HTTP server listening on netbird network port 8080")
+//	    log.Printf("HTTP server listening on netbirdy network port 8080")
 //
 //	    // Handle shutdown
 //	    stop := make(chan os.Signal, 1)
@@ -89,7 +89,7 @@ package embed
 //	        log.Printf("HTTP shutdown error: %v", err)
 //	    }
 //	    if err := client.Stop(shutdownCtx); err != nil {
-//	        log.Printf("Netbird shutdown error: %v", err)
+//	        log.Printf("NetBirdy shutdown error: %v", err)
 //	    }
 //	}
 //
@@ -128,11 +128,11 @@ package embed
 //	        log.Fatal(err)
 //	    }
 //
-//	    // Create HTTP client that uses netbird network
+//	    // Create HTTP client that uses netbirdy network
 //	    httpClient := client.NewHTTPClient()
 //	    httpClient.Timeout = 10 * time.Second
 //
-//	    // Make request to server in netbird network
+//	    // Make request to server in netbirdy network
 //	    target := os.Getenv("NB_TARGET")
 //	    resp, err := httpClient.Get(target)
 //	    if err != nil {
@@ -153,7 +153,7 @@ package embed
 //	    defer cancel()
 //
 //	    if err := client.Stop(shutdownCtx); err != nil {
-//	        log.Printf("Netbird shutdown error: %v", err)
+//	        log.Printf("NetBirdy shutdown error: %v", err)
 //	    }
 //	}
 //

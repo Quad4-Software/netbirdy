@@ -10,7 +10,7 @@ import (
 
 var postureCmd = &cobra.Command{
 	Use:    "posture",
-	Short:  "Posture helpers invoked by the NetBird daemon",
+	Short:  "Posture helpers invoked by the NetBirdy daemon",
 	Hidden: true,
 }
 

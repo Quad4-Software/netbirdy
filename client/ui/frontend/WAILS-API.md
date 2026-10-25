@@ -36,15 +36,15 @@ Subscribe with `Events.On(name, handler)` from `@wailsio/runtime`. Handlers rece
 
 | Event | Payload | Fires on |
 |---|---|---|
-| `netbird:status` | `Status` | Daemon SubscribeStatus snapshot — connection-state change, peer-list change, address change, mgmt/signal flip. Synthetic `StatusDaemonUnavailable` is emitted when the gRPC socket is unreachable, and a synthetic `Connecting` is emitted at the start of an active profile switch. |
-| `netbird:event` | `SystemEvent` | One push per daemon SubscribeEvents item (DNS / network / authentication / connectivity / system). Used by the tray for OS toasts; the TS side reads events through `Status.events` instead. |
-| `netbird:update:available` | `UpdateAvailable` | Daemon detected a new version (fan-out of the `new_version_available` metadata key). |
-| `netbird:preferences:changed` | `{ language: string }` | Fires after every successful `Preferences.SetLanguage` (including the caller's own window). `src/lib/i18n.ts` subscribes and calls `i18next.changeLanguage`. |
-| `netbird:update:progress` | `UpdateProgress` | Daemon enforced-update install progress (`action: "show"` etc.). |
+| `netbirdy:status` | `Status` | Daemon SubscribeStatus snapshot — connection-state change, peer-list change, address change, mgmt/signal flip. Synthetic `StatusDaemonUnavailable` is emitted when the gRPC socket is unreachable, and a synthetic `Connecting` is emitted at the start of an active profile switch. |
+| `netbirdy:event` | `SystemEvent` | One push per daemon SubscribeEvents item (DNS / network / authentication / connectivity / system). Used by the tray for OS toasts; the TS side reads events through `Status.events` instead. |
+| `netbirdy:update:available` | `UpdateAvailable` | Daemon detected a new version (fan-out of the `new_version_available` metadata key). |
+| `netbirdy:preferences:changed` | `{ language: string }` | Fires after every successful `Preferences.SetLanguage` (including the caller's own window). `src/lib/i18n.ts` subscribes and calls `i18next.changeLanguage`. |
+| `netbirdy:update:progress` | `UpdateProgress` | Daemon enforced-update install progress (`action: "show"` etc.). |
 | `browser-login:cancel` | (none) | Either the user closed the `BrowserLogin` window (Go-emitted) or the page's Cancel button (frontend-emitted). |
 | `trigger-login` | (none) | Reserved by the tray for asking the frontend to start an SSO flow. `layouts/ConnectionStatusSwitch.tsx` subscribes and runs `startLogin()`; no Go-side emitter today. |
 
-The two stream loops behind `netbird:status` and `netbird:event` start automatically — `main.go` calls `peers.Watch(context.Background())` at boot. `Peers.Watch` is still exported but the frontend doesn't need to invoke it.
+The two stream loops behind `netbirdy:status` and `netbirdy:event` start automatically — `main.go` calls `peers.Watch(context.Background())` at boot. `Peers.Watch` is still exported but the frontend doesn't need to invoke it.
 
 ## `Connection`
 
@@ -57,7 +57,7 @@ Connection.Logout(p: LogoutParams): Promise<void>
 Connection.OpenURL(url: string): Promise<void>               // honors $BROWSER
 ```
 
-`Login` Down-resets the daemon first to dislodge a stale `WaitSSOLogin` (so a previously abandoned SSO flow doesn't fail the next attempt). `Up` always uses async mode — status flows back through `netbird:status`. **Do not call `Up` on an `Idle` / `NeedsLogin` daemon** — the daemon's internal 50s `waitForUp` will block and return `DeadlineExceeded`.
+`Login` Down-resets the daemon first to dislodge a stale `WaitSSOLogin` (so a previously abandoned SSO flow doesn't fail the next attempt). `Up` always uses async mode — status flows back through `netbirdy:status`. **Do not call `Up` on an `Idle` / `NeedsLogin` daemon** — the daemon's internal 50s `waitForUp` will block and return `DeadlineExceeded`.
 
 Full SSO sequence: `Login` → if `result.needsSsoLogin`, open `result.verificationUriComplete` via `OpenURL` + `WindowManager.OpenBrowserLogin(uri)` → `WaitSSOLogin({ userCode })` → `Up({})`. The canonical implementation is `startLogin()` in `layouts/ConnectionStatusSwitch.tsx`.
 
@@ -78,7 +78,7 @@ Peers.CancelProfileSwitch(): Promise<void>
 ProfileSwitcher.SwitchActive(p: ProfileRef): Promise<void>
 ```
 
-The single entry point both tray and frontend should use for profile flips. Applies the reconnect policy below, mirrors the switch into the user-side `profilemanager` (so the CLI's `netbird up` reads a consistent active profile), and drives the optimistic-Connecting paint via `Peers.BeginProfileSwitch`.
+The single entry point both tray and frontend should use for profile flips. Applies the reconnect policy below, mirrors the switch into the user-side `profilemanager` (so the CLI's `netbirdy up` reads a consistent active profile), and drives the optimistic-Connecting paint via `Peers.BeginProfileSwitch`.
 
 Reconnect policy (driven by `prevStatus` captured at entry):
 
@@ -100,7 +100,7 @@ Profiles.Add(p: ProfileRef): Promise<void>
 Profiles.Remove(p: ProfileRef): Promise<void>
 ```
 
-`Profile.email` is populated by the **UI process** reading the per-profile state file (`~/Library/Application Support/netbird/<name>.state.json` on macOS), not by the daemon — the daemon runs as root and can't read user-owned files.
+`Profile.email` is populated by the **UI process** reading the per-profile state file (`~/Library/Application Support/netbirdy/<name>.state.json` on macOS), not by the daemon — the daemon runs as root and can't read user-owned files.
 
 ## `Settings`
 
@@ -181,7 +181,7 @@ Preferences.Get(): Promise<UIPreferences>                   // { language: strin
 Preferences.SetLanguage(code: LanguageCode): Promise<void>  // rejects on unknown code
 ```
 
-`SetLanguage` validates against the loaded `i18n.Bundle`, persists to `os.UserConfigDir()/netbird/ui-preferences.json`, and emits `netbird:preferences:changed`. The frontend's `src/lib/i18n.ts` listens to that event and calls `i18next.changeLanguage` so a flip in any window paints in all of them. Missing preferences file → defaults to `en`, written on first read.
+`SetLanguage` validates against the loaded `i18n.Bundle`, persists to `os.UserConfigDir()/netbirdy/ui-preferences.json`, and emits `netbirdy:preferences:changed`. The frontend's `src/lib/i18n.ts` listens to that event and calls `i18next.changeLanguage` so a flip in any window paints in all of them. Missing preferences file → defaults to `en`, written on first read.
 
 ## Daemon `Status.status` values
 

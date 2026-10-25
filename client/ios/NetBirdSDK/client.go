@@ -161,7 +161,7 @@ func (c *Client) loadConfig(input profilemanager.ConfigInput) (*profilemanager.C
 // Run start the internal client. It is a blocker function
 func (c *Client) Run(fd int32, interfaceName string, envList *EnvList) error {
 	exportEnvList(envList)
-	log.Infof("Starting NetBird client")
+	log.Infof("Starting NetBirdy client")
 	log.Debugf("Tunnel uses interface: %s", interfaceName)
 
 	cfg, err := c.loadConfig(profilemanager.ConfigInput{

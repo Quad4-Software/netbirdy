@@ -8,14 +8,14 @@ const ART = `
 
 export function welcome() {
     const message = `%c${ART}%c
-NetBird — The Only Secure Access Platform You'll Ever Need.
+NetBirdy — The Only Secure Access Platform You'll Ever Need.
 
-WEBSITE:      https://netbird.io/
-WE'RE HIRING: https://netbird.io/careers
-OPEN SOURCE:  https://github.com/netbirdio/netbird
+WEBSITE:      https://netbirdy.io/
+WE'RE HIRING: https://netbirdy.io/careers
+OPEN SOURCE:  https://github.com/netbirdio/netbirdy
 `;
 
-    // Intentional NetBird ASCII banner in the devtools console.
+    // Intentional NetBirdy ASCII banner in the devtools console.
     // eslint-disable-next-line no-console
     console.log(
         message,

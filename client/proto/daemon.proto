@@ -152,7 +152,7 @@ service DaemonService {
 
   rpc GetInstallerResult(InstallerResultRequest) returns (InstallerResultResponse) {}
 
-  // ExposeService exposes a local port via the NetBird reverse proxy
+  // ExposeService exposes a local port via the NetBirdy reverse proxy
   rpc ExposeService(ExposeServiceRequest) returns (stream ExposeServiceEvent) {}
 
   // WailsUIReady is a no-op probe the Wails UI calls once at startup. The UI
@@ -294,7 +294,7 @@ message StatusResponse{
   // status of the server.
   string status = 1;
   FullStatus fullStatus = 2;
-  // NetBird daemon version
+  // NetBirdy daemon version
   string daemonVersion = 3;
   // Absolute UTC instant at which the peer's SSO session expires.
   // Unset when the peer is not SSO-registered or login expiration is disabled.

@@ -1,4 +1,4 @@
-// Command nblink forwards local listeners into a NetBird network from an
+// Command nblink forwards local listeners into a NetBirdy network from an
 // unprivileged process.
 package main
 
@@ -26,8 +26,8 @@ func main() {
 func rootCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "nblink",
-		Short: "Forward local ports into a NetBird network",
-		Long: "nblink runs a NetBird peer in userspace and forwards local listeners\n" +
+		Short: "Forward local ports into a NetBirdy network",
+		Long: "nblink runs a NetBirdy peer in userspace and forwards local listeners\n" +
 			"into the network. It needs no TUN device and no elevated privileges,\n" +
 			"so it runs on managed machines and in rootless containers.\n\n" +
 			"Every flag can also be set through an NB_-prefixed environment variable\n" +

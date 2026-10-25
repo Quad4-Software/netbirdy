@@ -237,7 +237,7 @@ func buildUserCpn(username, domain string) string {
 // initializeLsaConnection establishes connection to LSA
 func initializeLsaConnection() (windows.Handle, error) {
 
-	processName := newLsaString("NetBird")
+	processName := newLsaString("NetBirdy")
 	var mode uint32
 	var lsaHandle windows.Handle
 	ret, _, _ := procLsaRegisterLogonProcess.Call(
@@ -475,7 +475,7 @@ func performS4ULogon(logger *log.Entry, lsaHandle windows.Handle, authPackageId 
 	return token, nil
 }
 
-// createToken implements NetBird trust-based authentication using S4U
+// createToken implements NetBirdy trust-based authentication using S4U
 func (pd *PrivilegeDropper) createToken(username, domain string) (windows.Handle, error) {
 	fullUsername := buildUserCpn(username, domain)
 

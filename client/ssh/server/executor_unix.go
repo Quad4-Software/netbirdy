@@ -66,7 +66,7 @@ func (pd *PrivilegeDropper) log() *log.Entry {
 	return log.NewEntry(log.StandardLogger())
 }
 
-// CreateExecutorCommand creates a command that spawns netbird ssh exec for privilege dropping
+// CreateExecutorCommand creates a command that spawns netbirdy ssh exec for privilege dropping
 func (pd *PrivilegeDropper) CreateExecutorCommand(ctx context.Context, config ExecutorConfig) (*exec.Cmd, error) {
 	netbirdPath, err := os.Executable()
 	if err != nil {

@@ -4,7 +4,7 @@ package services
 
 import "github.com/netbirdio/netbird/client/proto"
 
-// DaemonConn returns a lazy gRPC client to the NetBird daemon.
+// DaemonConn returns a lazy gRPC client to the NetBirdy daemon.
 // All services receive a DaemonConn so they share a single connection.
 type DaemonConn interface {
 	Client() (proto.DaemonServiceClient, error)

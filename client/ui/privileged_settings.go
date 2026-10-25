@@ -16,7 +16,7 @@ import (
 // apply are declared once. There is nothing privileged about the mode itself; it
 // sends the same request the frontend would have sent, and the daemon authorizes it
 // from the identity the kernel reports on the control channel exactly as it does
-// for `sudo netbird up`.
+// for `sudo netbirdy up`.
 func runPrivilegedSettings(args []string) int {
 	return services.RunPrivilegedSettings(args, func(addr string) (proto.DaemonServiceClient, error) {
 		if addr == "" {

@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=NetBirdy
+Comment=NetBirdy desktop client
+Exec=env WEBKIT_DISABLE_DMABUF_RENDERER=1 /usr/bin/netbirdy-ui
+Icon=netbirdy
+Type=Application
+Terminal=false
+Categories=Utility;
+Keywords=netbirdy;
+StartupWMClass=org.wails.netbirdy

@@ -46,7 +46,7 @@ func NewClient(nbClient *netbird.Client) *Client {
 	}
 }
 
-// Connect establishes an SSH connection through NetBird network.
+// Connect establishes an SSH connection through NetBirdy network.
 // ipVersion may be 4, 6, or 0 for automatic selection.
 func (c *Client) Connect(host string, port int, username, jwtToken string, ipVersion int) error {
 	addr := net.JoinHostPort(host, fmt.Sprintf("%d", port))
@@ -102,16 +102,16 @@ func (c *Client) getAuthMethods(jwtToken string) ([]ssh.AuthMethod, error) {
 
 	nbConfig, err := c.nbClient.GetConfig()
 	if err != nil {
-		return nil, fmt.Errorf("get NetBird config: %w", err)
+		return nil, fmt.Errorf("get NetBirdy config: %w", err)
 	}
 
 	if nbConfig.SSHKey == "" {
-		return nil, fmt.Errorf("no NetBird SSH key available")
+		return nil, fmt.Errorf("no NetBirdy SSH key available")
 	}
 
 	signer, err := ssh.ParsePrivateKey([]byte(nbConfig.SSHKey))
 	if err != nil {
-		return nil, fmt.Errorf("parse NetBird SSH private key: %w", err)
+		return nil, fmt.Errorf("parse NetBirdy SSH private key: %w", err)
 	}
 
 	logrus.Debugf("SSH: Added public key auth")

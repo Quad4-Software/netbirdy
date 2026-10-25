@@ -21,12 +21,9 @@ const (
 	defaultPushInterval = 5 * time.Minute
 )
 
-// defaultMetricsServerURL is used as fallback when NB_METRICS_FORCE_SENDING is true
+// defaultMetricsServerURL is used as fallback when NB_METRICS_FORCE_SENDING is
+// true. It is nil on NetBirdy so metrics are never pushed to upstream ingest.
 var defaultMetricsServerURL *url.URL
-
-func init() {
-	defaultMetricsServerURL, _ = url.Parse("https://ingest.netbird.io")
-}
 
 // PushConfig holds configuration for metrics push
 type PushConfig struct {

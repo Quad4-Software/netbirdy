@@ -9,9 +9,9 @@ import (
 	nberrors "github.com/netbirdio/netbird/client/errors"
 )
 
-// InterfaceAllower opens the NetBird interface in the kernel's filter table and
+// InterfaceAllower opens the NetBirdy interface in the kernel's filter table and
 // external chains and keeps them reconciled via a netlink monitor, so the host
-// firewall doesn't drop traffic the NetBird firewall handles. It is used by the
+// firewall doesn't drop traffic the NetBirdy firewall handles. It is used by the
 // userspace firewall, where routing happens in the forwarder, so only INPUT is
 // opened (the userspace router never forwards in the kernel).
 //

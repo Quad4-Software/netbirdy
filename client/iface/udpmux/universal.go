@@ -1,7 +1,7 @@
 package udpmux
 
 /*
- Most of this code was copied from https://github.com/pion/ice and modified to fulfill NetBird's requirements.
+ Most of this code was copied from https://github.com/pion/ice and modified to fulfill NetBirdy's requirements.
 */
 
 import (
@@ -127,8 +127,8 @@ func (u *UDPConn) WriteTo(b []byte, addr net.Addr) (int, error) {
 	}
 	dst := udpAddr.AddrPort().Addr().Unmap()
 	if (u.address.Network.IsValid() && u.address.Network.Contains(dst)) || (u.address.IPv6Net.IsValid() && u.address.IPv6Net.Contains(dst)) {
-		log.Warnf("address %s is part of the NetBird network %s, refusing to write", addr, u.address)
-		return 0, fmt.Errorf("address %s is part of the NetBird network %s, refusing to write", addr, u.address)
+		log.Warnf("address %s is part of the NetBirdy network %s, refusing to write", addr, u.address)
+		return 0, fmt.Errorf("address %s is part of the NetBirdy network %s, refusing to write", addr, u.address)
 	}
 	return u.PacketConn.WriteTo(b, addr)
 }

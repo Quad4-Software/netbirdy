@@ -58,10 +58,10 @@ func (l Level) String() string {
 	return LevelDefaultString
 }
 
-// protectedDomains are NetBird-operated suffixes that stay recognizable in an
+// protectedDomains are NetBirdy-operated suffixes that stay recognizable in an
 // anonymized bundle. At LevelStrict the labels in front of them (the peer
 // name) are still replaced, except under netbird.io, which only hosts
-// NetBird infrastructure (api, signal, flow), never peer names.
+// NetBirdy infrastructure (api, signal, flow), never peer names.
 var protectedDomains = []string{"netbird.io", "netbird.selfhosted", "netbird.cloud", "netbird.stage"}
 
 const infraDomain = "netbird.io"
@@ -581,7 +581,7 @@ func generateAnonymousKey() string {
 	return base64.StdEncoding.EncodeToString(buf)
 }
 
-// protectedSuffix returns the protected NetBird suffix baseDomain ends with,
+// protectedSuffix returns the protected NetBirdy suffix baseDomain ends with,
 // or empty. The match is label-anchored so an unrelated domain that merely
 // ends in the same characters is not preserved.
 func protectedSuffix(baseDomain string) string {
@@ -601,7 +601,7 @@ func withTrailingDot(domain string, hasDot bool) string {
 }
 
 // isCGNAT reports whether addr is in 100.64.0.0/10 (RFC 6598), the range
-// NetBird assigns overlay peer addresses from.
+// NetBirdy assigns overlay peer addresses from.
 func isCGNAT(addr netip.Addr) bool {
 	cgnatRangeStart := netip.AddrFrom4([4]byte{100, 64, 0, 0})
 	cgnatRange := netip.PrefixFrom(cgnatRangeStart, 10)

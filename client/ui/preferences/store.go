@@ -20,12 +20,12 @@ import (
 	"github.com/netbirdio/netbird/util"
 )
 
-// Lives under os.UserConfigDir()/netbird (OS-user writable, not the daemon's
+// Lives under os.UserConfigDir()/netbirdy (OS-user writable, not the daemon's
 // root-owned state).
 const preferencesFileName = "ui-preferences.json"
 
 // EventPreferencesChanged fires on every persisted update, payload UIPreferences.
-const EventPreferencesChanged = "netbird:preferences:changed"
+const EventPreferencesChanged = "netbirdy:preferences:changed"
 
 // ViewMode is the preferred Main-window layout: "default" (compact, 380-wide)
 // or "advanced" (900-wide).
@@ -381,5 +381,5 @@ func preferencesPath() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return filepath.Join(dir, "netbird", preferencesFileName), nil
+	return filepath.Join(dir, "netbirdy", preferencesFileName), nil
 }

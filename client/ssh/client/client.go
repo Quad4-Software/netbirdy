@@ -27,9 +27,9 @@ import (
 )
 
 const (
-	// DefaultDaemonAddr is the default address for the NetBird daemon
+	// DefaultDaemonAddr is the default address for the NetBirdy daemon
 	DefaultDaemonAddr = "unix:///var/run/netbird.sock"
-	// DefaultDaemonAddrWindows is the default address for the NetBird daemon on Windows
+	// DefaultDaemonAddrWindows is the default address for the NetBirdy daemon on Windows
 	DefaultDaemonAddrWindows = daemonaddr.WindowsPipeAddr
 )
 
@@ -373,7 +373,7 @@ func dialWithJWT(ctx context.Context, network, addr string, config *ssh.ClientCo
 	return dialSSH(ctx, network, addr, configWithJWT)
 }
 
-// requestJWTToken requests a JWT token from the NetBird daemon
+// requestJWTToken requests a JWT token from the NetBirdy daemon
 func requestJWTToken(ctx context.Context, daemonAddr string, skipCache, noBrowser bool) (string, error) {
 	hint := profilemanager.GetLoginHint()
 
@@ -393,7 +393,7 @@ func requestJWTToken(ctx context.Context, daemonAddr string, skipCache, noBrowse
 	return nbssh.RequestJWTToken(ctx, client, os.Stdout, os.Stderr, !skipCache, hint, browserOpener)
 }
 
-// verifyHostKeyViaDaemon verifies SSH host key by querying the NetBird daemon
+// verifyHostKeyViaDaemon verifies SSH host key by querying the NetBirdy daemon
 func verifyHostKeyViaDaemon(hostname string, remote net.Addr, key ssh.PublicKey, daemonAddr string) error {
 	conn, err := connectToDaemon(daemonAddr)
 	if err != nil {
@@ -416,8 +416,8 @@ func connectToDaemon(daemonAddr string) (*grpc.ClientConn, error) {
 
 	conn, err := grpc.NewClient(target, opts...)
 	if err != nil {
-		log.Debugf("failed to create gRPC client for NetBird daemon at %s: %v", daemonAddr, err)
-		return nil, fmt.Errorf("failed to connect to NetBird daemon: %w", err)
+		log.Debugf("failed to create gRPC client for NetBirdy daemon at %s: %v", daemonAddr, err)
+		return nil, fmt.Errorf("failed to connect to NetBirdy daemon: %w", err)
 	}
 
 	return conn, nil
@@ -433,7 +433,7 @@ func getKnownHostsFiles() []string {
 		files = append(files, userKnownHosts)
 	}
 
-	// NetBird managed known_hosts files
+	// NetBirdy managed known_hosts files
 	if runtime.GOOS == "windows" {
 		programData := os.Getenv("PROGRAMDATA")
 		if programData == "" {

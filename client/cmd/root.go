@@ -9,6 +9,7 @@ import (
 	"os"
 	"os/signal"
 	"path"
+	"path/filepath"
 	"runtime"
 	"slices"
 	"strings"
@@ -46,6 +47,16 @@ const (
 	enableLazyConnectionFlag = "enable-lazy-connection"
 	mtuFlag                  = "mtu"
 )
+
+// invokedBinaryName returns the basename the CLI was invoked as, so a netbird
+// symlink keeps printing netbird in help output.
+func invokedBinaryName() string {
+	base := strings.TrimSuffix(filepath.Base(os.Args[0]), ".exe")
+	if base == "netbird" {
+		return base
+	}
+	return "netbirdy"
+}
 
 var (
 	defaultConfigPathDir    string
@@ -89,7 +100,7 @@ var (
 	localMetricsAddr       string
 
 	rootCmd = &cobra.Command{
-		Use:          "netbird",
+		Use:          invokedBinaryName(),
 		Short:        "",
 		Long:         "",
 		SilenceUsage: true,
@@ -135,13 +146,13 @@ func init() {
 
 	switch runtime.GOOS {
 	case "windows":
-		defaultConfigPathDir = os.Getenv("PROGRAMDATA") + "\\Netbird\\"
-		defaultLogFileDir = os.Getenv("PROGRAMDATA") + "\\Netbird\\"
+		defaultConfigPathDir = os.Getenv("PROGRAMDATA") + "\\NetBirdy\\"
+		defaultLogFileDir = os.Getenv("PROGRAMDATA") + "\\NetBirdy\\"
 
 		oldDefaultConfigPathDir = os.Getenv("PROGRAMDATA") + "\\Wiretrustee\\"
 		oldDefaultLogFileDir = os.Getenv("PROGRAMDATA") + "\\Wiretrustee\\"
 	case "freebsd":
-		defaultConfigPathDir = "/var/db/netbird/"
+		defaultConfigPathDir = "/var/db/netbirdy/"
 	}
 
 	defaultConfigPath = defaultConfigPathDir + "config.json"
@@ -159,8 +170,8 @@ func init() {
 	rootCmd.PersistentFlags().StringVarP(&managementURL, "management-url", "m", "", fmt.Sprintf("Management Service URL [http|https]://[host]:[port] (default \"%s\")", profilemanager.DefaultManagementURL))
 	rootCmd.PersistentFlags().StringVar(&adminURL, "admin-url", "", "(DEPRECATED) Admin Panel URL - This flag is no longer functional")
 	_ = rootCmd.PersistentFlags().MarkDeprecated("admin-url", "the admin-url flag is no longer functional and will be removed in a future version")
-	rootCmd.PersistentFlags().StringVarP(&logLevel, "log-level", "l", "info", "sets NetBird log level")
-	rootCmd.PersistentFlags().StringSliceVar(&logFiles, "log-file", []string{defaultLogFile}, "sets NetBird log paths written to simultaneously. If `console` is specified the log will be output to stdout. If `syslog` is specified the log will be sent to syslog daemon. You can pass the flag multiple times or separate entries by `,` character")
+	rootCmd.PersistentFlags().StringVarP(&logLevel, "log-level", "l", "info", "sets NetBirdy log level")
+	rootCmd.PersistentFlags().StringSliceVar(&logFiles, "log-file", []string{defaultLogFile}, "sets NetBirdy log paths written to simultaneously. If `console` is specified the log will be output to stdout. If `syslog` is specified the log will be sent to syslog daemon. You can pass the flag multiple times or separate entries by `,` character")
 	rootCmd.PersistentFlags().StringVarP(&setupKey, "setup-key", "k", "", "Setup key obtained from the Management Service Dashboard (used to register peer)")
 	rootCmd.PersistentFlags().StringVar(&setupKeyPath, "setup-key-file", "", "The path to a setup key obtained from the Management Service Dashboard (used to register peer) This is ignored if the setup-key flag is provided.")
 	rootCmd.MarkFlagsMutuallyExclusive("setup-key", "setup-key-file")
@@ -215,7 +226,7 @@ func init() {
 			`or --external-ip-map ""`,
 	)
 	upCmd.PersistentFlags().StringVar(&customDNSAddress, dnsResolverAddress, "",
-		`Sets a custom address for NetBird's local DNS resolver. `+
+		`Sets a custom address for NetBirdy's local DNS resolver. `+
 			`If set, the agent won't attempt to discover the best ip and port to listen on. `+
 			`An empty string "" clears the previous configuration. `+
 			`E.g. --dns-resolver-address 127.0.0.1:5053 or --dns-resolver-address ""`,
@@ -296,7 +307,7 @@ func DialClientGRPCServer(ctx context.Context, addr string) (*grpc.ClientConn, e
 // update-settings kill switch, an MDM-managed field), or the method is not
 // implemented.
 //
-// Both `netbird up` and `netbird login` run Login through the backoff, and
+// Both `netbirdy up` and `netbirdy login` run Login through the backoff, and
 // they each carried their own copy of this list — which is how one of them
 // ended up retrying a refusal the other treated as final.
 func terminalLoginError(err error) bool {
@@ -488,7 +499,7 @@ func getClient(cmd *cobra.Command) (*grpc.ClientConn, error) {
 		//nolint
 		return nil, fmt.Errorf("failed to connect to daemon error: %v\n"+
 			"If the daemon is not running please run: "+
-			"\nnetbird service install \nnetbird service start\n", err)
+			"\nnetbirdy service install \nnetbirdy service start\n", err)
 	}
 
 	return conn, nil

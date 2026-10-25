@@ -15,7 +15,7 @@ import (
 
 // EventSystemThemeChanged fires when the OS appearance flips, payload SystemTheme.
 // The frontend resolves the "system" preference against it.
-const EventSystemThemeChanged = "netbird:system-theme:changed"
+const EventSystemThemeChanged = "netbirdy:system-theme:changed"
 
 // SystemTheme is the EventSystemThemeChanged payload.
 type SystemTheme struct {

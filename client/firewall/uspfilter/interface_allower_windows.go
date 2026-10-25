@@ -17,10 +17,10 @@ type action string
 const (
 	addRule          action = "add"
 	deleteRule       action = "delete"
-	firewallRuleName        = "Netbird"
+	firewallRuleName        = "NetBirdy"
 )
 
-// WindowsInterfaceAllower opens the NetBird interface in the Windows firewall
+// WindowsInterfaceAllower opens the NetBirdy interface in the Windows firewall
 // via netsh advfirewall rules. It implements InterfaceAllower for the userspace
 // firewall on Windows.
 type WindowsInterfaceAllower struct {

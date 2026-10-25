@@ -1,11 +1,11 @@
-!define APP_NAME "Netbird"
-!define COMP_NAME "Netbird"
-!define WEB_SITE "Netbird.io"
+!define APP_NAME "NetBirdy"
+!define COMP_NAME "NetBirdy"
+!define WEB_SITE "NetBirdy.io"
 !define VERSION $%APPVER%
-!define COPYRIGHT "Netbird Authors, 2022-2026"
+!define COPYRIGHT "NetBirdy Authors, 2022-2026"
 !define DESCRIPTION "Connect your devices into a secure WireGuard-based overlay network with SSO, MFA, and granular access controls."
-!define INSTALLER_NAME "netbird-installer.exe"
-!define MAIN_APP_EXE "Netbird"
+!define INSTALLER_NAME "netbirdy-installer.exe"
+!define MAIN_APP_EXE "NetBirdy"
 !define ICON "ui\\build\\windows\\icon.ico"
 !define BANNER "ui\\build\\banner.bmp"
 !define LICENSE_DATA "..\\LICENSE"
@@ -16,13 +16,13 @@
 !define REG_APP_PATH "Software\Microsoft\Windows\CurrentVersion\App Paths\${MAIN_APP_EXE}"
 !define UNINSTALL_PATH "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_NAME}"
 
-!define UI_APP_NAME "Netbird UI"
-!define UI_APP_EXE "Netbird-ui"
+!define UI_APP_NAME "NetBirdy UI"
+!define UI_APP_EXE "NetBirdy-ui"
 
 !define UI_REG_APP_PATH "Software\Microsoft\Windows\CurrentVersion\App Paths\${UI_APP_EXE}"
 !define UI_UNINSTALL_PATH "Software\Microsoft\Windows\CurrentVersion\Uninstall\${UI_APP_NAME}"
 
-!define NETBIRD_DATA_DIR "$COMMONPROGRAMDATA\Netbird"
+!define NETBIRD_DATA_DIR "$COMMONPROGRAMDATA\NetBirdy"
 
 Unicode True
 
@@ -183,7 +183,7 @@ ${If} $R0 != ""
     # if silent install jump to uninstall step
     IfSilent uninstall
 
-    MessageBox MB_YESNO|MB_ICONQUESTION "NetBird is already installed. We must remove it before installing upgrading NetBird. Proceed?" IDNO done IDYES uninstall
+    MessageBox MB_YESNO|MB_ICONQUESTION "NetBirdy is already installed. We must remove it before installing upgrading NetBirdy. Proceed?" IDNO done IDYES uninstall
 
     uninstall:
       !insertmacro UninstallPreviousNSIS $R0 "/NoMsgBox"
@@ -201,7 +201,7 @@ Section -MainProgram
     ; The previous uninstaller stops the service and the UI only when its uninstall key
     ; is found and endpoint protection lets the unsigned uninstaller run. Extraction
     ; fails on any exe that is still running.
-    DetailPrint "Stopping Netbird service..."
+    DetailPrint "Stopping NetBirdy service..."
     ExecWait '"$INSTDIR\${MAIN_APP_EXE}" service stop'
     DetailPrint "Terminating ${UI_APP_NAME} process..."
     ExecWait '"$SYSDIR\taskkill.exe" /im ${UI_APP_EXE}.exe /f'
@@ -218,7 +218,7 @@ Section -MainProgram
     !else
         File /r "..\\dist\\netbird_windows_amd64\\"
     !endif
-    File "..\\client\\ui\\assets\\netbird.png"
+    File "..\\client\\ui\\assets\\netbirdy.png"
 SectionEnd
 ######################################################################
 
@@ -291,25 +291,25 @@ SectionEnd
 Section Uninstall
 ${INSTALL_TYPE}
 
-DetailPrint "Stopping Netbird service..."
+DetailPrint "Stopping NetBirdy service..."
 ExecWait '"$INSTDIR\${MAIN_APP_EXE}" service stop'
-DetailPrint "Uninstalling Netbird service..."
+DetailPrint "Uninstalling NetBirdy service..."
 ExecWait '"$INSTDIR\${MAIN_APP_EXE}" service uninstall'
 
-DetailPrint "Terminating Netbird UI process..."
+DetailPrint "Terminating NetBirdy UI process..."
 ExecWait `taskkill /im ${UI_APP_EXE}.exe /f`
 
 ; Handle data deletion based on checkbox
 DetailPrint "Checking if user requested data deletion..."
 ${If} $DeleteDataEnabled == "1"
-    DetailPrint "User opted to delete Netbird data. Removing ${NETBIRD_DATA_DIR}..."
+    DetailPrint "User opted to delete NetBirdy data. Removing ${NETBIRD_DATA_DIR}..."
     ClearErrors
     RMDir /r "${NETBIRD_DATA_DIR}"
     IfErrors 0 +2 ; If no errors, jump over the message
-    DetailPrint "Error deleting Netbird data directory. It might be in use or already removed."
-    DetailPrint "Netbird data directory removal complete."
+    DetailPrint "Error deleting NetBirdy data directory. It might be in use or already removed."
+    DetailPrint "NetBirdy data directory removal complete."
 ${Else}
-    DetailPrint "User did not opt to delete Netbird data."
+    DetailPrint "User did not opt to delete NetBirdy data."
 ${EndIf}
 
 # wait the service uninstall take unblock the executable

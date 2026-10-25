@@ -19,7 +19,7 @@ const (
 	maxResponseSize = 1024 * 1024 // 1MB
 )
 
-// performRequest executes an HTTP request through NetBird and returns the response and body
+// performRequest executes an HTTP request through NetBirdy and returns the response and body
 func performRequest(nbClient *netbird.Client, method, url string, headers map[string]string, body []byte) (*http.Response, []byte, error) {
 	httpClient := nbClient.NewHTTPClient()
 	httpClient.Timeout = httpTimeout
@@ -51,7 +51,7 @@ func performRequest(nbClient *netbird.Client, method, url string, headers map[st
 	return resp, respBody, nil
 }
 
-// ProxyRequest performs a proxied HTTP request through NetBird and returns a JavaScript object
+// ProxyRequest performs a proxied HTTP request through NetBirdy and returns a JavaScript object
 func ProxyRequest(nbClient *netbird.Client, request js.Value) (js.Value, error) {
 	url := request.Get("url").String()
 	if url == "" {

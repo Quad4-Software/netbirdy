@@ -14,7 +14,7 @@ import (
 // forbids *changing* settings, so a request that restates the stored values is
 // not a change and must not be refused.
 //
-// This has to be judged on values, not on field presence. `netbird up` rebuilds
+// This has to be judged on values, not on field presence. `netbirdy up` rebuilds
 // the whole config surface of SetConfigRequest and LoginRequest from its flags
 // and environment on every invocation, so a service or container configured by
 // environment restates its own configuration on every start. A presence-based

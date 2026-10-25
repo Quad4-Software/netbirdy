@@ -57,7 +57,7 @@ func startDebugTestDaemon(t *testing.T) string {
 	return "tcp://" + lis.Addr().String()
 }
 
-// runDebugCmd runs `netbird debug <args>` against the daemon at addr and
+// runDebugCmd runs `netbirdy debug <args>` against the daemon at addr and
 // returns everything the command printed.
 func runDebugCmd(addr string, args ...string) (string, error) {
 	daemonAddr = addr
@@ -158,7 +158,7 @@ func TestDebugForNoUpDown(t *testing.T) {
 
 	out, err := runDebugCmd(addr, "for", "1s", "-S=false", "--no-updown")
 	require.NoError(t, err, "output: %s", out)
-	assert.NotContains(t, out, "netbird down", "--no-updown must not bring the daemon down")
-	assert.NotContains(t, out, "netbird up", "--no-updown must not bring the daemon up")
+	assert.NotContains(t, out, "netbirdy down", "--no-updown must not bring the daemon down")
+	assert.NotContains(t, out, "netbirdy up", "--no-updown must not bring the daemon up")
 	assert.Contains(t, out, "Local file:", "the bundle must still be created")
 }

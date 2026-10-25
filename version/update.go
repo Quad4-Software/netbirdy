@@ -1,8 +1,10 @@
 package version
 
 import (
+	"encoding/json"
 	"io"
 	"net/http"
+	"strings"
 	"sync"
 	"time"
 
@@ -15,7 +17,7 @@ const (
 )
 
 var (
-	versionURL = "https://pkgs.netbird.io/releases/latest/version"
+	versionURL = "https://api.github.com/repos/Sudo-Ivan/netbirdy/releases/latest"
 )
 
 // Update fetch the version info periodically and notify the onUpdateListener in case the UI version or the
@@ -152,7 +154,7 @@ func (u *Update) fetchVersion() bool {
 		return false
 	}
 
-	if resp.ContentLength > 100 {
+	if resp.ContentLength > 1<<20 {
 		log.Errorf("too large response: %d", resp.ContentLength)
 		return false
 	}
@@ -163,7 +165,15 @@ func (u *Update) fetchVersion() bool {
 		return false
 	}
 
-	latestAvailable, err := goversion.NewVersion(string(content))
+	versionStr := strings.TrimSpace(string(content))
+	var gh struct {
+		TagName string `json:"tag_name"`
+	}
+	if json.Unmarshal(content, &gh) == nil && gh.TagName != "" {
+		versionStr = gh.TagName
+	}
+
+	latestAvailable, err := goversion.NewVersion(versionStr)
 	if err != nil {
 		log.Errorf("failed to parse the version string: %s", err)
 		return false

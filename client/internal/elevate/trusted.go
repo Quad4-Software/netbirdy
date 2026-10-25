@@ -21,8 +21,8 @@ func CheckOnlyOwnerWritable(path string) error {
 // willing to have run as root.
 //
 // The check is what keeps elevation from becoming a way to launder someone
-// else's code into a root process: the user consents to NetBird being elevated,
-// having been shown NetBird's name, so what runs must be the file NetBird was
+// else's code into a root process: the user consents to NetBirdy being elevated,
+// having been shown NetBirdy's name, so what runs must be the file NetBirdy was
 // installed as and not something a third party could have swapped for it. An
 // executable only its owner can write is that; anything wider is refused, and
 // the caller falls back to showing the command instead.

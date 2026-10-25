@@ -43,9 +43,9 @@ type IPRule struct {
 }
 
 const (
-	// NetbirdVPNTableID is the ID of the custom routing table used by Netbird.
+	// NetbirdVPNTableID is the ID of the custom routing table used by NetBirdy.
 	NetbirdVPNTableID = 0x1BD0
-	// NetbirdVPNTableName is the name of the custom routing table used by Netbird.
+	// NetbirdVPNTableName is the name of the custom routing table used by NetBirdy.
 	NetbirdVPNTableName = "netbird"
 
 	// rtTablesPath is the path to the file containing the routing table names.

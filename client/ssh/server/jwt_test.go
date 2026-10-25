@@ -172,7 +172,7 @@ func generateValidJWT(t *testing.T, privateKey *rsa.PrivateKey, issuer, audience
 	return tokenString
 }
 
-// connectWithNetBirdClient connects to SSH server using NetBird's SSH client
+// connectWithNetBirdClient connects to SSH server using NetBirdy's SSH client
 func connectWithNetBirdClient(t *testing.T, host string, port int) (*client.Client, error) {
 	t.Helper()
 	addr := net.JoinHostPort(host, strconv.Itoa(port))

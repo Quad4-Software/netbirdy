@@ -14,7 +14,7 @@ import (
 )
 
 // EventStateChanged carries the full State snapshot as payload.
-const EventStateChanged = "netbird:update:state"
+const EventStateChanged = "netbirdy:update:state"
 
 // State is the typed snapshot of the daemon's update situation. Installing is
 // driven only by the daemon's progress_window:show event; a UI-side

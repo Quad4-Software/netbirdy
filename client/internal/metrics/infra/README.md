@@ -1,6 +1,6 @@
 # Client Metrics
 
-Internal documentation for the NetBird client metrics system.
+Internal documentation for the NetBirdy client metrics system.
 
 ## Overview
 
@@ -69,7 +69,7 @@ Tags:
 - `deployment_type`: "cloud" | "selfhosted" | "unknown"
 - `connection_type`: "ice_p2p" | "ice_turn" | "relay" (see below)
 - `attempt_type`: "initial" | "reconnection"
-- `version`: NetBird version string
+- `version`: NetBirdy version string
 - `os`: Operating system (linux, darwin, windows, android, ios, etc.)
 - `arch`: CPU architecture (amd64, arm64, etc.)
 - `peer_id`: obfuscated peer identifier (truncated SHA-256 of the WireGuard public key)
@@ -85,7 +85,7 @@ Derived from the connection priority (`conntype.ConnPriority`) by `metricsConnTy
 |-------|----------|------------|
 | `ice_p2p` | `ICEP2P` | direct peer-to-peer |
 | `ice_turn` | `ICETurn` | relayed, through a TURN server |
-| `relay` | `Relay` | relayed, through a NetBird relay |
+| `relay` | `Relay` | relayed, through a NetBirdy relay |
 | `unknown` | `None` or unrecognised | no active transport — **the sample is not pushed** |
 
 **Direct traffic is `ice_p2p` only.** `ice_turn` is relayed despite being negotiated by ICE, matching `Conn.isRelayed`.
@@ -104,7 +104,7 @@ Measurement: `netbird_sync`
 
 Tags:
 - `deployment_type`: "cloud" | "selfhosted" | "unknown"
-- `version`: NetBird version string
+- `version`: NetBirdy version string
 - `os`: Operating system (linux, darwin, windows, android, ios, etc.)
 - `arch`: CPU architecture (amd64, arm64, etc.)
 
@@ -121,7 +121,7 @@ Breaks down where time goes inside a single sync, so the total `netbird_sync` du
 Tags:
 - `phase`: the sub-phase — `netbird_config`, `checks`, `persist`, `dns_server`, `routes_classify`, `routes_apply`, `filtering`, `dns_forwarder`, `forward_rules`, `offline_peers`, `removed_peers`, `modified_peers`, `added_peers`, `lazy_exclude`
 - `deployment_type`: "cloud" | "selfhosted" | "unknown"
-- `version`: NetBird version string
+- `version`: NetBirdy version string
 - `os`: Operating system (linux, darwin, windows, android, ios, etc.)
 - `arch`: CPU architecture (amd64, arm64, etc.)
 
@@ -138,7 +138,7 @@ Measurement: `netbird_login`
 Tags:
 - `deployment_type`: "cloud" | "selfhosted" | "unknown"
 - `result`: "success" | "failure"
-- `version`: NetBird version string
+- `version`: NetBirdy version string
 - `os`: Operating system (linux, darwin, windows, android, ios, etc.)
 - `arch`: CPU architecture (amd64, arm64, etc.)
 
@@ -167,7 +167,7 @@ The InfluxDB backend limits in-memory sample storage to prevent unbounded growth
 | Variable | Default | Description |
 |----------|---------|-------------|
 | `INGEST_LISTEN_ADDR` | `:8087` | Listen address |
-| `INFLUXDB_URL` | `http://influxdb:8086/api/v2/write?org=netbird&bucket=metrics&precision=ns` | InfluxDB write endpoint |
+| `INFLUXDB_URL` | `http://influxdb:8086/api/v2/write?org=netbirdy&bucket=metrics&precision=ns` | InfluxDB write endpoint |
 | `INFLUXDB_TOKEN` | *(required)* | InfluxDB auth token (server-side only) |
 | `CONFIG_METRICS_SERVER_URL` | *(empty — disables /config)* | `server_url` in the remote config JSON (the URL clients push metrics to) |
 | `CONFIG_VERSION_SINCE` | `0.0.0` | Minimum client version to push metrics |
@@ -228,7 +228,7 @@ go run ./client/ up
 
 ### 4. View in Grafana
 
-- **InfluxDB dashboard:** http://localhost:3001/d/netbird-influxdb-metrics
+- **InfluxDB dashboard:** http://localhost:3001/d/netbirdy-influxdb-metrics
 
 ### 5. Verify Data
 
@@ -236,7 +236,7 @@ go run ./client/ up
 # Query via InfluxDB (using admin token from .env)
 docker compose exec influxdb influx query \
   'from(bucket: "metrics") |> range(start: -1h)' \
-  --org netbird
+  --org netbirdy
 
 # Check ingest server health
 curl http://localhost:8087/health
@@ -263,7 +263,7 @@ INFLUXDB_ADMIN_TOKEN=admin123 INFLUXDB_ADMIN_PASSWORD=admin123 GRAFANA_ADMIN_PAS
 So you only see this bundle:
 
 ```bash
-docker exec influxdb influx delete --org netbird --bucket metrics --token admin123 \
+docker exec influxdb influx delete --org netbirdy --bucket metrics --token admin123 \
   --start 1970-01-01T00:00:00Z --stop 2100-01-01T00:00:00Z
 ```
 
@@ -273,7 +273,7 @@ InfluxDB is not exposed on the host, so import inside the container:
 
 ```bash
 docker cp /path/to/bundle/metrics.txt influxdb:/tmp/m.txt
-docker exec influxdb influx write --org netbird --bucket metrics --precision ns \
+docker exec influxdb influx write --org netbirdy --bucket metrics --precision ns \
   --token admin123 --file /tmp/m.txt
 ```
 
@@ -283,8 +283,8 @@ Re-importing the same file is idempotent (same measurement+tags+timestamp overwr
 
 Grafana on http://localhost:3001 (login `admin` / `admin123`), datasource pre-provisioned:
 
-- **Where sync time goes:** http://localhost:3001/d/netbird-sync-phases/netbird-sync-phases-where-time-goes
-- **General client metrics:** http://localhost:3001/d/netbird-influxdb-metrics
+- **Where sync time goes:** http://localhost:3001/d/netbirdy-sync-phases/netbirdy-sync-phases-where-time-goes
+- **General client metrics:** http://localhost:3001/d/netbirdy-influxdb-metrics
 
 **Set the time range** to cover the bundle's timestamps (e.g. "Last 7 days" or an absolute range matching when the bundle was taken) — with the default short range the panels look empty.
 

@@ -16,10 +16,10 @@ import (
 )
 
 const (
-	notifyIDSessionExpired = "netbird-session-expired"
-	notifyIDSessionWarning = "netbird-session-warning"
+	notifyIDSessionExpired = "netbirdy-session-expired"
+	notifyIDSessionWarning = "netbirdy-session-warning"
 
-	notifyCategorySessionWarning = "netbird-session-warning"
+	notifyCategorySessionWarning = "netbirdy-session-warning"
 	notifyActionExtendNow        = "extend-now"
 	notifyActionDismiss          = "dismiss"
 

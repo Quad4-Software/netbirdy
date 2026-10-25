@@ -8,27 +8,27 @@
         AllowPromptForPassword="false">
     </Settings>
     <Installer
-        Path="netbird-ui"
+        Path="netbirdy-ui"
         Arguments=""
-        InstallLocation="C:\Program Files\NetBird\NetBird">
+        InstallLocation="C:\Program Files\NetBirdy\NetBirdy">
     </Installer>
     <PackageInformation
-        PackageName="NetBird"
-        PackageDisplayName="NetBird"
-        PublisherName="CN=NetBird"
-        PublisherDisplayName="NetBird"
+        PackageName="NetBirdy"
+        PackageDisplayName="NetBirdy"
+        PublisherName="CN=NetBirdy"
+        PublisherDisplayName="NetBirdy"
         Version="0.0.1.0"
-        PackageDescription="NetBird desktop client">
+        PackageDescription="NetBirdy desktop client">
         <Capabilities>
             <Capability Name="runFullTrust" />
             
         </Capabilities>
         <Applications>
             <Application
-                Id="io.netbird.client"
-                Description="NetBird desktop client"
-                DisplayName="NetBird"
-                ExecutableName="netbird-ui"
+                Id="io.netbirdy.client"
+                Description="NetBirdy desktop client"
+                DisplayName="NetBirdy"
+                ExecutableName="netbirdy-ui"
                 EntryPoint="Windows.FullTrustApplication">
                 
             </Application>
@@ -41,13 +41,13 @@
         </Dependencies>
         <Properties>
             <Framework>false</Framework>
-            <DisplayName>NetBird</DisplayName>
-            <PublisherDisplayName>NetBird</PublisherDisplayName>
-            <Description>NetBird desktop client</Description>
+            <DisplayName>NetBirdy</DisplayName>
+            <PublisherDisplayName>NetBirdy</PublisherDisplayName>
+            <Description>NetBirdy desktop client</Description>
             <Logo>Assets\AppIcon.png</Logo>
         </Properties>
     </PackageInformation>
-    <SaveLocation PackagePath="netbird-ui.msix" />
+    <SaveLocation PackagePath="netbirdy-ui.msix" />
     <PackageIntegrity>
         <CertificatePath></CertificatePath>
     </PackageIntegrity>

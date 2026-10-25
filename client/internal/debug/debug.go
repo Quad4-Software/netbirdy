@@ -37,10 +37,10 @@ import (
 const readmeContent = `This debug bundle contains the following files.
 If anonymization is enabled (--anonymize / --anonymize-level), the files are anonymized to protect sensitive information.
 
-status.txt: Anonymized status information of the NetBird client.
-client.log: Most recent, anonymized client log file of the NetBird client.
-netbird.err: Most recent, anonymized stderr log file of the NetBird client.
-netbird.out: Most recent, anonymized stdout log file of the NetBird client.
+status.txt: Anonymized status information of the NetBirdy client.
+client.log: Most recent, anonymized client log file of the NetBirdy client.
+netbird.err: Most recent, anonymized stderr log file of the NetBirdy client.
+netbird.out: Most recent, anonymized stdout log file of the NetBirdy client.
 routes.txt: Detailed system routing table in tabular format including destination, gateway, interface, metrics, and protocol information, if --system-info flag was provided.
 interfaces.txt: Anonymized network interface information, if --system-info flag was provided.
 ip_rules.txt: Detailed IP routing rules in tabular format including priority, source, destination, interfaces, table, and action information (Linux only), if --system-info flag was provided.
@@ -48,12 +48,12 @@ iptables.txt: Anonymized iptables (IPv4) rules with packet counters, if --system
 ip6tables.txt: Anonymized ip6tables (IPv6) rules with packet counters, if --system-info flag was provided.
 ipset.txt: Anonymized ipset list output, if --system-info flag was provided.
 nftables.txt: Anonymized nftables rules with packet counters across all families (ip, ip6, inet, etc.), if --system-info flag was provided.
-sysctls.txt: Forwarding, reverse-path filter, source-validation, and conntrack accounting sysctl values that the NetBird client may read or modify, if --system-info flag was provided (Linux only).
+sysctls.txt: Forwarding, reverse-path filter, source-validation, and conntrack accounting sysctl values that the NetBirdy client may read or modify, if --system-info flag was provided (Linux only).
 resolv.conf: DNS resolver configuration from /etc/resolv.conf (Unix systems only), if --system-info flag was provided.
 scutil_dns.txt: DNS configuration from scutil --dns (macOS only), if --system-info flag was provided.
 dns_windows.txt: Anonymized NRPT rules and policy table in effect, DNS client policy, and per-interface and per-adapter DNS configuration (Windows only), if --system-info flag was provided.
 resolved_domains.txt: Anonymized resolved domain IP addresses from the status recorder.
-config.txt: Anonymized configuration information of the NetBird client.
+config.txt: Anonymized configuration information of the NetBirdy client.
 network_map.json: Anonymized sync response containing peer configurations, routes, DNS settings, and firewall rules.
 state.json: Anonymized client state dump containing netbird states for the active profile.
 service_params.json: Sanitized service install parameters (service.json). Sensitive environment variable values are masked. Only present when service.json exists.
@@ -84,7 +84,7 @@ Strict level (--anonymize-level strict), in addition to the default level:
 - Private (RFC 1918), CGNAT (100.64.0.0/10), and link-local (169.254.0.0/16, fe80::/10) addresses are anonymized too.
 - Internal IPv4 addresses are replaced with addresses starting from 198.18.0.0 and internal IPv6 addresses with addresses starting from 2001:db8:1::, so internal addresses remain distinguishable from public ones.
 - Addresses are mapped in order of first appearance: subnet structure, allocation scheme, and gateway conventions are not preserved. Prefix lengths of networks are preserved.
-- Peer names in front of NetBird domains are replaced with numbered placeholders (e.g. peer-1.netbird.cloud), and subdomain labels of other domains with host-N placeholders.
+- Peer names in front of NetBirdy domains are replaced with numbered placeholders (e.g. peer-1.netbird.cloud), and subdomain labels of other domains with host-N placeholders.
 - WireGuard public keys are replaced with consistent placeholder keys.
 
 Reoccuring IP addresses are replaced with the same anonymized address.
@@ -110,7 +110,7 @@ The network_map.json file contains the following anonymized information:
 SSH keys in the sync response are replaced with a placeholder value. All IP addresses and domains in the sync response follow the same anonymization rules as described above.
 
 State File
-The state.json file contains anonymized internal state information of the NetBird client, including:
+The state.json file contains anonymized internal state information of the NetBirdy client, including:
 - DNS settings and configuration
 - Firewall rules
 - Exclusion routes
@@ -123,7 +123,7 @@ The state file follows the same anonymization rules as other files:
 - Technical identifiers and non-sensitive data remain unchanged
 
 Mutex, Goroutines, Block, and Heap Profiling Files
-The goroutine, block, mutex, and heap profiling files contain process information that might help the NetBird team diagnose performance or memory issues. The information in these files doesn't contain personal data.
+The goroutine, block, mutex, and heap profiling files contain process information that might help the NetBirdy team diagnose performance or memory issues. The information in these files doesn't contain personal data.
 You can check each using the following go command:
 
 go tool pprof -http=:8088 <profile_name>.prof
@@ -153,7 +153,7 @@ The table format provides a comprehensive view of the system's routing configura
 For anonymized routes, IP addresses are replaced as described above. The prefix length remains unchanged. Note that for prefixes, the anonymized IP might not be a network address, but the prefix length is still correct. Interface names are anonymized using string anonymization.
 
 Resolved Domains
-The resolved_domains.txt file contains information about domain names that have been resolved to IP addresses by NetBird's DNS resolver. This includes:
+The resolved_domains.txt file contains information about domain names that have been resolved to IP addresses by NetBirdy's DNS resolver. This includes:
 - Original domain patterns that were configured for routing
 - Resolved domain names that matched those patterns
 - IP address prefixes that were resolved for each domain
@@ -172,7 +172,7 @@ The interfaces.txt file contains information about network interfaces, including
 The IP addresses in the interfaces file are anonymized using the same process as described above. Interface names, indexes, MTUs, and flags are not anonymized.
 
 Configuration
-The config.txt file contains anonymized configuration information of the NetBird client. Sensitive information such as private keys and SSH keys are excluded. The following fields are anonymized:
+The config.txt file contains anonymized configuration information of the NetBirdy client. Sensitive information such as private keys and SSH keys are excluded. The following fields are anonymized:
 - ManagementURL
 - NATExternalIPs
 - CustomDNSAddress
@@ -545,7 +545,7 @@ func (g *BundleGenerator) addReadme() error {
 	if g.anonymize {
 		level = g.anonymizeLevel.String()
 	}
-	header := fmt.Sprintf("Netbird debug bundle\nAnonymization level applied to this bundle: %s\n", level)
+	header := fmt.Sprintf("NetBirdy debug bundle\nAnonymization level applied to this bundle: %s\n", level)
 
 	readmeReader := strings.NewReader(header + readmeContent)
 	if err := g.addFileToZip(readmeReader, "README.txt"); err != nil {
@@ -618,7 +618,7 @@ func (g *BundleGenerator) addConfig() error {
 	// Surface the set of MDM-enforced keys so a support engineer reading
 	// the bundle can tell which field values are user-set vs MDM-overridden.
 	// Same semantics as the mDMManagedFields list returned by the
-	// GetConfig RPC consumed by `netbird debug config`.
+	// GetConfig RPC consumed by `netbirdy debug config`.
 	if managed := g.internalConfig.Policy().ManagedKeys(); len(managed) > 0 {
 		configContent.WriteString(fmt.Sprintf("MDMManagedFields: %v\n", managed))
 	}
@@ -716,7 +716,7 @@ func isSensitiveEnvVar(key string) bool {
 }
 
 func (g *BundleGenerator) addCommonConfigFields(configContent *strings.Builder) {
-	configContent.WriteString("NetBird Client Configuration:\n\n")
+	configContent.WriteString("NetBirdy Client Configuration:\n\n")
 
 	if key, err := wgtypes.ParseKey(g.internalConfig.PrivateKey); err == nil {
 		configContent.WriteString(fmt.Sprintf("PublicKey: %s\n", g.anonymizer.AnonymizeWGKey(key.PublicKey().String())))

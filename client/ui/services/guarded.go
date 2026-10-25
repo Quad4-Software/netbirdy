@@ -17,7 +17,7 @@ import (
 
 // The command line of the one-shot mode this binary runs itself in, elevated, to
 // apply a setting the daemon restricts to root/administrator. The setting flags
-// spell the same words as `netbird up`, so the command a user is shown and what
+// spell the same words as `netbirdy up`, so the command a user is shown and what
 // runs behind the prompt read alike. Parsed in oneshot.go.
 const (
 	FlagApplyPrivilegedSettings = "apply-privileged-settings"
@@ -96,7 +96,7 @@ type GuardedSettings struct {
 }
 
 // guardedSetting is one setting to change, in the two spellings this needs: the
-// one-shot's own flag, and the `netbird up` flag that does the same thing from a
+// one-shot's own flag, and the `netbirdy up` flag that does the same thing from a
 // terminal, for when there is no prompt to raise.
 type guardedSetting struct {
 	arg  string
@@ -109,7 +109,7 @@ type guardedSetting struct {
 //
 // The user authorizes it at the platform's own prompt: the UAC consent dialog,
 // the macOS authentication dialog, or the polkit agent's. Any credentials are the
-// operating system's business; NetBird neither sees nor asks for them. Nothing
+// operating system's business; NetBirdy neither sees nor asks for them. Nothing
 // about the daemon's rules changes, and the elevated process is authorized like
 // any other privileged caller, from the identity the kernel reports for it.
 //

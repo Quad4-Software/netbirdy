@@ -432,10 +432,10 @@ func (c *ConnTrack) inferDirection(mark uint32, srcIP, dstIP netip.Addr) nftypes
 	case addr.IP == dstIP || (addr.IPv6.IsValid() && addr.IPv6 == dstIP):
 		return nftypes.Ingress
 	case addr.Network.Contains(srcIP) || (addr.IPv6Net.IsValid() && addr.IPv6Net.Contains(srcIP)):
-		// netbird network -> resource network
+		// netbirdy network -> resource network
 		return nftypes.Ingress
 	case addr.Network.Contains(dstIP) || (addr.IPv6Net.IsValid() && addr.IPv6Net.Contains(dstIP)):
-		// resource network -> netbird network
+		// resource network -> netbirdy network
 		return nftypes.Egress
 	}
 

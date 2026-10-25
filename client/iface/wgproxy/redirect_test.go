@@ -31,7 +31,7 @@ func TestRedirectAs_UDP_IPv4(t *testing.T) {
 	wgPort := 51852
 	proxy := udp.NewWGUDPProxy(wgPort, 1280)
 
-	// NetBird UDP address of the remote peer
+	// NetBirdy UDP address of the remote peer
 	nbAddr := &net.UDPAddr{
 		IP:   net.ParseIP("100.108.111.177"),
 		Port: 38746,
@@ -50,7 +50,7 @@ func TestRedirectAs_UDP_IPv6(t *testing.T) {
 	wgPort := 51853
 	proxy := udp.NewWGUDPProxy(wgPort, 1280)
 
-	// NetBird UDP address of the remote peer
+	// NetBirdy UDP address of the remote peer
 	nbAddr := &net.UDPAddr{
 		IP:   net.ParseIP("100.108.111.177"),
 		Port: 38746,
@@ -94,7 +94,7 @@ func testRedirectAs(t *testing.T, proxy Proxy, wgPort int, nbAddr, p2pEndpoint *
 	}
 	defer wgListener6.Close()
 
-	// Determine which listener to use based on the NetBird address IP version
+	// Determine which listener to use based on the NetBirdy address IP version
 	// (this is where initial traffic will come from before RedirectAs is called)
 	var wgListener *net.UDPConn
 	if p2pEndpoint.IP.To4() == nil {
@@ -213,7 +213,7 @@ func TestRedirectAs_Loopback_IPv4(t *testing.T) {
 
 	proxy := loopback.NewProxyWrapper(loopbackProxy)
 
-	// NetBird UDP address of the remote peer
+	// NetBirdy UDP address of the remote peer
 	nbAddr := &net.UDPAddr{
 		IP:   net.ParseIP("100.108.111.177"),
 		Port: 38746,
@@ -242,7 +242,7 @@ func TestRedirectAs_Loopback_IPv6(t *testing.T) {
 
 	proxy := loopback.NewProxyWrapper(loopbackProxy)
 
-	// NetBird UDP address of the remote peer
+	// NetBirdy UDP address of the remote peer
 	nbAddr := &net.UDPAddr{
 		IP:   net.ParseIP("100.108.111.177"),
 		Port: 38746,

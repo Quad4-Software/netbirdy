@@ -42,7 +42,7 @@ func uiLogOpener(id ipcauth.Identity, identified bool) debug.LogOpener {
 // into both an exfiltration channel and a request forwarder that reaches
 // services only it can talk to.
 //
-// The upload service NetBird publishes is open to any caller, since that is what
+// The upload service NetBirdy publishes is open to any caller, since that is what
 // the CLI and the desktop UI use. Any other endpoint, self-hosted upload servers
 // included, requires a privileged caller. Plaintext is refused for everyone: the
 // daemon fetches the URL and then PUTs the bundle to whatever that fetch returns,
@@ -71,7 +71,7 @@ func requirePrivilegeForUploadURL(ctx context.Context, rawURL string, insecure b
 	if insecure {
 		return denyPrivileged(ctx,
 			"uploading a debug bundle without transport security (--upload-bundle-insecure)",
-			ipcauth.ElevatedCommand("netbird debug bundle -U --upload-bundle-insecure --upload-bundle-url <url>"))
+			ipcauth.ElevatedCommand("netbirdy debug bundle -U --upload-bundle-insecure --upload-bundle-url <url>"))
 	}
 
 	if parsed.Scheme != "https" {
@@ -84,11 +84,11 @@ func requirePrivilegeForUploadURL(ctx context.Context, rawURL string, insecure b
 
 	return denyPrivileged(ctx,
 		"uploading a debug bundle to an upload service other than the default one",
-		ipcauth.ElevatedCommand("netbird debug bundle -U --upload-bundle-url <url>"))
+		ipcauth.ElevatedCommand("netbirdy debug bundle -U --upload-bundle-url <url>"))
 }
 
 // isDefaultUploadService reports whether the URL points at the upload service
-// NetBird runs. Only the host is compared: the service's path may differ between
+// NetBirdy runs. Only the host is compared: the service's path may differ between
 // releases, and the host is what decides who receives the bundle.
 func isDefaultUploadService(parsed *url.URL) bool {
 	defaultURL, err := url.Parse(types.DefaultBundleURL)

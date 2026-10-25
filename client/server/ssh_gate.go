@@ -92,7 +92,7 @@ func requirePrivilegeForConfigChange(ctx context.Context, stored *profilemanager
 	}
 
 	if enables(sshServerCurrentlyAllowed(stored), change.serverSSHAllowed) {
-		return denyPrivileged(ctx, "enabling the NetBird SSH server", ipcauth.UpCommand("--allow-server-ssh"))
+		return denyPrivileged(ctx, "enabling the NetBirdy SSH server", ipcauth.UpCommand("--allow-server-ssh"))
 	}
 
 	// Enabling remote jobs lets the management server run jobs (e.g. debug
@@ -118,7 +118,7 @@ func requirePrivilegeForConfigChange(ctx context.Context, stored *profilemanager
 
 	if change.managementURL != "" && !sameManagementURL(stored.ManagementURL, change.managementURL) {
 		return denyPrivileged(ctx,
-			"changing the management URL while the NetBird SSH server is enabled",
+			"changing the management URL while the NetBirdy SSH server is enabled",
 			ipcauth.UpCommand("-m "+change.managementURL))
 	}
 
@@ -139,7 +139,7 @@ func requirePrivilegeForDeregistration(ctx context.Context, cfg *profilemanager.
 	}
 
 	return denyPrivileged(ctx,
-		"deregistering this peer while the NetBird SSH server is enabled",
+		"deregistering this peer while the NetBirdy SSH server is enabled",
 		ipcauth.ElevatedCommand("netbird logout"))
 }
 
@@ -215,9 +215,9 @@ func unidentifiedSummary(action string) string {
 // callers can be identified.
 func reinstallCommand() string {
 	if runtime.GOOS == "windows" {
-		return fmt.Sprintf("netbird service install --daemon-addr %s", daemonaddr.WindowsPipeAddr)
+		return fmt.Sprintf("netbirdy service install --daemon-addr %s", daemonaddr.WindowsPipeAddr)
 	}
-	return "sudo netbird service install --daemon-addr unix:///var/run/netbird.sock"
+	return "sudo netbirdy service install --daemon-addr unix:///var/run/netbird.sock"
 }
 
 func capitalize(s string) string {

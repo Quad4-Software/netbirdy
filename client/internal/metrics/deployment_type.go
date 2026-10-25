@@ -5,17 +5,17 @@ import (
 	"strings"
 )
 
-// DeploymentType represents the type of NetBird deployment
+// DeploymentType represents the type of NetBirdy deployment
 type DeploymentType int
 
 const (
 	// DeploymentTypeUnknown represents an unknown or uninitialized deployment type
 	DeploymentTypeUnknown DeploymentType = iota
 
-	// DeploymentTypeCloud represents a cloud-hosted NetBird deployment
+	// DeploymentTypeCloud represents a cloud-hosted NetBirdy deployment
 	DeploymentTypeCloud
 
-	// DeploymentTypeSelfHosted represents a self-hosted NetBird deployment
+	// DeploymentTypeSelfHosted represents a self-hosted NetBirdy deployment
 	DeploymentTypeSelfHosted
 )
 

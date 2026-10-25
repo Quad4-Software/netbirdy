@@ -823,7 +823,7 @@ func (g *BundleGenerator) addSysctls() error {
 	return nil
 }
 
-// collectSysctls reads every sysctl that the netbird client may modify, plus
+// collectSysctls reads every sysctl that the netbirdy client may modify, plus
 // global IPv4/IPv6 forwarding, and returns a formatted dump grouped by topic.
 // Per-interface values are enumerated by listing /proc/sys/net/ipv{4,6}/conf.
 func collectSysctls() string {

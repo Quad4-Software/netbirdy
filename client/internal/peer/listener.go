@@ -18,7 +18,7 @@ const (
 	ClientStateNoNetwork
 )
 
-// Listener is a callback type about the NetBird network connection state
+// Listener is a callback type about the NetBirdy network connection state
 type Listener interface {
 	// OnStateChanged reports every client state transition. New states are
 	// delivered only through this callback; the per-state callbacks below

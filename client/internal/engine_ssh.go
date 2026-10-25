@@ -35,7 +35,7 @@ func (e *Engine) setupSSHPortRedirection() error {
 
 	localAddr := e.wgInterface.Address().IP
 	if !localAddr.IsValid() {
-		return errors.New("invalid local NetBird address")
+		return errors.New("invalid local NetBirdy address")
 	}
 
 	if err := e.firewall.AddInboundDNAT(localAddr, firewallManager.ProtocolTCP, 22, 22022); err != nil {
@@ -218,7 +218,7 @@ func (e *Engine) GetPeerSSHKey(peerAddress string) ([]byte, bool) {
 	return nil, false
 }
 
-// cleanupSSHConfig removes NetBird SSH client configuration on shutdown
+// cleanupSSHConfig removes NetBirdy SSH client configuration on shutdown
 func (e *Engine) cleanupSSHConfig() {
 	if netstack.IsEnabled() {
 		return
@@ -354,7 +354,7 @@ func (e *Engine) cleanupSSHPortRedirection() error {
 
 	localAddr := e.wgInterface.Address().IP
 	if !localAddr.IsValid() {
-		return errors.New("invalid local NetBird address")
+		return errors.New("invalid local NetBirdy address")
 	}
 
 	if err := e.firewall.RemoveInboundDNAT(localAddr, firewallManager.ProtocolTCP, 22, 22022); err != nil {

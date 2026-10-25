@@ -256,7 +256,7 @@ func TestSSHProxy_CommandQuoting(t *testing.T) {
 }
 
 // setupProxySSHClient creates a full proxy test environment and returns
-// an SSH client connected through the proxy to a backend NetBird SSH server.
+// an SSH client connected through the proxy to a backend NetBirdy SSH server.
 func setupProxySSHClient(t *testing.T) (*cryptossh.Client, func()) {
 	t.Helper()
 

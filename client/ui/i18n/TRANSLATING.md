@@ -1,8 +1,8 @@
-# Translating the NetBird UI
+# Translating the NetBirdy UI
 
 A short brief for translating the desktop UI — for any translator, human or AI agent (*"you"* = whoever's translating).
 
-**Translations are managed on Crowdin: <https://crowdin.com/project/netbird>.** Join the project, pick your language, and translate in the editor. Each string carries a context note (the `description` from the source file) telling you what it is and where it shows up, and the project's glossary, style guide, and QA checks mirror this document.
+**Translations are managed on Crowdin: <https://crowdin.com/project/netbirdy>.** Join the project, pick your language, and translate in the editor. Each string carries a context note (the `description` from the source file) telling you what it is and where it shows up, and the project's glossary, style guide, and QA checks mirror this document.
 
 > 💡 **The one habit that matters most:** read each string's context before translating it. Labels are terse and ambiguous on their own; the context tells you what the string is, where it shows up, what to keep verbatim, and what it actually means.
 
@@ -23,7 +23,7 @@ i18n/locales/en/common.json ──sync──▶ Crowdin ──service PR──�
 
 ---
 
-## What NetBird is
+## What NetBirdy is
 
 A **business zero-trust VPN** — an encrypted **overlay mesh** between a company's devices, built on **WireGuard®**, connecting peers directly with a **relay** fallback. This is the **desktop client** (tray app + windows) someone runs to connect, switch profiles, browse peers, and pick an exit node — *not* the admin dashboard.
 
@@ -34,7 +34,7 @@ A **business zero-trust VPN** — an encrypted **overlay mesh** between a compan
 | Term | What it means here |
 |---|---|
 | **Peer** | A device on the network (laptop, server, phone) |
-| **Resource / Network** | A routed network or service reachable through NetBird (UI calls these "Resources") |
+| **Resource / Network** | A routed network or service reachable through NetBirdy (UI calls these "Resources") |
 | **Exit Node** | A peer that routes *all* internet traffic, like a full-tunnel gateway |
 | **Profile** | A saved connection identity you can switch between |
 | **Daemon** | The background service the UI talks to |
@@ -64,7 +64,7 @@ These are the usual ways a translation *breaks the app*, not just reads oddly.
 
 ## Glossary
 
-**Tier A — never translate (brands):** `NetBird` · `WireGuard®` · `Rosenpass` · `GitHub` · `ICE` · company/product names · sample URLs · version numbers.
+**Tier A — never translate (brands):** `NetBirdy` · `WireGuard®` · `Rosenpass` · `GitHub` · `ICE` · company/product names · sample URLs · version numbers.
 
 When a brand sits beside a common noun, keep its exact spelling but join them the way your language builds such phrases — a hyphen, a connector word, an inflected noun — rather than copying English's bare noun-stack.
 

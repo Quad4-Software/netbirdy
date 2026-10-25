@@ -54,7 +54,7 @@ type guardedField struct {
 	// thing that validates the value, so it fails on anything it does not
 	// recognise rather than guessing.
 	write func(*proto.SetConfigRequest, string) error
-	// up renders the equivalent `netbird up` flag, for the fallback command shown
+	// up renders the equivalent `netbirdy up` flag, for the fallback command shown
 	// when there is no prompt to raise.
 	up func(value string) string
 }
@@ -76,7 +76,7 @@ var guardedFields = []guardedField{
 		// The daemon names this one as `-m <url>` in its own refusals.
 		up: func(value string) string { return "-m " + value },
 	},
-	boolField(FlagAllowServerSSH, "Run the NetBird SSH server.",
+	boolField(FlagAllowServerSSH, "Run the NetBirdy SSH server.",
 		func(p GuardedSettings) *bool { return p.ServerSSHAllowed },
 		func(req *proto.SetConfigRequest, v *bool) { req.ServerSSHAllowed = v }),
 	boolField(FlagEnableSSHRoot, "Allow SSH sessions to privileged accounts.",
@@ -156,7 +156,7 @@ func IsPrivilegedSettingsRun(args []string) bool {
 // platform lets it. On success it says so on standard output, because macOS gives
 // the parent no exit status to read: see elevate.AppliedMarker.
 func RunPrivilegedSettings(args []string, connect func(addr string) (proto.DaemonServiceClient, error)) int {
-	fs := flag.NewFlagSet("netbird-ui --"+FlagApplyPrivilegedSettings, flag.ContinueOnError)
+	fs := flag.NewFlagSet("netbirdy-ui --"+FlagApplyPrivilegedSettings, flag.ContinueOnError)
 	fs.Bool(FlagApplyPrivilegedSettings, false, "Apply the settings the daemon restricts to root/administrator and exit.")
 	daemonAddr := fs.String(FlagDaemonAddr, "", "Daemon gRPC address: unix:///path, npipe://name or tcp://host:port")
 	logLevel := fs.String(FlagLogLevel, "info", "Log level: trace|debug|info|warn|error.")

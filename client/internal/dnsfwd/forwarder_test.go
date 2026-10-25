@@ -860,7 +860,7 @@ func TestDNSForwarder_UpstreamFailureEDE(t *testing.T) {
 			reqEdns:     true,
 			wantEDE:     true,
 			wantCode:    edeNetbirdUpstreamTimeout,
-			wantTextHas: "netbird forwarder: upstream timeout",
+			wantTextHas: "netbirdy forwarder: upstream timeout",
 		},
 		{
 			name:        "server failure with edns0",
@@ -868,7 +868,7 @@ func TestDNSForwarder_UpstreamFailureEDE(t *testing.T) {
 			reqEdns:     true,
 			wantEDE:     true,
 			wantCode:    edeNetbirdUpstreamFailure,
-			wantTextHas: "netbird forwarder: upstream failure",
+			wantTextHas: "netbirdy forwarder: upstream failure",
 		},
 		{
 			name:      "no edns0 in request omits ede",

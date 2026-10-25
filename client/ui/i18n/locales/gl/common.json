@@ -1,6 +1,6 @@
 {
     "tray.tooltip": {
-        "message": "NetBird"
+        "message": "NetBirdy"
     },
     "tray.status.disconnected": {
         "message": "Desconectado"
@@ -51,7 +51,7 @@
         "message": "{count} días"
     },
     "tray.menu.open": {
-        "message": "Abrir NetBird"
+        "message": "Abrir NetBirdy"
     },
     "tray.menu.connect": {
         "message": "Conectar"
@@ -105,19 +105,19 @@
         "message": "—"
     },
     "tray.menu.quit": {
-        "message": "Saír de NetBird"
+        "message": "Saír de NetBirdy"
     },
     "notify.daemonOutdated.title": {
-        "message": "O servizo NetBird está desactualizado"
+        "message": "O servizo NetBirdy está desactualizado"
     },
     "notify.daemonOutdated.body": {
-        "message": "Actualice o servizo NetBird para usar esta aplicación."
+        "message": "Actualice o servizo NetBirdy para usar esta aplicación."
     },
     "notify.update.title": {
-        "message": "Actualización de NetBird dispoñible"
+        "message": "Actualización de NetBirdy dispoñible"
     },
     "notify.update.body": {
-        "message": "NetBird {version} está dispoñible."
+        "message": "NetBirdy {version} está dispoñible."
     },
     "notify.update.enforcedSuffix": {
         "message": " O seu administrador require esta actualización."
@@ -147,10 +147,10 @@
         "message": "A sesión caduca en breve"
     },
     "notify.sessionWarning.body": {
-        "message": "A súa sesión de NetBird caduca en {remaining}. Prema en Prolongar agora para renovar."
+        "message": "A súa sesión de NetBirdy caduca en {remaining}. Prema en Prolongar agora para renovar."
     },
     "notify.sessionWarning.bodyGeneric": {
-        "message": "A súa sesión de NetBird está a punto de caducar. Prema en Prolongar agora para renovar."
+        "message": "A súa sesión de NetBirdy está a punto de caducar. Prema en Prolongar agora para renovar."
     },
     "notify.sessionWarning.extend": {
         "message": "Prolongar agora"
@@ -159,10 +159,10 @@
         "message": "Descartar"
     },
     "notify.sessionWarning.failed": {
-        "message": "Erro ao prolongar a sesión de NetBird"
+        "message": "Erro ao prolongar a sesión de NetBirdy"
     },
     "notify.sessionWarning.successTitle": {
-        "message": "Sesión de NetBird prolongada"
+        "message": "Sesión de NetBirdy prolongada"
     },
     "notify.sessionWarning.successBody": {
         "message": "A súa sesión foi renovada."
@@ -174,10 +174,10 @@
         "message": "O servidor enviou unha data límite de sesión non válida. Por favor, inicie sesión de novo."
     },
     "notify.mdm.policyApplied.title": {
-        "message": "Configuración de NetBird actualizada"
+        "message": "Configuración de NetBirdy actualizada"
     },
     "notify.mdm.policyApplied.body": {
-        "message": "A súa configuración de NetBird foi actualizada pola súa política de IT."
+        "message": "A súa configuración de NetBirdy foi actualizada pola súa política de IT."
     },
     "common.cancel": {
         "message": "Cancelar"
@@ -224,8 +224,8 @@
     "common.loading": {
         "message": "Cargando…"
     },
-    "common.netbird": {
-        "message": "NetBird"
+    "common.netbirdy": {
+        "message": "NetBirdy"
     },
     "common.noResults.title": {
         "message": "Non se puido atopar ningún resultado"
@@ -237,7 +237,7 @@
         "message": "Sen conexión"
     },
     "notConnected.description": {
-        "message": "Conéctese primeiro a NetBird para ver información detallada sobre os seus peers, recursos de rede e nodos de saída."
+        "message": "Conéctese primeiro a NetBirdy para ver información detallada sobre os seus peers, recursos de rede e nodos de saída."
     },
     "connect.status.disconnected": {
         "message": "Desconectado"
@@ -246,7 +246,7 @@
         "message": "Establecendo conexión..."
     },
     "connect.status.connected": {
-        "message": "Conectado á rede NetBird"
+        "message": "Conectado á rede NetBirdy"
     },
     "connect.status.disconnecting": {
         "message": "Desconectando..."
@@ -351,7 +351,7 @@
         "message": "Por favor, introduza un nome de perfil, p. ex. traballo, casa"
     },
     "profile.dialog.managementHelp": {
-        "message": "Use NetBird Cloud ou o seu propio servidor."
+        "message": "Use NetBirdy Cloud ou o seu propio servidor."
     },
     "profile.dialog.urlUnreachable": {
         "message": "Non se puido acadar este servidor. Comprobe o URL ou engada o perfil de todas formas se ten a certeza de que é correcto."
@@ -375,7 +375,7 @@
         "message": "Cambiar de perfil"
     },
     "connect.toggle.label": {
-        "message": "Alternar conexión de NetBird"
+        "message": "Alternar conexión de NetBirdy"
     },
     "connect.localIp.label": {
         "message": "Enderezos IP locais"
@@ -471,7 +471,7 @@
         "message": "Perfís"
     },
     "settings.profiles.intro": {
-        "message": "Manteña identidades de NetBird separadas lado a lado, por exemplo contas de traballo e persoais, ou diferentes servidores de xestión. Engada, dea de baixa ou elimine perfís a continuación."
+        "message": "Manteña identidades de NetBirdy separadas lado a lado, por exemplo contas de traballo e persoais, ou diferentes servidores de xestión. Engada, dea de baixa ou elimine perfís a continuación."
     },
     "settings.profiles.addProfile": {
         "message": "Engadir perfil"
@@ -483,7 +483,7 @@
         "message": "Sen perfís"
     },
     "settings.profiles.emptyDescription": {
-        "message": "Cree un perfil para conectarse a un servidor de xestión de NetBird."
+        "message": "Cree un perfil para conectarse a un servidor de xestión de NetBirdy."
     },
     "settings.error.loadTitle": {
         "message": "Erro ao cargar a configuración"
@@ -543,10 +543,10 @@
         "message": "Amosar notificacións de escritorio para novas actualizacións e eventos de conexión."
     },
     "settings.general.autostart.label": {
-        "message": "Iniciar UI de NetBird ao acceder"
+        "message": "Iniciar UI de NetBirdy ao acceder"
     },
     "settings.general.autostart.help": {
-        "message": "Inicie a interface de NetBird automaticamente cando inicie sesión. Isto afecta só á interface gráfica, non ao servizo en segundo plano."
+        "message": "Inicie a interface de NetBirdy automaticamente cando inicie sesión. Isto afecta só á interface gráfica, non ao servizo en segundo plano."
     },
     "settings.general.autostart.errorTitle": {
         "message": "Erro ao cambiar o inicio automático"
@@ -555,13 +555,13 @@
         "message": "Manter conectado ao pechar"
     },
     "settings.general.keepConnectedOnQuit.help": {
-        "message": "Mantén a conexión de NetBird en segundo plano cando se pecha a xanela principal."
+        "message": "Mantén a conexión de NetBirdy en segundo plano cando se pecha a xanela principal."
     },
     "settings.general.language.label": {
         "message": "Idioma da interface"
     },
     "settings.general.language.help": {
-        "message": "Escolla o idioma no que se amosa a aplicación NetBird."
+        "message": "Escolla o idioma no que se amosa a aplicación NetBirdy."
     },
     "settings.general.language.search": {
         "message": "Buscar idioma…"
@@ -588,7 +588,7 @@
         "message": "Servidor de xestión"
     },
     "settings.general.management.help": {
-        "message": "Conéctese a NetBird Cloud ou ao seu propio servidor de xestión autoaloxado. Os cambios volverán conectar o cliente."
+        "message": "Conéctese a NetBirdy Cloud ou ao seu propio servidor de xestión autoaloxado. Os cambios volverán conectar o cliente."
     },
     "settings.general.management.cloud": {
         "message": "Cloud"
@@ -606,7 +606,7 @@
         "message": "Non se puido acadar este servidor. Comprobe o URL ou garde de todas formas se ten a certeza de que é correcto."
     },
     "settings.general.management.switchCloudTitle": {
-        "message": "Cambiar a NetBird Cloud?"
+        "message": "Cambiar a NetBirdy Cloud?"
     },
     "settings.general.management.switchCloudMessage": {
         "message": "Isto desconecta o seu servidor autoaloxado.\nPode que teña que iniciar sesión de novo."
@@ -630,7 +630,7 @@
         "message": "Activar DNS"
     },
     "settings.network.dns.help": {
-        "message": "Aplica a configuración DNS xestionada por NetBird ao resolutor do sistema."
+        "message": "Aplica a configuración DNS xestionada por NetBirdy ao resolutor do sistema."
     },
     "settings.network.clientRoutes.label": {
         "message": "Activar rutas de cliente"
@@ -648,7 +648,7 @@
         "message": "Activar IPv6"
     },
     "settings.network.ipv6.help": {
-        "message": "Use o enderezamento IPv6 para a rede superposta de NetBird."
+        "message": "Use o enderezamento IPv6 para a rede superposta de NetBirdy."
     },
     "settings.security.section.firewall": {
         "message": "Cortafogos"
@@ -693,7 +693,7 @@
         "message": "Activar servidor SSH"
     },
     "settings.ssh.server.help": {
-        "message": "Executa o servidor SSH de NetBird neste equipo para que outros peers poidan conectarse a el."
+        "message": "Executa o servidor SSH de NetBirdy neste equipo para que outros peers poidan conectarse a el."
     },
     "settings.ssh.root.label": {
         "message": "Permitir inicio de sesión de root"
@@ -768,7 +768,7 @@
         "message": "Chave precompartida"
     },
     "settings.advanced.psk.help": {
-        "message": "Chave PSK opcional de WireGuard para cifrado simétrico adicional. Non é o mesmo que unha chave de configuración de NetBird. Só se comunicará con peers que usen a mesma chave precompartida."
+        "message": "Chave PSK opcional de WireGuard para cifrado simétrico adicional. Non é o mesmo que unha chave de configuración de NetBirdy. Só se comunicará con peers que usen a mesma chave precompartida."
     },
     "settings.troubleshooting.section.title": {
         "message": "Paquete de depuración"
@@ -777,7 +777,7 @@
         "message": "Anonimizar información confidencial"
     },
     "settings.troubleshooting.anonymize.help": {
-        "message": "Oculta enderezos IP públicos e dominios que non sexan de NetBird nos rexistros."
+        "message": "Oculta enderezos IP públicos e dominios que non sexan de NetBirdy nos rexistros."
     },
     "settings.troubleshooting.anonymize.info": {
         "message": "O nivel predeterminado mantén lexibles os enderezos IPv4 internos e os nomes dos peers para o soporte. O nivel estrito anonimiza ademais os enderezos IP privados (RFC 1918), CGNAT e de ligazón local, os nomes dos peers e as chaves públicas de WireGuard. Os valores recorrentes asígnanse ao mesmo marcador, polo que os peers seguen sendo distinguibles. Use Estrito cando comparta o paquete fóra da súa organización."
@@ -798,10 +798,10 @@
         "message": "Inclúe SO, kernel, interfaces de rede e táboas de encamiñamento."
     },
     "settings.troubleshooting.upload.label": {
-        "message": "Subir paquete aos servidores de NetBird"
+        "message": "Subir paquete aos servidores de NetBirdy"
     },
     "settings.troubleshooting.upload.help": {
-        "message": "Devolve unha chave de subida para compartir co soporte de NetBird."
+        "message": "Devolve unha chave de subida para compartir co soporte de NetBirdy."
     },
     "settings.troubleshooting.trace.label": {
         "message": "Activar rexistros de traza"
@@ -834,7 +834,7 @@
         "message": "Crear paquete"
     },
     "settings.troubleshooting.progress.description": {
-        "message": "Recompilando rexistros, detalles do sistema e estado de conexión. Isto adoita levar un momento. Pode seguir usando NetBird ou pechar a Configuración mentres remata."
+        "message": "Recompilando rexistros, detalles do sistema e estado de conexión. Isto adoita levar un momento. Pode seguir usando NetBirdy ou pechar a Configuración mentres remata."
     },
     "settings.troubleshooting.cancelling": {
         "message": "Cancelando…"
@@ -846,7 +846,7 @@
         "message": "Paquete gardado"
     },
     "settings.troubleshooting.done.uploadedDescription": {
-        "message": "Comparta a chave de subida de abaixo co <docs>soporte de NetBird</docs>. Tamén se gardou unha copia local no seu dispositivo."
+        "message": "Comparta a chave de subida de abaixo co <docs>soporte de NetBirdy</docs>. Tamén se gardou unha copia local no seu dispositivo."
     },
     "settings.troubleshooting.done.savedDescription": {
         "message": "O seu paquete de depuración gardouse localmente."
@@ -867,7 +867,7 @@
         "message": "Erro na subida. O paquete aínda está gardado localmente."
     },
     "settings.troubleshooting.stage.reconnecting": {
-        "message": "Reconectando NetBird…"
+        "message": "Reconectando NetBirdy…"
     },
     "settings.troubleshooting.stage.capturing": {
         "message": "Capturando rexistros de depuración"
@@ -876,16 +876,16 @@
         "message": "Xerando paquete de depuración…"
     },
     "settings.troubleshooting.stage.uploading": {
-        "message": "Subindo a NetBird…"
+        "message": "Subindo a NetBirdy…"
     },
     "settings.troubleshooting.stage.cancelling": {
         "message": "Cancelando…"
     },
     "settings.about.client": {
-        "message": "Cliente NetBird v{version}"
+        "message": "Cliente NetBirdy v{version}"
     },
     "settings.about.clientName": {
-        "message": "Cliente NetBird"
+        "message": "Cliente NetBirdy"
     },
     "settings.about.development": {
         "message": "[Desenvolvemento]"
@@ -897,7 +897,7 @@
         "message": "GUI"
     },
     "settings.about.copyright": {
-        "message": "© {year} NetBird. Todos os dereitos reservados."
+        "message": "© {year} NetBirdy. Todos os dereitos reservados."
     },
     "settings.about.links.imprint": {
         "message": "Aviso legal"
@@ -927,7 +927,7 @@
         "message": "Comentarios"
     },
     "update.banner.message": {
-        "message": "NetBird {version} está listo para instalar."
+        "message": "NetBirdy {version} está listo para instalar."
     },
     "update.banner.later": {
         "message": "Máis tarde"
@@ -951,7 +951,7 @@
         "message": "Descargar"
     },
     "update.card.autoCheckInterval": {
-        "message": "NetBird busca actualizacións en segundo plano."
+        "message": "NetBirdy busca actualizacións en segundo plano."
     },
     "update.card.changelog": {
         "message": "Rexistro de cambios"
@@ -963,13 +963,13 @@
         "message": "Actualización dispoñible"
     },
     "update.overlay.updatingVersion": {
-        "message": "Actualizando NetBird á v{version}"
+        "message": "Actualizando NetBirdy á v{version}"
     },
     "update.overlay.updating": {
-        "message": "Actualizando NetBird"
+        "message": "Actualizando NetBirdy"
     },
     "update.overlay.description": {
-        "message": "Unha versión máis recente está dispoñible e estase instalando. NetBird reiniciarase automaticamente unha vez remate a actualización."
+        "message": "Unha versión máis recente está dispoñible e estase instalando. NetBirdy reiniciarase automaticamente unha vez remate a actualización."
     },
     "update.overlay.error.timeoutTitle": {
         "message": "A actualización está tardando demasiado"
@@ -1059,22 +1059,22 @@
         "message": "Actualizando"
     },
     "window.title.welcome": {
-        "message": "Benvido a NetBird"
+        "message": "Benvido a NetBirdy"
     },
     "window.title.error": {
         "message": "Erro"
     },
     "welcome.title": {
-        "message": "Busque NetBird na súa área de notificación"
+        "message": "Busque NetBirdy na súa área de notificación"
     },
     "welcome.titleMac": {
-        "message": "Busque NetBird na súa barra de menú"
+        "message": "Busque NetBirdy na súa barra de menú"
     },
     "welcome.description": {
-        "message": "NetBird reside na súa área de notificación. Faga clic na icona para conectar, cambiar de perfil ou abrir a configuración."
+        "message": "NetBirdy reside na súa área de notificación. Faga clic na icona para conectar, cambiar de perfil ou abrir a configuración."
     },
     "welcome.descriptionMac": {
-        "message": "NetBird reside na súa barra de menú. Faga clic na icona para conectar, cambiar de perfil ou abrir a configuración."
+        "message": "NetBirdy reside na súa barra de menú. Faga clic na icona para conectar, cambiar de perfil ou abrir a configuración."
     },
     "welcome.continue": {
         "message": "Continuar"
@@ -1083,13 +1083,13 @@
         "message": "Volver"
     },
     "welcome.management.title": {
-        "message": "Configurar NetBird"
+        "message": "Configurar NetBirdy"
     },
     "welcome.management.description": {
-        "message": "Faga clic en Continuar para comezar, ou escolla Autoaloxado se ten o seu propio servidor de NetBird."
+        "message": "Faga clic en Continuar para comezar, ou escolla Autoaloxado se ten o seu propio servidor de NetBirdy."
     },
     "welcome.management.cloud.title": {
-        "message": "NetBird Cloud"
+        "message": "NetBirdy Cloud"
     },
     "welcome.management.cloud.description": {
         "message": "Use o noso servizo aloxado. Sen necesidade de configuración."
@@ -1185,10 +1185,10 @@
         "message": "Dominio"
     },
     "peers.details.netbirdIp": {
-        "message": "IP de NetBird"
+        "message": "IP de NetBirdy"
     },
     "peers.details.netbirdIpv6": {
-        "message": "IPv6 de NetBird"
+        "message": "IPv6 de NetBirdy"
     },
     "peers.details.publicKey": {
         "message": "Chave pública"
@@ -1323,7 +1323,7 @@
         "message": "Desconectar"
     },
     "daemon.unavailable.title": {
-        "message": "O servizo NetBird non está en execución"
+        "message": "O servizo NetBirdy non está en execución"
     },
     "daemon.unavailable.description": {
         "message": "A aplicación volverá conectar automaticamente cando o servizo estea en execución."
@@ -1332,10 +1332,10 @@
         "message": "Documentación"
     },
     "daemon.outdated.title": {
-        "message": "O cliente NetBird está desactualizado"
+        "message": "O cliente NetBirdy está desactualizado"
     },
     "daemon.outdated.description": {
-        "message": "A nova GUI non é compatible co cliente NetBird máis antigo. Actualice o seu cliente para usar a nova aplicación."
+        "message": "A nova GUI non é compatible co cliente NetBirdy máis antigo. Actualice o seu cliente para usar a nova aplicación."
     },
     "daemon.outdated.download": {
         "message": "Descargar a última versión"
@@ -1359,7 +1359,7 @@
         "message": "O inicio de sesión foi rexeitado polo servidor."
     },
     "error.daemon_unreachable": {
-        "message": "O daemon de NetBird non responde. Por favor, comprobe que o servizo está en execución."
+        "message": "O daemon de NetBirdy non responde. Por favor, comprobe que o servizo está en execución."
     },
     "error.settings_locked": {
         "message": "A configuración non se pode cambiar neste dispositivo: un administrador bloqueouna."
@@ -1371,7 +1371,7 @@
         "message": "A operación fallou."
     },
     "error.elevation_unavailable": {
-        "message": "NetBird non puido solicitar a este sistema os privilexios que o cambio require. Execute isto no seu lugar:"
+        "message": "NetBirdy non puido solicitar a este sistema os privilexios que o cambio require. Execute isto no seu lugar:"
     },
     "error.elevation_failed": {
         "message": "O cambio non se puido aplicar con privilexios elevados. Execute isto no seu lugar:"

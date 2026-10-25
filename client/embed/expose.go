@@ -20,7 +20,7 @@ const (
 	ExposeProtocolTLS = expose.ProtocolTLS
 )
 
-// ExposeRequest is a request to expose a local service via the NetBird reverse proxy.
+// ExposeRequest is a request to expose a local service via the NetBirdy reverse proxy.
 type ExposeRequest = expose.Request
 
 // ExposeProtocolType represents the protocol used for exposing a service.

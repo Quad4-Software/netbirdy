@@ -9,7 +9,7 @@ services:
       - "8087:8087"
     environment:
       - INGEST_LISTEN_ADDR=:8087
-      - INFLUXDB_URL=http://influxdb:8086/api/v2/write?org=netbird&bucket=metrics&precision=ns
+      - INFLUXDB_URL=http://influxdb:8086/api/v2/write?org=netbirdy&bucket=metrics&precision=ns
       - INFLUXDB_TOKEN=${INFLUXDB_ADMIN_TOKEN:?required}
       - CONFIG_METRICS_SERVER_URL=${CONFIG_METRICS_SERVER_URL:-}
       - CONFIG_VERSION_SINCE=${CONFIG_VERSION_SINCE:-0.0.0}
@@ -32,7 +32,7 @@ services:
       - DOCKER_INFLUXDB_INIT_MODE=setup
       - DOCKER_INFLUXDB_INIT_USERNAME=admin
       - DOCKER_INFLUXDB_INIT_PASSWORD=${INFLUXDB_ADMIN_PASSWORD:?required}
-      - DOCKER_INFLUXDB_INIT_ORG=netbird
+      - DOCKER_INFLUXDB_INIT_ORG=netbirdy
       - DOCKER_INFLUXDB_INIT_BUCKET=metrics
       - DOCKER_INFLUXDB_INIT_RETENTION=365d
       - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=${INFLUXDB_ADMIN_TOKEN:-}

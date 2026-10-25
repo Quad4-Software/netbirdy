@@ -9,7 +9,7 @@ import (
 	gstatus "google.golang.org/grpc/status"
 )
 
-// A refused settings update has to fail `netbird up`, or a caller that asked
+// A refused settings update has to fail `netbirdy up`, or a caller that asked
 // for a setting the daemon will not apply connects as if it had been applied.
 // The daemon being unable to serve the call is the case that stays a warning.
 func TestRefusedSettingsUpdate(t *testing.T) {
@@ -56,7 +56,7 @@ func TestRefusedSettingsUpdate(t *testing.T) {
 	}
 }
 
-// Both `netbird up` and `netbird login` drive Login through the backoff cycle,
+// Both `netbirdy up` and `netbirdy login` drive Login through the backoff cycle,
 // and a final answer has to stop it: retrying a refusal only replaces the
 // daemon's reason with "login backoff cycle failed" thirty seconds later.
 func TestTerminalLoginError(t *testing.T) {

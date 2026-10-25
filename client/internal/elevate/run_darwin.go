@@ -30,7 +30,7 @@ import (
 // been deprecated for many years. Do not use it in a widely distributed product."
 // It is used here anyway, knowingly, because the alternatives Apple offers are for
 // *obtaining* ongoing privileges — an installer package, SMAppService, SMJobBless —
-// and NetBird already has what they would install: a launchd daemon running as
+// and NetBirdy already has what they would install: a launchd daemon running as
 // root. What is missing is only a way for an unprivileged client to ask it to act.
 //
 // The way to that without a deprecated call is to authorize the client instead of
@@ -71,7 +71,7 @@ const rightExecute = "system.privilege.admin"
 // the system's in the dialog. It is about the change rather than the mechanism.
 const (
 	promptKey  = "prompt"
-	promptText = "NetBird needs to change a setting that grants SSH access to this computer."
+	promptText = "NetBirdy needs to change a setting that grants SSH access to this computer."
 )
 
 // OSStatus values from SecBase.h that mean something to us; anything else is

@@ -1,6 +1,6 @@
 {
     "tray.tooltip": {
-        "message": "NetBird"
+        "message": "NetBirdy"
     },
     "tray.status.disconnected": {
         "message": "Отключено"
@@ -51,7 +51,7 @@
         "message": "{count} дней"
     },
     "tray.menu.open": {
-        "message": "Открыть NetBird"
+        "message": "Открыть NetBirdy"
     },
     "tray.menu.connect": {
         "message": "Подключиться"
@@ -105,19 +105,19 @@
         "message": "—"
     },
     "tray.menu.quit": {
-        "message": "Выйти из NetBird"
+        "message": "Выйти из NetBirdy"
     },
     "notify.daemonOutdated.title": {
-        "message": "Служба NetBird устарела"
+        "message": "Служба NetBirdy устарела"
     },
     "notify.daemonOutdated.body": {
-        "message": "Обновите службу NetBird, чтобы использовать это приложение."
+        "message": "Обновите службу NetBirdy, чтобы использовать это приложение."
     },
     "notify.update.title": {
-        "message": "Доступно обновление NetBird"
+        "message": "Доступно обновление NetBirdy"
     },
     "notify.update.body": {
-        "message": "Доступна версия NetBird {version}."
+        "message": "Доступна версия NetBirdy {version}."
     },
     "notify.update.enforcedSuffix": {
         "message": " Ваш администратор требует установить это обновление."
@@ -138,19 +138,19 @@
         "message": "Не удалось обновить выходной узел {name}"
     },
     "notify.sessionExpired.title": {
-        "message": "Сеанс NetBird истёк"
+        "message": "Сеанс NetBirdy истёк"
     },
     "notify.sessionExpired.body": {
-        "message": "Сеанс NetBird истёк. Пожалуйста, войдите снова."
+        "message": "Сеанс NetBirdy истёк. Пожалуйста, войдите снова."
     },
     "notify.sessionWarning.title": {
         "message": "Сеанс скоро истечёт"
     },
     "notify.sessionWarning.body": {
-        "message": "Сеанс NetBird истекает через {remaining}. Нажмите «Продлить сейчас», чтобы продлить сеанс."
+        "message": "Сеанс NetBirdy истекает через {remaining}. Нажмите «Продлить сейчас», чтобы продлить сеанс."
     },
     "notify.sessionWarning.bodyGeneric": {
-        "message": "Сеанс NetBird скоро истечёт. Нажмите «Продлить сейчас», чтобы продлить сеанс."
+        "message": "Сеанс NetBirdy скоро истечёт. Нажмите «Продлить сейчас», чтобы продлить сеанс."
     },
     "notify.sessionWarning.extend": {
         "message": "Продлить сейчас"
@@ -159,10 +159,10 @@
         "message": "Закрыть"
     },
     "notify.sessionWarning.failed": {
-        "message": "Не удалось продлить сеанс NetBird"
+        "message": "Не удалось продлить сеанс NetBirdy"
     },
     "notify.sessionWarning.successTitle": {
-        "message": "Сеанс NetBird продлён"
+        "message": "Сеанс NetBirdy продлён"
     },
     "notify.sessionWarning.successBody": {
         "message": "Сеанс обновлён."
@@ -174,10 +174,10 @@
         "message": "Сервер передал неверный срок действия сеанса. Пожалуйста, войдите снова."
     },
     "notify.mdm.policyApplied.title": {
-        "message": "Настройки NetBird обновлены"
+        "message": "Настройки NetBirdy обновлены"
     },
     "notify.mdm.policyApplied.body": {
-        "message": "Конфигурация NetBird была обновлена в соответствии с вашей ИТ-политикой."
+        "message": "Конфигурация NetBirdy была обновлена в соответствии с вашей ИТ-политикой."
     },
     "common.cancel": {
         "message": "Отмена"
@@ -224,8 +224,8 @@
     "common.loading": {
         "message": "Загрузка…"
     },
-    "common.netbird": {
-        "message": "NetBird"
+    "common.netbirdy": {
+        "message": "NetBirdy"
     },
     "common.noResults.title": {
         "message": "Ничего не найдено"
@@ -237,7 +237,7 @@
         "message": "Отключено"
     },
     "notConnected.description": {
-        "message": "Сначала подключитесь к NetBird, чтобы увидеть подробную информацию о пирах, сетевых ресурсах и выходных узлах."
+        "message": "Сначала подключитесь к NetBirdy, чтобы увидеть подробную информацию о пирах, сетевых ресурсах и выходных узлах."
     },
     "connect.status.disconnected": {
         "message": "Отключено"
@@ -351,7 +351,7 @@
         "message": "Введите имя профиля, например работа или дом"
     },
     "profile.dialog.managementHelp": {
-        "message": "Используйте NetBird Cloud или собственный сервер."
+        "message": "Используйте NetBirdy Cloud или собственный сервер."
     },
     "profile.dialog.urlUnreachable": {
         "message": "Не удалось связаться с сервером. Проверьте URL или всё равно добавьте профиль, если уверены, что он правильный."
@@ -375,7 +375,7 @@
         "message": "Сменить профиль"
     },
     "connect.toggle.label": {
-        "message": "Переключить подключение NetBird"
+        "message": "Переключить подключение NetBirdy"
     },
     "connect.localIp.label": {
         "message": "Локальные IP-адреса"
@@ -471,7 +471,7 @@
         "message": "Профили"
     },
     "settings.profiles.intro": {
-        "message": "Управляйте несколькими профилями NetBird параллельно — например, рабочими и личными учётными записями или разными серверами управления. Ниже можно добавлять профили, отменять их регистрацию и удалять их."
+        "message": "Управляйте несколькими профилями NetBirdy параллельно — например, рабочими и личными учётными записями или разными серверами управления. Ниже можно добавлять профили, отменять их регистрацию и удалять их."
     },
     "settings.profiles.addProfile": {
         "message": "Добавить профиль"
@@ -483,7 +483,7 @@
         "message": "Нет профилей"
     },
     "settings.profiles.emptyDescription": {
-        "message": "Создайте профиль, чтобы подключиться к серверу управления NetBird."
+        "message": "Создайте профиль, чтобы подключиться к серверу управления NetBirdy."
     },
     "settings.error.loadTitle": {
         "message": "Не удалось загрузить настройки"
@@ -543,10 +543,10 @@
         "message": "Показывать уведомления о новых обновлениях и событиях подключения."
     },
     "settings.general.autostart.label": {
-        "message": "Запускать интерфейс NetBird при входе"
+        "message": "Запускать интерфейс NetBirdy при входе"
     },
     "settings.general.autostart.help": {
-        "message": "Автоматически запускать интерфейс NetBird при входе в систему. Это влияет только на графический интерфейс, но не на фоновую службу."
+        "message": "Автоматически запускать интерфейс NetBirdy при входе в систему. Это влияет только на графический интерфейс, но не на фоновую службу."
     },
     "settings.general.autostart.errorTitle": {
         "message": "Не удалось изменить автозапуск"
@@ -555,13 +555,13 @@
         "message": "Оставаться подключённым после выхода"
     },
     "settings.general.keepConnectedOnQuit.help": {
-        "message": "Соединение остаётся активным в фоне после закрытия NetBird. Оно прервётся, только когда вы отключите его сами."
+        "message": "Соединение остаётся активным в фоне после закрытия NetBirdy. Оно прервётся, только когда вы отключите его сами."
     },
     "settings.general.language.label": {
         "message": "Язык интерфейса"
     },
     "settings.general.language.help": {
-        "message": "Выберите язык интерфейса NetBird."
+        "message": "Выберите язык интерфейса NetBirdy."
     },
     "settings.general.language.search": {
         "message": "Поиск языка…"
@@ -588,7 +588,7 @@
         "message": "Сервер управления"
     },
     "settings.general.management.help": {
-        "message": "Подключайтесь к NetBird Cloud или к собственному серверу управления. Изменения вызовут переподключение клиента."
+        "message": "Подключайтесь к NetBirdy Cloud или к собственному серверу управления. Изменения вызовут переподключение клиента."
     },
     "settings.general.management.cloud": {
         "message": "Cloud"
@@ -606,7 +606,7 @@
         "message": "Не удалось связаться с сервером. Проверьте URL или всё равно сохраните, если уверены, что он правильный."
     },
     "settings.general.management.switchCloudTitle": {
-        "message": "Переключиться на NetBird Cloud?"
+        "message": "Переключиться на NetBirdy Cloud?"
     },
     "settings.general.management.switchCloudMessage": {
         "message": "Это отключит ваш собственный сервер.\nВозможно, потребуется войти снова."
@@ -630,7 +630,7 @@
         "message": "Включить DNS"
     },
     "settings.network.dns.help": {
-        "message": "Применять управляемые NetBird настройки DNS к системному резолверу."
+        "message": "Применять управляемые NetBirdy настройки DNS к системному резолверу."
     },
     "settings.network.clientRoutes.label": {
         "message": "Включить клиентские маршруты"
@@ -648,7 +648,7 @@
         "message": "Включить IPv6"
     },
     "settings.network.ipv6.help": {
-        "message": "Использовать IPv6-адресацию для оверлейной сети NetBird."
+        "message": "Использовать IPv6-адресацию для оверлейной сети NetBirdy."
     },
     "settings.security.section.firewall": {
         "message": "Брандмауэр"
@@ -693,7 +693,7 @@
         "message": "Включить SSH-сервер"
     },
     "settings.ssh.server.help": {
-        "message": "Запускать SSH-сервер NetBird на этом хосте, чтобы другие пиры могли к нему подключаться."
+        "message": "Запускать SSH-сервер NetBirdy на этом хосте, чтобы другие пиры могли к нему подключаться."
     },
     "settings.ssh.root.label": {
         "message": "Разрешить вход под root"
@@ -768,7 +768,7 @@
         "message": "Общий ключ"
     },
     "settings.advanced.psk.help": {
-        "message": "Необязательный PSK WireGuard для дополнительного симметричного шифрования. Это не то же самое, что ключ установки NetBird. Вы будете обмениваться данными только с пирами, использующими тот же общий ключ."
+        "message": "Необязательный PSK WireGuard для дополнительного симметричного шифрования. Это не то же самое, что ключ установки NetBirdy. Вы будете обмениваться данными только с пирами, использующими тот же общий ключ."
     },
     "settings.troubleshooting.section.title": {
         "message": "Отладочный пакет"
@@ -798,10 +798,10 @@
         "message": "Включить ОС, ядро, сетевые интерфейсы и таблицы маршрутизации."
     },
     "settings.troubleshooting.upload.label": {
-        "message": "Загрузить пакет на серверы NetBird"
+        "message": "Загрузить пакет на серверы NetBirdy"
     },
     "settings.troubleshooting.upload.help": {
-        "message": "Возвращает ключ загрузки, который можно передать поддержке NetBird."
+        "message": "Возвращает ключ загрузки, который можно передать поддержке NetBirdy."
     },
     "settings.troubleshooting.trace.label": {
         "message": "Включить журналы TRACE"
@@ -846,7 +846,7 @@
         "message": "Пакет сохранён"
     },
     "settings.troubleshooting.done.uploadedDescription": {
-        "message": "Поделитесь ключом загрузки ниже с <docs>поддержкой NetBird</docs>. Локальная копия также сохранена на вашем устройстве."
+        "message": "Поделитесь ключом загрузки ниже с <docs>поддержкой NetBirdy</docs>. Локальная копия также сохранена на вашем устройстве."
     },
     "settings.troubleshooting.done.savedDescription": {
         "message": "Отладочный пакет сохранён локально."
@@ -867,7 +867,7 @@
         "message": "Не удалось загрузить. Пакет всё равно сохранён локально."
     },
     "settings.troubleshooting.stage.reconnecting": {
-        "message": "Переподключение NetBird…"
+        "message": "Переподключение NetBirdy…"
     },
     "settings.troubleshooting.stage.capturing": {
         "message": "Сбор отладочных журналов"
@@ -876,16 +876,16 @@
         "message": "Создание отладочного пакета…"
     },
     "settings.troubleshooting.stage.uploading": {
-        "message": "Загрузка в NetBird…"
+        "message": "Загрузка в NetBirdy…"
     },
     "settings.troubleshooting.stage.cancelling": {
         "message": "Отмена…"
     },
     "settings.about.client": {
-        "message": "Клиент NetBird v{version}"
+        "message": "Клиент NetBirdy v{version}"
     },
     "settings.about.clientName": {
-        "message": "Клиент NetBird"
+        "message": "Клиент NetBirdy"
     },
     "settings.about.development": {
         "message": "[Разработка]"
@@ -897,7 +897,7 @@
         "message": "GUI"
     },
     "settings.about.copyright": {
-        "message": "© {year} NetBird. Все права защищены."
+        "message": "© {year} NetBirdy. Все права защищены."
     },
     "settings.about.links.imprint": {
         "message": "Правовая информация"
@@ -927,7 +927,7 @@
         "message": "Обратная связь"
     },
     "update.banner.message": {
-        "message": "NetBird {version} готов к установке."
+        "message": "NetBirdy {version} готов к установке."
     },
     "update.banner.later": {
         "message": "Позже"
@@ -951,7 +951,7 @@
         "message": "Загрузить"
     },
     "update.card.autoCheckInterval": {
-        "message": "NetBird проверяет обновления в фоновом режиме."
+        "message": "NetBirdy проверяет обновления в фоновом режиме."
     },
     "update.card.changelog": {
         "message": "Список изменений"
@@ -963,13 +963,13 @@
         "message": "Доступно обновление"
     },
     "update.overlay.updatingVersion": {
-        "message": "Обновление NetBird до v{version}"
+        "message": "Обновление NetBirdy до v{version}"
     },
     "update.overlay.updating": {
-        "message": "Обновление NetBird"
+        "message": "Обновление NetBirdy"
     },
     "update.overlay.description": {
-        "message": "Доступна более новая версия, идёт её установка. NetBird автоматически перезапустится после завершения обновления."
+        "message": "Доступна более новая версия, идёт её установка. NetBirdy автоматически перезапустится после завершения обновления."
     },
     "update.overlay.error.timeoutTitle": {
         "message": "Обновление занимает слишком много времени"
@@ -1059,22 +1059,22 @@
         "message": "Обновление"
     },
     "window.title.welcome": {
-        "message": "Добро пожаловать в NetBird"
+        "message": "Добро пожаловать в NetBirdy"
     },
     "window.title.error": {
         "message": "Ошибка"
     },
     "welcome.title": {
-        "message": "Найдите NetBird в системном трее"
+        "message": "Найдите NetBirdy в системном трее"
     },
     "welcome.titleMac": {
-        "message": "Найдите NetBird в строке меню"
+        "message": "Найдите NetBirdy в строке меню"
     },
     "welcome.description": {
-        "message": "NetBird находится в системном трее. Нажмите на значок, чтобы подключиться, переключить профиль или открыть настройки."
+        "message": "NetBirdy находится в системном трее. Нажмите на значок, чтобы подключиться, переключить профиль или открыть настройки."
     },
     "welcome.descriptionMac": {
-        "message": "NetBird находится в строке меню. Нажмите на значок, чтобы подключиться, переключить профиль или открыть настройки."
+        "message": "NetBirdy находится в строке меню. Нажмите на значок, чтобы подключиться, переключить профиль или открыть настройки."
     },
     "welcome.continue": {
         "message": "Продолжить"
@@ -1083,13 +1083,13 @@
         "message": "Назад"
     },
     "welcome.management.title": {
-        "message": "Настройка NetBird"
+        "message": "Настройка NetBirdy"
     },
     "welcome.management.description": {
-        "message": "Нажмите «Продолжить», чтобы начать, или выберите «Собственный сервер», если у вас есть свой сервер NetBird."
+        "message": "Нажмите «Продолжить», чтобы начать, или выберите «Собственный сервер», если у вас есть свой сервер NetBirdy."
     },
     "welcome.management.cloud.title": {
-        "message": "NetBird Cloud"
+        "message": "NetBirdy Cloud"
     },
     "welcome.management.cloud.description": {
         "message": "Используйте наш облачный сервис. Настройка не требуется."
@@ -1185,10 +1185,10 @@
         "message": "Домен"
     },
     "peers.details.netbirdIp": {
-        "message": "NetBird IP"
+        "message": "NetBirdy IP"
     },
     "peers.details.netbirdIpv6": {
-        "message": "NetBird IPv6"
+        "message": "NetBirdy IPv6"
     },
     "peers.details.publicKey": {
         "message": "Открытый ключ"
@@ -1323,7 +1323,7 @@
         "message": "Отключиться"
     },
     "daemon.unavailable.title": {
-        "message": "Служба NetBird не запущена"
+        "message": "Служба NetBirdy не запущена"
     },
     "daemon.unavailable.description": {
         "message": "Приложение автоматически переподключится, как только служба будет запущена."
@@ -1332,7 +1332,7 @@
         "message": "Документация"
     },
     "daemon.outdated.title": {
-        "message": "Клиент NetBird устарел"
+        "message": "Клиент NetBirdy устарел"
     },
     "daemon.outdated.description": {
         "message": "Новый GUI несовместим с вашим более старым клиентом. Обновите клиент, чтобы использовать новое приложение."
@@ -1359,7 +1359,7 @@
         "message": "Сервер отклонил вход."
     },
     "error.daemon_unreachable": {
-        "message": "Демон NetBird не отвечает. Проверьте, запущена ли служба."
+        "message": "Демон NetBirdy не отвечает. Проверьте, запущена ли служба."
     },
     "error.settings_locked": {
         "message": "Настройки на этом устройстве изменить нельзя: администратор заблокировал их."
@@ -1371,7 +1371,7 @@
         "message": "Не удалось выполнить операцию."
     },
     "error.elevation_unavailable": {
-        "message": "NetBird не смог запросить у этой системы нужные права. Выполните вместо этого:"
+        "message": "NetBirdy не смог запросить у этой системы нужные права. Выполните вместо этого:"
     },
     "error.elevation_failed": {
         "message": "Не удалось применить изменение с повышенными правами. Выполните вместо этого:"

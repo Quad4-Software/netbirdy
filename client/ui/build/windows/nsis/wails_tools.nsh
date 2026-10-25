@@ -5,19 +5,19 @@
 !include "FileFunc.nsh"
 
 !ifndef INFO_PROJECTNAME
-    !define INFO_PROJECTNAME "netbird-ui"
+    !define INFO_PROJECTNAME "netbirdy-ui"
 !endif
 !ifndef INFO_COMPANYNAME
-    !define INFO_COMPANYNAME "NetBird"
+    !define INFO_COMPANYNAME "NetBirdy"
 !endif
 !ifndef INFO_PRODUCTNAME
-    !define INFO_PRODUCTNAME "NetBird"
+    !define INFO_PRODUCTNAME "NetBirdy"
 !endif
 !ifndef INFO_PRODUCTVERSION
     !define INFO_PRODUCTVERSION "0.0.1"
 !endif
 !ifndef INFO_COPYRIGHT
-    !define INFO_COPYRIGHT "NetBird GmbH"
+    !define INFO_COPYRIGHT "NetBirdy GmbH"
 !endif
 !ifndef PRODUCT_EXECUTABLE
     !define PRODUCT_EXECUTABLE "${INFO_PROJECTNAME}.exe"

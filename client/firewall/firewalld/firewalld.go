@@ -1,4 +1,4 @@
-// Package firewalld integrates with the firewalld daemon so NetBird can place
+// Package firewalld integrates with the firewalld daemon so NetBirdy can place
 // its wg interface into firewalld's "trusted" zone. This is required because
 // firewalld's nftables chains are created with NFT_CHAIN_OWNER on recent
 // versions, which returns EPERM to any other process that tries to insert

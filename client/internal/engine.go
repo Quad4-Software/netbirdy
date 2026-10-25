@@ -9,6 +9,7 @@ import (
 	"net/netip"
 	"net/url"
 	"os"
+	"path/filepath"
 	"runtime"
 	"slices"
 	"sort"
@@ -113,7 +114,7 @@ type EngineConfig struct {
 	WgPort      int
 	WgIfaceName string
 
-	// WgAddr is the Wireguard local address (Netbird Network IP).
+	// WgAddr is the Wireguard local address (NetBirdy Network IP).
 	// Contains both v4 and optional v6 overlay addresses.
 	WgAddr wgaddr.Address
 
@@ -309,9 +310,29 @@ type Engine struct {
 	// what marks persistence as active. The backend (disk or memory) is
 	// selected per-platform; see the syncstore package. syncStoreDir is where
 	// a disk-backed store serializes to.
-	syncRespMux  sync.RWMutex
-	syncStore    syncstore.Store
+	syncRespMux sync.RWMutex
+	syncStore   syncstore.Store
+
+	// offline marks the engine as running from a cached network map: Sync,
+	// signal negotiation and relay refresh are skipped in Start.
+	offline               bool
+	offlineProtectedHosts map[string]struct{}
 	syncStoreDir string
+
+	// lastAppliedNetworkMap is the most recently applied network map.
+	lastAppliedNetworkMap *mgmProto.NetworkMap
+
+	// lastAppliedSync is the most recently applied SyncResponse; the
+	// offline debouncer re-saves it when a peer's direct endpoint lands.
+	lastAppliedSync *mgmProto.SyncResponse
+
+	// offlinePeerEndpoints holds last-known direct endpoints per peer key.
+	offlinePeerEndpoints map[string]string
+
+	// offlineDebouncer rate-limits networkmap.bin snapshot writes (at most
+	// one per 5s); nil until the engine starts.
+	offlineDebouncer *offlineDebouncer
+	offlineLogGate   atomic.Int64
 
 	flowManager nftypes.FlowManager
 
@@ -377,34 +398,36 @@ func NewEngine(
 	// than in Start.
 	ctx, cancel := context.WithCancel(clientCtx)
 	engine := &Engine{
-		clientCtx:          clientCtx,
-		clientCancel:       clientCancel,
-		ctx:                ctx,
-		cancel:             cancel,
-		signal:             services.SignalClient,
-		signaler:           peer.NewSignaler(services.SignalClient, config.WgPrivateKey),
-		mgmClient:          services.MgmClient,
-		relayManager:       services.RelayManager,
-		peerStore:          peerstore.NewConnStore(),
-		wgDetector:         stdnet.NewWGDetector(config.WgIfaceName),
-		syncMsgMux:         &sync.Mutex{},
-		config:             config,
-		mobileDep:          mobileDep,
-		netMgr:             services.NetMgr,
-		STUNs:              []*stun.URI{},
-		TURNs:              []*stun.URI{},
-		networkSerial:      0,
-		statusRecorder:     services.StatusRecorder,
-		stateManager:       services.StateManager,
-		portForwardManager: portforward.NewManager(),
-		checks:             services.Checks,
-		certWake:           make(chan struct{}, 1),
-		probeStunTurn:      relay.NewStunTurnProbe(relay.DefaultCacheTTL),
-		jobExecutor:        jobexec.NewExecutor(),
-		clientMetrics:      services.ClientMetrics,
-		metricsCtx:         services.MetricsCtx,
-		updateManager:      services.UpdateManager,
-		syncStoreDir:       config.StateDir,
+		clientCtx:            clientCtx,
+		clientCancel:         clientCancel,
+		ctx:                  ctx,
+		cancel:               cancel,
+		signal:               services.SignalClient,
+		signaler:             peer.NewSignaler(services.SignalClient, config.WgPrivateKey),
+		mgmClient:            services.MgmClient,
+		relayManager:         services.RelayManager,
+		peerStore:            peerstore.NewConnStore(),
+		offlinePeerEndpoints: map[string]string{},
+		wgDetector:           stdnet.NewWGDetector(config.WgIfaceName),
+		syncMsgMux:           &sync.Mutex{},
+		config:               config,
+		mobileDep:            mobileDep,
+		netMgr:               services.NetMgr,
+		STUNs:                []*stun.URI{},
+		TURNs:                []*stun.URI{},
+		networkSerial:        0,
+		statusRecorder:       services.StatusRecorder,
+		stateManager:         services.StateManager,
+		portForwardManager:   portforward.NewManager(),
+		checks:               services.Checks,
+		certWake:             make(chan struct{}, 1),
+		probeStunTurn:        relay.NewStunTurnProbe(relay.DefaultCacheTTL),
+		jobExecutor:          jobexec.NewExecutor(),
+		clientMetrics:        services.ClientMetrics,
+		metricsCtx:           services.MetricsCtx,
+		updateManager:        services.UpdateManager,
+		syncStoreDir:         config.StateDir,
+		offlineDebouncer:     nil,
 	}
 	// sessionWatcher keeps the SubscribeStatus consumers in sync with the
 	// session expiry deadline. Deadline-change ticks come for free via
@@ -424,7 +447,7 @@ func NewEngine(
 
 func (e *Engine) Stop() error {
 	if e == nil {
-		// this seems to be a very odd case but there was the possibility if the netbird down command comes before the engine is fully started
+		// this seems to be a very odd case but there was the possibility if the netbirdy down command comes before the engine is fully started
 		log.Debugf("tried stopping engine that is nil")
 		return nil
 	}
@@ -444,7 +467,7 @@ func (e *Engine) Stop() error {
 		log.Warnf("shutdown timeout exceeded after %v, some goroutines may still be running", timeout)
 	}
 
-	log.Infof("stopped Netbird Engine")
+	log.Infof("stopped NetBirdy Engine")
 
 	return nil
 }
@@ -708,6 +731,12 @@ func (e *Engine) Start(netbirdConfig *mgmProto.NetbirdConfig, mgmtURL *url.URL) 
 	iceCfg := e.createICEConfig()
 
 	e.connMgr = NewConnMgr(e.config, e.statusRecorder, e.peerStore, wgIface)
+	peer.SetDirectEndpointHook(func(key, endpoint string) {
+		e.offlinePeerEndpoints[key] = endpoint
+		if e.lastAppliedSync != nil {
+			e.scheduleOfflineSnapshot(e.lastAppliedSync)
+		}
+	})
 	e.connMgr.SetRoutedIPsReconciler(func(peerKey string) error {
 		if e.routeManager == nil {
 			return nil
@@ -727,13 +756,20 @@ func (e *Engine) Start(netbirdConfig *mgmProto.NetbirdConfig, mgmtURL *url.URL) 
 	})
 
 	e.srWatcher = guard.NewSRWatcher(e.signal, e.relayManager, e.mobileDep.IFaceDiscover, iceCfg)
-	e.srWatcher.Start(peer.IsForceRelayed())
 
-	if err = e.receiveSignalEvents(); err != nil {
-		return err
+	if e.offline {
+		// Cached-map mode: signal and management are unreachable by
+		// definition, so the ICE watcher and the event receivers stay off.
+		log.Warnf("engine running offline from a cached network map")
+	} else {
+		e.srWatcher.Start(peer.IsForceRelayed())
+
+		if err = e.receiveSignalEvents(); err != nil {
+			return err
+		}
+		e.receiveManagementEvents()
+		e.receiveJobEvents()
 	}
-	e.receiveManagementEvents()
-	e.receiveJobEvents()
 
 	// starting network monitor at the very last to avoid disruptions
 	e.startNetworkMonitor()
@@ -1111,6 +1147,20 @@ func (e *Engine) handleSync(update *mgmProto.SyncResponse) error {
 	if err := e.updateNetworkMap(nm); err != nil {
 		return err
 	}
+	e.lastAppliedNetworkMap = nm
+	e.lastAppliedSync = update
+
+	// Keep a local copy of the applied sync so a restart with an
+	// unreachable management server can re-apply it. Keepalive-style
+	// responses carry no network map and must not clobber the snapshot.
+	if nm != nil {
+		e.scheduleOfflineSnapshot(update)
+		if nm.GetRemotePeersIsEmpty() {
+			// Peer list was emptied by the server: this peer is gone, the
+			// cached map would resurrect deleted peers.
+			_ = deleteOfflineSnapshot(e.offlineSnapshotFile())
+		}
+	}
 
 	e.statusRecorder.PublishEvent(cProto.SystemEvent_INFO, cProto.SystemEvent_SYSTEM, "Network map updated", "", nil)
 
@@ -1130,7 +1180,7 @@ func extractDNSDomainFromFQDN(fqdn string) string {
 	return ""
 }
 
-// updateNetbirdConfig applies the management-provided NetBird configuration:
+// updateNetbirdConfig applies the management-provided NetBirdy configuration:
 // STUN/TURN and relay servers, flow logging and DNS settings. A nil config is a no-op,
 // which is the case for sync updates carrying only a network map.
 func (e *Engine) updateNetbirdConfig(wCfg *mgmProto.NetbirdConfig) error {
@@ -1646,6 +1696,9 @@ func (e *Engine) updateNetworkMap(networkMap *mgmProto.NetworkMap) error {
 	}
 
 	dnsConfig := toDNSConfig(protoDNSConfig, e.wgInterface.Address())
+	if e.offline {
+		dnsConfig.NameServerGroups = filterOfflineNSGroups(dnsConfig.NameServerGroups, e.offlineProtectedHosts)
+	}
 
 	done := e.phase("dns_server")
 	if err := e.dnsServer.UpdateDNSServer(serial, dnsConfig); err != nil {
@@ -2184,7 +2237,7 @@ func (e *Engine) close() {
 		e.afpacketCapture = nil
 	}
 
-	log.Debugf("removing Netbird interface %s", e.config.WgIfaceName)
+	log.Debugf("removing NetBirdy interface %s", e.config.WgIfaceName)
 
 	if e.wgInterface != nil {
 		// Drop the handle before the close starts: a retune that loads it
@@ -2192,7 +2245,7 @@ func (e *Engine) close() {
 		// for an engine that is already gone.
 		e.wgDevice.Store(nil)
 		if err := e.wgInterface.Close(); err != nil {
-			log.Errorf("failed closing Netbird interface %s %v", e.config.WgIfaceName, err)
+			log.Errorf("failed closing NetBirdy interface %s %v", e.config.WgIfaceName, err)
 		}
 		e.wgInterface = nil
 		e.statusRecorder.SetWgIface(nil)
@@ -2535,6 +2588,41 @@ func (e *Engine) SetSyncResponsePersistence(enabled bool) {
 	}
 
 	e.syncStore = syncstore.New(e.syncStoreDir)
+}
+
+// offlineSnapshotFile is the path of the last-known-sync snapshot, stored
+// next to state.json and config.json.
+func (e *Engine) offlineSnapshotFile() string {
+	return filepath.Join(e.syncStoreDir, "networkmap.bin")
+}
+
+// scheduleOfflineSnapshot persists the applied sync response at most once
+// every 5s in the background. Write failures are logged at debug level once
+// per minute at most. Disabled when NB_OFFLINE_MAX_AGE is 0.
+func (e *Engine) scheduleOfflineSnapshot(update *mgmProto.SyncResponse) {
+	if OfflineMaxAge() <= 0 {
+		return
+	}
+	if e.offlineDebouncer == nil {
+		path := e.offlineSnapshotFile()
+		e.offlineDebouncer = newOfflineDebouncer(5*time.Second, func() error {
+			// Merge last-known direct endpoints: captured values win for
+			// connected peers, previously saved values fill gaps.
+			peerKeys := make(map[string]struct{}, len(e.peerStore.PeersPubKey()))
+			for _, k := range e.peerStore.PeersPubKey() {
+				peerKeys[k] = struct{}{}
+			}
+			merged := mergeEndpoints(LastEndpoints(), e.offlinePeerEndpoints, peerKeys)
+			return saveOfflineSnapshot(path, update, merged, time.Now())
+		}, func(err error) {
+			if now := time.Now().UnixNano(); now-e.offlineLogGate.Load() > int64(time.Minute) {
+				if e.offlineLogGate.CompareAndSwap(e.offlineLogGate.Load(), now) {
+					log.Debugf("offline snapshot write failed: %v", err)
+				}
+			}
+		})
+	}
+	e.offlineDebouncer.Save()
 }
 
 // GetLatestSyncResponse returns the stored sync response if persistence is enabled

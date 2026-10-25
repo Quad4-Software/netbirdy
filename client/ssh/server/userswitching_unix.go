@@ -179,7 +179,7 @@ func (s *Server) getSupplementaryGroups(u *user.User) ([]uint32, error) {
 	return groups, nil
 }
 
-// createExecutorCommand creates a command that spawns netbird ssh exec for privilege dropping.
+// createExecutorCommand creates a command that spawns netbirdy ssh exec for privilege dropping.
 // Returns the command and a cleanup function (no-op on Unix).
 func (s *Server) createExecutorCommand(logger *log.Entry, session ssh.Session, localUser *user.User, hasPty bool) (*exec.Cmd, func(), error) {
 	logger.Debugf("creating executor command for user %s (Pty: %v)", localUser.Username, hasPty)

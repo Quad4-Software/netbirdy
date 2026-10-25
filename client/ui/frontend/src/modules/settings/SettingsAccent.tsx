@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
-import netbirdLogo from "@/assets/logos/netbird.svg";
+import netbirdLogo from "@/assets/logos/netbirdy.svg";
 
 const scratch = new Uint32Array(1);
 

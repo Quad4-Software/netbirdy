@@ -5,18 +5,18 @@ usage() {
   cat <<'EOF'
 Usage: client/test/json-socket-docker.sh [tcp|unix|both]
 
-Builds the NetBird client Docker image from the local source tree, starts
-`netbird service run` in a container with --enable-json-socket, and verifies
+Builds the NetBirdy client Docker image from the local source tree, starts
+`netbirdy service run` in a container with --enable-json-socket, and verifies
 that the HTTP/JSON daemon gateway responds to Status requests.
 
 Modes:
   tcp   Validate tcp://0.0.0.0:8080 via a published localhost port (default)
-  unix  Validate unix:///sock/netbird-http.sock via a bind-mounted socket dir
+  unix  Validate unix:///sock/netbirdy-http.sock via a bind-mounted socket dir
   both  Run both validations
 
 Environment:
   CONTAINER_RUNTIME  docker or podman. Auto-detected if unset.
-  IMAGE              Image tag to build. Default: netbird-json-socket-test:local
+  IMAGE              Image tag to build. Default: netbirdy-json-socket-test:local
   TARGETARCH         Go/Docker target arch. Default: `go env GOARCH`
   PLATFORM           Docker platform. Default: linux/$TARGETARCH
   WAIT_TIMEOUT       Seconds to wait for the JSON socket. Default: 30
@@ -60,7 +60,7 @@ if ! command -v curl >/dev/null 2>&1; then
 fi
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
-IMAGE="${IMAGE:-netbird-json-socket-test:local}"
+IMAGE="${IMAGE:-netbirdy-json-socket-test:local}"
 TARGETARCH="${TARGETARCH:-$(go env GOARCH)}"
 PLATFORM="${PLATFORM:-linux/${TARGETARCH}}"
 WAIT_TIMEOUT="${WAIT_TIMEOUT:-30}"
@@ -78,17 +78,17 @@ cleanup() {
 trap cleanup EXIT
 
 build_image() {
-  echo "==> Building Linux ${TARGETARCH} netbird binary"
+  echo "==> Building Linux ${TARGETARCH} netbirdy binary"
   mkdir -p "${TMP_DIR}/context/client"
   cp "${ROOT_DIR}/client/Dockerfile" "${TMP_DIR}/context/Dockerfile"
-  cp "${ROOT_DIR}/client/netbird-entrypoint.sh" "${TMP_DIR}/context/client/netbird-entrypoint.sh"
+  cp "${ROOT_DIR}/client/netbirdy-entrypoint.sh" "${TMP_DIR}/context/client/netbirdy-entrypoint.sh"
 
-  (cd "${ROOT_DIR}" && CGO_ENABLED=0 GOOS=linux GOARCH="${TARGETARCH}" go build -o "${TMP_DIR}/context/netbird" ./client)
+  (cd "${ROOT_DIR}" && CGO_ENABLED=0 GOOS=linux GOARCH="${TARGETARCH}" go build -o "${TMP_DIR}/context/netbirdy" ./client)
 
   echo "==> Building ${IMAGE} for ${PLATFORM}"
   "${RUNTIME}" build \
     --platform "${PLATFORM}" \
-    --build-arg NETBIRD_BINARY=netbird \
+    --build-arg NETBIRD_BINARY=netbirdy \
     -t "${IMAGE}" \
     -f "${TMP_DIR}/context/Dockerfile" \
     "${TMP_DIR}/context"
@@ -172,8 +172,8 @@ run_netbird_container() {
   CONTAINERS+=("${container}")
   "${RUNTIME}" run --rm -d \
     --name "${container}" \
-    -e NB_STATE_DIR=/tmp/netbird-state \
-    --entrypoint /usr/local/bin/netbird \
+    -e NB_STATE_DIR=/tmp/netbirdy-state \
+    --entrypoint /usr/local/bin/netbirdy \
     "$@" \
     "${IMAGE}" \
     --log-file console \
@@ -196,12 +196,12 @@ run_tcp_test() {
 run_unix_test() {
   local sock_dir sock_path container
   sock_dir="${TMP_DIR}/sock"
-  sock_path="${sock_dir}/netbird-http.sock"
+  sock_path="${sock_dir}/netbirdy-http.sock"
   container="nb-json-socket-unix-$RANDOM-$RANDOM"
   mkdir -p "${sock_dir}"
 
   echo "==> Validating Unix JSON socket at ${sock_path}"
-  run_netbird_container "${container}" "unix:///sock/netbird-http.sock" -v "${sock_dir}:/sock"
+  run_netbird_container "${container}" "unix:///sock/netbirdy-http.sock" -v "${sock_dir}:/sock"
   wait_for_http_status "${container}" --unix-socket "${sock_path}" "http://unix/daemon.DaemonService/Status"
 }
 

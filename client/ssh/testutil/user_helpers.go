@@ -147,7 +147,7 @@ func CreateWindowsTestUser(t *testing.T, username string) bool {
 	psCmd := fmt.Sprintf(`
 		try {
 			$password = ConvertTo-SecureString "TestPassword123!" -AsPlainText -Force
-			New-LocalUser -Name "%s" -Password $password -Description "NetBird test user" -UserMayNotChangePassword -PasswordNeverExpires
+			New-LocalUser -Name "%s" -Password $password -Description "NetBirdy test user" -UserMayNotChangePassword -PasswordNeverExpires
 			Add-LocalGroupMember -Group "Users" -Member "%s"
 			Write-Output "User created successfully"
 		} catch {

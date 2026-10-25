@@ -1,6 +1,6 @@
 {
     "tray.tooltip": {
-        "message": "NetBird"
+        "message": "NetBirdy"
     },
     "tray.status.disconnected": {
         "message": "מנותק"
@@ -51,7 +51,7 @@
         "message": "{count} ימים"
     },
     "tray.menu.open": {
-        "message": "פתיחת NetBird"
+        "message": "פתיחת NetBirdy"
     },
     "tray.menu.connect": {
         "message": "התחברות"
@@ -105,19 +105,19 @@
         "message": "—"
     },
     "tray.menu.quit": {
-        "message": "יציאה מ־NetBird"
+        "message": "יציאה מ־NetBirdy"
     },
     "notify.daemonOutdated.title": {
-        "message": "שירות NetBird אינו עדכני"
+        "message": "שירות NetBirdy אינו עדכני"
     },
     "notify.daemonOutdated.body": {
-        "message": "יש לעדכן את שירות NetBird כדי להשתמש ביישום הזה."
+        "message": "יש לעדכן את שירות NetBirdy כדי להשתמש ביישום הזה."
     },
     "notify.update.title": {
-        "message": "יש עדכון ל־NetBird"
+        "message": "יש עדכון ל־NetBirdy"
     },
     "notify.update.body": {
-        "message": "יצא NetBird {version}."
+        "message": "יצא NetBirdy {version}."
     },
     "notify.update.enforcedSuffix": {
         "message": " הנהלת המערכת דורשת ממך לעדכן לגרסה הזאת."
@@ -138,19 +138,19 @@
         "message": "עדכון נקודת היציאה {name} נכשל"
     },
     "notify.sessionExpired.title": {
-        "message": "תוקף הפעלת NetBird פג"
+        "message": "תוקף הפעלת NetBirdy פג"
     },
     "notify.sessionExpired.body": {
-        "message": "תוקף הפעלת ה־NetBird שלך פג. נא להיכנס למערכת שוב."
+        "message": "תוקף הפעלת ה־NetBirdy שלך פג. נא להיכנס למערכת שוב."
     },
     "notify.sessionWarning.title": {
         "message": "תוקף ההפעלה יפוג בקרוב"
     },
     "notify.sessionWarning.body": {
-        "message": "הפעלת ה־NetBird שלך תפוג בעוד {remaining}. לחיצה על להאריך כעת תחדש אותה."
+        "message": "הפעלת ה־NetBirdy שלך תפוג בעוד {remaining}. לחיצה על להאריך כעת תחדש אותה."
     },
     "notify.sessionWarning.bodyGeneric": {
-        "message": "תוקף הפעלת ה־NetBird שלך עומד לפוג. לחיצה על להאריך כעת תחדש אותו."
+        "message": "תוקף הפעלת ה־NetBirdy שלך עומד לפוג. לחיצה על להאריך כעת תחדש אותו."
     },
     "notify.sessionWarning.extend": {
         "message": "להאריך כעת"
@@ -159,10 +159,10 @@
         "message": "התעלמות"
     },
     "notify.sessionWarning.failed": {
-        "message": "הארכת ההפעלה של NetBird נכשלה"
+        "message": "הארכת ההפעלה של NetBirdy נכשלה"
     },
     "notify.sessionWarning.successTitle": {
-        "message": "ההפעלה של NetBird הוארכה"
+        "message": "ההפעלה של NetBirdy הוארכה"
     },
     "notify.sessionWarning.successBody": {
         "message": "ההפעלה שלך התרעננה."
@@ -174,10 +174,10 @@
         "message": "השרת שלח מועד סיום שגוי להפעלה. נא להיכנס שוב למערכת."
     },
     "notify.mdm.policyApplied.title": {
-        "message": "ההגדרות של NetBird עודכנו"
+        "message": "ההגדרות של NetBirdy עודכנו"
     },
     "notify.mdm.policyApplied.body": {
-        "message": "הגדרות ה־NetBird שלך עודכנו על ידי מדיניות צוות המחשוב שלך."
+        "message": "הגדרות ה־NetBirdy שלך עודכנו על ידי מדיניות צוות המחשוב שלך."
     },
     "common.cancel": {
         "message": "ביטול"
@@ -224,8 +224,8 @@
     "common.loading": {
         "message": "בטעינה…"
     },
-    "common.netbird": {
-        "message": "NetBird"
+    "common.netbirdy": {
+        "message": "NetBirdy"
     },
     "common.noResults.title": {
         "message": "לא ניתן למצוא תוצאות כלשהן."
@@ -237,7 +237,7 @@
         "message": "מנותק"
     },
     "notConnected.description": {
-        "message": "יש להתחבר ל־NetBird תחילה כדי לצפות במידע מפורט על העמיתים, משאבי הרשת ונקודות היציאה שלך."
+        "message": "יש להתחבר ל־NetBirdy תחילה כדי לצפות במידע מפורט על העמיתים, משאבי הרשת ונקודות היציאה שלך."
     },
     "connect.status.disconnected": {
         "message": "מנותק"
@@ -351,7 +351,7 @@
         "message": "נא למלא שם לפרופיל, למשל: עבודה, בית"
     },
     "profile.dialog.managementHelp": {
-        "message": "אפשר להשתמש בענן של NetBird או בשרת משלך."
+        "message": "אפשר להשתמש בענן של NetBirdy או בשרת משלך."
     },
     "profile.dialog.urlUnreachable": {
         "message": "לא ניתן להגיע לשרת. נא לבדוק שהכתובת נכונה או להוסיף את הפרופיל בכל זאת אם ברור לך שהיא נכונה."
@@ -375,7 +375,7 @@
         "message": "החלפת פרופיל"
     },
     "connect.toggle.label": {
-        "message": "החלפת מצב חיבור NetBird"
+        "message": "החלפת מצב חיבור NetBirdy"
     },
     "connect.localIp.label": {
         "message": "כתובות IP מקומיות"
@@ -471,7 +471,7 @@
         "message": "פרופילים"
     },
     "settings.profiles.intro": {
-        "message": "ניתן להחזיק את זהויות ה־NetBird הנפרדות זו לצד זו, למשל חשבון עבודה וחשבון פרטי או שרתי ניהול שונים. אפשר להוסיף, לבטל רישום או למחוק פרופילים להלן."
+        "message": "ניתן להחזיק את זהויות ה־NetBirdy הנפרדות זו לצד זו, למשל חשבון עבודה וחשבון פרטי או שרתי ניהול שונים. אפשר להוסיף, לבטל רישום או למחוק פרופילים להלן."
     },
     "settings.profiles.addProfile": {
         "message": "הוספת פרופיל"
@@ -483,7 +483,7 @@
         "message": "אין פרופילים"
     },
     "settings.profiles.emptyDescription": {
-        "message": "יש ליצור פרופיל כדי להתחבר לשרת ניהול של NetBird."
+        "message": "יש ליצור פרופיל כדי להתחבר לשרת ניהול של NetBirdy."
     },
     "settings.error.loadTitle": {
         "message": "טעינת ההגדרות נכשלה"
@@ -543,10 +543,10 @@
         "message": "להציג התראות שולחן עבודה על עדכונים חדשים ואירועי חיבור."
     },
     "settings.general.autostart.label": {
-        "message": "להפעיל את ממשק המשתמש של NetBird עם הכניסה למערכת"
+        "message": "להפעיל את ממשק המשתמש של NetBirdy עם הכניסה למערכת"
     },
     "settings.general.autostart.help": {
-        "message": "להפעיל את הממשק של NetBird אוטומטית עם הכניסה. הפעולה הזאת משפיעה על הממשק הגרפי בלבד, לא על שירות הרקע."
+        "message": "להפעיל את הממשק של NetBirdy אוטומטית עם הכניסה. הפעולה הזאת משפיעה על הממשק הגרפי בלבד, לא על שירות הרקע."
     },
     "settings.general.autostart.errorTitle": {
         "message": "שינוי בהפעלה האוטומטית נכשל"
@@ -555,13 +555,13 @@
         "message": "להשאיר את החיבור לאחר היציאה"
     },
     "settings.general.keepConnectedOnQuit.help": {
-        "message": "החיבור נשאר פעיל ברקע לאחר סגירת NetBird. הוא נקטע רק כשבחרת לנתק אותו בעצמך."
+        "message": "החיבור נשאר פעיל ברקע לאחר סגירת NetBirdy. הוא נקטע רק כשבחרת לנתק אותו בעצמך."
     },
     "settings.general.language.label": {
         "message": "שפת התצוגה"
     },
     "settings.general.language.help": {
-        "message": "בחירת שפת הממשק של NetBird."
+        "message": "בחירת שפת הממשק של NetBirdy."
     },
     "settings.general.language.search": {
         "message": "חיפוש שפה…"
@@ -588,7 +588,7 @@
         "message": "שרת ניהול"
     },
     "settings.general.management.help": {
-        "message": "אפשר להתחבר לענן של NetBird או לשרת ניהול באירוח שלך. שינויים יחברו את הלקוח מחדש."
+        "message": "אפשר להתחבר לענן של NetBirdy או לשרת ניהול באירוח שלך. שינויים יחברו את הלקוח מחדש."
     },
     "settings.general.management.cloud": {
         "message": "ענן"
@@ -606,7 +606,7 @@
         "message": "לא ניתן להגיע לשרת הזה. נא לבדוק את הכתובת או לשמור בכל זאת אם ברור לך שהיא נכונה."
     },
     "settings.general.management.switchCloudTitle": {
-        "message": "לעבור לענן NetBird?"
+        "message": "לעבור לענן NetBirdy?"
     },
     "settings.general.management.switchCloudMessage": {
         "message": "מנתק אותך מהשרת שלך באירוח עצמי.\nיתכן שיהיה עליך להיכנס למערכת שוב."
@@ -630,7 +630,7 @@
         "message": "הפעלת DNS"
     },
     "settings.network.dns.help": {
-        "message": "החלת הגדרות DNS בניהול NetBird לפותר שמות המארחים."
+        "message": "החלת הגדרות DNS בניהול NetBirdy לפותר שמות המארחים."
     },
     "settings.network.clientRoutes.label": {
         "message": "הפעלת ניתובי לקוח"
@@ -648,7 +648,7 @@
         "message": "הפעלת IPv6"
     },
     "settings.network.ipv6.help": {
-        "message": "להשתמש בחלוקת כתובות IPv6 לרשת שכבת העל של NetBird."
+        "message": "להשתמש בחלוקת כתובות IPv6 לרשת שכבת העל של NetBirdy."
     },
     "settings.security.section.firewall": {
         "message": "חומת אש"
@@ -693,7 +693,7 @@
         "message": "הפעלת שרת SSH"
     },
     "settings.ssh.server.help": {
-        "message": "להריץ את שרת ה־SSH של NetBird על המארח הזה כדי שעמיתים אחרים יוכלו להתחבר אליו."
+        "message": "להריץ את שרת ה־SSH של NetBirdy על המארח הזה כדי שעמיתים אחרים יוכלו להתחבר אליו."
     },
     "settings.ssh.root.label": {
         "message": "לאפשר כניסת ניהול (root)"
@@ -768,7 +768,7 @@
         "message": "מפתח ששותף מראש"
     },
     "settings.advanced.psk.help": {
-        "message": "מפתח ששותף מראש (PSK) של WireGuard כרשות להצפנה סימטרית בנוסף. לא זהה למפתח התקנה של NetBird. תהיה לך תקשורת רק מול עמיתים שמשתמשים באותו המפתח ששותף מראש."
+        "message": "מפתח ששותף מראש (PSK) של WireGuard כרשות להצפנה סימטרית בנוסף. לא זהה למפתח התקנה של NetBirdy. תהיה לך תקשורת רק מול עמיתים שמשתמשים באותו המפתח ששותף מראש."
     },
     "settings.troubleshooting.section.title": {
         "message": "מאגד ניפוי שגיאות"
@@ -777,7 +777,7 @@
         "message": "הסוואת מידע רגיש עם מידע אלמוני"
     },
     "settings.troubleshooting.anonymize.help": {
-        "message": "הסתרת כתובות IP ציבוריות ושמות תחום שאינם של NetBird מהיומנים."
+        "message": "הסתרת כתובות IP ציבוריות ושמות תחום שאינם של NetBirdy מהיומנים."
     },
     "settings.troubleshooting.anonymize.info": {
         "message": "ברירת המחדל משאירה את כתובות ה־IPv4 הפנימיות ואת שמות העמיתים קריאים למטרות תמיכה. מצב מחמיר מסתיר באלמוניות כתובות פרטיות (RFC 1918), CGNAT ו־link-local (קישור מקומי), שמות עמיתים ומפתחות ציבוריים של WireGuard. ערכים חוזרים ממופים לאותו ממלא המקום, כך שהעמיתים נשארים בלתי ניתנים להבדלה. כדאי להשתמש במחמיר בעת שיתוף המאגד מחוץ לארגון שלך."
@@ -798,10 +798,10 @@
         "message": "לכלול את מערכת ההפעלה, הליבה, ממשקי הרשת וטבלאות הניתוב."
     },
     "settings.troubleshooting.upload.label": {
-        "message": "להעלות את המאגד לשרתים של NetBird"
+        "message": "להעלות את המאגד לשרתים של NetBirdy"
     },
     "settings.troubleshooting.upload.help": {
-        "message": "החזרת מפתח שליחה לשיתוף עם התמיכה של NetBird."
+        "message": "החזרת מפתח שליחה לשיתוף עם התמיכה של NetBirdy."
     },
     "settings.troubleshooting.trace.label": {
         "message": "הפעלת יומני מעקב"
@@ -834,7 +834,7 @@
         "message": "יצירת מאגד"
     },
     "settings.troubleshooting.progress.description": {
-        "message": "היומנים, פרטי המערכת ומצב החיבור נאספים. האיסוף בדרך כלל לוקח כמה רגעים. אפשר להמשיך להשתמש ב־NetBird או לסגור את ההגדרות בזמן שהתהליך מסתיים."
+        "message": "היומנים, פרטי המערכת ומצב החיבור נאספים. האיסוף בדרך כלל לוקח כמה רגעים. אפשר להמשיך להשתמש ב־NetBirdy או לסגור את ההגדרות בזמן שהתהליך מסתיים."
     },
     "settings.troubleshooting.cancelling": {
         "message": "מבוטל…"
@@ -846,7 +846,7 @@
         "message": "המאגד נשמר"
     },
     "settings.troubleshooting.done.uploadedDescription": {
-        "message": "יש לשתף את מפתח השליחה להלן עם <docs>התמיכה של NetBird</docs>. עותק מקומי נשמר בנוסף על המכונה שלך."
+        "message": "יש לשתף את מפתח השליחה להלן עם <docs>התמיכה של NetBirdy</docs>. עותק מקומי נשמר בנוסף על המכונה שלך."
     },
     "settings.troubleshooting.done.savedDescription": {
         "message": "מאגד ניפוי השגיאות שלך נשמר מקומית."
@@ -867,7 +867,7 @@
         "message": "ההעלאה נכשלה. המאגד עדיין שמור מקומית."
     },
     "settings.troubleshooting.stage.reconnecting": {
-        "message": "NetBird מתחבר מחדש…"
+        "message": "NetBirdy מתחבר מחדש…"
     },
     "settings.troubleshooting.stage.capturing": {
         "message": "יומני ניפוי השגיאות נלכדים"
@@ -876,16 +876,16 @@
         "message": "מאגד ניפוי שגיאות נוצר…"
     },
     "settings.troubleshooting.stage.uploading": {
-        "message": "נשלח ל־NetBird…"
+        "message": "נשלח ל־NetBirdy…"
     },
     "settings.troubleshooting.stage.cancelling": {
         "message": "מבטל…"
     },
     "settings.about.client": {
-        "message": "לקוח NetBird v{version}"
+        "message": "לקוח NetBirdy v{version}"
     },
     "settings.about.clientName": {
-        "message": "לקוח NetBird"
+        "message": "לקוח NetBirdy"
     },
     "settings.about.development": {
         "message": "[פיתוח]"
@@ -897,7 +897,7 @@
         "message": "ממשק משתמש"
     },
     "settings.about.copyright": {
-        "message": "© {year} NetBird. כל הזכויות שמורות."
+        "message": "© {year} NetBirdy. כל הזכויות שמורות."
     },
     "settings.about.links.imprint": {
         "message": "הצהרה משפטית"
@@ -927,7 +927,7 @@
         "message": "משוב"
     },
     "update.banner.message": {
-        "message": "ההתקנה של NetBird {version} מוכנה."
+        "message": "ההתקנה של NetBirdy {version} מוכנה."
     },
     "update.banner.later": {
         "message": "אחר כך"
@@ -951,7 +951,7 @@
         "message": "הורדה"
     },
     "update.card.autoCheckInterval": {
-        "message": "NetBird בודק ברקע אם יש עדכונים."
+        "message": "NetBirdy בודק ברקע אם יש עדכונים."
     },
     "update.card.changelog": {
         "message": "יומן שינויים"
@@ -963,13 +963,13 @@
         "message": "יש עדכון"
     },
     "update.overlay.updatingVersion": {
-        "message": "NetBird מתעדכן ל־v{version}"
+        "message": "NetBirdy מתעדכן ל־v{version}"
     },
     "update.overlay.updating": {
-        "message": "NetBird מתעדכן"
+        "message": "NetBirdy מתעדכן"
     },
     "update.overlay.description": {
-        "message": "גרסה חדשה יותר זמינה ומותקנת כרגע. NetBird יופעל מחדש אוטומטית לאחר סיום העדכון."
+        "message": "גרסה חדשה יותר זמינה ומותקנת כרגע. NetBirdy יופעל מחדש אוטומטית לאחר סיום העדכון."
     },
     "update.overlay.error.timeoutTitle": {
         "message": "העדכון אורך זמן רב מדי"
@@ -1059,22 +1059,22 @@
         "message": "מתעדכן"
     },
     "window.title.welcome": {
-        "message": "ברוך בואך ל־NetBird"
+        "message": "ברוך בואך ל־NetBirdy"
     },
     "window.title.error": {
         "message": "שגיאה"
     },
     "welcome.title": {
-        "message": "כדאי לחפש את NetBird בשורת המשימות שלך"
+        "message": "כדאי לחפש את NetBirdy בשורת המשימות שלך"
     },
     "welcome.titleMac": {
-        "message": "כדאי לחפש את NetBird בשורת התפריטים שלך"
+        "message": "כדאי לחפש את NetBirdy בשורת התפריטים שלך"
     },
     "welcome.description": {
-        "message": "NetBird שוכן בשורת המשימות שלך. יש ללחוץ על הסמל כדי להתחבר, להחליף פרופילים או כדי לפתוח את ההגדרות."
+        "message": "NetBirdy שוכן בשורת המשימות שלך. יש ללחוץ על הסמל כדי להתחבר, להחליף פרופילים או כדי לפתוח את ההגדרות."
     },
     "welcome.descriptionMac": {
-        "message": "NetBird שוכן בסרגל התפריטים שלך. יש ללחוץ על הסמל כדי להתחבר, להחליף פרופילים או כדי לפתוח את ההגדרות."
+        "message": "NetBirdy שוכן בסרגל התפריטים שלך. יש ללחוץ על הסמל כדי להתחבר, להחליף פרופילים או כדי לפתוח את ההגדרות."
     },
     "welcome.continue": {
         "message": "המשך"
@@ -1083,13 +1083,13 @@
         "message": "חזרה"
     },
     "welcome.management.title": {
-        "message": "הגדרת NetBird"
+        "message": "הגדרת NetBirdy"
     },
     "welcome.management.description": {
-        "message": "יש ללחוץ על המשך כדי להתחיל או לבחור באירוח עצמי אם יש לך שרת NetBird משלך."
+        "message": "יש ללחוץ על המשך כדי להתחיל או לבחור באירוח עצמי אם יש לך שרת NetBirdy משלך."
     },
     "welcome.management.cloud.title": {
-        "message": "ענן NetBird"
+        "message": "ענן NetBirdy"
     },
     "welcome.management.cloud.description": {
         "message": "אפשר להשתמש בשירות באירוח שלנו. לא צריך הגדרות."
@@ -1185,10 +1185,10 @@
         "message": "שם תחום"
     },
     "peers.details.netbirdIp": {
-        "message": "IP של NetBird"
+        "message": "IP של NetBirdy"
     },
     "peers.details.netbirdIpv6": {
-        "message": "IPv6 של NetBird"
+        "message": "IPv6 של NetBirdy"
     },
     "peers.details.publicKey": {
         "message": "מפתח ציבורי"
@@ -1323,7 +1323,7 @@
         "message": "התנתקות"
     },
     "daemon.unavailable.title": {
-        "message": "שירות NetBird לא פעיל"
+        "message": "שירות NetBirdy לא פעיל"
     },
     "daemon.unavailable.description": {
         "message": "היישום יתחבר אוטומטית לאחר שהשירות יופעל."
@@ -1332,10 +1332,10 @@
         "message": "תיעוד"
     },
     "daemon.outdated.title": {
-        "message": "שירות NetBird אינו עדכני"
+        "message": "שירות NetBirdy אינו עדכני"
     },
     "daemon.outdated.description": {
-        "message": "ממשק המשתמש החדש לא תואם ללקוח ישן יותר של NetBird. יש לעדכן את הלקוח שלך כדי להשתמש ביישום החדש"
+        "message": "ממשק המשתמש החדש לא תואם ללקוח ישן יותר של NetBirdy. יש לעדכן את הלקוח שלך כדי להשתמש ביישום החדש"
     },
     "daemon.outdated.download": {
         "message": "להוריד את העדכני ביותר"
@@ -1359,7 +1359,7 @@
         "message": "בקשת הכניסה נדחתה על ידי השרת."
     },
     "error.daemon_unreachable": {
-        "message": "הסוכן של NetBird לא מגיב. נא לבדוק שהשירות פעיל."
+        "message": "הסוכן של NetBirdy לא מגיב. נא לבדוק שהשירות פעיל."
     },
     "error.settings_locked": {
         "message": "אי אפשר לשנות את ההגדרות במכשיר הזה: הן ננעלו על ידי ההנהלה."
@@ -1371,7 +1371,7 @@
         "message": "הפעולה נכשלה."
     },
     "error.elevation_unavailable": {
-        "message": "NetBird לא הצליח לבקש מהמערכת הזאת את ההרשאות שהשינוי הזה צריך. יש להריץ את זה במקום:"
+        "message": "NetBirdy לא הצליח לבקש מהמערכת הזאת את ההרשאות שהשינוי הזה צריך. יש להריץ את זה במקום:"
     },
     "error.elevation_failed": {
         "message": "אי אפשר להחיל את השינויים עם הרשאות גבוהות יותר. יש להריץ את זה במקום:"

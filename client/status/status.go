@@ -25,7 +25,7 @@ import (
 	"github.com/netbirdio/netbird/version"
 )
 
-// DaemonStatus represents the current state of the NetBird daemon.
+// DaemonStatus represents the current state of the NetBirdy daemon.
 // These values mirror internal.StatusType but are defined here to avoid an import cycle.
 type DaemonStatus string
 
@@ -448,7 +448,7 @@ func (o *OutputOverview) GeneralSummary(showURL bool, showRelays bool, showNameS
 
 	ipv6Line := ""
 	if o.IPv6 != "" {
-		ipv6Line = fmt.Sprintf("NetBird IPv6: %s\n", o.IPv6)
+		ipv6Line = fmt.Sprintf("NetBirdy IPv6: %s\n", o.IPv6)
 	}
 
 	var relaysString string
@@ -603,7 +603,7 @@ func (o *OutputOverview) GeneralSummary(showURL bool, showRelays bool, showNameS
 			"Relays: %s\n"+
 			"Nameservers: %s\n"+
 			"FQDN: %s\n"+
-			"NetBird IP: %s\n"+
+			"NetBirdy IP: %s\n"+
 			"%s"+
 			"Interface type: %s\n"+
 			"Wireguard port: %s\n"+
@@ -797,12 +797,12 @@ func parsePeers(peers PeersStateOutput, rosenpassEnabled, rosenpassPermissive bo
 
 		ipv6Line := ""
 		if peerState.IPv6 != "" {
-			ipv6Line = fmt.Sprintf("  NetBird IPv6: %s\n", peerState.IPv6)
+			ipv6Line = fmt.Sprintf("  NetBirdy IPv6: %s\n", peerState.IPv6)
 		}
 
 		peerString := fmt.Sprintf(
 			"\n %s:\n"+
-				"  NetBird IP: %s\n"+
+				"  NetBirdy IP: %s\n"+
 				"%s"+
 				"  Public key: %s\n"+
 				"  Status: %s\n"+

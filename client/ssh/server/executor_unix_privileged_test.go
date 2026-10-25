@@ -26,7 +26,7 @@ func TestPrivilegeDropper_CreateExecutorCommand(t *testing.T) {
 	require.NoError(t, err)
 	require.NotNil(t, cmd)
 
-	// Verify the command is calling netbird ssh exec
+	// Verify the command is calling netbirdy ssh exec
 	assert.Contains(t, cmd.Args, "ssh")
 	assert.Contains(t, cmd.Args, "exec")
 	assert.Contains(t, cmd.Args, "--uid")

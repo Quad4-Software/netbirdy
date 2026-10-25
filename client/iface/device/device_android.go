@@ -85,9 +85,9 @@ func (t *WGTunDevice) Create(routes []string, dns string, searchDomains []string
 	t.filteredDevice = newDeviceFilter(t.renewableTun)
 
 	log.Debugf("attaching to interface %v", name)
-	t.device = wgbackend.NewDevice(t.filteredDevice, t.iceBind, wgbackend.NewLogger(wgLogLevel(), "[netbird] "))
+	t.device = wgbackend.NewDevice(t.filteredDevice, t.iceBind, wgbackend.NewLogger(wgLogLevel(), "[netbirdy] "))
 	// without this property mobile devices can discover remote endpoints if the configured one was wrong.
-	// this helps with support for the older NetBird clients that had a hardcoded direct mode
+	// this helps with support for the older NetBirdy clients that had a hardcoded direct mode
 	// t.device.DisableSomeRoamingForBrokenMobileSemantics()
 
 	t.configurer = configurer.NewUSPConfigurer(t.device, t.name, t.iceBind.ActivityRecorder())

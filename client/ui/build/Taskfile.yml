@@ -19,7 +19,7 @@ tasks:
       - sh: pnpm --version
         msg: "Looks like pnpm isn't installed. Install with: corepack enable && corepack prepare pnpm@latest --activate"
     cmds:
-      - pnpm install
+      - pnpm install --frozen-lockfile
 
   build:frontend:
     label: build:frontend (DEV={{.DEV}})
@@ -112,7 +112,7 @@ tasks:
   generate:tray:icons:
     summary: Rebuild Windows multi-res .ico files from the per-state PNGs.
     desc: |
-      The colored tray PNGs (assets/netbird-systemtray-<state>.png) and the
+      The colored tray PNGs (assets/netbirdy-systemtray-<state>.png) and the
       macOS template variants are committed to the repo as the canonical
       source. This task only regenerates the Windows multi-resolution .ico
       files from those PNGs by downscaling each to 16/24/32/48 px and
@@ -124,14 +124,14 @@ tasks:
       assets/svg/ are kept for reference but are not built by default.
     dir: assets
     sources:
-      - "netbird-systemtray-connected.png"
-      - "netbird-systemtray-disconnected.png"
-      - "netbird-systemtray-connecting.png"
-      - "netbird-systemtray-error.png"
-      - "netbird-systemtray-update-connected.png"
-      - "netbird-systemtray-update-disconnected.png"
+      - "netbirdy-systemtray-connected.png"
+      - "netbirdy-systemtray-disconnected.png"
+      - "netbirdy-systemtray-connecting.png"
+      - "netbirdy-systemtray-error.png"
+      - "netbirdy-systemtray-update-connected.png"
+      - "netbirdy-systemtray-update-disconnected.png"
     generates:
-      - "netbird-systemtray-*.ico"
+      - "netbirdy-systemtray-*.ico"
     preconditions:
       - sh: command -v magick >/dev/null 2>&1 || command -v convert >/dev/null 2>&1
         msg: "ImageMagick is required to downscale PNGs (apt install imagemagick)"
@@ -145,9 +145,9 @@ tasks:
         resize=$(command -v magick || echo convert)
         for state in connected disconnected connecting error update-connected update-disconnected; do
           for sz in 16 24 32 48; do
-            "$resize" "netbird-systemtray-$state.png" -resize ${sz}x${sz} "$tmp/$state-$sz.png"
+            "$resize" "netbirdy-systemtray-$state.png" -resize ${sz}x${sz} "$tmp/$state-$sz.png"
           done
-          icotool -c -o "netbird-systemtray-$state.ico" \
+          icotool -c -o "netbirdy-systemtray-$state.ico" \
             "$tmp/$state-16.png" "$tmp/$state-24.png" "$tmp/$state-32.png" "$tmp/$state-48.png"
         done
 

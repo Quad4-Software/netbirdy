@@ -1,5 +1,5 @@
 // Package reposign implements a cryptographic signing and verification system
-// for NetBird software update artifacts. It provides a hierarchical key
+// for NetBirdy software update artifacts. It provides a hierarchical key
 // management system with support for key rotation, revocation, and secure
 // artifact distribution.
 //

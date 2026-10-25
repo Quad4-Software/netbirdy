@@ -70,7 +70,7 @@ export default function FancyToggleSwitch({
 
     return (
         <div
-            {...(disabled ? { inert: "" } : {})}
+            {...(disabled ? { inert: true } : {})}
             className={cn(
                 "relative z-1 cursor-default transition-all duration-300",
                 "inline-block w-full text-start",

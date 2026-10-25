@@ -19,7 +19,7 @@ func setScanDir(dir string) {
 
 // ResolveUnixDaemonAddr checks whether the default Unix socket exists and, if not,
 // scans /var/run/netbird/ for a single .sock file to use instead. This handles the
-// mismatch between the netbird@.service template (which places the socket under
+// mismatch between the netbirdy@.service template (which places the socket under
 // /var/run/netbird/<instance>.sock) and the CLI default (/var/run/netbird.sock).
 func ResolveUnixDaemonAddr(addr string) string {
 	if !strings.HasPrefix(addr, "unix://") {

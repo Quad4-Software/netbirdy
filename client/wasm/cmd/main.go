@@ -45,15 +45,15 @@ func main() {
 }
 
 func startClient(ctx context.Context, nbClient *netbird.Client) error {
-	log.Info("Starting NetBird client...")
+	log.Info("Starting NetBirdy client...")
 	if err := nbClient.Start(ctx); err != nil {
 		return err
 	}
-	log.Info("NetBird client started successfully")
+	log.Info("NetBirdy client started successfully")
 	return nil
 }
 
-// parseClientOptions extracts NetBird options from JavaScript object
+// parseClientOptions extracts NetBirdy options from JavaScript object
 func parseClientOptions(jsOptions js.Value) (netbird.Options, error) {
 	options := netbird.Options{
 		LogLevel: defaultLogLevel,
@@ -151,7 +151,7 @@ func createStopMethod(client *netbird.Client) js.Func {
 				return
 			}
 
-			log.Info("NetBird client stopped")
+			log.Info("NetBirdy client stopped")
 			resolve.Invoke(js.ValueOf(true))
 		})
 	})
@@ -694,7 +694,7 @@ func createDetectSSHServerMethod(client *netbird.Client) js.Func {
 	})
 }
 
-// createClientObject wraps the NetBird client in a JavaScript object
+// createClientObject wraps the NetBirdy client in a JavaScript object
 func createClientObject(client *netbird.Client) js.Value {
 	obj := make(map[string]interface{})
 
@@ -811,7 +811,7 @@ func netBirdClientConstructor(_ js.Value, args []js.Value) any {
 				log.Warnf("Failed to initialize logging: %v", err)
 			}
 
-			log.Infof("Creating NetBird client with options: deviceName=%s, hasJWT=%v, hasSetupKey=%v, mgmtURL=%s",
+			log.Infof("Creating NetBirdy client with options: deviceName=%s, hasJWT=%v, hasSetupKey=%v, mgmtURL=%s",
 				options.DeviceName, options.JWTToken != "", options.SetupKey != "", options.ManagementURL)
 
 			client, err := netbird.New(options)
@@ -821,7 +821,7 @@ func netBirdClientConstructor(_ js.Value, args []js.Value) any {
 			}
 
 			clientObj := createClientObject(client)
-			log.Info("NetBird client created successfully")
+			log.Info("NetBirdy client created successfully")
 			resolve.Invoke(clientObj)
 		}()
 

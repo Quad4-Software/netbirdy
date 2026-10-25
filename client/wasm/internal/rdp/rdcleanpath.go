@@ -253,7 +253,7 @@ func (p *RDCleanPathProxy) handleDirectRDP(conn *proxyConnection, firstPacket []
 	defer p.cleanupConnection(conn)
 
 	destination := conn.destination
-	log.Infof("Direct RDP mode: Connecting to %s via NetBird", destination)
+	log.Infof("Direct RDP mode: Connecting to %s via NetBirdy", destination)
 
 	ctx, cancel := context.WithTimeout(conn.ctx, rdpDialTimeout)
 	defer cancel()

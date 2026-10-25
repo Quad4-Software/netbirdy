@@ -390,9 +390,9 @@ func unsetOnDisk(t *testing.T, path string, fields ...string) {
 // Seven fields mean "the effective default" when they hold no value, and every
 // profile written before apply() resolved them holds them as null. Restating
 // that default is asking for no change — and the CLI restates it on every
-// `netbird up`, because a flag set through an environment variable is a flag
+// `netbirdy up`, because a flag set through an environment variable is a flag
 // pflag reports as Changed. Judging those restatements as changes made the
-// update-settings gate refuse `netbird up` outright for a client configured
+// update-settings gate refuse `netbirdy up` outright for a client configured
 // through the environment, which is the shape of a Kubernetes deployment.
 //
 // A login now writes those fields set, so the fixture puts the null state back
@@ -489,7 +489,7 @@ func TestServiceURLPortIsNormalizedNumerically(t *testing.T) {
 
 // A list the profile does not have and a list the request empties are the same
 // thing: no NAT mappings, no DNS labels. The profile stores an absent list as
-// JSON null and reads it back as a nil slice, while `netbird up` sends the
+// JSON null and reads it back as a nil slice, while `netbirdy up` sends the
 // emptied list — CleanNATExternalIPs / CleanDNSLabels — whenever the matching
 // environment variable is set to nothing, which a deployment template does by
 // default. Judging nil and empty as different made the gate refuse that start,

@@ -13,7 +13,7 @@
 // (NB_TPM_PIN); none of them is read from the profile config.
 //
 // User stores cannot be read by a privileged daemon, so it starts this binary as
-// "netbird posture cert-proof" inside the user's session and receives only signatures
+// "netbirdy posture cert-proof" inside the user's session and receives only signatures
 // and chains on its stdout. On macOS uid is not what unlocks a login keychain, the
 // session's bootstrap namespace is, which is why the helper enters it through launchctl
 // asuser. On Windows a service opening CURRENT_USER silently reads its own empty hive, so

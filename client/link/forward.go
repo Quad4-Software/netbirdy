@@ -1,5 +1,5 @@
 // Package link implements nblink, an unprivileged forwarder that exposes local
-// listeners and carries their traffic into the NetBird overlay.
+// listeners and carries their traffic into the NetBirdy overlay.
 //
 // The process runs the embedded client in netstack mode, so it needs no TUN
 // device and no elevated privileges. Overlay names on the upstream side are

@@ -20,7 +20,7 @@ var (
 	ErrIPNotAllowed = errors.New("IP address not allowed")
 )
 
-// ServerDomains represents the management server domains extracted from NetBird configuration
+// ServerDomains represents the management server domains extracted from NetBirdy configuration
 type ServerDomains struct {
 	Signal domain.Domain
 	Relay  []domain.Domain
@@ -29,7 +29,7 @@ type ServerDomains struct {
 	Turns  []domain.Domain
 }
 
-// ExtractFromNetbirdConfig extracts domain information from NetBird protobuf configuration
+// ExtractFromNetbirdConfig extracts domain information from NetBirdy protobuf configuration
 func ExtractFromNetbirdConfig(config *mgmProto.NetbirdConfig) ServerDomains {
 	if config == nil {
 		return ServerDomains{}
@@ -154,7 +154,7 @@ func extractMultipleDomains(urls []string, serviceType string) []domain.Domain {
 	return domains
 }
 
-// extractSignalDomain extracts the signal domain from NetBird configuration.
+// extractSignalDomain extracts the signal domain from NetBirdy configuration.
 func extractSignalDomain(config *mgmProto.NetbirdConfig) domain.Domain {
 	if config.Signal != nil {
 		return extractSingleDomain(config.Signal.Uri, "signal")
@@ -162,7 +162,7 @@ func extractSignalDomain(config *mgmProto.NetbirdConfig) domain.Domain {
 	return ""
 }
 
-// extractRelayDomains extracts relay server domains from NetBird configuration.
+// extractRelayDomains extracts relay server domains from NetBirdy configuration.
 func extractRelayDomains(config *mgmProto.NetbirdConfig) []domain.Domain {
 	if config.Relay != nil {
 		return extractMultipleDomains(config.Relay.Urls, "relay")
@@ -170,7 +170,7 @@ func extractRelayDomains(config *mgmProto.NetbirdConfig) []domain.Domain {
 	return nil
 }
 
-// extractFlowDomain extracts the traffic flow domain from NetBird configuration.
+// extractFlowDomain extracts the traffic flow domain from NetBirdy configuration.
 func extractFlowDomain(config *mgmProto.NetbirdConfig) domain.Domain {
 	if config.Flow != nil {
 		return extractSingleDomain(config.Flow.Url, "flow")
@@ -178,7 +178,7 @@ func extractFlowDomain(config *mgmProto.NetbirdConfig) domain.Domain {
 	return ""
 }
 
-// extractStunDomains extracts STUN server domains from NetBird configuration.
+// extractStunDomains extracts STUN server domains from NetBirdy configuration.
 func extractStunDomains(config *mgmProto.NetbirdConfig) []domain.Domain {
 	var urls []string
 	for _, stun := range config.Stuns {
@@ -189,7 +189,7 @@ func extractStunDomains(config *mgmProto.NetbirdConfig) []domain.Domain {
 	return extractMultipleDomains(urls, "STUN")
 }
 
-// extractTurnDomains extracts TURN server domains from NetBird configuration.
+// extractTurnDomains extracts TURN server domains from NetBirdy configuration.
 func extractTurnDomains(config *mgmProto.NetbirdConfig) []domain.Domain {
 	var urls []string
 	for _, turn := range config.Turns {

@@ -175,7 +175,7 @@ func (r *family) setupDataPlaneMark() error {
 	return nil
 }
 
-// openInterface adds passthrough accept rules for the NetBird interface to the
+// openInterface adds passthrough accept rules for the NetBirdy interface to the
 // kernel's filter table and external chains so they don't drop our traffic.
 // includeForward also opens the FORWARD chains (kernel routing); when false only
 // INPUT is opened, which is all the userspace router needs since it never

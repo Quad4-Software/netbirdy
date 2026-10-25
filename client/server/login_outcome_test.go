@@ -17,7 +17,7 @@ import (
 // credentials, so it must come back as a retryable error rather than an SSO
 // prompt: the user cannot finish a browser login while Management is down, and
 // the CLI's own backoff resolves the outage on its own once the daemon reports
-// the failure. Reproduces `netbird down; netbird up` printing a device-code URL
+// the failure. Reproduces `netbirdy down; netbirdy up` printing a device-code URL
 // because Management happened to be restarting when the daemon dialed it.
 func TestLogin_ManagementUnreachableIsReturnedInsteadOfDemandingSSO(t *testing.T) {
 	s, _, _, username, _ := setupServerWithProfile(t)

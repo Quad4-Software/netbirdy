@@ -768,6 +768,9 @@ func (conn *Conn) updateIceState(iceConnInfo ICEConnInfo, updateTime time.Time) 
 	}
 
 	err := conn.statusRecorder.UpdatePeerICEState(peerState)
+	if err == nil && !iceConnInfo.Relayed {
+		reportDirectEndpoint(conn.config.Key, iceConnInfo.RemoteIceCandidateEndpoint)
+	}
 	if err != nil {
 		conn.Log.Warnf("unable to save peer's ICE state, got error: %v", err)
 	}
@@ -1022,14 +1025,14 @@ func (conn *Conn) presharedKey(remoteRosenpassKey []byte) *wgtypes.Key {
 		return nil
 	}
 
-	// Use NetBird PSK as the seed for Rosenpass. This same PSK is passed to
+	// Use NetBirdy PSK as the seed for Rosenpass. This same PSK is passed to
 	// Rosenpass as PeerConfig.PresharedKey, ensuring the derived post-quantum
 	// key is cryptographically bound to the original secret.
 	if conn.config.WgConfig.PreSharedKey != nil {
 		return conn.config.WgConfig.PreSharedKey
 	}
 
-	// Fallback to deterministic key if no NetBird PSK is configured
+	// Fallback to deterministic key if no NetBirdy PSK is configured
 	determKey, err := rosenpass.DeterministicSeedKey(conn.config.LocalKey, conn.config.Key)
 	if err != nil {
 		conn.Log.Errorf("failed to generate Rosenpass initial key: %v", err)

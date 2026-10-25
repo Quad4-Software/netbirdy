@@ -38,8 +38,8 @@ const PasswordRequiredMarker = "netbird-ssh-password-required"
 // HostKeyUnknownMarker tells Java to show the fingerprint and, on confirmation,
 // retry with TrustHostKey set. The presented fingerprint is appended after the
 // marker so the prompt can display it and the retry can guard against a key
-// that changed between the two connects. Only regular (non-NetBird) servers
-// reach this: NetBird peers verify against the registry.
+// that changed between the two connects. Only regular (non-NetBirdy) servers
+// reach this: NetBirdy peers verify against the registry.
 const HostKeyUnknownMarker = "netbird-ssh-hostkey-unknown"
 
 var (
@@ -68,10 +68,10 @@ type SSHTerminalListener interface {
 	OnError(message string)
 }
 
-// SSHClient is a NetBird-aware SSH client exposed to Java via gomobile.
+// SSHClient is a NetBirdy-aware SSH client exposed to Java via gomobile.
 //
-// It dials through the running NetBird tunnel and runs a standard SSH session
-// on top with PTY enabled. Host-key verification uses the NetBird-provided
+// It dials through the running NetBirdy tunnel and runs a standard SSH session
+// on top with PTY enabled. Host-key verification uses the NetBirdy-provided
 // peer SSH host keys, identical to the desktop client.
 type SSHClient struct {
 	nb        *Client
@@ -103,7 +103,7 @@ type SSHClient struct {
 	trustHostKey string
 }
 
-// NewSSHClient creates a new SSH client bound to the running NetBird Client.
+// NewSSHClient creates a new SSH client bound to the running NetBirdy Client.
 func NewSSHClient(c *Client) *SSHClient {
 	return &SSHClient{nb: c}
 }
@@ -145,18 +145,18 @@ func (s *SSHClient) TrustHostKey(fingerprint string) {
 	s.mu.Unlock()
 }
 
-// Connect dials the SSH server through the NetBird tunnel and performs the
+// Connect dials the SSH server through the NetBirdy tunnel and performs the
 // SSH handshake. It auto-detects the server type via SSH banner inspection
 // and selects the appropriate authentication path:
 //
-//   - NetBird-SSH server requiring JWT: launches the OAuth 2.0 device-code
+//   - NetBirdy-SSH server requiring JWT: launches the OAuth 2.0 device-code
 //     flow, opens the verification URL through the registered URLOpener, and
 //     uses the resulting token as the SSH password. Host-key verification
-//     uses the NetBird peer registry.
-//   - NetBird-SSH server without JWT: authenticates with the NetBird SSH
-//     private key. Host-key verification uses the NetBird peer registry.
-//   - Regular SSH server (e.g. OpenSSH): authenticates with the NetBird key
-//     first (so a user-installed NetBird public key works), then falls back
+//     uses the NetBirdy peer registry.
+//   - NetBirdy-SSH server without JWT: authenticates with the NetBirdy SSH
+//     private key. Host-key verification uses the NetBirdy peer registry.
+//   - Regular SSH server (e.g. OpenSSH): authenticates with the NetBirdy key
+//     first (so a user-installed NetBirdy public key works), then falls back
 //     to the supplied password if non-empty. Host-key verification is
 //     trust-on-first-use against the per-profile known-hosts store.
 //
@@ -168,14 +168,14 @@ func (s *SSHClient) Connect(host string, port int, user, password string) error 
 
 	cfg, cfgPath, cc := s.nb.authSnapshot()
 	if cc == nil {
-		return errors.New("netbird client not running")
+		return errors.New("netbirdy client not running")
 	}
 	if cfg == nil {
-		return errors.New("netbird config not loaded")
+		return errors.New("netbirdy config not loaded")
 	}
 	engine := cc.Engine()
 	if engine == nil {
-		return errors.New("netbird engine not available")
+		return errors.New("netbirdy engine not available")
 	}
 
 	s.mu.Lock()
@@ -207,7 +207,7 @@ func (s *SSHClient) Connect(host string, port int, user, password string) error 
 	}
 
 	// A regular server may still accept a password, so let the caller ask for
-	// one instead of failing. NetBird servers never use a password, so a
+	// one instead of failing. NetBirdy servers never use a password, so a
 	// failure there is genuine.
 	if err != nil && serverType != detection.ServerTypeNetBirdJWT &&
 		serverType != detection.ServerTypeNetBirdNoJWT && isAuthFailure(err) &&
@@ -360,11 +360,11 @@ func (s *SSHClient) buildAuth(cfg *profilemanager.Config, cfgPath string, engine
 
 	case detection.ServerTypeNetBirdNoJWT:
 		if cfg.SSHKey == "" {
-			return nil, nil, errors.New("no NetBird SSH key available")
+			return nil, nil, errors.New("no NetBirdy SSH key available")
 		}
 		signer, err := gossh.ParsePrivateKey([]byte(cfg.SSHKey))
 		if err != nil {
-			return nil, nil, fmt.Errorf("parse netbird ssh key: %w", err)
+			return nil, nil, fmt.Errorf("parse netbirdy ssh key: %w", err)
 		}
 		auths := []gossh.AuthMethod{gossh.PublicKeys(signer)}
 		return auths, nbssh.CreateHostKeyCallback(nbssh.PeerKeyLookup(engine.GetPeerSSHKey)), nil

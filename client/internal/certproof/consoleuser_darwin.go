@@ -28,7 +28,7 @@ var (
 )
 
 // ConsoleUser is the account whose desktop session owns the display. Its login keychain
-// is the only user keychain a NetBird daemon can reach, and only while it is logged in.
+// is the only user keychain a NetBirdy daemon can reach, and only while it is logged in.
 type ConsoleUser struct {
 	Name string
 	UID  uint32

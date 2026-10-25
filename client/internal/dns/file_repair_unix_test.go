@@ -184,7 +184,7 @@ searchdomain netbird.cloud something`
 }
 
 // systemd-resolved can rewrite resolv.conf twice in a row, e.g. on restart. When the second write
-// lands right after NetBird's repair, the watcher must still see it and repair again; otherwise the
+// lands right after NetBirdy's repair, the watcher must still see it and repair again; otherwise the
 // host silently stays on the upstream resolver until the next unrelated change of the file.
 func Test_repairCatchesWriteRacingRepair(t *testing.T) {
 	good := "nameserver 10.0.0.1\nsearch netbird.cloud\n"
@@ -220,7 +220,7 @@ func Test_repairCatchesWriteRacingRepair(t *testing.T) {
 	assert.GreaterOrEqual(t, calls.Load(), int32(2), "the racing write should trigger a second repair")
 }
 
-// A change made between NetBird's write and the arming of the watch produces no event, so the
+// A change made between NetBirdy's write and the arming of the watch produces no event, so the
 // watcher must check the file as soon as it starts.
 func Test_repairChecksFileWhenArmed(t *testing.T) {
 	good := "nameserver 10.0.0.1\nsearch netbird.cloud\n"
@@ -247,7 +247,7 @@ func Test_repairChecksFileWhenArmed(t *testing.T) {
 	}
 }
 
-// When NetBird has more search domains than resolv.conf can hold, its own write lacks some of them
+// When NetBirdy has more search domains than resolv.conf can hold, its own write lacks some of them
 // and fails the parameter check. The watcher must recognize that write as its own and not repair
 // it again in a loop.
 func Test_repairNoLoopOnTruncatedSearchDomains(t *testing.T) {
@@ -275,7 +275,7 @@ func Test_repairNoLoopOnTruncatedSearchDomains(t *testing.T) {
 	require.Eventually(t, func() bool { return calls.Load() >= 1 }, 2*time.Second, 10*time.Millisecond,
 		"the third-party write should be repaired")
 	time.Sleep(500 * time.Millisecond)
-	assert.Equal(t, int32(1), calls.Load(), "NetBird's own truncated write should not trigger another repair")
+	assert.Equal(t, int32(1), calls.Load(), "NetBirdy's own truncated write should not trigger another repair")
 }
 
 // fsnotify blocks its reader until an error is received, and an error such as a queue overflow

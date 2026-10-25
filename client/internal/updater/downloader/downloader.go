@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	userAgent         = "NetBird agent installer/%s"
+	userAgent         = "NetBirdy agent installer/%s"
 	DefaultRetryDelay = 3 * time.Second
 )
 

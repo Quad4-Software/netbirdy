@@ -10,7 +10,7 @@ import (
 
 // handlerTestLink wires two NetbirdHandlers as the two ends of a single
 // tunnel: handler A manages the rosenpass peer B and vice versa, the way two
-// NetBird clients see each other.
+// NetBirdy clients see each other.
 type handlerTestLink struct {
 	handlerA, handlerB *NetbirdHandler
 	ifaceA, ifaceB     *mockIface

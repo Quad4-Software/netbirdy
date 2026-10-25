@@ -91,7 +91,7 @@ func TestDialTargetAcceptsAStatusOverTheGrpcDefault(t *testing.T) {
 
 // TestDialTargetRaisesTheDefaultLimit is the negative control: the same response
 // over a connection carrying gRPC's own defaults is refused, which is the failure
-// reported by `netbird status -d` on a large deployment.
+// reported by `netbirdy status -d` on a large deployment.
 func TestDialTargetRaisesTheDefaultLimit(t *testing.T) {
 	payload := strings.Repeat("x", 5*1024*1024)
 	addr := startBigStatusServer(t, payload)

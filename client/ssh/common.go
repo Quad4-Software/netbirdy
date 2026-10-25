@@ -48,7 +48,7 @@ func (l PeerKeyLookup) VerifySSHHostKey(peerAddress string, presentedKey []byte)
 	return VerifyHostKey(storedKey, presentedKey, peerAddress)
 }
 
-// DaemonHostKeyVerifier implements HostKeyVerifier using the NetBird daemon
+// DaemonHostKeyVerifier implements HostKeyVerifier using the NetBirdy daemon
 type DaemonHostKeyVerifier struct {
 	client proto.DaemonServiceClient
 }
@@ -60,7 +60,7 @@ func NewDaemonHostKeyVerifier(client proto.DaemonServiceClient) *DaemonHostKeyVe
 	}
 }
 
-// VerifySSHHostKey verifies an SSH host key by querying the NetBird daemon
+// VerifySSHHostKey verifies an SSH host key by querying the NetBirdy daemon
 func (d *DaemonHostKeyVerifier) VerifySSHHostKey(peerAddress string, presentedKey []byte) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()

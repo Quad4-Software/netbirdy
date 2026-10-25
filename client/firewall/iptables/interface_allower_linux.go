@@ -10,7 +10,7 @@ import (
 	nberrors "github.com/netbirdio/netbird/client/errors"
 )
 
-// InterfaceAllower opens the NetBird interface on the iptables filter INPUT
+// InterfaceAllower opens the NetBirdy interface on the iptables filter INPUT
 // chain so the host firewall doesn't drop traffic the userspace firewall
 // handles. It is the fallback used when nftables is unavailable (an
 // iptables-legacy host).

@@ -113,7 +113,7 @@ func TestJSONSocketServiceParamsPersistEnableAndAddress(t *testing.T) {
 }
 
 func TestRemoveStaleUnixSocketDoesNotRemoveRegularFile(t *testing.T) {
-	path := filepath.Join(t.TempDir(), "netbird-http.sock")
+	path := filepath.Join(t.TempDir(), "netbirdy-http.sock")
 	require.NoError(t, os.WriteFile(path, []byte("not a socket"), 0600))
 
 	removeStaleUnixSocket(path)
@@ -128,7 +128,7 @@ func TestRemoveStaleUnixSocketRemovesSocket(t *testing.T) {
 		t.Skip("unix sockets are not available on Windows")
 	}
 
-	path := filepath.Join(t.TempDir(), "netbird-http.sock")
+	path := filepath.Join(t.TempDir(), "netbirdy-http.sock")
 	addr := &net.UnixAddr{Name: path, Net: "unix"}
 	listener, err := net.ListenUnix("unix", addr)
 	require.NoError(t, err)
@@ -149,7 +149,7 @@ func TestRemoveStaleUnixSocketDoesNotRemoveLiveSocket(t *testing.T) {
 		t.Skip("unix sockets are not available on Windows")
 	}
 
-	path := filepath.Join(t.TempDir(), "netbird-http.sock")
+	path := filepath.Join(t.TempDir(), "netbirdy-http.sock")
 	listener, err := net.Listen("unix", path)
 	require.NoError(t, err)
 	defer listener.Close()

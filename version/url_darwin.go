@@ -6,8 +6,8 @@ import (
 )
 
 const (
-	urlMacIntel = "https://pkgs.netbird.io/macos/amd64"
-	urlMacM1M2  = "https://pkgs.netbird.io/macos/arm64"
+	urlMacIntel = "https://github.com/Sudo-Ivan/netbirdy/releases/latest"
+	urlMacM1M2  = "https://github.com/Sudo-Ivan/netbirdy/releases/latest"
 )
 
 // DownloadUrl return with the proper download link

@@ -30,7 +30,7 @@ import (
 const peerLoginExpiredMsg = "peer login has expired"
 
 // errSetupKeyOnSSOExpiredPeer replaces the raw management error when the
-// user runs `netbird login -k <setup-key>` against a peer that was
+// user runs `netbirdy login -k <setup-key>` against a peer that was
 // originally enrolled via SSO. Wrapped in a PermissionDenied gRPC status
 // so callers' existing isPermissionDenied / isAuthError checks still
 // classify it correctly (early-exit from retry backoff, StatusNeedsLogin
@@ -38,7 +38,7 @@ const peerLoginExpiredMsg = "peer login has expired"
 var errSetupKeyOnSSOExpiredPeer = status.Error(
 	codes.PermissionDenied,
 	"this peer was originally enrolled via SSO and its session has expired. "+
-		"Setup keys can only enrol new peers — run `netbird up` (interactive SSO) to re-login.",
+		"Setup keys can only enrol new peers — run `netbirdy up` (interactive SSO) to re-login.",
 )
 
 // Auth manages authentication operations with the management server

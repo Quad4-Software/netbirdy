@@ -11,11 +11,11 @@ import (
 	"golang.org/x/sys/windows/registry"
 )
 
-// policyRegistryPath is the well-known MDM policy registry key for NetBird.
+// policyRegistryPath is the well-known MDM policy registry key for NetBirdy.
 // Admins push values here through Group Policy, Intune ADMX ingestion, an
 // Intune custom Registry CSP profile, or `reg add` during MSI deployment.
 // Listed in the project's docs/mdm/netbird.admx schema.
-const policyRegistryPath = `Software\Policies\NetBird`
+const policyRegistryPath = `Software\Policies\NetBirdy`
 
 // readRegistryValue reads a single value under policyRegistryPath and,
 // on success, stores the type-coerced result in out[canonical]. Type
@@ -62,9 +62,9 @@ func readRegistryValue(k registry.Key, name, canonical string, out map[string]an
 }
 
 // loadPlatform reads the MDM-managed configuration from the Windows
-// registry under HKLM\Software\Policies\NetBird, unless a fetcher was
+// registry under HKLM\Software\Policies\NetBirdy, unless a fetcher was
 // injected, in which case its values are returned instead. Returns:
-//   - (nil, nil)  when the key is absent (device not MDM-enrolled for NetBird)
+//   - (nil, nil)  when the key is absent (device not MDM-enrolled for NetBirdy)
 //   - (map, nil)  with N entries when N managed values are set (N may be 0)
 //   - (nil, err)  on open / enumerate registry errors
 //

@@ -1,22 +1,22 @@
 FROM registry.access.redhat.com/ubi9/ubi-minimal@sha256:2d4c4551af6831dcd26bbf86108c4385de5183ec8fe6b5868f6f9640fe47f4ed
 
 ARG TARGETPLATFORM
-ARG NETBIRD_BINARY=$TARGETPLATFORM/netbird
+ARG NETBIRD_BINARY=$TARGETPLATFORM/netbirdy
 ARG VERSION=dev
 ARG RELEASE=1
 
-LABEL name="netbird-rootless" \
-      maintainer="NetBird <dev@netbird.io>" \
+LABEL name="netbirdy-rootless" \
+      maintainer="NetBirdy <dev@netbird.io>" \
       vendor="NetBird GmbH" \
       version="${VERSION}" \
       release="${RELEASE}" \
-      summary="NetBird Rootless Client" \
-      description="NetBird connects devices through an encrypted overlay using userspace networking without a TUN device or network administration capabilities."
+      summary="NetBirdy Rootless Client" \
+      description="NetBirdy connects devices through an encrypted overlay using userspace networking without a TUN device or network administration capabilities."
 
 RUN microdnf install -y bash ca-certificates && microdnf clean all
 
-COPY --chmod=0555 client/netbird-entrypoint.sh /usr/local/bin/netbird-entrypoint.sh
-COPY --chmod=0555 ${NETBIRD_BINARY} /usr/local/bin/netbird
+COPY --chmod=0555 client/netbirdy-entrypoint.sh /usr/local/bin/netbirdy-entrypoint.sh
+COPY --chmod=0555 ${NETBIRD_BINARY} /usr/local/bin/netbirdy
 COPY licenses/ /licenses/
 # Only application storage is group-writable for arbitrary non-root UIDs.
 # Runtime-created credentials keep the client's restrictive file modes.
@@ -30,7 +30,7 @@ USER 1000:0
 
 ENV \
     HOME="/var/lib/netbird" \
-    NETBIRD_BIN="/usr/local/bin/netbird" \
+    NETBIRD_BIN="/usr/local/bin/netbirdy" \
     NB_USE_NETSTACK_MODE="true" \
     NB_ENABLE_NETSTACK_LOCAL_FORWARDING="true" \
     NB_CONFIG="/var/lib/netbird/config.json" \
@@ -42,4 +42,4 @@ ENV \
     NB_ENTRYPOINT_SERVICE_TIMEOUT="30"
 
 STOPSIGNAL SIGTERM
-ENTRYPOINT ["/usr/local/bin/netbird-entrypoint.sh"]
+ENTRYPOINT ["/usr/local/bin/netbirdy-entrypoint.sh"]

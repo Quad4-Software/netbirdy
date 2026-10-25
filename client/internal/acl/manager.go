@@ -175,7 +175,7 @@ func (d *DefaultManager) applyPeerACLs(networkMap *mgmProto.NetworkMap) error {
 	// if we got empty rules list but management not set networkMap.FirewallRulesIsEmpty flag
 	// we have old version of management without rules handling, we should allow all traffic
 	if len(networkMap.FirewallRules) == 0 && !networkMap.FirewallRulesIsEmpty {
-		log.Warn("this peer is connected to a NetBird Management service with an older version. Allowing all traffic from connected peers")
+		log.Warn("this peer is connected to a NetBirdy Management service with an older version. Allowing all traffic from connected peers")
 		rules = append(rules,
 			&mgmProto.FirewallRule{
 				PeerIP:    "0.0.0.0", //nolint:staticcheck

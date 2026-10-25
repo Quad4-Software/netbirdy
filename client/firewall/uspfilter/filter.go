@@ -67,7 +67,7 @@ const (
 	// compatibility.
 	EnvForceUserspaceRouter = "NB_FORCE_USERSPACE_ROUTER"
 
-	// EnvEnableLocalForwarding enables forwarding of local traffic to the native stack for internal (non-NetBird) interfaces.
+	// EnvEnableLocalForwarding enables forwarding of local traffic to the native stack for internal (non-NetBirdy) interfaces.
 	// Default off as it might be security risk because sockets listening on localhost only will become accessible.
 	EnvEnableLocalForwarding = "NB_ENABLE_LOCAL_FORWARDING"
 
@@ -124,7 +124,7 @@ type Iface interface {
 	GetWGDevice() *wgbackend.Device
 }
 
-// InterfaceAllower opens the NetBird interface in the host firewall so it
+// InterfaceAllower opens the NetBirdy interface in the host firewall so it
 // doesn't drop traffic the userspace firewall handles, without taking over
 // packet filtering. Implementations (nftables, iptables, firewalld, the windows
 // netsh rule) are selected per platform and injected into Create; Apply runs at
@@ -138,7 +138,7 @@ type InterfaceAllower interface {
 type Config struct {
 	// IFace is the overlay interface the filter attaches to.
 	IFace Iface
-	// InterfaceAllower opens the NetBird interface in foreign kernel filter
+	// InterfaceAllower opens the NetBirdy interface in foreign kernel filter
 	// chains so the kernel doesn't drop traffic the userspace firewall handles.
 	// Nil in netstack mode, on non-Linux platforms without a backend, or when
 	// neither nftables nor iptables is available. firewalld trust is applied by
@@ -417,7 +417,7 @@ func (m *Manager) setupConntrack(disabled bool) {
 	m.tcpTracker = conntrack.NewTCPTracker(conntrack.DefaultTCPTimeout, m.logger, m.flowLogger)
 }
 
-// openHostFirewall opens the NetBird interface in the kernel firewall so it
+// openHostFirewall opens the NetBirdy interface in the kernel firewall so it
 // doesn't drop traffic the userspace firewall handles. Best-effort: failures
 // here shouldn't prevent the firewall from coming up.
 func (m *Manager) openHostFirewall(ifaceName string) {
@@ -1939,13 +1939,13 @@ func (m *Manager) shouldForward(d *decoder, dstIP netip.Addr) bool {
 		return !m.hasMatchingNetstackService(d)
 	}
 
-	// traffic to our other local interfaces (not NetBird IP) - always forward
+	// traffic to our other local interfaces (not NetBirdy IP) - always forward
 	addr := m.wgIface.Address()
 	if dstIP != addr.IP && (!addr.IPv6.IsValid() || dstIP != addr.IPv6) {
 		return true
 	}
 
-	// traffic to our NetBird IP, not netstack mode - send to netstack listeners
+	// traffic to our NetBirdy IP, not netstack mode - send to netstack listeners
 	return false
 }
 

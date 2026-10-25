@@ -1,4 +1,4 @@
-// Package installer provides functionality for managing NetBird application
+// Package installer provides functionality for managing NetBirdy application
 // updates and installations across Windows, macOS. It handles
 // the complete update lifecycle including artifact download, cryptographic verification,
 // installation execution, process management, and result reporting.
@@ -7,7 +7,7 @@
 //
 // The installer package uses a two-process architecture to enable self-updates:
 //
-//  1. Service Process: The main NetBird daemon process that initiates updates
+//  1. Service Process: The main NetBirdy daemon process that initiates updates
 //  2. Updater Process: A detached child process that performs the actual installation
 //
 // This separation is critical because:
@@ -54,11 +54,11 @@
 //     continues as on success
 //  7. Updater restarts daemon:
 //     - Windows: netbird.exe service start
-//     - macOS/Linux: netbird service start
+//     - macOS/Linux: netbirdy service start
 //  8. Updater restarts UI:
-//     - Windows: Launches netbird-ui.exe using CreateProcessAsUser in every
+//     - Windows: Launches netbirdy-ui.exe using CreateProcessAsUser in every
 //     session it was terminated in, falling back to the active console session
-//     - macOS: Uses launchctl asuser to launch NetBird.app for console user
+//     - macOS: Uses launchctl asuser to launch NetBirdy.app for console user
 //     - Linux: Not implemented (UI typically auto-starts)
 //  9. Updater writes result.json with success/error status (a pending reboot is
 //     recorded as success)
@@ -83,8 +83,8 @@
 // Temporary Directory (platform-specific):
 //
 // Windows:
-//   - Path: %ProgramData%\Netbird\tmp-install
-//   - Example: C:\ProgramData\Netbird\tmp-install
+//   - Path: %ProgramData%\NetBirdy\tmp-install
+//   - Example: C:\ProgramData\NetBirdy\tmp-install
 //
 // macOS:
 //   - Path: /var/lib/netbird/tmp-install
@@ -120,5 +120,5 @@
 // Enable via environment variable:
 //
 //	export NB_AUTO_UPDATE_DRY_RUN=true
-//	netbird service install-update 0.29.0
+//	netbirdy service install-update 0.29.0
 package installer

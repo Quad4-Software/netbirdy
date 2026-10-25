@@ -4,11 +4,11 @@
         <key>CFBundlePackageType</key>
             <string>APPL</string>
         <key>CFBundleName</key>
-            <string>NetBird</string>
+            <string>NetBirdy</string>
         <key>CFBundleDisplayName</key>
-            <string>NetBird</string>
+            <string>NetBirdy</string>
         <key>CFBundleExecutable</key>
-            <string>netbird-ui</string>
+            <string>netbirdy-ui</string>
         <key>CFBundleIdentifier</key>
             <string>io.netbird.client</string>
         <key>CFBundleVersion</key>

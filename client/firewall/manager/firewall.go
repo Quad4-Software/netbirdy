@@ -111,7 +111,7 @@ func (d Network) IsZero() bool {
 // Manager is the high level abstraction of a firewall manager
 //
 // It declares methods which handle actions required by the
-// Netbird client for ACL and routing functionality
+// NetBirdy client for ACL and routing functionality
 type Manager interface {
 	Init(stateManager *statemanager.Manager) error
 
@@ -175,7 +175,7 @@ type Manager interface {
 	// UpdateSet updates the set with the given prefixes
 	UpdateSet(hash Set, prefixes []netip.Prefix) error
 
-	// AddInboundDNAT adds an inbound DNAT rule redirecting traffic from NetBird peers to local services
+	// AddInboundDNAT adds an inbound DNAT rule redirecting traffic from NetBirdy peers to local services
 	AddInboundDNAT(localAddr netip.Addr, protocol Protocol, originalPort, translatedPort uint16) error
 
 	// RemoveInboundDNAT removes inbound DNAT rule

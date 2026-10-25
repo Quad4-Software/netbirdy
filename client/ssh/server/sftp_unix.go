@@ -48,7 +48,7 @@ func (s *Server) executeSftpWithPrivilegeDrop(sess ssh.Session, targetUser *user
 	return nil
 }
 
-// createSftpExecutorCommand creates a command that spawns netbird ssh sftp for privilege dropping
+// createSftpExecutorCommand creates a command that spawns netbirdy ssh sftp for privilege dropping
 func (s *Server) createSftpExecutorCommand(sess ssh.Session, uid, gid uint32, groups []uint32, workingDir string) (*exec.Cmd, error) {
 	netbirdPath, err := os.Executable()
 	if err != nil {

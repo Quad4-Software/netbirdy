@@ -109,7 +109,7 @@ func TestJWTCache_Expiry(t *testing.T) {
 	assert.False(t, found)
 }
 
-// Logout and SwitchProfile call clear — Down deliberately does not: the NetBird
+// Logout and SwitchProfile call clear — Down deliberately does not: the NetBirdy
 // session the token speaks for is over, so not even its owner may have it back.
 func TestJWTCache_ClearDropsTheEntry(t *testing.T) {
 	c := newJWTCache()

@@ -73,7 +73,7 @@ func (s *ProfileSwitcher) switchActive(ctx context.Context, p ProfileRef, connec
 		return fmt.Errorf("switch profile %q: %w", p.ProfileName, err)
 	}
 
-	// Mirror into the user-side ProfileManager state: the CLI's `netbird up`
+	// Mirror into the user-side ProfileManager state: the CLI's `netbirdy up`
 	// reads this file and sends the ID back in the Up RPC, so if it diverges
 	// the daemon reverts the UI switch on the next CLI `up`. Best-effort — the
 	// daemon is authoritative; a failure only leaves the CLI's view stale.

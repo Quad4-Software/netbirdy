@@ -12,7 +12,7 @@ import (
 const (
 	// ErrorReasonPrivilegeRequired identifies the detail.
 	ErrorReasonPrivilegeRequired = "PRIVILEGE_REQUIRED"
-	// ErrorDomain scopes the reason to the NetBird daemon.
+	// ErrorDomain scopes the reason to the NetBirdy daemon.
 	ErrorDomain = "daemon.netbird.io"
 	// ErrorMetaSummary is the one-sentence explanation of what was refused.
 	ErrorMetaSummary = "summary"
@@ -135,7 +135,7 @@ func ElevatedCommand(command string) string {
 	return "sudo " + command
 }
 
-// UpCommand renders an elevated `netbird up` with the given flags, preceded by a
+// UpCommand renders an elevated `netbirdy up` with the given flags, preceded by a
 // `down`. The down is what makes the command work on a connected client: `netbird
 // up` prints "Already connected" and returns without applying any config flag, so
 // on its own the command would appear to do nothing. It is a no-op, exit 0, when
@@ -145,5 +145,5 @@ func ElevatedCommand(command string) string {
 // might have: PowerShell 5.1, still the default on Windows Server, rejects "&&"
 // as a syntax error.
 func UpCommand(flags string) string {
-	return ElevatedCommand("netbird down") + "; " + ElevatedCommand("netbird up "+flags)
+	return ElevatedCommand("netbirdy down") + "; " + ElevatedCommand("netbirdy up "+flags)
 }

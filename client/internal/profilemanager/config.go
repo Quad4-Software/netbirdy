@@ -32,11 +32,11 @@ const (
 	// managementLegacyPortString is the port that was used before by the Management gRPC server.
 	// It is used for backward compatibility now.
 	managementLegacyPortString = "33073"
-	// DefaultManagementURL points to the NetBird's cloud management endpoint
+	// DefaultManagementURL points to the NetBirdy's cloud management endpoint
 	DefaultManagementURL = "https://api.netbird.io:443"
-	// oldDefaultManagementURL points to the NetBird's old cloud management endpoint
+	// oldDefaultManagementURL points to the NetBirdy's old cloud management endpoint
 	oldDefaultManagementURL = "https://api.wiretrustee.com:443"
-	// DefaultAdminURL points to NetBird's cloud management console. It is only
+	// DefaultAdminURL points to NetBirdy's cloud management console. It is only
 	// reported by the deprecated mobile admin URL getters.
 	DefaultAdminURL = "https://app.netbird.io:443"
 )
@@ -333,14 +333,14 @@ func newConfigSkeleton() *Config {
 // point: with the values named, every comparison below it diffs values instead
 // of presence.
 //
-// Presence-based comparison is what broke `netbird up` for a client configured
+// Presence-based comparison is what broke `netbirdy up` for a client configured
 // through the environment. These fields mean "the effective default" when they
 // hold nothing — every consumer already reads a nil as the value resolved here,
 // the SSH toggles in engine_ssh.go and the network monitor in
 // createEngineConfig — so naming them changes nothing about what runs. But
 // while they stayed nil, an input restating the default read as a change, and
 // since the CLI sends every flag whose value came from an environment variable
-// on each `netbird up`, a client with NB_ENABLE_SSH_ROOT=false restated it
+// on each `netbirdy up`, a client with NB_ENABLE_SSH_ROOT=false restated it
 // every time and the update-settings gate refused it.
 //
 // Filling a field in is not a settings change, so a caller measuring change
@@ -528,7 +528,7 @@ func (config *Config) apply(input ConfigInput) (updated bool, err error) {
 	// slices.Equal, not reflect.DeepEqual, and for the same reason the DNS
 	// labels below use it: DeepEqual calls a nil slice and an empty one
 	// different, while both mean "no NAT mappings". A profile stores the
-	// absent list as JSON null and reads it back nil, and `netbird up` sends
+	// absent list as JSON null and reads it back nil, and `netbirdy up` sends
 	// CleanNATExternalIPs — an empty list — whenever NB_EXTERNAL_IP_MAP is set
 	// to nothing, so the two met on every start and the gate read a no-op as a
 	// settings change.
@@ -1219,7 +1219,7 @@ func GetExistingConfig(configPath string) (*Config, error) {
 
 // UpdateOldManagementURL checks whether client can switch to the new Management URL with port 443 and the management domain.
 // If it can switch, then it updates the config and returns a new one. Otherwise, it returns the provided config.
-// The check is performed only for the NetBird's managed version.
+// The check is performed only for the NetBirdy's managed version.
 func UpdateOldManagementURL(ctx context.Context, config *Config, configPath string) (*Config, error) {
 	defaultManagementURL, err := parseURL("Management URL", DefaultManagementURL)
 	if err != nil {
@@ -1233,7 +1233,7 @@ func UpdateOldManagementURL(ctx context.Context, config *Config, configPath stri
 
 	if config.ManagementURL.Hostname() != defaultManagementURL.Hostname() &&
 		config.ManagementURL.Hostname() != parsedOldDefaultManagementURL.Hostname() {
-		// only do the check for the NetBird's managed version
+		// only do the check for the NetBirdy's managed version
 		return config, nil
 	}
 

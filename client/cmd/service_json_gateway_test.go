@@ -81,10 +81,10 @@ func TestJSONGateway_ForgedIdentityHeaderIsDropped(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	req.Header.Set("Grpc-Metadata-X-Netbird-Fwd-Uid", "0")
-	req.Header.Set("Grpc-Metadata-X-Netbird-Fwd-Gid", "0")
-	req.Header.Set("Grpc-Metadata-X-Netbird-Fwd", "1")
-	req.Header.Set("Grpc-Metadata-X-Netbird-Fwd-Sid", "S-1-5-18")
+	req.Header.Set("Grpc-Metadata-X-NetBirdy-Fwd-Uid", "0")
+	req.Header.Set("Grpc-Metadata-X-NetBirdy-Fwd-Gid", "0")
+	req.Header.Set("Grpc-Metadata-X-NetBirdy-Fwd", "1")
+	req.Header.Set("Grpc-Metadata-X-NetBirdy-Fwd-Sid", "S-1-5-18")
 
 	caller := ipcauth.Identity{UID: 31000, GID: 31000}
 	md := gatewayMetadata(t, req, clientCtx(caller, true))
@@ -230,8 +230,8 @@ func TestJSONGateway_IdentityComesFromTheSocket(t *testing.T) {
 	// Forge the identity headers on the wire as well.
 	request := "POST /daemon.DaemonService/SetConfig HTTP/1.1\r\n" +
 		"Host: localhost\r\n" +
-		"Grpc-Metadata-X-Netbird-Fwd: 1\r\n" +
-		"Grpc-Metadata-X-Netbird-Fwd-Uid: 0\r\n" +
+		"Grpc-Metadata-X-NetBirdy-Fwd: 1\r\n" +
+		"Grpc-Metadata-X-NetBirdy-Fwd-Uid: 0\r\n" +
 		"Content-Length: 0\r\n\r\n"
 	if _, err := conn.Write([]byte(request)); err != nil {
 		t.Fatal(err)

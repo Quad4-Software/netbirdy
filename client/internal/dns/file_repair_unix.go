@@ -25,7 +25,7 @@ var (
 	}
 )
 
-// repairConfFn writes the NetBird-managed resolv.conf and returns the exact content it wrote.
+// repairConfFn writes the NetBirdy-managed resolv.conf and returns the exact content it wrote.
 type repairConfFn func([]string, netip.Addr, *resolvConf, *statemanager.Manager) ([]byte, error)
 
 type repair struct {
@@ -46,7 +46,7 @@ func newRepair(operationFile string, updateFn repairConfFn) *repair {
 	}
 }
 
-// watchFileChanges keeps resolv.conf pointing at NetBird. written is the content NetBird last
+// watchFileChanges keeps resolv.conf pointing at NetBirdy. written is the content NetBirdy last
 // wrote to the file, used to recognize the echo of its own writes.
 func (f *repair) watchFileChanges(nbSearchDomains []string, nbNameserverIP netip.Addr, written []byte, stateManager *statemanager.Manager) {
 	if f.inotify != nil {
@@ -97,9 +97,9 @@ func (f *repair) watchFileChanges(nbSearchDomains []string, nbNameserverIP netip
 	}()
 }
 
-// checkAndRepair rewrites resolv.conf when NetBird's parameters are missing from it and returns
-// the content NetBird last wrote. The watch stays armed while repairing, so a third-party write
-// racing the repair still raises an event; the echo of NetBird's own write is skipped by content.
+// checkAndRepair rewrites resolv.conf when NetBirdy's parameters are missing from it and returns
+// the content NetBirdy last wrote. The watch stays armed while repairing, so a third-party write
+// racing the repair still raises an event; the echo of NetBirdy's own write is skipped by content.
 func (f *repair) checkAndRepair(nbSearchDomains []string, nbNameserverIP netip.Addr, lastWritten []byte, stateManager *statemanager.Manager) []byte {
 	content, err := os.ReadFile(f.operationFile)
 	if err != nil {
@@ -108,7 +108,7 @@ func (f *repair) checkAndRepair(nbSearchDomains []string, nbNameserverIP netip.A
 	}
 
 	if bytes.Equal(content, lastWritten) {
-		log.Tracef("%s still holds the NetBird managed content, skip the check", f.operationFile)
+		log.Tracef("%s still holds the NetBirdy managed content, skip the check", f.operationFile)
 		return lastWritten
 	}
 
@@ -165,9 +165,9 @@ func (f *repair) isEventRelevant(event fsnotify.Event) bool {
 	return false
 }
 
-// nbParamsAreMissing checks if the resolv.conf file contains all the parameters that NetBird needs
-// check the NetBird related nameserver IP at the first place
-// check the NetBird related search domains in the search domains list
+// nbParamsAreMissing checks if the resolv.conf file contains all the parameters that NetBirdy needs
+// check the NetBirdy related nameserver IP at the first place
+// check the NetBirdy related search domains in the search domains list
 func isNbParamsMissing(nbSearchDomains []string, nbNameserverIP netip.Addr, rConf *resolvConf) bool {
 	if !isContains(nbSearchDomains, rConf.searchDomains) {
 		return true

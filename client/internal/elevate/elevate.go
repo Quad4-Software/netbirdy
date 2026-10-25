@@ -6,7 +6,7 @@
 // shows the UAC consent dialog, macOS the system authentication dialog, and
 // Linux/FreeBSD the session's polkit agent. The credentials, where any are
 // asked for, are collected by the operating system and never pass through
-// NetBird.
+// NetBirdy.
 //
 // What the elevated process then does is the caller's business: it is the same
 // binary, in a one-shot mode, and it is authorized by the daemon exactly like
