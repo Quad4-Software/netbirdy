@@ -183,7 +183,7 @@ func TestIsReservedForwardKey(t *testing.T) {
 
 	// grpc-gateway canonicalises header names, so the check has to be
 	// case-insensitive.
-	if !IsReservedForwardKey("X-NetBirdy-Fwd-Uid") {
+	if !IsReservedForwardKey("X-NetBird-Fwd-Uid") {
 		t.Error("the check must be case-insensitive")
 	}
 

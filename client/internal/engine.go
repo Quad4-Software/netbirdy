@@ -317,7 +317,7 @@ type Engine struct {
 	// signal negotiation and relay refresh are skipped in Start.
 	offline               bool
 	offlineProtectedHosts map[string]struct{}
-	syncStoreDir string
+	syncStoreDir          string
 
 	// lastAppliedNetworkMap is the most recently applied network map.
 	lastAppliedNetworkMap *mgmProto.NetworkMap
@@ -326,8 +326,10 @@ type Engine struct {
 	// offline debouncer re-saves it when a peer's direct endpoint lands.
 	lastAppliedSync *mgmProto.SyncResponse
 
-	// offlinePeerEndpoints holds last-known direct endpoints per peer key.
-	offlinePeerEndpoints map[string]string
+	// offlinePeerEndpoints holds last-known direct endpoints per peer key;
+	// written from peer goroutines via the direct endpoint hook.
+	offlinePeerEndpointsMu sync.Mutex
+	offlinePeerEndpoints   map[string]string
 
 	// offlineDebouncer rate-limits networkmap.bin snapshot writes (at most
 	// one per 5s); nil until the engine starts.
@@ -732,7 +734,9 @@ func (e *Engine) Start(netbirdConfig *mgmProto.NetbirdConfig, mgmtURL *url.URL) 
 
 	e.connMgr = NewConnMgr(e.config, e.statusRecorder, e.peerStore, wgIface)
 	peer.SetDirectEndpointHook(func(key, endpoint string) {
+		e.offlinePeerEndpointsMu.Lock()
 		e.offlinePeerEndpoints[key] = endpoint
+		e.offlinePeerEndpointsMu.Unlock()
 		if e.lastAppliedSync != nil {
 			e.scheduleOfflineSnapshot(e.lastAppliedSync)
 		}
@@ -2612,7 +2616,13 @@ func (e *Engine) scheduleOfflineSnapshot(update *mgmProto.SyncResponse) {
 			for _, k := range e.peerStore.PeersPubKey() {
 				peerKeys[k] = struct{}{}
 			}
-			merged := mergeEndpoints(LastEndpoints(), e.offlinePeerEndpoints, peerKeys)
+			e.offlinePeerEndpointsMu.Lock()
+			endpoints := make(map[string]string, len(e.offlinePeerEndpoints))
+			for k, v := range e.offlinePeerEndpoints {
+				endpoints[k] = v
+			}
+			e.offlinePeerEndpointsMu.Unlock()
+			merged := mergeEndpoints(LastEndpoints(), endpoints, peerKeys)
 			return saveOfflineSnapshot(path, update, merged, time.Now())
 		}, func(err error) {
 			if now := time.Now().UnixNano(); now-e.offlineLogGate.Load() > int64(time.Minute) {

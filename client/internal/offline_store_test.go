@@ -5,6 +5,7 @@ import (
 	"errors"
 	"os"
 	"path/filepath"
+	"runtime"
 	"sync"
 	"sync/atomic"
 	"testing"
@@ -46,8 +47,10 @@ func TestOfflineSnapshot(t *testing.T) {
 		if err != nil {
 			t.Fatalf("stat: %v", err)
 		}
-		if got := fi.Mode().Perm(); got != 0o600 {
-			t.Fatalf("mode = %o, want 0600", got)
+		if runtime.GOOS != "windows" { // unix perm bits do not exist on Windows
+			if got := fi.Mode().Perm(); got != 0o600 {
+				t.Fatalf("mode = %o, want 0600", got)
+			}
 		}
 		got, savedAt, err := loadOfflineSnapshot(p, age, now.Add(time.Hour))
 		if err != nil {

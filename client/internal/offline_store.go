@@ -7,6 +7,7 @@ import (
 	"net/netip"
 	"os"
 	"path/filepath"
+	"sync"
 	"sync/atomic"
 	"time"
 
@@ -51,7 +52,7 @@ func saveOfflineSnapshot(path string, resp *mgmProto.SyncResponse, endpoints map
 	if err != nil {
 		return fmt.Errorf("marshal sync response: %w", err)
 	}
-	mgmtAddrs := lastMgmtAddrs
+	mgmtAddrs := LastMgmtAddrs()
 	if len(mgmtAddrs) == 0 {
 		if bs, rerr := os.ReadFile(path); rerr == nil {
 			var prev offlineSnapshot
@@ -98,9 +99,10 @@ func loadOfflineSnapshot(path string, maxAge time.Duration, now time.Time) (*mgm
 }
 
 var (
-	loaded        map[string]string
-	lastEndpoints map[string]string
-	lastMgmtAddrs  []string
+	loaded          map[string]string
+	lastEndpoints   map[string]string
+	lastMgmtAddrs   []string
+	lastMgmtAddrsMu sync.Mutex
 )
 
 func loadSnapshotInner(path string, maxAge time.Duration, now time.Time) (*mgmProto.SyncResponse, time.Time, error) {
@@ -147,7 +149,9 @@ func loadSnapshotInner(path string, maxAge time.Duration, now time.Time) (*mgmPr
 		}
 	}
 	loaded = env.Endpoints
+	lastMgmtAddrsMu.Lock()
 	lastMgmtAddrs = env.MgmtAddrs
+	lastMgmtAddrsMu.Unlock()
 	return resp, env.SavedAt, nil
 }
 
@@ -230,7 +234,11 @@ func DeleteOfflineSnapshotFor(configPath string) error {
 func LastEndpoints() map[string]string { return lastEndpoints }
 
 // LastMgmtAddrs returns the cached management IPs from the snapshot.
-func LastMgmtAddrs() []string { return lastMgmtAddrs }
+func LastMgmtAddrs() []string {
+	lastMgmtAddrsMu.Lock()
+	defer lastMgmtAddrsMu.Unlock()
+	return append([]string(nil), lastMgmtAddrs...)
+}
 
 // updateMgmtAddrs persists freshly resolved management IPs into an existing
 // snapshot envelope immediately, so a later debounced write cannot race the
@@ -253,12 +261,18 @@ func updateMgmtAddrs(path string, addrs []string) {
 		return
 	}
 	if err := os.WriteFile(path, out, 0o600); err == nil {
+		lastMgmtAddrsMu.Lock()
 		lastMgmtAddrs = addrs
+		lastMgmtAddrsMu.Unlock()
 	}
 }
 
 // SetMgmtAddrs records freshly resolved management IPs for the snapshot.
-func SetMgmtAddrs(addrs []string) { lastMgmtAddrs = addrs }
+func SetMgmtAddrs(addrs []string) {
+	lastMgmtAddrsMu.Lock()
+	lastMgmtAddrs = addrs
+	lastMgmtAddrsMu.Unlock()
+}
 
 // mergeEndpoints keeps endpoints for peers that exist in the current map:
 // freshly captured values win, previous values fill gaps for peers that are
