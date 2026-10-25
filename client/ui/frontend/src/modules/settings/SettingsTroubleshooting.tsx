@@ -27,6 +27,8 @@ import { Tooltip } from "@/components/Tooltip";
 import { formatRemaining } from "@/lib/formatters";
 import type { AnonymizeLevel, DebugStage } from "@/contexts/DebugBundleContext";
 import { useDebugBundleContext } from "@/contexts/DebugBundleContext";
+
+const inertProps = { inert: "" };
 import { SectionGroup, SettingsBottomBar } from "@/modules/settings/SettingsSection.tsx";
 
 const SUPPORT_DOCS_URL = "https://docs.netbird.io/help/report-bug-issues";
@@ -143,7 +145,7 @@ export function SettingsTroubleshooting() {
                 />
                 <div
                     className={"flex items-center justify-between gap-6"}
-                    {...(capture ? {} : { inert: "" })}
+                    {...(capture ? {} : (inertProps as object))}
                 >
                     <div className={"max-w-md flex-1"}>
                         <Label htmlFor={durationId} disabled={!capture}>

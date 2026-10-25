@@ -1,6 +1,8 @@
 import type { ReactNode } from "react";
 import { cn } from "@/lib/cn";
 
+const inertProps = { inert: "" };
+
 export const SectionGroup = ({
     title,
     children,
@@ -13,7 +15,7 @@ export const SectionGroup = ({
     <section
         aria-label={title}
         tabIndex={disabled ? -1 : 0}
-        {...(disabled ? { inert: "" } : {})}
+        {...(disabled ? (inertProps as object) : {})}
         className={cn(
             "mb-8 rounded-md px-1 outline-hidden last:mb-1",
             "focus-visible:ring-2 focus-visible:ring-nb-gray-50/60 focus-visible:ring-offset-2 focus-visible:ring-offset-nb-gray-940",
