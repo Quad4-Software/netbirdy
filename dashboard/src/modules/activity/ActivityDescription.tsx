@@ -1006,6 +1006,23 @@ export default function ActivityDescription({ event }: Props) {
       </div>
     );
 
+  if (event.activity_code == "peer.ip.new")
+    return <div className={"inline"}>Peer <Value>{m.peer_name || m.target || ""}</Value> connected from a new IP <Value>{m.src_ip}</Value></div>;
+  if (event.activity_code == "peer.connection.concurrent")
+    return <div className={"inline"}>Peer <Value>{m.peer_name || m.target || ""}</Value> had concurrent connections for one key</div>;
+  if (event.activity_code == "peer.ip.flap")
+    return <div className={"inline"}>Peer <Value>{m.peer_name || m.target || ""}</Value> source IP flapping detected</div>;
+  if (event.activity_code == "peer.meta.mismatch")
+    return <div className={"inline"}>Peer <Value>{m.peer_name || m.target || ""}</Value> machine metadata changed</div>;
+  if (event.activity_code == "auth.failure.burst")
+    return <div className={"inline"}>Authentication failure burst from <Value>{m.src_ip}</Value></div>;
+  if (event.activity_code == "setupkey.misuse")
+    return <div className={"inline"}>Setup key used unusually from <Value>{m.src_ip}</Value></div>;
+  if (event.activity_code == "user.login.anomaly")
+    return <div className={"inline"}>User <Value>{m.user_id || m.target || ""}</Value> logged in from a new location</div>;
+  if (event.activity_code == "pat.anomaly")
+    return <div className={"inline"}>Access token used from a new address <Value>{m.src_ip}</Value></div>;
+
   return (
     <div className={"flex gap-2.5 items-center"}>
       <span className={"mb-[1px]"}>{event.activity}</span>

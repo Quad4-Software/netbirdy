@@ -231,6 +231,14 @@ export default function IdentityProviderModal({
                     <GlobeIcon size={16} className="text-nb-gray-300" />
                   }
                 />
+                {type === "pocketid" && (
+                  <HelpText margin={false} className={"mt-1.5"}>
+                    Your Pocket ID URL, no trailing slash.{" "}
+                    <InlineLink href={"/docs/guides/pocket-id"} target={"_blank"}>
+                      Setup guide
+                    </InlineLink>
+                  </HelpText>
+                )}
               </div>
             )}
 
