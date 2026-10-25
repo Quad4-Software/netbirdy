@@ -46,15 +46,31 @@ release so the job runs again.
 
 ## Release procedure
 
-Tagging `v*` triggers `.github/workflows/release-fork.yml` (fork only).
-A dry run that builds and signs everything without publishing is
-available via workflow_dispatch with `publish` set to false; outputs are
-uploaded as workflow artifacts.
+Pushing a `v*` tag runs `.github/workflows/release-fork.yml` (fork only). The
+workflow_dispatch trigger is a dry run: it builds and signs everything, publishes
+nothing and uploads the result as the `release-assets` workflow artifact.
 
-Required secret: `NETBIRDY_ARTIFACT_KEY` (the artifact private key,
-ed25519). The root private key never leaves `~/.config/netbirdy-signing/`
-on the maintainer machine.
+Jobs:
 
-Artifacts are signed by the signer tool (reposign), checksums are
-cosign-signed keylessly, and build provenance is attested. Prerelease
-tags never move the `latest` image tag.
+- goreleaser builds the archives, deb and rpm packages and the client, relay,
+  signal, management, upload and server images, and creates the GitHub release.
+- windows-installer builds `netbirdy_<version>_windows_amd64` as an NSIS installer
+  named `netbirdy_installer_<version>_windows_amd64.exe`. The installer ships the
+  daemon and CLI without the desktop UI. No MSI is built.
+- macos-pkg builds `netbirdy_<version>_darwin_amd64.pkg` and `_arm64.pkg`.
+- images builds and pushes the dashboard and updater images and writes
+  `netbirdy_<version>_images.txt` (server, dashboard and updater by digest).
+- sign writes `netbirdy_<version>_checksums.txt`, signs every asset and the
+  checksums and image list with the artifact key and verifies each signature
+  against `publickeys/artifact-signatures/keys/artifact-key-pub.pem`.
+- publish uploads the signatures and extra assets to the release, signs the
+  checksums, image list and images with cosign, attests build provenance and
+  marks stable releases latest.
+
+Image tags have no leading v (`ghcr.io/sudo-ivan/netbirdy-server:1.2.3`).
+Prerelease tags (a hyphen in the version, for example `v1.0.0-rc.1`) stay
+GitHub prereleases and never move the `latest` image tag.
+
+Required secret: `NETBIRDY_ARTIFACT_KEY` (the artifact private key). The root
+private key never leaves `~/.config/netbirdy-signing/` on the maintainer
+machine.

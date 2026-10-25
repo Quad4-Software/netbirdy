@@ -6,129 +6,204 @@
   </picture>
 </p>
 
-# NetBirdy
+<p align="center">
+  <b>A private network for your devices that you run yourself.</b><br>
+  Laptops, servers, phones and home lab machines talk to each other directly and securely, from anywhere.
+</p>
 
-Self-hostable WireGuard overlay network with a privacy-first control
-plane. NetBirdy is a fork of NetBird: same protocol, same client
-compatibility, hardened defaults, extra security tooling, and a
-restyled dashboard.
+<p align="center">
+  <a href="https://github.com/Sudo-Ivan/netbirdy/actions/workflows/golang-test-linux.yml"><img src="https://github.com/Sudo-Ivan/netbirdy/actions/workflows/golang-test-linux.yml/badge.svg" alt="CI"></a>
+</p>
 
-[![CI](https://github.com/Sudo-Ivan/netbirdy/actions/workflows/golang-test-linux.yml/badge.svg)](https://github.com/Sudo-Ivan/netbirdy/actions/workflows/golang-test-linux.yml)
+## What is this?
 
-## What is different from upstream
+Imagine all your computers sitting on the same home network, even when one is
+in a datacenter, one is at the office and one is in your backpack. That is what
+NetBirdy gives you. Each device runs a small program, signs in once, and then
+connects straight to your other devices over encrypted WireGuard tunnels. You
+decide who can reach what with simple access rules.
 
-| Feature | Where documented |
-| --- | --- |
-| Crimson monochrome dashboard: black dark theme, warm paper light theme, Instrument Sans and JetBrains Mono vendored locally with no third-party requests | `docs/brand/` |
-| Command palette and keyboard shortcuts | dashboard UI, `docs/brand/` |
-| Embedded, offline-searchable documentation inside the dashboard | `dashboard/content/docs/` |
-| Enterprise, cloud-only and license-gated UI removed | `NOTICE.md`, dashboard |
-| OG and PWA metadata for dashboard pages | `dashboard/` |
-| Reverse proxy scanner and crawler shield: honeypot paths, scanner and AI crawler UA classification, scoring, proof-of-work challenge, tarpit, bans, JSONL shield log, debug routes | `proxy/docs/shield.md` |
-| HTTP/3 with Alt-Svc, plus a documented protocol support matrix: HTTP/1.1, HTTP/2, WS/WSS, SSE, gRPC unary, TCP/UDP passthrough, PROXY protocol, gaps documented (no h2c backends, no WebSocket over HTTP/3) | `proxy/docs/` |
-| Listener hardening and trusted-proxy IP resolution | `proxy/docs/` |
-| Offline-capable client: cached network map and cached management IPs, with documented limits | `docs/offline-mode.md` |
-| Anomaly detection engine with off / observe / prevent modes: rules, learning period, hourly caps, cooldowns, owner safeguards | `docs/security-monitoring.md` |
-| JSONL audit and security event logs, optional RFC 5424 syslog sink (UDP/TCP/TLS) | `docs/security-monitoring.md` |
-| Wazuh 4.x integration pack: decoders, rules 100100-100303, dry-run-by-default active response (Wazuh 5.0 unsupported) | `docs/wazuh.md`, `integrations/wazuh/` |
-| Pocket ID login: guided dashboard preset, compose profile, `podman/add-pocketid.sh` helper | `docs/pocket-id.md` |
-| One-command Podman preview stack, telemetry off by default | `podman/README.md` |
-| Drop-in compatibility: Go module path, `NB_*` env vars, `/etc/netbird` paths, wire protocol, package provide/replace for `netbird`, stock NetBird clients (including the mobile apps) work against a NetBirdy server | `docs/migrating-from-netbird.md` |
-| Supply-chain defaults: pnpm 12 workspace with 7-day release-age cooldown, lockfile guard, SHA-pinned GitHub Actions, Go 1.27 | `docs/frontend-supply-chain.md` |
+NetBirdy is a community fork of [NetBird](https://github.com/netbirdio/netbird).
+It keeps everything that makes NetBird work, and adds a nicer control panel,
+more protection for your server, and tools for people who run their own
+infrastructure.
 
-## Quick start (Podman preview)
+**Already using NetBird?** You do not have to start over. NetBirdy is a drop-in
+replacement. Your devices, keys and settings keep working, and the official
+NetBird clients can connect to a NetBirdy server because it speaks the same protocol.
+
+## Why people pick NetBirdy
+
+**A control panel that is pleasant to use**
+A clean black dark theme and a warm light theme, a quick search and keyboard
+shortcuts (press `?` in the panel to see them), and built-in help pages that
+work without internet access.
+
+**Protection built in**
+- A web shield for services you publish. It spots scanners and crawlers by how
+  they behave and slows them down or blocks them, without bothering real visitors.
+- An alarm for suspicious sign-ins. It notices things like a device suddenly
+  appearing from a new place or many failed logins. It can just tell you, or it
+  can ask for approval before a device is allowed back in.
+- Ready-made rules for [Wazuh](https://wazuh.com), if you already run it for
+  security monitoring.
+
+**Keeps working when the server does not**
+If your server goes offline, devices that are already connected stay connected.
+After a restart they can reconnect to their peers using what they remembered,
+instead of going dark until the server comes back.
+
+**Easy to run yourself**
+- One command starts a complete test setup on your own machine with Podman.
+- Signing in with [Pocket ID](https://pocket-id.org) (passkeys) has a guided setup.
+- NetBirdy turns off the usage reports that NetBird sends to its own servers, and update checks are
+  opt-in. Nothing is sent anywhere unless you turn it on.
+- Updates come from signed releases, and the server can update itself with an
+  optional helper container that makes a backup first and rolls back if
+  something goes wrong.
+
+**Fast, modern web access**
+Publish internal web apps through the built-in reverse proxy, with HTTP/3,
+WebSockets and streaming support.
+
+## Try it in five minutes
+
+You need [Podman](https://podman.io) and `make`.
 
 ```sh
-make podman-build   # build server and dashboard images
-make podman-up      # generate secrets and config, start detached
-make podman-logs    # follow logs
-make podman-down    # stop the stack
+git clone https://github.com/Sudo-Ivan/netbirdy.git
+cd netbirdy
+make podman-build   # builds the server and the control panel
+make podman-up      # creates your settings and starts everything
 ```
 
-- Dashboard: `http://localhost:8080`
-- Management / embedded IdP / signal / relay / STUN: `http://localhost:8081`
-- Owner credentials are generated into `podman/.env` on first run.
+Then open the control panel at **http://localhost:8080**. Your admin email and a
+generated password are saved in `podman/.env` on your machine.
 
-See `podman/README.md` for the full matrix (custom ports, reset,
-testing inside the containers).
+When you are done:
 
-## Install clients
+```sh
+make podman-down    # stop it
+make podman-clean   # stop it and remove everything it created
+```
 
-Client packages and binaries are named `netbirdy` (`netbirdy`,
-`netbirdy-ui`, `netbirdy-signal`, `netbirdy-relay`). The official NetBird mobile apps work against a NetBirdy server.
+More options (other ports, resetting, running the tests) are in
+[podman/README.md](podman/README.md).
 
-## Compatibility
+## Connect your first device
 
-| Kept as upstream | Why |
+1. In the control panel, open **Setup Keys** and create a key.
+2. Install the client on the device. Packages and installers are on the
+   [Releases page](https://github.com/Sudo-Ivan/netbirdy/releases). The program is
+   called `netbirdy`.
+3. Connect it:
+   ```sh
+   sudo netbirdy up --management-url http://YOUR-SERVER:8081 --setup-key YOUR-KEY
+   ```
+4. Run `netbirdy status` to see your other devices.
+
+Repeat on every device. Use the **Access Control** page to choose who can talk to whom.
+
+Coming from NetBird? Read [Moving from NetBird](docs/migrating-from-netbird.md).
+Installing the NetBirdy package replaces the NetBird one and keeps your existing
+settings.
+
+## Questions people ask
+
+**Is this the same as NetBird?**
+It is built on NetBird and speaks the same protocol, so the two work together.
+NetBirdy adds its own look, extra security features and fork-specific tooling.
+It is an independent project and is not affiliated with the NetBird company.
+
+**Can I mix NetBird and NetBirdy?**
+Yes. Stock NetBird clients can join a NetBirdy server. Some NetBirdy-only
+features, like offline reconnect and update downloads through your server, only
+work with the NetBirdy client.
+
+**Does it send data to anyone?**
+Not by default. The usage reports to NetBird's servers are off, and update
+checking is opt-in. Fonts and help pages are bundled, so the control panel does
+not load anything from third-party sites.
+
+**Is it free?**
+Yes. See the license section below.
+
+**Where do I report a security problem?**
+Privately, as described in [SECURITY.md](SECURITY.md).
+
+## Guides
+
+| I want to | Read |
 | --- | --- |
-| Go module path `github.com/netbirdio/netbird` | import compatibility |
+| Move from NetBird | [Moving from NetBird](docs/migrating-from-netbird.md) |
+| Understand what happens when the server is down | [Offline mode](docs/offline-mode.md) |
+| Get alerts about suspicious sign-ins | [Security monitoring](docs/security-monitoring.md) |
+| Send events to Wazuh | [Wazuh](docs/wazuh.md) |
+| Sign in with passkeys | [Pocket ID](docs/pocket-id.md) |
+| Keep the server and clients up to date | [Updating](docs/updating.md) and [Update mirror](docs/update-mirror.md) |
+| Protect published web apps from scanners | [Web shield](proxy/docs/shield.md) |
+| Use my own domain for published apps | [Custom domains](docs/custom-domain-validation.md) |
+| Run the CI checks on my own server | [Crow CI](docs/ci-crow.md) |
+| Maintain a fork or cut a release | [Maintaining](docs/maintaining.md) |
+
+The full list is in [docs/README.md](docs/README.md). The control panel also has
+built-in help under **Docs**, so many of these guides are one click away.
+
+## For developers
+
+<details>
+<summary>What stays the same as NetBird, and why</summary>
+
+NetBirdy changes names and looks, but keeps the parts that other software
+depends on so upgrades never break:
+
+| Kept as in NetBird | Why |
+| --- | --- |
+| Go module path `github.com/netbirdio/netbird` | existing imports keep compiling |
 | `NB_*` environment variables | existing configs keep working |
-| `/etc/netbird` config path and `netbird` service/user | drop-in upgrades |
-| Wire protocol, API, setup keys | interop with stock clients |
-| `x-netbird-fwd-*` protocol headers | forwarded-identity protocol |
-| packages `Provides`/`Replaces`/`Conflicts: netbird` | package-level migration |
-| `docs.netbird.io`, `pkgs.netbird.io` references where no fork equivalent exists | upstream links must keep working |
+| `/etc/netbird`, the `netbird` service and user | in-place upgrades |
+| Wire protocol, API and setup keys | works with stock clients |
+| `X-NetBird-Fwd-*` headers | forwarded-identity protocol |
+| Package `Provides`, `Replaces` and `Conflicts: netbird` | package-level migration |
+| `docs.netbird.io` and `pkgs.netbird.io` links where there is no fork equivalent | upstream links keep working |
 
-## Security
+</details>
 
-Report vulnerabilities privately: see `SECURITY.md`. Hardening notes:
-`docs/security-monitoring.md`, `proxy/docs/shield.md`, `docs/wazuh.md`.
-
-## Documentation
-
-| File | Contents |
-| --- | --- |
-| `docs/migrating-from-netbird.md` | Migrating an existing NetBird install |
-| `docs/offline-mode.md` | Client offline mode behaviour and limits |
-| `docs/security-monitoring.md` | Anomaly detection, audit log, syslog |
-| `docs/wazuh.md` | Wazuh SIEM integration |
-| `docs/pocket-id.md` | Pocket ID sign-in setup |
-| `docs/updating.md` | Updating server, packages and clients |
-| `docs/maintaining.md` | Fork maintenance and release process |
-| `docs/frontend-supply-chain.md` | Frontend dependency policies |
-| `docs/testing-privileged.md` | Privileged test setup |
-| `docs/custom-domain-validation.md` | Custom domains on the reverse proxy |
-| `docs/ci-crow.md` | Self-hosted Crow CI pipelines |
-| `podman/README.md` | Podman preview stack reference |
-| `proxy/docs/` | Reverse proxy, shield, protocol matrix |
-| `integrations/wazuh/README.md` | Wazuh pack install |
-
-## Updating
-
-See `docs/updating.md`.
-
-## Project layout
+<details>
+<summary>Repository layout</summary>
 
 ```
-client/         agent (CLI netbirdy), runs on each machine
-management/     control plane, REST + gRPC API
-signal/         peer handshake broker
-relay/          traffic relay for peers that cannot connect directly
+client/         the agent that runs on each device (netbirdy)
+client/ui/      desktop app
+management/     control plane with REST and gRPC APIs
+signal/         helps devices find each other
+relay/          carries traffic when devices cannot connect directly
 combined/       all-in-one server binary
-dashboard/      management web UI (Next.js)
-proxy/          reverse proxy with the scanner/crawler shield
-idp/            embedded Dex identity provider
-shared/         shared proto and API types
-podman/         local preview stack (Containerfiles, compose, setup)
+dashboard/      the control panel (Next.js)
+proxy/          reverse proxy with the web shield
+idp/            built-in identity provider (Dex)
+updater/        optional helper that updates the server stack
+shared/         shared API types and update verification
+podman/         local stack (Containerfiles, compose, setup)
 integrations/   third-party integrations (Wazuh)
-client/ui/      desktop UI (Wails)
 ```
 
-## Contributing
+</details>
 
-Issues and pull requests go to
-[github.com/Sudo-Ivan/netbirdy](https://github.com/Sudo-Ivan/netbirdy).
-Run `tools/rebrand/rebrand.sh --check` before pushing identifier
-changes and `docs/brand/generate.sh --check` for brand assets.
+Issues and pull requests are welcome at
+[github.com/Sudo-Ivan/netbirdy](https://github.com/Sudo-Ivan/netbirdy). Before
+pushing, run `tools/rebrand/rebrand.sh --check` for naming changes and
+`docs/brand/generate.sh --check` for brand assets.
 
 ## License
 
-BSD-3-Clause except `management/`, `signal/`, `relay/`, `combined/` and
-`dashboard/`, which are AGPL-3.0-only. See `NOTICE.md` and
-`LICENSES/` for the full license texts and the change notice.
+NetBirdy is open source. Most of the code is BSD-3-Clause. The server pieces
+(`management/`, `signal/`, `relay/`, `combined/`) and the control panel
+(`dashboard/`) are AGPL-3.0. If you modify and run those parts as a service, you
+must offer your users the source. [NOTICE.md](NOTICE.md) and the `LICENSES/`
+folder have the full texts, the list of changes from NetBird and the source offer.
 
 ## Trademark
 
-NetBird is a trademark of its respective owner; see `NOTICE.md`.
-NetBirdy is an independent fork and is not affiliated with or endorsed
-by the upstream project.
+NetBird is a trademark of its owner. NetBirdy is an independent fork and is not
+affiliated with or endorsed by the upstream project.
