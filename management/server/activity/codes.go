@@ -300,6 +300,8 @@ const (
 	SetupKeyMisuseDetected   Activity = 151
 	UserLoginAnomaly         Activity = 152
 	PATAnomaly               Activity = 153
+	UpdateCheckRequested     Activity = 154
+	ServerUpdateRequested    Activity = 155
 
 	AccountDeleted Activity = 99999
 )
@@ -493,6 +495,8 @@ var activityMap = map[Activity]Code{
 	SetupKeyMisuseDetected:   {"Setup key used unusually", "setupkey.misuse"},
 	UserLoginAnomaly:         {"User login from a new location", "user.login.anomaly"},
 	PATAnomaly:               {"Access token used from a new address", "pat.anomaly"},
+	UpdateCheckRequested:     {"Update check requested", "update.check.request"},
+	ServerUpdateRequested:    {"Server update requested", "update.server.request"},
 }
 
 // StringCode returns a string code of the activity

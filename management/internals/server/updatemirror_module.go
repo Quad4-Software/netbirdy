@@ -2,12 +2,17 @@ package server
 
 import (
 	"context"
-
-	"github.com/netbirdio/netbird/management/server/store"
 	"net/http"
+	"os"
 	"time"
 
+	"github.com/gorilla/mux"
+	log "github.com/sirupsen/logrus"
+
 	"github.com/netbirdio/netbird/management/internals/modules/updatemirror"
+	"github.com/netbirdio/netbird/management/server/http/handlers/updates"
+	"github.com/netbirdio/netbird/management/server/http/middleware/bypass"
+	"github.com/netbirdio/netbird/management/server/store"
 )
 
 // UpdateMirror returns the update mirror singleton; nil when disabled.
@@ -54,7 +59,7 @@ func (s *BaseServer) updateMirrorPlatforms() []string {
 	}
 	ctx := context.Background()
 	for _, ac := range st.GetAllAccounts(ctx) {
-		peers, err := st.GetAccountPeers(ctx, store.LockingStrengthUpdate, ac.Id, "", "", "")
+		peers, err := st.GetAccountPeers(ctx, store.LockingStrengthNone, ac.Id, "", "", "")
 		if err != nil {
 			continue
 		}
@@ -89,11 +94,48 @@ func (s *BaseServer) updateMirrorTarget() string {
 	return ""
 }
 
-// mountUpdateMirror registers /updates/v1/ on the router when enabled.
+// updateMirrorPublicPaths are the mirror routes served without API authentication.
+var updateMirrorPublicPaths = []string{
+	"/updates/v1/manifest.json",
+	"/updates/v1/keys/*",
+	"/updates/v1/files/*/*",
+	"/updates/v1/tag/*/*",
+}
+
+// mountUpdateMirror registers /updates/v1/ on the router when enabled. The
+// served files are public signed data, so the routes skip API authentication.
 func mountUpdateMirror(s *BaseServer) http.Handler {
 	m := s.UpdateMirror()
 	if m == nil {
 		return http.NotFoundHandler()
 	}
+	for _, p := range updateMirrorPublicPaths {
+		if err := bypass.AddBypassPath(p); err != nil {
+			log.Errorf("failed to register update mirror path %s: %v", p, err)
+		}
+	}
 	return m.Handler()
+}
+
+// registerUpdatesAPI mounts the authenticated owner and admin update endpoints.
+func (s *BaseServer) registerUpdatesAPI(router *mux.Router) {
+	opts := updates.Options{}
+	if m := s.UpdateMirror(); m != nil {
+		opts.Mirror = m
+		opts.Repository = s.Config.UpdateMirror.Repository
+		opts.MaxCacheBytes = s.Config.UpdateMirror.MaxCacheBytes
+	}
+	if uc := s.Config.Updater; uc != nil && uc.URL != "" {
+		token := ""
+		if uc.TokenEnv != "" {
+			token = os.Getenv(uc.TokenEnv)
+		}
+		u, err := updates.NewHTTPUpdater(uc.URL, token)
+		if err != nil {
+			log.Errorf("updater disabled: %v", err)
+		} else {
+			opts.Updater = u
+		}
+	}
+	updates.AddEndpoints(s.AccountManager(), router, opts)
 }

@@ -33,7 +33,12 @@ const (
 
 var MgmtConfigPath string
 
-// Config of the Management service
+// UpdaterConfig maps the `updater:` config section.
+type UpdaterConfig struct {
+	URL      string `yaml:"url"`
+	TokenEnv string `yaml:"token_env"`
+}
+
 // UpdateMirrorConfig maps the `update_mirror:` config section.
 type UpdateMirrorConfig struct {
 	Enabled        bool
@@ -69,6 +74,7 @@ type SecurityConfig struct {
 	} `yaml:"rules" json:"rules"`
 }
 
+// Config of the Management service
 type Config struct {
 	Stuns      []*Host
 	TURNConfig *TURNConfig
@@ -88,6 +94,7 @@ type Config struct {
 	// engine is not constructed and hooks are never called.
 	Security     *SecurityConfig
 	UpdateMirror *UpdateMirrorConfig `yaml:"update_mirror"`
+	Updater      *UpdaterConfig      `yaml:"updater"`
 
 	PKCEAuthorizationFlow *PKCEAuthorizationFlow
 

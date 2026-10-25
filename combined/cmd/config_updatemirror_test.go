@@ -18,6 +18,9 @@ server:
     enabled: true
     repository: "Sudo-Ivan/netbirdy"
     prefetch: false
+  updater:
+    url: "http://netbirdy-updater:8089"
+    token_env: "NETBIRDY_UPDATER_TOKEN"
 management:
   dataDir: ` + dir + `
 signal:
@@ -44,5 +47,8 @@ stun:
 	}
 	if mgmt.UpdateMirror == nil || !mgmt.UpdateMirror.Enabled {
 		t.Fatal("update_mirror did not reach management config")
+	}
+	if mgmt.Updater == nil || mgmt.Updater.URL != "http://netbirdy-updater:8089" || mgmt.Updater.TokenEnv != "NETBIRDY_UPDATER_TOKEN" {
+		t.Fatal("updater did not reach management config")
 	}
 }

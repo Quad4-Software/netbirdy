@@ -202,6 +202,7 @@ func (s *BaseServer) APIHandler() http.Handler {
 		if err != nil {
 			log.Fatalf("failed to create API handler: %v", err)
 		}
+		s.registerUpdatesAPI(apiRouter)
 		return apiRouter
 	})
 

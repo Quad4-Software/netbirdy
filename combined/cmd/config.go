@@ -66,16 +66,17 @@ type ServerConfig struct {
 	SignalURI string       `yaml:"signalUri"` // External signal server (disables local signal)
 
 	// Management settings (simplified mode)
-	DisableAnonymousMetrics bool               `yaml:"disableAnonymousMetrics"`
-	DisableGeoliteUpdate    bool               `yaml:"disableGeoliteUpdate"`
-	Auth                    AuthConfig         `yaml:"auth"`
-	Store                   StoreConfig        `yaml:"store"`
-	ActivityStore           StoreConfig        `yaml:"activityStore"`
-	AccessLogStore          StoreConfig        `yaml:"accessLogStore"`
-	AuthStore               StoreConfig        `yaml:"authStore"`
-	ReverseProxy            ReverseProxyConfig `yaml:"reverseProxy"`
-	Security                *nbconfig.SecurityConfig `yaml:"security"`
+	DisableAnonymousMetrics bool                         `yaml:"disableAnonymousMetrics"`
+	DisableGeoliteUpdate    bool                         `yaml:"disableGeoliteUpdate"`
+	Auth                    AuthConfig                   `yaml:"auth"`
+	Store                   StoreConfig                  `yaml:"store"`
+	ActivityStore           StoreConfig                  `yaml:"activityStore"`
+	AccessLogStore          StoreConfig                  `yaml:"accessLogStore"`
+	AuthStore               StoreConfig                  `yaml:"authStore"`
+	ReverseProxy            ReverseProxyConfig           `yaml:"reverseProxy"`
+	Security                *nbconfig.SecurityConfig     `yaml:"security"`
 	UpdateMirror            *nbconfig.UpdateMirrorConfig `yaml:"update_mirror"`
+	Updater                 *nbconfig.UpdaterConfig      `yaml:"updater"`
 
 	SupportedSyncMessageVersions           *int           `yaml:"supportedSyncMessageVersions,omitempty"`
 	PerAccountSupportedSyncMessageVersions map[string]int `yaml:"perAccountSupportedSyncMessageVersions,omitempty"`
@@ -128,21 +129,22 @@ type SignalConfig struct {
 
 // ManagementConfig contains management service settings
 type ManagementConfig struct {
-	Enabled                 bool               `yaml:"enabled"`
-	LogLevel                string             `yaml:"logLevel"`
-	DataDir                 string             `yaml:"dataDir"`
-	DnsDomain               string             `yaml:"dnsDomain"`
-	DisableAnonymousMetrics bool               `yaml:"disableAnonymousMetrics"`
-	DisableGeoliteUpdate    bool               `yaml:"disableGeoliteUpdate"`
-	DisableDefaultPolicy    bool               `yaml:"disableDefaultPolicy"`
-	Auth                    AuthConfig         `yaml:"auth"`
-	Stuns                   []HostConfig       `yaml:"stuns"`
-	Relays                  RelaysConfig       `yaml:"relays"`
-	SignalURI               string             `yaml:"signalUri"`
-	Store                   StoreConfig        `yaml:"store"`
-	ReverseProxy            ReverseProxyConfig `yaml:"reverseProxy"`
-	Security                *nbconfig.SecurityConfig `yaml:"security"`
+	Enabled                 bool                         `yaml:"enabled"`
+	LogLevel                string                       `yaml:"logLevel"`
+	DataDir                 string                       `yaml:"dataDir"`
+	DnsDomain               string                       `yaml:"dnsDomain"`
+	DisableAnonymousMetrics bool                         `yaml:"disableAnonymousMetrics"`
+	DisableGeoliteUpdate    bool                         `yaml:"disableGeoliteUpdate"`
+	DisableDefaultPolicy    bool                         `yaml:"disableDefaultPolicy"`
+	Auth                    AuthConfig                   `yaml:"auth"`
+	Stuns                   []HostConfig                 `yaml:"stuns"`
+	Relays                  RelaysConfig                 `yaml:"relays"`
+	SignalURI               string                       `yaml:"signalUri"`
+	Store                   StoreConfig                  `yaml:"store"`
+	ReverseProxy            ReverseProxyConfig           `yaml:"reverseProxy"`
+	Security                *nbconfig.SecurityConfig     `yaml:"security"`
 	UpdateMirror            *nbconfig.UpdateMirrorConfig `yaml:"update_mirror"`
+	Updater                 *nbconfig.UpdaterConfig      `yaml:"updater"`
 }
 
 // AuthConfig contains authentication/identity provider settings
@@ -727,8 +729,9 @@ func (c *CombinedConfig) ToManagementConfig() (*nbconfig.Config, error) {
 		Relay:                              relayConfig,
 		Signal:                             signalConfig,
 		Datadir:                            mgmt.DataDir,
-		Security:                          c.Server.Security,
-		UpdateMirror:                     c.Server.UpdateMirror,
+		Security:                           c.Server.Security,
+		UpdateMirror:                       c.Server.UpdateMirror,
+		Updater:                            c.Server.Updater,
 		DataStoreEncryptionKey:             mgmt.Store.EncryptionKey,
 		HttpConfig:                         httpConfig,
 		StoreConfig:                        storeConfig,
