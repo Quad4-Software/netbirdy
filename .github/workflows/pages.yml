@@ -27,7 +27,7 @@ jobs:
 
       - name: Check the site files
         run: |
-          for f in index.html 404.html style.css tokens.css base.css robots.txt sitemap.xml manifest.webmanifest assets/og-image.png assets/icon.svg; do
+          for f in index.html download/index.html 404.html style.css tokens.css base.css robots.txt sitemap.xml manifest.webmanifest assets/og-image.png assets/icon.svg; do
             test -s "site/$f" || { echo "missing site/$f" >&2; exit 1; }
           done
           grep -q '<link rel="canonical"' site/index.html

@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Download NetBirdy for Linux, Windows and macOS</title>
+<meta name="description" content="Download the NetBirdy client for Linux, Windows and macOS, and the server images. Every file is signed and linked from the GitHub releases page.">
+<link rel="canonical" href="https://sudo-ivan.github.io/netbirdy/download/">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="color-scheme" content="dark light">
+<meta name="theme-color" content="#0b0a09" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f6f2ea" media="(prefers-color-scheme: light)">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="NetBirdy">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="Download NetBirdy for Linux, Windows and macOS">
+<meta property="og:description" content="Signed client packages and server images for NetBirdy, a self-hosted WireGuard mesh network.">
+<meta property="og:url" content="https://sudo-ivan.github.io/netbirdy/download/">
+<meta property="og:image" content="https://sudo-ivan.github.io/netbirdy/assets/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="NetBirdy wordmark with the three-node mark on a black background">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Download NetBirdy for Linux, Windows and macOS">
+<meta name="twitter:description" content="Signed client packages and server images for NetBirdy, a self-hosted WireGuard mesh network.">
+<meta name="twitter:image" content="https://sudo-ivan.github.io/netbirdy/assets/og-image.png">
+<link rel="icon" href="../assets/icon.svg" type="image/svg+xml">
+<link rel="icon" href="../assets/icon-192.png" sizes="192x192" type="image/png">
+<link rel="apple-touch-icon" href="../assets/apple-icon.png">
+<link rel="manifest" href="../manifest.webmanifest">
+<link rel="preload" href="../fonts/instrument-sans-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="../style.css">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "NetBirdy", "item": "https://sudo-ivan.github.io/netbirdy/" },
+    { "@type": "ListItem", "position": 2, "name": "Download", "item": "https://sudo-ivan.github.io/netbirdy/download/" }
+  ]
+}
+</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="nav">
+  <div class="container nav__row">
+    <a class="nav__brand" href="../" aria-label="NetBirdy home">
+      <svg class="nav__mark" viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="M8.5 22.5 14.2 9.4 23.5 22.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="8.5" cy="23.5" r="4.4" fill="currentColor"/><circle cx="14.6" cy="8" r="4.4" fill="currentColor"/><circle cx="23.5" cy="23.5" r="4.4" fill="currentColor"/></svg>
+      NetBirdy
+    </a>
+    <nav class="nav__links" aria-label="Main">
+      <a href="../#compare">Compare</a>
+      <a href="../#features">Features</a>
+      <a href="https://github.com/Sudo-Ivan/netbirdy">GitHub</a>
+      <a class="btn" href="https://github.com/Sudo-Ivan/netbirdy/releases">All releases</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+  <section class="page-head">
+    <div class="container">
+      <h1>Download NetBirdy</h1>
+      <p class="lead">Clients for Linux, Windows and macOS, and images for the server.</p>
+      <p class="release" id="release" aria-live="polite">Files are listed on the <a href="https://github.com/Sudo-Ivan/netbirdy/releases">GitHub releases page</a>.</p>
+    </div>
+  </section>
+
+  <section class="container" aria-label="Client downloads">
+    <div class="dl" id="linux">
+      <div>
+        <h2>Linux</h2>
+        <p class="dl__note">deb, rpm and tar.gz</p>
+      </div>
+      <div class="dl__body">
+        <ul class="files" data-group="linux"><li><span class="files__empty"><a href="https://github.com/Sudo-Ivan/netbirdy/releases">Open the releases page</a> to pick a package for your architecture.</span></li></ul>
+        <div class="well ticks"><pre class="code" tabindex="0"><code>sudo apt install ./netbirdy_*_linux_amd64.deb
+<span class="c"># or</span>
+sudo dnf install ./netbirdy_*_linux_amd64.rpm</code></pre></div>
+        <p>The package replaces the NetBird package and keeps <code>/etc/netbird</code>.</p>
+      </div>
+    </div>
+
+    <div class="dl" id="windows">
+      <div>
+        <h2>Windows</h2>
+        <p class="dl__note">Installer for 64-bit Windows</p>
+      </div>
+      <div class="dl__body">
+        <ul class="files" data-group="windows"><li><span class="files__empty"><a href="https://github.com/Sudo-Ivan/netbirdy/releases">Open the releases page</a> to get the installer.</span></li></ul>
+        <p>Run the installer as an administrator. It installs the <code>netbirdy</code> command and starts the service.</p>
+      </div>
+    </div>
+
+    <div class="dl" id="macos">
+      <div>
+        <h2>macOS</h2>
+        <p class="dl__note">Apple silicon and Intel</p>
+      </div>
+      <div class="dl__body">
+        <ul class="files" data-group="macos"><li><span class="files__empty"><a href="https://github.com/Sudo-Ivan/netbirdy/releases">Open the releases page</a> to get the package for your Mac.</span></li></ul>
+        <div class="well ticks"><pre class="code" tabindex="0"><code>sudo installer -pkg netbirdy_*_darwin_arm64.pkg -target /</code></pre></div>
+      </div>
+    </div>
+
+    <div class="dl" id="desktop" hidden>
+      <div>
+        <h2>Desktop app</h2>
+        <p class="dl__note">Tray app and window</p>
+      </div>
+      <div class="dl__body">
+        <ul class="files" data-group="desktop"></ul>
+      </div>
+    </div>
+
+    <div class="dl" id="server">
+      <div>
+        <h2>Server</h2>
+        <p class="dl__note">Container images on GHCR</p>
+      </div>
+      <div class="dl__body">
+        <div class="well ticks"><pre class="code" tabindex="0"><code>podman pull ghcr.io/sudo-ivan/netbirdy-server
+podman pull ghcr.io/sudo-ivan/netbirdy-dashboard</code></pre></div>
+        <p>For a complete local setup, follow the <a href="https://github.com/Sudo-Ivan/netbirdy#quick-start">quick start</a>.</p>
+      </div>
+    </div>
+
+    <div class="dl" id="verify">
+      <div>
+        <h2>Verify</h2>
+        <p class="dl__note">Signatures and checksums</p>
+      </div>
+      <div class="dl__body">
+        <div class="well ticks"><pre class="code" tabindex="0"><code>sha256sum -c netbirdy_*_checksums.txt --ignore-missing
+gh attestation verify FILE --repo Sudo-Ivan/netbirdy</code></pre></div>
+        <p>Each file has a <code>.sig</code> signature. The <a href="https://github.com/Sudo-Ivan/netbirdy/blob/main/docs/updating.md">updating guide</a> explains how to check them.</p>
+        <ul class="files" data-group="verify"></ul>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="container footer__grid">
+    <div>
+      <span class="footer__brand">
+        <svg viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="M8.5 22.5 14.2 9.4 23.5 22.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="8.5" cy="23.5" r="4.4" fill="currentColor"/><circle cx="14.6" cy="8" r="4.4" fill="currentColor"/><circle cx="23.5" cy="23.5" r="4.4" fill="currentColor"/></svg>
+        NetBirdy
+      </span>
+      <p class="footer__fine">An independent fork of NetBird. BSD-3-Clause, with the server and dashboard under AGPL-3.0.</p>
+    </div>
+    <nav class="footer__nav" aria-label="Footer">
+      <div>
+        <h2 class="footer__title">Project</h2>
+        <ul>
+          <li><a href="./">Download</a></li>
+          <li><a href="https://github.com/Sudo-Ivan/netbirdy">Source code</a></li>
+          <li><a href="https://github.com/Sudo-Ivan/netbirdy/releases">Releases</a></li>
+          <li><a href="https://github.com/Sudo-Ivan/netbirdy/issues">Issues</a></li>
+        </ul>
+      </div>
+      <div>
+        <h2 class="footer__title">Learn</h2>
+        <ul>
+          <li><a href="https://github.com/Sudo-Ivan/netbirdy/tree/main/docs">Documentation</a></li>
+          <li><a href="https://github.com/Sudo-Ivan/netbirdy/blob/main/docs/migrating-from-netbird.md">Move from NetBird</a></li>
+          <li><a href="https://github.com/Sudo-Ivan/netbirdy/blob/main/SECURITY.md">Security policy</a></li>
+        </ul>
+      </div>
+      <div>
+        <h2 class="footer__title">Legal</h2>
+        <ul>
+          <li><a href="https://github.com/Sudo-Ivan/netbirdy/blob/main/NOTICE.md">Licenses</a></li>
+          <li><a href="https://github.com/netbirdio/netbird">NetBird upstream</a></li>
+        </ul>
+      </div>
+    </nav>
+  </div>
+</footer>
+
+<script>
+(function () {
+  document.querySelectorAll('.code').forEach(function (pre) {
+    if (!navigator.clipboard) return;
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'copy';
+    btn.textContent = 'Copy';
+    btn.addEventListener('click', function () {
+      navigator.clipboard.writeText(pre.textContent.replace(/\n$/, '')).then(function () {
+        btn.textContent = 'Copied';
+        setTimeout(function () { btn.textContent = 'Copy'; }, 1600);
+      });
+    });
+    pre.parentElement.appendChild(btn);
+  });
+
+  var groups = {
+    linux: /^netbirdy_.+_linux_(amd64|arm64|armv6|386)\.(deb|rpm|tar\.gz)$/,
+    windows: /^netbirdy_installer_.+_windows_amd64\.exe$/,
+    macos: /^netbirdy_.+_darwin_(amd64|arm64)\.pkg$/,
+    desktop: /^netbirdy-ui.+\.(deb|rpm|tar\.gz|zip|exe|dmg|pkg|AppImage)$/,
+    verify: /_checksums\.txt$/
+  };
+
+  function size(bytes) {
+    if (bytes >= 1048576) return (bytes / 1048576).toFixed(1) + ' MB';
+    return Math.max(1, Math.round(bytes / 1024)) + ' KB';
+  }
+
+  function row(asset, sig) {
+    var li = document.createElement('li');
+    var a = document.createElement('a');
+    a.href = asset.browser_download_url;
+    a.textContent = asset.name;
+    var meta = document.createElement('span');
+    meta.className = 'files__meta';
+    meta.textContent = size(asset.size);
+    li.appendChild(a);
+    li.appendChild(meta);
+    if (sig) {
+      var s = document.createElement('a');
+      s.className = 'files__meta files__sig';
+      s.href = sig.browser_download_url;
+      s.textContent = 'Signature';
+      li.appendChild(s);
+    }
+    return li;
+  }
+
+  fetch('https://api.github.com/repos/Sudo-Ivan/netbirdy/releases?per_page=10', { headers: { Accept: 'application/vnd.github+json' } })
+    .then(function (r) { return r.ok ? r.json() : Promise.reject(new Error('releases')); })
+    .then(function (list) {
+      var live = list.filter(function (r) { return !r.draft; });
+      var rel = live.filter(function (r) { return !r.prerelease; })[0] || live[0];
+      if (!rel) return;
+      var names = {};
+      rel.assets.forEach(function (a) { names[a.name] = a; });
+      Object.keys(groups).forEach(function (key) {
+        var ul = document.querySelector('[data-group="' + key + '"]');
+        var rows = rel.assets.filter(function (a) { return groups[key].test(a.name); });
+        if (!ul || !rows.length) return;
+        ul.textContent = '';
+        rows.forEach(function (a) { ul.appendChild(row(a, key === 'verify' ? null : names[a.name + '.sig'])); });
+        if (key === 'desktop') document.getElementById('desktop').hidden = false;
+      });
+      var info = document.getElementById('release');
+      info.textContent = '';
+      var link = document.createElement('a');
+      link.href = rel.html_url;
+      link.textContent = rel.name || rel.tag_name;
+      info.appendChild(document.createTextNode('Latest ' + (rel.prerelease ? 'pre-release' : 'release') + ': '));
+      info.appendChild(link);
+      info.appendChild(document.createTextNode(', published ' + new Date(rel.published_at).toLocaleDateString('en-GB', { year: 'numeric', month: 'long', day: 'numeric' }) + '.'));
+    })
+    .catch(function () {});
+})();
+</script>
+</body>
+</html>
