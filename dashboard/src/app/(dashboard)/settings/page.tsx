@@ -4,6 +4,7 @@ import { RestrictedAccess } from "@components/ui/RestrictedAccess";
 import { VerticalTabs } from "@components/VerticalTabs";
 import {
   AlertOctagonIcon,
+  ArrowUpCircleIcon,
   ChartNoAxesCombined,
   FingerprintIcon,
   FolderGit2Icon,
@@ -28,11 +29,13 @@ import MetricsTab from "@/modules/settings/MetricsTab";
 import NetworkSettingsTab from "@/modules/settings/NetworkSettingsTab";
 import PermissionsTab from "@/modules/settings/PermissionsTab";
 import SetupKeysTab from "@/modules/settings/SetupKeysTab";
+import UpdatesTab from "@/modules/settings/UpdatesTab";
 
 export default function NetBirdSettings() {
   const queryParams = useSearchParams();
   const queryTab = queryParams.get("tab");
   const { permission } = usePermissions();
+  const { isOwnerOrAdmin } = useLoggedInUser();
 
   const initialTab = useMemo(() => {
     if (permission?.settings?.read) return "authentication";
@@ -108,6 +111,15 @@ export default function NetBirdSettings() {
                 <ChartNoAxesCombined size={14} />
                 Metrics
               </VerticalTabs.Trigger>
+              {isOwnerOrAdmin && (
+                <VerticalTabs.Trigger
+                  value="updates"
+                  data-testid="settings-tab-updates"
+                >
+                  <ArrowUpCircleIcon size={14} />
+                  Updates
+                </VerticalTabs.Trigger>
+              )}
             </>
           )}
           <DangerZoneTabTrigger />
@@ -126,6 +138,7 @@ export default function NetBirdSettings() {
             {account && <NetworkSettingsTab account={account} />}
             {account && <ClientSettingsTab account={account} />}
             {account && <MetricsTab account={account} />}
+            {isOwnerOrAdmin && <UpdatesTab />}
             {account && <DangerZoneTab account={account} />}
           </div>
         </RestrictedAccess>
