@@ -67,10 +67,17 @@ type handler struct {
 
 // AddEndpoints registers the update endpoints on an authenticated router.
 func AddEndpoints(accountManager account.Manager, router *mux.Router, opts Options) {
+	newHandler(accountManager, opts).register(router)
+}
+
+func newHandler(accountManager account.Manager, opts Options) *handler {
 	if opts.Repository == "" {
 		opts.Repository = defaultRepo
 	}
-	h := &handler{accountManager: accountManager, opts: opts, now: time.Now}
+	return &handler{accountManager: accountManager, opts: opts, now: time.Now}
+}
+
+func (h *handler) register(router *mux.Router) {
 	router.HandleFunc("/updates", h.get).Methods("GET", "OPTIONS")
 	router.HandleFunc("/updates/check", h.check).Methods("POST", "OPTIONS")
 	router.HandleFunc("/updates/server", h.applyServer).Methods("POST", "OPTIONS")

@@ -102,8 +102,8 @@ func newHarness(t *testing.T, opts Options) (*mux.Router, *events, *handler) {
 	}
 	r := mux.NewRouter()
 	api := r.PathPrefix("/api").Subrouter()
-	AddEndpoints(am, api, opts)
-	h := &handler{accountManager: am, opts: opts, now: time.Now}
+	h := newHandler(am, opts)
+	h.register(api)
 	return r, ev, h
 }
 
