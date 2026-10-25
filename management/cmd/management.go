@@ -30,6 +30,7 @@ import (
 	"github.com/netbirdio/netbird/shared/management/grpc"
 	"github.com/netbirdio/netbird/util"
 	"github.com/netbirdio/netbird/util/crypt"
+	"github.com/netbirdio/netbird/util/sandbox"
 )
 
 var newServer = func(cfg *server.Config) server.Server {
@@ -107,6 +108,10 @@ var (
 				if err != nil {
 					return fmt.Errorf("failed creating datadir: %s: %v", config.Datadir, err)
 				}
+			}
+
+			if _, err := sandbox.Apply(sandboxPolicy(config)); err != nil {
+				return fmt.Errorf("failed to apply landlock sandbox: %w", err)
 			}
 
 			if disableSingleAccMode {

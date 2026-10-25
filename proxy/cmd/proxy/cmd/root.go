@@ -17,6 +17,7 @@ import (
 	"github.com/netbirdio/netbird/shared/externalipmap"
 	"github.com/netbirdio/netbird/shared/management/domain"
 	"github.com/netbirdio/netbird/shared/profiling"
+	"github.com/netbirdio/netbird/util/sandbox"
 
 	"github.com/netbirdio/netbird/client/embed"
 	"github.com/netbirdio/netbird/proxy"
@@ -255,6 +256,16 @@ func runServer(cmd *cobra.Command, args []string) error {
 
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGTERM, syscall.SIGINT)
 	defer stop()
+
+	if _, err := sandbox.Apply(sandbox.Policy{
+		Name:           "reverse proxy",
+		ReadWriteDirs:  sandbox.NonEmpty(certDir, geoDataDir),
+		ReadWriteFiles: sandbox.NonEmpty(shieldState, shieldLog),
+		ReadOnlyDirs:   sandbox.NonEmpty(wildcardCertDir),
+		ReadOnlyFiles:  sandbox.NonEmpty(shieldConfig, certFile, certKeyFile),
+	}); err != nil {
+		return fmt.Errorf("failed to apply landlock sandbox: %w", err)
+	}
 
 	srv := proxy.New(ctx, proxy.Config{
 		ListenAddr:               addr,

@@ -74,7 +74,7 @@ services:
     container_name: netbirdy-updater
     restart: unless-stopped
     environment:
-      - UPDATER_TOKEN=${NETBIRDY_UPDATER_TOKEN:?set NETBIRDY_UPDATER_TOKEN}
+      - UPDATER_TOKEN=${NETBIRDY_UPDATER_TOKEN:-}
       - UPDATER_PROJECT=netbirdy
       - UPDATER_SERVICES=server,dashboard
       - UPDATER_IMAGE_PREFIX=${NETBIRDY_IMAGE_PREFIX:-ghcr.io/sudo-ivan/netbirdy-}

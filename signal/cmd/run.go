@@ -25,6 +25,7 @@ import (
 	"github.com/netbirdio/netbird/shared/signal/proto"
 	"github.com/netbirdio/netbird/signal/server"
 	"github.com/netbirdio/netbird/util"
+	"github.com/netbirdio/netbird/util/sandbox"
 	"github.com/netbirdio/netbird/util/wsproxy"
 	wsproxyserver "github.com/netbirdio/netbird/util/wsproxy/server"
 	"github.com/netbirdio/netbird/version"
@@ -98,6 +99,15 @@ var (
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			flag.Parse()
+
+			if _, err := sandbox.Apply(sandbox.Policy{
+				Name:           "signal server",
+				ReadWriteDirs:  sandbox.NonEmpty(signalLetsencryptDataDir),
+				ReadWriteFiles: sandbox.NonEmpty(logFile),
+				ReadOnlyFiles:  sandbox.NonEmpty(signalCertFile, signalCertKey),
+			}); err != nil {
+				return fmt.Errorf("failed to apply landlock sandbox: %w", err)
+			}
 
 			startPprof()
 

@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/netbirdio/netbird/updater"
+	"github.com/netbirdio/netbird/util/sandbox"
 )
 
 func httpClient() *http.Client { return &http.Client{Timeout: 5 * time.Second} }
@@ -18,6 +19,12 @@ func main() {
 	}
 	cfg, err := updater.Load()
 	if err != nil {
+		log.Fatal(err)
+	}
+	if _, err := sandbox.Apply(sandbox.Policy{
+		Name:          "updater",
+		ReadWriteDirs: sandbox.NonEmpty(cfg.DataDir, cfg.BackupDir),
+	}); err != nil {
 		log.Fatal(err)
 	}
 	run, err := updater.NewRunner(cfg)

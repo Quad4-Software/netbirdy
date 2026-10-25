@@ -42,6 +42,8 @@ Website: <https://sudo-ivan.github.io/netbirdy/>
 - Signed releases, a server-side cache for client updates, and an optional
   updater container that backs up and rolls back. See
   [docs/updating.md](docs/updating.md) and [docs/update-mirror.md](docs/update-mirror.md).
+- Landlock sandbox: server processes limit themselves to the paths they need.
+  See [docs/landlock.md](docs/landlock.md).
 - Podman stack for local use and testing.
 
 ## Quick start
@@ -111,6 +113,7 @@ the desktop app is not code-signed, and there is no Windows MSI.
 | [docs/pocket-id.md](docs/pocket-id.md) | Pocket ID sign-in |
 | [docs/updating.md](docs/updating.md) | Updating servers, packages and clients |
 | [docs/update-mirror.md](docs/update-mirror.md) | Client update cache on the server |
+| [docs/landlock.md](docs/landlock.md) | Landlock sandbox for server processes |
 | [proxy/docs/](proxy/docs/) | Reverse proxy, shield, protocol support |
 | [docs/custom-domain-validation.md](docs/custom-domain-validation.md) | Custom domains |
 | [docs/maintaining.md](docs/maintaining.md) | Releases and fork maintenance |

@@ -96,6 +96,10 @@ func execute(cmd *cobra.Command, _ []string) error {
 		return fmt.Errorf("management must be enabled when signal or relay are enabled (provides the base HTTP server)")
 	}
 
+	if err := applySandbox(config); err != nil {
+		return fmt.Errorf("failed to apply landlock sandbox: %w", err)
+	}
+
 	servers, err := createAllServers(cmd.Context(), config)
 	if err != nil {
 		return err

@@ -26,6 +26,7 @@ import (
 	"github.com/netbirdio/netbird/stun"
 	"github.com/netbirdio/netbird/trustedproxy"
 	"github.com/netbirdio/netbird/util"
+	"github.com/netbirdio/netbird/util/sandbox"
 )
 
 type Config struct {
@@ -150,6 +151,15 @@ func execute(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		log.Debugf("failed to initialize log: %s", err)
 		return fmt.Errorf("failed to initialize log: %s", err)
+	}
+
+	if _, err := sandbox.Apply(sandbox.Policy{
+		Name:           "relay server",
+		ReadWriteDirs:  sandbox.NonEmpty(cobraConfig.LetsencryptDataDir),
+		ReadWriteFiles: sandbox.NonEmpty(cobraConfig.LogFile),
+		ReadOnlyFiles:  sandbox.NonEmpty(cobraConfig.TlsCertFile, cobraConfig.TlsKeyFile),
+	}); err != nil {
+		return fmt.Errorf("failed to apply landlock sandbox: %w", err)
 	}
 
 	// Resource creation phase (fail fast before starting any goroutines)
