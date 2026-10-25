@@ -10,9 +10,9 @@ export function welcome() {
     const message = `%c${ART}%c
 NetBirdy — The Only Secure Access Platform You'll Ever Need.
 
-WEBSITE:      https://netbirdy.io/
-WE'RE HIRING: https://netbirdy.io/careers
-OPEN SOURCE:  https://github.com/netbirdio/netbirdy
+WEBSITE:      https://github.com/Sudo-Ivan/netbirdy
+WE'RE HIRING: https://github.com/Sudo-Ivan/netbirdycareers
+OPEN SOURCE:  https://github.com/Sudo-Ivan/netbirdy
 `;
 
     // Intentional NetBirdy ASCII banner in the devtools console.

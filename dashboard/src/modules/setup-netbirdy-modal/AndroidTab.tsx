@@ -23,7 +23,7 @@ export default function AndroidTab() {
             <div className={"flex gap-4 mt-1"}>
               <Link
                 href={
-                  "https://play.google.com/store/apps/details?id=io.netbirdy.client"
+                  "https://play.google.com/store/apps/details?id=io.netbird.client"
                 }
                 target={"_blank"}
               >
@@ -57,6 +57,7 @@ export default function AndroidTab() {
           </Steps.Step>
         </Steps>
       </TabsContentPadding>
-    </TabsContent>
+    The official NetBird mobile apps work with a NetBirdy server.
+</TabsContent>
   );
 }

@@ -22,7 +22,7 @@ export default function IOSTab() {
             <p>Download and install the application on the App Store:</p>
             <div className={"flex gap-4 mt-1"}>
               <Link
-                href={"https://apps.apple.com/app/netbirdy-p2p-vpn/id6469329339"}
+                href={"https://apps.apple.com/app/netbird-p2p-vpn/id6469329339"}
                 target={"_blank"}
               >
                 <Image

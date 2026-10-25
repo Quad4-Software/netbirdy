@@ -230,7 +230,7 @@ if test -f 'management.json'; then
     fi
 fi
 
-env | grep NETBIRDY
+env | grep NETBIRD
 
 bkp_postfix="$(date +%s)"
 if test -f "${artifacts_path}/docker-compose.yml"; then

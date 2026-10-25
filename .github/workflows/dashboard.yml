@@ -47,7 +47,9 @@ jobs:
         run: pnpm --filter netbirdy-dashboard lint
 
       - name: Typecheck
-        run: pnpm --filter netbirdy-dashboard exec tsc --noEmit
+        run: |
+          pnpm --filter netbirdy-dashboard docs:build
+          pnpm --filter netbirdy-dashboard exec tsc --noEmit
 
       - name: Unit tests
         run: pnpm --filter netbirdy-dashboard test:unit
