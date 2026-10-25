@@ -236,8 +236,8 @@ func targetAccessForwardedHeaders(authValue string) http.Header {
 		targetAccessHeader: []string{authValue},
 		"Authorization":    []string{targetAccessApplicationAuth},
 		"Cookie":           []string{"nb_session=e2e-proxy-session; " + targetAccessApplicationCookie},
-		"X-NetBird-User":   []string{"spoofed@example.com"},
-		"X-NetBird-Groups": []string{"administrators"},
+		"X-NetBirdy-User":   []string{"spoofed@example.com"},
+		"X-NetBirdy-Groups": []string{"administrators"},
 	}
 }
 
@@ -292,8 +292,8 @@ func requireProxyEcho(
 	assert.Equal(t, targetAccessApplicationAuth, echo.Authorization, "application authorization must be preserved")
 	assert.NotContains(t, echo.Cookie, "nb_session=", "proxy session cookie must be stripped")
 	assert.Contains(t, echo.Cookie, targetAccessApplicationCookie, "application cookie must be preserved")
-	assert.Empty(t, echo.NetBirdUser, "client-supplied NetBird identity must be stripped")
-	assert.Empty(t, echo.NetBirdGroups, "client-supplied NetBird groups must be stripped")
+	assert.Empty(t, echo.NetBirdUser, "client-supplied NetBirdy identity must be stripped")
+	assert.Empty(t, echo.NetBirdGroups, "client-supplied NetBirdy groups must be stripped")
 }
 
 func requireProxyStatus(

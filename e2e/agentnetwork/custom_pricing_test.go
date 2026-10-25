@@ -316,7 +316,7 @@ func verifyUsageRowForSession(t *testing.T, sessionID string, inRate, outRate fl
 }
 
 // TestCustomModelPricing proves an operator can serve a model that is NOT in
-// NetBird's compiled catalog, at prices they type themselves, and that those
+// NetBirdy's compiled catalog, at prices they type themselves, and that those
 // operator prices drive the recorded cost end to end — access log AND usage
 // ledger. The provider enumerates one made-up model id at deliberately odd rates
 // (no default entry could supply them), the client requests it, and every cost
@@ -554,7 +554,7 @@ func TestPricingDefaultsFileLeavesOtherModelsAlone(t *testing.T) {
 // dimensions — the columns the dashboard filters, groups and drills down on.
 //
 // A custom model id is the interesting case precisely because nothing in
-// NetBird's catalog describes it. Its provider vendor, parser surface, cost
+// NetBirdy's catalog describes it. Its provider vendor, parser surface, cost
 // buckets, and dashboard filterability all have to come from the operator's
 // provider record rather than from a compiled-in entry. So this checks:
 //
@@ -735,7 +735,7 @@ func inDelta(a, b, tol float64) bool {
 // release-date fallback to Claude ids. Pricing looks every model up through
 // that helper, so while it matched a bare trailing date any operator id ending
 // in eight digits inherited the rate of its undated sibling — a silent
-// mis-bill on models NetBird knows nothing about.
+// mis-bill on models NetBirdy knows nothing about.
 func TestCustomDatedModelKeepsItsOwnPrice(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Minute)
 	defer cancel()

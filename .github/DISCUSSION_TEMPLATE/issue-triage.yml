@@ -4,7 +4,7 @@ body:
       value: |
         ## Issue Triage
 
-        Use this category for reproducible bugs and regressions in NetBird.
+        Use this category for reproducible bugs and regressions in NetBirdy.
 
         The more context you include, the faster we can validate and act on your report. If you're not sure whether something is a bug, **Q&A / Support** is a good starting point — we can always move the conversation here once we've confirmed it's a product issue.
 
@@ -41,7 +41,7 @@ body:
         - Peer connectivity
         - DNS
         - Routes / Exit nodes
-        - NetBird SSH
+        - NetBirdy SSH
         - Relay / Signal / NAT traversal
         - Login / Authentication / IdP
         - Dashboard / Admin UI
@@ -59,7 +59,7 @@ body:
     attributes:
       label: Deployment type
       options:
-        - NetBird Cloud
+        - NetBirdy Cloud
         - Self-hosted - quickstart script
         - Self-hosted - advanced/custom deployment
         - Local development build
@@ -92,8 +92,8 @@ body:
   - type: textarea
     id: version
     attributes:
-      label: NetBird version and upgrade status
-      description: Run `netbird version` where applicable. For self-hosted deployments, include management, signal, relay, and dashboard versions if available. If you cannot test on a current/supported version, explain why.
+      label: NetBirdy version and upgrade status
+      description: Run `netbirdy version` where applicable. For self-hosted deployments, include management, signal, relay, and dashboard versions if available. If you cannot test on a current/supported version, explain why.
       placeholder: |
         Example:
         - Client: 0.30.2
@@ -203,7 +203,7 @@ body:
     attributes:
       label: Logs, status output, or debug evidence
       description: |
-        For client, connectivity, DNS, route, relay/signal, or self-hosted reports, logs are essential — please include anonymized output from `netbird status -dA`, or a debug bundle via `netbird debug for 1m -AS -U`. Debug bundles are automatically deleted after 30 days.
+        For client, connectivity, DNS, route, relay/signal, or self-hosted reports, logs are essential — please include anonymized output from `netbirdy status -dA`, or a debug bundle via `netbirdy debug for 1m -AS -U`. Debug bundles are automatically deleted after 30 days.
 
         For UI, dashboard, or documentation reports, leave the pre-filled `N/A`.
       value: "N/A"

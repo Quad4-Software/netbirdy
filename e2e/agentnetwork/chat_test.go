@@ -23,7 +23,7 @@ import (
 type per1k struct{ in, out, read, write float64 }
 
 // publishedPer1k hardcodes the vendors' PUBLISHED rates for the models the live matrix can drive,
-// keyed by the normalized model id the proxy stamps. Deliberately independent of NetBird's own
+// keyed by the normalized model id the proxy stamps. Deliberately independent of NetBirdy's own
 // default pricing table so a wrong default rate or a broken normalization fails the run.
 //
 // These rates are also what providerRequest registers as the operator's per-model prices. Since
@@ -41,7 +41,7 @@ var publishedPer1k = map[string]per1k{
 	"anthropic.claude-sonnet-4-5": {0.003, 0.015, 0.0003, 0.00375},
 	"anthropic.claude-sonnet-4-6": {0.003, 0.015, 0.0003, 0.00375},
 	// Gateway-prefixed ids (Vercel AI Gateway, OpenRouter). A gateway model is not in
-	// NetBird's default table, so before operator pricing it could only be recorded at
+	// NetBirdy's default table, so before operator pricing it could only be recorded at
 	// cost 0. The operator names it and prices it — at the underlying vendor's published
 	// rate, which is what the gateway charges through — so these rows are now priced.
 	"openai/gpt-4o-mini": {0.00015, 0.0006, 0.000075, 0},
@@ -163,7 +163,7 @@ func verifyUsageRowsSQL(t *testing.T, srv *harness.Combined) {
 	require.Positive(t, verified, "raw SQL check must cover at least one usage row")
 	t.Logf("[sql] verified %d usage rows in store.db against published rates", verified)
 
-	// Gateway-prefixed model ids are absent from NetBird's default pricing table, so they are
+	// Gateway-prefixed model ids are absent from NetBirdy's default pricing table, so they are
 	// priced only because the operator registered and priced them on the provider record. Assert
 	// they are priced (not silently 0) — the join above already checked the exact figures for the
 	// ones this matrix drives. A gateway row at cost 0 means the per-record table never reached

@@ -1,7 +1,7 @@
 version: 2
 env:
   - SKIP_PUBLISH={{ if index .Env "SKIP_PUBLISH" }}{{ .Env.SKIP_PUBLISH }}{{ else }}true{{ end }}
-project_name: netbird-ui
+project_name: netbirdy-ui
 
 before:
   hooks:
@@ -12,9 +12,9 @@ before:
     - sh -c 'cd client/ui/frontend && pnpm install --frozen-lockfile && pnpm build'
 
 builds:
-  - id: netbird-ui
+  - id: netbirdy-ui
     dir: client/ui
-    binary: netbird-ui
+    binary: netbirdy-ui
     env:
       - CGO_ENABLED=1
     goos:
@@ -27,9 +27,9 @@ builds:
     tags:
       - production
 
-  - id: netbird-ui-windows-amd64
+  - id: netbirdy-ui-windows-amd64
     dir: client/ui
-    binary: netbird-ui
+    binary: netbirdy-ui
     env:
       - CGO_ENABLED=1
       - CC=x86_64-w64-mingw32-gcc
@@ -44,9 +44,9 @@ builds:
     tags:
       - production
 
-  - id: netbird-ui-windows-arm64
+  - id: netbirdy-ui-windows-arm64
     dir: client/ui
-    binary: netbird-ui
+    binary: netbirdy-ui
     env:
       - CGO_ENABLED=1
       - CC=aarch64-w64-mingw32-clang
@@ -66,68 +66,68 @@ archives:
   - id: linux-arch
     name_template: "{{ .ProjectName }}-linux_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
     builds:
-      - netbird-ui
+      - netbirdy-ui
   - id: windows-arch
     name_template: "{{ .ProjectName }}-windows_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
     builds:
-      - netbird-ui-windows-amd64
-      - netbird-ui-windows-arm64
+      - netbirdy-ui-windows-amd64
+      - netbirdy-ui-windows-arm64
 
 nfpms:
-  - maintainer: Netbird <dev@netbird.io>
-    description: Netbird client UI.
-    homepage: https://netbird.io/
+  - maintainer: NetBirdy <https://github.com/Sudo-Ivan/netbirdy>
+    description: NetBirdy client UI.
+    homepage: https://github.com/Sudo-Ivan/netbirdy
     license: BSD-3-Clause
-    vendor: NetBird
+    vendor: NetBirdy
     id: netbird_ui_deb
-    package_name: netbird-ui
+    package_name: netbirdy-ui
     builds:
-      - netbird-ui
+      - netbirdy-ui
     formats:
       - deb
     scripts:
       postinstall: "release_files/ui-post-install.sh"
     contents:
-      - src: client/ui/build/linux/netbird.desktop
-        dst: /usr/share/applications/org.wails.netbird.desktop
+      - src: client/ui/build/linux/netbirdy.desktop
+        dst: /usr/share/applications/org.wails.netbirdy.desktop
       - src: client/ui/build/appicon.png
-        dst: /usr/share/pixmaps/netbird.png
+        dst: /usr/share/pixmaps/netbirdy.png
       # Names the polkit action for the elevation prompt the app raises when an
       # unprivileged user changes a privileged setting; without it the dialog
       # shows a raw command line.
       - src: client/ui/build/linux/polkit/io.netbird.settings.policy
         dst: /usr/share/polkit-1/actions/io.netbird.settings.policy
     dependencies:
-      - netbird (>= 0.75.0)
+      - netbirdy (>= 0.75.0)
       - libgtk-4-1 (>= 4.14)
       - libwebkitgtk-6.0-4
       - xdg-utils
 
-  - maintainer: Netbird <dev@netbird.io>
-    description: Netbird client UI.
-    homepage: https://netbird.io/
+  - maintainer: NetBirdy <https://github.com/Sudo-Ivan/netbirdy>
+    description: NetBirdy client UI.
+    homepage: https://github.com/Sudo-Ivan/netbirdy
     license: BSD-3-Clause
-    vendor: NetBird
+    vendor: NetBirdy
     id: netbird_ui_rpm
-    package_name: netbird-ui
+    package_name: netbirdy-ui
     builds:
-      - netbird-ui
+      - netbirdy-ui
     formats:
       - rpm
     scripts:
       postinstall: "release_files/ui-post-install.sh"
     contents:
-      - src: client/ui/build/linux/netbird.desktop
-        dst: /usr/share/applications/org.wails.netbird.desktop
+      - src: client/ui/build/linux/netbirdy.desktop
+        dst: /usr/share/applications/org.wails.netbirdy.desktop
       - src: client/ui/build/appicon.png
-        dst: /usr/share/pixmaps/netbird.png
+        dst: /usr/share/pixmaps/netbirdy.png
       # Names the polkit action for the elevation prompt the app raises when an
       # unprivileged user changes a privileged setting; without it the dialog
       # shows a raw command line.
       - src: client/ui/build/linux/polkit/io.netbird.settings.policy
         dst: /usr/share/polkit-1/actions/io.netbird.settings.policy
     dependencies:
-      - netbird >= 0.75.0
+      - netbirdy >= 0.75.0
       - (gtk4 >= 4.14 or libgtk-4-1 >= 4.14)
       - (webkitgtk6.0 or libwebkitgtk-6_0-4)
       - xdg-utils
@@ -158,7 +158,7 @@ uploads:
 release:
   # Uploads into the release created by the main .goreleaser.yaml run.
   # make_latest stays false everywhere: the signing pipeline
-  # (netbirdio/sign-pipelines) marks the release latest after the Windows
+  # (ghcr.io/sudo-ivan/netbirdy-sign-pipelines) marks the release latest after the Windows
   # and macOS artifacts are signed.
   make_latest: false
   prerelease: auto

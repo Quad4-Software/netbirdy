@@ -1027,7 +1027,7 @@
   ],
   "schemaVersion": 39,
   "tags": [
-    "netbird",
+    "netbirdy",
     "client"
   ],
   "templating": {
@@ -1100,8 +1100,8 @@
   },
   "timepicker": {},
   "timezone": "browser",
-  "title": "Netbird / Client",
-  "uid": "netbird-client-v001",
+  "title": "NetBirdy / Client",
+  "uid": "netbirdy-client-v001",
   "version": 1,
   "weekStart": ""
 }

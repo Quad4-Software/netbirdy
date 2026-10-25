@@ -125,7 +125,7 @@ func TestDatedModelIdRouting(t *testing.T) {
 // TestBedrockInferenceProfilesReachTheUpstream covers the startup lookup a
 // Bedrock client makes. The proxy forwards it to the configured upstream rather
 // than denying it, so what comes back is the upstream's answer — never a
-// NetBird policy rejection.
+// NetBirdy policy rejection.
 func TestBedrockInferenceProfilesReachTheUpstream(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Minute)
 	defer cancel()

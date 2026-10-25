@@ -1,0 +1,30 @@
+packages:
+  - dashboard
+  - proxy/web
+  - client/ui/frontend
+
+minimumReleaseAge: 10080
+minimumReleaseAgeStrict: true
+minimumReleaseAgeExclude:
+  # matches the wails v3 binding pinned in go.mod
+  - '@wailsio/runtime@3.0.0-beta.34'
+blockExoticSubdeps: true
+trustPolicy: no-downgrade
+trustPolicyIgnoreAfter: 525600
+strictDepBuilds: true
+allowBuilds:
+  '@axa-fr/oidc-client': true
+  '@axa-fr/react-oidc': true
+  esbuild: true
+  sharp: true
+  '@tailwindcss/oxide': true
+  unrs-resolver: true
+engineStrict: true
+verifyDepsBeforeRun: error
+shamefullyHoist: false
+overrides:
+  minimatch: '>=10.2.1'
+  '@types/react': '19.3.0'
+  '@types/react-dom': '19.3.0'
+  # eslint-plugin-react-hooks pins zod; override clears GHSA memory issue
+  zod: '>=4.6.7'

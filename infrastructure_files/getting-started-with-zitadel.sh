@@ -9,9 +9,9 @@ For new deployments, use getting-started.sh:
 
 https://docs.netbird.io/selfhosted/selfhosted-quickstart
 
-The current installer includes NetBird's embedded Dex-based identity provider.
+The current installer includes NetBirdy's embedded Dex-based identity provider.
 Zitadel can be added as an external identity provider directly through the
-NetBird Dashboard:
+NetBirdy Dashboard:
 
 https://docs.netbird.io/selfhosted/identity-providers/zitadel
 
@@ -20,7 +20,7 @@ supported through the advanced guide:
 
 https://docs.netbird.io/selfhosted/selfhosted-guide
 
-This compatibility notice will be removed in NetBird v0.80.
+This compatibility notice will be removed in NetBirdy v0.80.
 EOF
 
 exit 1

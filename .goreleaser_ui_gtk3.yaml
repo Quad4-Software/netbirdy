@@ -1,7 +1,7 @@
 version: 2
 env:
   - SKIP_PUBLISH={{ if index .Env "SKIP_PUBLISH" }}{{ .Env.SKIP_PUBLISH }}{{ else }}true{{ end }}
-project_name: netbird-ui
+project_name: netbirdy-ui
 
 before:
   hooks:
@@ -20,9 +20,9 @@ builds:
   # Wails Linux backend to the GTK3 stack and swaps our GTK4-only XEmbed
   # tray host for the pure-Go stub (client/ui/xembed_host_gtk3_linux.go).
   # Must be built on the oldest supported glibc (ubuntu-22.04 runner).
-  - id: netbird-ui-gtk3
+  - id: netbirdy-ui-gtk3
     dir: client/ui
-    binary: netbird-ui
+    binary: netbirdy-ui
     env:
       - CGO_ENABLED=1
     goos:
@@ -40,66 +40,66 @@ archives:
   - id: linux-gtk3-arch
     name_template: "{{ .ProjectName }}-linux-gtk3_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
     builds:
-      - netbird-ui-gtk3
+      - netbirdy-ui-gtk3
 
 nfpms:
-  # Mutually-exclusive alternative to the GTK4 netbird-ui package -- both
-  # ship the same /usr/bin/netbird-ui from the shared stable/yum repos, so
+  # Mutually-exclusive alternative to the GTK4 netbirdy-ui package -- both
+  # ship the same /usr/bin/netbirdy-ui from the shared stable/yum repos, so
   # this one carries its own name and conflicts with the GTK4 package.
-  - maintainer: Netbird <dev@netbird.io>
-    description: Netbird client UI.
-    homepage: https://netbird.io/
+  - maintainer: NetBirdy <https://github.com/Sudo-Ivan/netbirdy>
+    description: NetBirdy client UI.
+    homepage: https://github.com/Sudo-Ivan/netbirdy
     license: BSD-3-Clause
-    vendor: NetBird
+    vendor: NetBirdy
     id: netbird_ui_deb_gtk3
-    package_name: netbird-ui-gtk3
+    package_name: netbirdy-ui-gtk3
     file_name_template: "{{ .PackageName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
     builds:
-      - netbird-ui-gtk3
+      - netbirdy-ui-gtk3
     formats:
       - deb
     scripts:
       postinstall: "release_files/ui-post-install.sh"
     contents:
-      - src: client/ui/build/linux/netbird.desktop
-        dst: /usr/share/applications/org.wails.netbird.desktop
+      - src: client/ui/build/linux/netbirdy.desktop
+        dst: /usr/share/applications/org.wails.netbirdy.desktop
       - src: client/ui/build/appicon.png
-        dst: /usr/share/pixmaps/netbird.png
+        dst: /usr/share/pixmaps/netbirdy.png
     conflicts:
-      - netbird-ui
+      - netbirdy-ui
     replaces:
-      - netbird-ui
+      - netbirdy-ui
     dependencies:
-      - netbird (>= 0.75.0)
+      - netbirdy (>= 0.75.0)
       - libgtk-3-0
       - libwebkit2gtk-4.1-0
       - xdg-utils
 
-  - maintainer: Netbird <dev@netbird.io>
-    description: Netbird client UI.
-    homepage: https://netbird.io/
+  - maintainer: NetBirdy <https://github.com/Sudo-Ivan/netbirdy>
+    description: NetBirdy client UI.
+    homepage: https://github.com/Sudo-Ivan/netbirdy
     license: BSD-3-Clause
-    vendor: NetBird
+    vendor: NetBirdy
     id: netbird_ui_rpm_gtk3
-    package_name: netbird-ui-gtk3
+    package_name: netbirdy-ui-gtk3
     file_name_template: "{{ .PackageName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
     builds:
-      - netbird-ui-gtk3
+      - netbirdy-ui-gtk3
     formats:
       - rpm
     scripts:
       postinstall: "release_files/ui-post-install.sh"
     contents:
-      - src: client/ui/build/linux/netbird.desktop
-        dst: /usr/share/applications/org.wails.netbird.desktop
+      - src: client/ui/build/linux/netbirdy.desktop
+        dst: /usr/share/applications/org.wails.netbirdy.desktop
       - src: client/ui/build/appicon.png
-        dst: /usr/share/pixmaps/netbird.png
+        dst: /usr/share/pixmaps/netbirdy.png
     # No `replaces` here: nfpm maps it to rpm Obsoletes, which would make
-    # dnf swap installed GTK4 netbird-ui packages for this one on upgrade.
+    # dnf swap installed GTK4 netbirdy-ui packages for this one on upgrade.
     conflicts:
-      - netbird-ui
+      - netbirdy-ui
     dependencies:
-      - netbird >= 0.75.0
+      - netbirdy >= 0.75.0
       - (gtk3 or libgtk-3-0)
       - (webkit2gtk4.1 or libwebkit2gtk-4_1-0)
       - xdg-utils
@@ -138,7 +138,7 @@ uploads:
 release:
   # Uploads into the release created by the main .goreleaser.yaml run.
   # make_latest stays false everywhere: the signing pipeline
-  # (netbirdio/sign-pipelines) marks the release latest after the Windows
+  # (ghcr.io/sudo-ivan/netbirdy-sign-pipelines) marks the release latest after the Windows
   # and macOS artifacts are signed.
   make_latest: false
   prerelease: auto

@@ -1,0 +1,43 @@
+name: upstream-sync
+on:
+  schedule:
+    - cron: "0 6 * * 1"
+  workflow_dispatch:
+permissions:
+  contents: write
+  pull-requests: write
+jobs:
+  sync:
+    if: github.repository == 'Sudo-Ivan/netbirdy'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          fetch-depth: 0
+      - name: detect new upstream tag
+        id: tag
+        run: |
+          git fetch https://github.com/netbirdio/netbird.git 'refs/tags/*:refs/tags/upstream/*'
+          LATEST=$(git tag -l 'upstream/v*' --sort=-v:refname | head -1 | sed 's|upstream/||')
+          echo "tag=$LATEST" >> "$GITHUB_OUTPUT"
+          if git branch -r --list "origin/sync/$LATEST" | grep -q . || gh pr list --state open --head "sync/$LATEST" --json number --jq 'length' | grep -qv '^0$'; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: sync branch and PR
+        if: steps.tag.outputs.exists == 'false'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "sync/${{ steps.tag.outputs.tag }}"
+          git merge --no-edit "upstream/${{ steps.tag.outputs.tag }}" || true
+          tools/rebrand/rebrand.sh
+          git add -A
+          git commit -m "sync upstream ${{ steps.tag.outputs.tag }}" || true
+          git push -u origin "sync/${{ steps.tag.outputs.tag }}"
+          gh pr create --title "sync upstream ${{ steps.tag.outputs.tag }}" --body "Automated upstream sync. Resolve conflicts marked in the diff before merging." --head "sync/${{ steps.tag.outputs.tag }}" --base main || true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

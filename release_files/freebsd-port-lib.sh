@@ -2,13 +2,13 @@
 #
 # Shared helpers for the FreeBSD port scripts. Source this file, do not run it.
 #
-# The FreeBSD port tracks stable NetBird releases only, so every helper here
+# The FreeBSD port tracks stable NetBirdy releases only, so every helper here
 # works on plain MAJOR.MINOR.PATCH versions and ignores canary, release
 # candidate and any other prerelease tag.
 
 GITHUB_REPO="netbirdio/netbird"
 GITHUB_REPO_URL="https://github.com/${GITHUB_REPO}.git"
-PORTS_MIRROR_BASE="https://raw.githubusercontent.com/freebsd/freebsd-ports/main/security/netbird"
+PORTS_MIRROR_BASE="https://raw.githubusercontent.com/freebsd/freebsd-ports/main/security/netbirdy"
 STABLE_VERSION_RE='^[0-9]+\.[0-9]+\.[0-9]+$'
 
 # is_stable_version reports whether the version is a plain MAJOR.MINOR.PATCH release.
@@ -63,7 +63,7 @@ resolve_target_version() {
     return 0
 }
 
-# fetch_ports_file prints a file from the security/netbird port on the FreeBSD
+# fetch_ports_file prints a file from the security/netbirdy port on the FreeBSD
 # ports GitHub mirror.
 fetch_ports_file() {
     local filename="$1"

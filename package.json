@@ -1,0 +1,12 @@
+{
+  "name": "netbirdy-workspace",
+  "private": true,
+  "packageManager": "pnpm@12.14.0",
+  "engines": { "node": ">=24" },
+  "scripts": {
+    "dev": "pnpm --filter netbirdy-dashboard dev",
+    "build": "pnpm --filter netbirdy-dashboard build",
+    "lint": "pnpm --filter netbirdy-dashboard lint",
+    "test": "pnpm --filter netbirdy-dashboard test:unit"
+  }
+}

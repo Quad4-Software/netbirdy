@@ -1,0 +1,53 @@
+name: netbirdy
+
+services:
+  server:
+    image: localhost/netbirdy-server:latest
+    build:
+      context: ..
+      dockerfile: podman/Containerfile.server
+    container_name: netbirdy-server
+    restart: unless-stopped
+    ports:
+      - "8081:8081"
+      - "3478:3478/udp"
+      - "9090:9090"
+      - "9000:9000"
+    volumes:
+      - ./config.yaml:/etc/netbird/config.yaml:ro,Z
+      - netbirdy-server-data:/var/lib/netbird
+    healthcheck:
+      # /health on :9000 stays unhealthy in combined mode (the multiplexed relay
+      # registers no standalone listeners), so probe the OIDC discovery document.
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8081/oauth2/.well-known/openid-configuration || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+
+  dashboard:
+    image: localhost/netbirdy-dashboard:latest
+    build:
+      context: ..
+      dockerfile: podman/Containerfile.dashboard
+    container_name: netbirdy-dashboard
+    restart: unless-stopped
+    depends_on:
+      server:
+        condition: service_healthy
+    ports:
+      - "8080:80"
+    environment:
+      NETBIRD_MGMT_API_ENDPOINT: "http://localhost:8081"
+      NETBIRD_MGMT_GRPC_API_ENDPOINT: "http://localhost:8081"
+      AUTH_AUTHORITY: "http://localhost:8081/oauth2"
+      AUTH_CLIENT_ID: "netbird-dashboard"
+      AUTH_CLIENT_SECRET: ""
+      AUTH_AUDIENCE: "netbird-dashboard"
+      USE_AUTH0: "false"
+      AUTH_SUPPORTED_SCOPES: "openid profile email groups"
+      AUTH_REDIRECT_URI: "/nb-auth"
+      AUTH_SILENT_REDIRECT_URI: "/nb-silent-auth"
+      LETSENCRYPT_DOMAIN: "none"
+
+volumes:
+  netbirdy-server-data:

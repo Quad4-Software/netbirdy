@@ -26,6 +26,7 @@ concurrency:
 
 jobs:
   e2e:
+    if: github.repository == 'netbirdio/netbird'
     name: Agent Network E2E
     runs-on: ubuntu-latest
     timeout-minutes: 45

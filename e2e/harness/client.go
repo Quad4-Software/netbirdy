@@ -28,7 +28,7 @@ const (
 	curlImage          = "curlimages/curl:latest"
 )
 
-// Client is a running NetBird client container joined to the combined server.
+// Client is a running NetBirdy client container joined to the combined server.
 type Client struct {
 	container testcontainers.Container
 	// name is the container hostname the agent reports to management at
@@ -135,34 +135,34 @@ func (cl *Client) Hostname() string {
 	return cl.name
 }
 
-// Restart bounces the client connection (netbird down/up) so it pulls a fresh
+// Restart bounces the client connection (netbirdy down/up) so it pulls a fresh
 // network map — the documented workaround for a freshly-joined client not yet
 // seeing a synthesized agent-network service.
 func (cl *Client) Restart(ctx context.Context) error {
 	return cl.Up(ctx)
 }
 
-// Up re-runs `netbird up` inside the client with the given extra flags (e.g.
+// Up re-runs `netbirdy up` inside the client with the given extra flags (e.g.
 // "--allow-remote-jobs"), bouncing the connection first so the new config is
 // picked up and re-synced to management. Used to toggle peer options that ride
 // on the login/sync request without recreating the container.
 func (cl *Client) Up(ctx context.Context, extraArgs ...string) error {
 	if _, _, err := cl.container.Exec(ctx, []string{"netbird", "down"}, tcexec.Multiplexed()); err != nil {
-		return fmt.Errorf("netbird down: %w", err)
+		return fmt.Errorf("netbirdy down: %w", err)
 	}
 	time.Sleep(2 * time.Second)
 	code, reader, err := cl.container.Exec(ctx, append([]string{"netbird", "up"}, extraArgs...), tcexec.Multiplexed())
 	if err != nil {
-		return fmt.Errorf("netbird up: %w", err)
+		return fmt.Errorf("netbirdy up: %w", err)
 	}
 	if code != 0 {
 		out, _ := io.ReadAll(reader)
-		return fmt.Errorf("netbird up %v exited %d: %s", extraArgs, code, string(out))
+		return fmt.Errorf("netbirdy up %v exited %d: %s", extraArgs, code, string(out))
 	}
 	return nil
 }
 
-// Status returns `netbird status` output from inside the client.
+// Status returns `netbirdy status` output from inside the client.
 func (cl *Client) Status(ctx context.Context) (string, error) {
 	code, reader, err := cl.container.Exec(ctx, []string{"netbird", "status"}, tcexec.Multiplexed())
 	if err != nil {
@@ -170,7 +170,7 @@ func (cl *Client) Status(ctx context.Context) (string, error) {
 	}
 	out, _ := io.ReadAll(reader)
 	if code != 0 {
-		return string(out), fmt.Errorf("netbird status exited %d", code)
+		return string(out), fmt.Errorf("netbirdy status exited %d", code)
 	}
 	return string(out), nil
 }

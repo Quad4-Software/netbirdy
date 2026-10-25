@@ -15,8 +15,8 @@ The harness builds the combined server and proxy from the current checkout.
 To test existing images, pass full image references:
 
 ```bash
-NB_E2E_COMBINED_IMAGE=local/netbird-combined:target-access \
-NB_E2E_PROXY_IMAGE=local/netbird-proxy:target-access \
+NB_E2E_COMBINED_IMAGE=local/netbirdy-combined:target-access \
+NB_E2E_PROXY_IMAGE=local/netbirdy-proxy:target-access \
 go test -tags e2e -timeout 25m -v ./e2e/reverseproxy/...
 ```
 

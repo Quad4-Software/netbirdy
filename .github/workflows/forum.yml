@@ -12,14 +12,14 @@ permissions:
 
 jobs:
   post:
-    if: github.event_name == 'release'
+    if: (github.event_name == 'release') && github.repository == 'netbirdio/netbird'
     runs-on: ubuntu-latest
     steps:
       - uses: roots/discourse-topic-github-release-action@557d74ea05b6cc0c47f555c1d5d28a89d904005b # v1.1.0
         with:
           discourse-api-key: ${{ secrets.DISCOURSE_RELEASES_API_KEY }}
           discourse-base-url: https://forum.netbird.io
-          discourse-author-username: NetBird
+          discourse-author-username: NetBirdy
           discourse-category: 17
           discourse-tags: releases
 
@@ -27,11 +27,11 @@ jobs:
   # raised by that token start no workflow, so the release event above never fires.
   post-tag-release:
     if: >-
-      github.event_name == 'workflow_run' &&
+      (github.event_name == 'workflow_run' &&
       github.event.workflow_run.event == 'push' &&
       github.event.workflow_run.conclusion == 'success' &&
       startsWith(github.event.workflow_run.head_branch, 'v') &&
-      !contains(github.event.workflow_run.head_branch, '-')
+      !contains(github.event.workflow_run.head_branch, '-')) && github.repository == 'netbirdio/netbird'
     runs-on: ubuntu-latest
     steps:
       - name: Post the release topic
@@ -40,7 +40,7 @@ jobs:
           TAG: ${{ github.event.workflow_run.head_branch }}
           DISCOURSE_API_KEY: ${{ secrets.DISCOURSE_RELEASES_API_KEY }}
           DISCOURSE_URL: https://forum.netbird.io
-          DISCOURSE_USER: NetBird
+          DISCOURSE_USER: NetBirdy
           DISCOURSE_CATEGORY: "17"
         run: |
           set -euo pipefail

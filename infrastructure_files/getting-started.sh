@@ -2,15 +2,15 @@
 
 set -e
 
-# NetBird Getting Started with Embedded IdP (Dex)
-# This script sets up NetBird with the embedded Dex identity provider
+# NetBirdy Getting Started with Embedded IdP (Dex)
+# This script sets up NetBirdy with the embedded Dex identity provider
 # No separate Dex container or reverse proxy needed - IdP is built into management server
 
 # Sed pattern to strip base64 padding characters
 SED_STRIP_PADDING='s/=//g'
 
 # Constants for repeated string literals
-readonly MSG_STARTING_SERVICES="\nStarting NetBird services\n"
+readonly MSG_STARTING_SERVICES="\nStarting NetBirdy services\n"
 readonly MSG_DONE="\nDone!\n"
 readonly MSG_NEXT_STEPS="Next steps:"
 readonly MSG_SEPARATOR="=========================================="
@@ -131,8 +131,8 @@ check_nb_domain() {
   if [[ "$domain" == "use-ip" ]]; then
     return 0
   fi
-  if [[ "$domain" == "netbird.example.com" ]]; then
-    echo "The NETBIRD_DOMAIN cannot be netbird.example.com" > /dev/stderr
+  if [[ "$domain" == "netbirdy.example.com" ]]; then
+    echo "The NETBIRD_DOMAIN cannot be netbirdy.example.com" > /dev/stderr
     return 1
   fi
   if [[ "$domain" =~ ^[0-9.]+$ ]]; then
@@ -140,7 +140,7 @@ check_nb_domain() {
     return 1
   fi
   if [[ ! "$domain" =~ ^[A-Za-z0-9]([A-Za-z0-9-]*[A-Za-z0-9])?(\.[A-Za-z0-9]([A-Za-z0-9-]*[A-Za-z0-9])?)+$ ]]; then
-    echo "'$domain' is not a valid FQDN. It needs at least one dot (e.g. netbird.my-domain.com), with no scheme, port or trailing dot." > /dev/stderr
+    echo "'$domain' is not a valid FQDN. It needs at least one dot (e.g. netbirdy.my-domain.com), with no scheme, port or trailing dot." > /dev/stderr
     return 1
   fi
   return 0
@@ -211,7 +211,7 @@ resolve() {
 
 read_nb_domain() {
   READ_NETBIRD_DOMAIN=""
-  echo -n "Enter the domain you want to use for NetBird (e.g. netbird.my-domain.com): " > /dev/stderr
+  echo -n "Enter the domain you want to use for NetBirdy (e.g. netbirdy.my-domain.com): " > /dev/stderr
   read -r READ_NETBIRD_DOMAIN < /dev/tty
   if ! check_nb_domain "$READ_NETBIRD_DOMAIN"; then
     read_nb_domain
@@ -265,7 +265,7 @@ read_reverse_proxy_type() {
 read_traefik_network() {
   echo "" > /dev/stderr
   echo "If you have an existing Traefik instance, enter its external network name." > /dev/stderr
-  echo -n "External network (leave empty to create 'netbird' network): " > /dev/stderr
+  echo -n "External network (leave empty to create 'netbirdy' network): " > /dev/stderr
   read -r NETWORK < /dev/tty
   echo "$NETWORK"
   return 0
@@ -312,7 +312,7 @@ read_proxy_docker_network() {
   local proxy_name="$1"
   echo "" > /dev/stderr
   echo "Is ${proxy_name} running in Docker?" > /dev/stderr
-  echo "If yes, enter the Docker network ${proxy_name} is on (NetBird will join it)." > /dev/stderr
+  echo "If yes, enter the Docker network ${proxy_name} is on (NetBirdy will join it)." > /dev/stderr
   echo -n "Docker network (leave empty if not in Docker): " > /dev/stderr
   read -r NETWORK < /dev/tty
   echo "$NETWORK"
@@ -321,8 +321,8 @@ read_proxy_docker_network() {
 
 read_enable_proxy() {
   echo "" > /dev/stderr
-  echo "Do you want to enable the NetBird Proxy service?" > /dev/stderr
-  echo "The proxy allows you to selectively expose internal NetBird network resources" > /dev/stderr
+  echo "Do you want to enable the NetBirdy Proxy service?" > /dev/stderr
+  echo "The proxy allows you to selectively expose internal NetBirdy network resources" > /dev/stderr
   echo "to the internet. You control which resources are exposed through the dashboard." > /dev/stderr
   echo -n "Enable proxy? [y/N]: " > /dev/stderr
   read -r CHOICE < /dev/tty
@@ -398,7 +398,7 @@ wait_management_proxy() {
     fi
   fi
 
-  echo -n "Waiting for NetBird server to become ready"
+  echo -n "Waiting for NetBirdy server to become ready"
   counter=1
   while true; do
     # Check the embedded IdP endpoint through the reverse proxy
@@ -415,7 +415,7 @@ wait_management_proxy() {
           $DOCKER_COMPOSE_COMMAND logs --tail=20 "$proxy_container"
         fi
       fi
-      $DOCKER_COMPOSE_COMMAND logs --tail=20 netbird-server
+      $DOCKER_COMPOSE_COMMAND logs --tail=20 netbirdy-server
     fi
     echo -n " ."
     sleep 2
@@ -429,7 +429,7 @@ wait_management_proxy() {
 wait_management_direct() {
   set +e
   local upstream_host=$(get_upstream_host)
-  echo -n "Waiting for NetBird server to become ready"
+  echo -n "Waiting for NetBirdy server to become ready"
   counter=1
   while true; do
     # Check the embedded IdP endpoint directly (no reverse proxy)
@@ -439,7 +439,7 @@ wait_management_direct() {
     if [[ $counter -eq 60 ]]; then
       echo ""
       echo "Taking too long. Checking logs..."
-      $DOCKER_COMPOSE_COMMAND logs --tail=20 netbird-server
+      $DOCKER_COMPOSE_COMMAND logs --tail=20 netbirdy-server
     fi
     echo -n " ."
     sleep 2
@@ -465,10 +465,10 @@ initialize_default_values() {
   NETBIRD_STUN_PORT=3478
 
   # Docker images
-  DASHBOARD_IMAGE=${DASHBOARD_IMAGE:-"netbirdio/dashboard:latest"}
+  DASHBOARD_IMAGE=${DASHBOARD_IMAGE:-"ghcr.io/sudo-ivan/netbirdy-dashboard:latest"}
   # Combined server replaces separate signal, relay, and management containers
-  NETBIRD_SERVER_IMAGE=${NETBIRD_SERVER_IMAGE:-"netbirdio/netbird-server:latest"}
-  NETBIRD_PROXY_IMAGE=${NETBIRD_PROXY_IMAGE:-"netbirdio/reverse-proxy:latest"}
+  NETBIRD_SERVER_IMAGE=${NETBIRD_SERVER_IMAGE:-"ghcr.io/sudo-ivan/netbirdy-server:latest"}
+  NETBIRD_PROXY_IMAGE=${NETBIRD_PROXY_IMAGE:-"ghcr.io/sudo-ivan/netbirdy-reverse-proxy:latest"}
   TRAEFIK_IMAGE=${TRAEFIK_IMAGE:-"traefik:v3.7.14"}
   CROWDSEC_IMAGE=${CROWDSEC_IMAGE:-"crowdsecurity/crowdsec:v1.8.1"}
   # Reverse proxy configuration
@@ -487,7 +487,7 @@ initialize_default_values() {
   # Traefik static IP within the internal bridge network
   TRAEFIK_IP="172.30.0.10"
 
-  # NetBird Proxy configuration
+  # NetBirdy Proxy configuration
   ENABLE_PROXY="false"
   PROXY_TOKEN=""
 
@@ -533,7 +533,7 @@ configure_domain() {
 }
 
 apply_agent_network_preset() {
-  # Agent-network turnkey install: built-in Traefik + NetBird Proxy with
+  # Agent-network turnkey install: built-in Traefik + NetBirdy Proxy with
   # NB_PROXY_PRIVATE=true, dashboard locked to agent-network-only mode.
   # Bypasses every reverse-proxy / proxy / CrowdSec prompt. The only
   # inputs we still need from the operator are the domain (handled by
@@ -550,7 +550,7 @@ apply_agent_network_preset() {
   echo "" > /dev/stderr
   echo "Agent-network preset enabled (NETBIRD_AGENT_NETWORK=true):" > /dev/stderr
   echo "  - reverse proxy: built-in Traefik" > /dev/stderr
-  echo "  - NetBird Proxy: enabled with NB_PROXY_PRIVATE=true" > /dev/stderr
+  echo "  - NetBirdy Proxy: enabled with NB_PROXY_PRIVATE=true" > /dev/stderr
   echo "  - server image: ${NETBIRD_SERVER_IMAGE}" > /dev/stderr
   echo "  - proxy image: ${NETBIRD_PROXY_IMAGE}" > /dev/stderr
   echo "  - dashboard: NETBIRD_AGENT_NETWORK_ONLY=true" > /dev/stderr
@@ -621,7 +621,7 @@ check_existing_installation() {
     echo "Generated files already exist, if you want to reinitialize the environment, please remove them first."
     echo "You can use the following commands:"
     echo "  $DOCKER_COMPOSE_COMMAND down --volumes # to remove all containers and volumes"
-    echo "  rm -f docker-compose.yml dashboard.env config.yaml proxy.env traefik-dynamic.yaml nginx-netbird.conf caddyfile-netbird.txt npm-advanced-config.txt && rm -rf crowdsec/"
+    echo "  rm -f docker-compose.yml dashboard.env config.yaml proxy.env traefik-dynamic.yaml nginx-netbirdy.conf caddyfile-netbirdy.txt npm-advanced-config.txt && rm -rf crowdsec/"
     echo "Be aware that this will remove all data from the database, and you will have to reconfigure the dashboard."
     exit 1
   fi
@@ -638,8 +638,8 @@ generate_configuration_files() {
       render_docker_compose_traefik_builtin > docker-compose.yml
       if [[ "$ENABLE_PROXY" == "true" ]]; then
         # Create placeholder proxy.env so docker-compose can validate
-        # This will be overwritten with the actual token after netbird-server starts
-        echo "# Placeholder - will be updated with token after netbird-server starts" > proxy.env
+        # This will be overwritten with the actual token after netbirdy-server starts
+        echo "# Placeholder - will be updated with token after netbirdy-server starts" > proxy.env
         echo "NB_PROXY_TOKEN=placeholder" >> proxy.env
         # TCP ServersTransport for PROXY protocol v2 to the proxy backend
         render_traefik_dynamic > traefik-dynamic.yaml
@@ -653,7 +653,7 @@ generate_configuration_files() {
       ;;
     2)
       render_docker_compose_exposed_ports > docker-compose.yml
-      render_nginx_conf > nginx-netbird.conf
+      render_nginx_conf > nginx-netbirdy.conf
       ;;
     3)
       render_docker_compose_exposed_ports > docker-compose.yml
@@ -661,7 +661,7 @@ generate_configuration_files() {
       ;;
     4)
       render_docker_compose_exposed_ports > docker-compose.yml
-      render_external_caddyfile > caddyfile-netbird.txt
+      render_external_caddyfile > caddyfile-netbirdy.txt
       ;;
     5)
       render_docker_compose_exposed_ports > docker-compose.yml
@@ -689,7 +689,7 @@ start_services_and_show_instructions() {
 
     if [[ "$ENABLE_PROXY" == "true" ]]; then
       # Phase 1: Start core services (without proxy)
-      local core_services="traefik dashboard netbird-server"
+      local core_services="traefik dashboard netbirdy-server"
       if [[ "$ENABLE_CROWDSEC" == "true" ]]; then
         core_services="$core_services crowdsec"
       fi
@@ -703,12 +703,12 @@ start_services_and_show_instructions() {
       echo ""
       echo "Creating proxy access token..."
       # Use docker exec with bash to run the token command directly
-      PROXY_TOKEN=$($DOCKER_COMPOSE_COMMAND exec -T netbird-server \
-        /go/bin/netbird-server admin token create --name "default-proxy" --config /etc/netbird/config.yaml 2>/dev/null | grep "^Token:" | awk '{print $2}')
+      PROXY_TOKEN=$($DOCKER_COMPOSE_COMMAND exec -T netbirdy-server \
+        /go/bin/netbirdy-server admin token create --name "default-proxy" --config /etc/netbird/config.yaml 2>/dev/null | grep "^Token:" | awk '{print $2}')
 
       if [[ -z "$PROXY_TOKEN" ]]; then
-        echo "ERROR: Failed to create proxy token. Check netbird-server logs." > /dev/stderr
-        $DOCKER_COMPOSE_COMMAND logs --tail=20 netbird-server
+        echo "ERROR: Failed to create proxy token. Check netbirdy-server logs." > /dev/stderr
+        $DOCKER_COMPOSE_COMMAND logs --tail=20 netbirdy-server
         exit 1
       fi
 
@@ -722,7 +722,7 @@ start_services_and_show_instructions() {
           if [[ $cs_retries -ge 30 ]]; then
             echo "WARNING: CrowdSec did not become ready. Skipping CrowdSec setup." > /dev/stderr
             echo "You can register a bouncer manually later with:" > /dev/stderr
-            echo "  docker exec netbird-crowdsec cscli bouncers add netbird-proxy -o raw" > /dev/stderr
+            echo "  docker exec netbirdy-crowdsec cscli bouncers add netbirdy-proxy -o raw" > /dev/stderr
             ENABLE_CROWDSEC="false"
             break
           fi
@@ -731,7 +731,7 @@ start_services_and_show_instructions() {
 
         if [[ "$ENABLE_CROWDSEC" == "true" ]]; then
           CROWDSEC_BOUNCER_KEY=$($DOCKER_COMPOSE_COMMAND exec -T crowdsec \
-            cscli bouncers add netbird-proxy -o raw 2>/dev/null)
+            cscli bouncers add netbirdy-proxy -o raw 2>/dev/null)
           if [[ -z "$CROWDSEC_BOUNCER_KEY" ]]; then
             echo "WARNING: Failed to create CrowdSec bouncer key. Skipping CrowdSec setup." > /dev/stderr
             ENABLE_CROWDSEC="false"
@@ -768,7 +768,7 @@ start_services_and_show_instructions() {
     echo -e "$MSG_DONE"
     print_post_setup_instructions
     echo ""
-    echo "NetBird containers are running. Once Traefik is connected, access the dashboard at:"
+    echo "NetBirdy containers are running. Once Traefik is connected, access the dashboard at:"
     echo "  $NETBIRD_HTTP_PROTOCOL://$NETBIRD_DOMAIN"
   elif [[ "$REVERSE_PROXY_TYPE" == "3" ]]; then
     # NPM - start containers first, then show instructions
@@ -782,7 +782,7 @@ start_services_and_show_instructions() {
     echo -e "$MSG_DONE"
     print_post_setup_instructions
     echo ""
-    echo "NetBird containers are running. Configure NPM as shown above, then access:"
+    echo "NetBirdy containers are running. Configure NPM as shown above, then access:"
     echo "  $NETBIRD_HTTP_PROTOCOL://$NETBIRD_DOMAIN"
   else
     # External proxies (nginx, external Caddy, other) - need manual config first
@@ -793,7 +793,7 @@ start_services_and_show_instructions() {
       echo -n "Press Enter when your reverse proxy is configured (or Ctrl+C to exit)... "
       read -r < /dev/tty
     else
-      echo "Non-interactive mode: starting NetBird containers now. Finish configuring"
+      echo "Non-interactive mode: starting NetBirdy containers now. Finish configuring"
       echo "your reverse proxy using the instructions above so it can reach them."
     fi
 
@@ -804,7 +804,7 @@ start_services_and_show_instructions() {
     wait_management_direct
 
     echo -e "$MSG_DONE"
-    echo "NetBird is now running. Access the dashboard at:"
+    echo "NetBirdy is now running. Access the dashboard at:"
     echo "  $NETBIRD_HTTP_PROTOCOL://$NETBIRD_DOMAIN"
   fi
   return 0
@@ -844,25 +844,25 @@ render_docker_compose_traefik_builtin() {
     traefik_dynamic_volume="      - ./traefik-dynamic.yaml:/etc/traefik/dynamic.yaml:ro"
 
     local proxy_depends="
-      netbird-server:
+      netbirdy-server:
         condition: service_started"
     if [[ "$ENABLE_CROWDSEC" == "true" ]]; then
       proxy_depends="
-      netbird-server:
+      netbirdy-server:
         condition: service_started
       crowdsec:
         condition: service_healthy"
     fi
 
     proxy_service="
-  # NetBird Proxy - exposes internal resources to the internet
+  # NetBirdy Proxy - exposes internal resources to the internet
   proxy:
     image: $NETBIRD_PROXY_IMAGE
-    container_name: netbird-proxy
+    container_name: netbirdy-proxy
     ports:
     - 51820:51820/udp
     restart: unless-stopped
-    networks: [netbird]
+    networks: [netbirdy]
     depends_on:${proxy_depends}
     env_file:
       - ./proxy.env
@@ -891,9 +891,9 @@ render_docker_compose_traefik_builtin() {
       crowdsec_service="
   crowdsec:
     image: $CROWDSEC_IMAGE
-    container_name: netbird-crowdsec
+    container_name: netbirdy-crowdsec
     restart: unless-stopped
-    networks: [netbird]
+    networks: [netbirdy]
     environment:
       COLLECTIONS: crowdsecurity/linux
     volumes:
@@ -922,10 +922,10 @@ services:
   # Traefik reverse proxy (automatic TLS via Let's Encrypt)
   traefik:
     image: $TRAEFIK_IMAGE
-    container_name: netbird-traefik
+    container_name: netbirdy-traefik
     restart: unless-stopped
     networks:
-      netbird:
+      netbirdy:
         ipv4_address: $TRAEFIK_IP
     command:
       # Logging
@@ -974,7 +974,7 @@ $traefik_dynamic_volume
     image: $DASHBOARD_IMAGE
     container_name: netbird-dashboard
     restart: unless-stopped
-    networks: [netbird]
+    networks: [netbirdy]
     env_file:
       - ./dashboard.env
     labels:
@@ -993,11 +993,11 @@ $traefik_dynamic_volume
         max-file: "2"
 
   # Combined server (Management + Signal + Relay + STUN)
-  netbird-server:
+  netbirdy-server:
     image: $NETBIRD_SERVER_IMAGE
-    container_name: netbird-server
+    container_name: netbirdy-server
     restart: unless-stopped
-    networks: [netbird]
+    networks: [netbirdy]
     ports:
       - '$NETBIRD_STUN_PORT:$NETBIRD_STUN_PORT/udp'
     volumes:
@@ -1007,23 +1007,23 @@ $traefik_dynamic_volume
     labels:
       - traefik.enable=true
       # gRPC router (needs h2c backend for HTTP/2 cleartext)
-      - traefik.http.routers.netbird-grpc.rule=Host(\`$NETBIRD_DOMAIN\`) && (PathPrefix(\`/signalexchange.SignalExchange/\`) || PathPrefix(\`/management.ManagementService/\`) || PathPrefix(\`/management.ProxyService/\`))
-      - traefik.http.routers.netbird-grpc.entrypoints=websecure
-      - traefik.http.routers.netbird-grpc.tls=true
-      - traefik.http.routers.netbird-grpc.tls.certresolver=letsencrypt
-      - traefik.http.routers.netbird-grpc.service=netbird-server-h2c
-      - traefik.http.routers.netbird-grpc.priority=100
+      - traefik.http.routers.netbirdy-grpc.rule=Host(\`$NETBIRD_DOMAIN\`) && (PathPrefix(\`/signalexchange.SignalExchange/\`) || PathPrefix(\`/management.ManagementService/\`) || PathPrefix(\`/management.ProxyService/\`))
+      - traefik.http.routers.netbirdy-grpc.entrypoints=websecure
+      - traefik.http.routers.netbirdy-grpc.tls=true
+      - traefik.http.routers.netbirdy-grpc.tls.certresolver=letsencrypt
+      - traefik.http.routers.netbirdy-grpc.service=netbirdy-server-h2c
+      - traefik.http.routers.netbirdy-grpc.priority=100
       # Backend router (relay, WebSocket, API, OAuth2)
-      - traefik.http.routers.netbird-backend.rule=Host(\`$NETBIRD_DOMAIN\`) && (PathPrefix(\`/relay\`) || PathPrefix(\`/ws-proxy/\`) || PathPrefix(\`/api\`) || PathPrefix(\`/oauth2\`))
-      - traefik.http.routers.netbird-backend.entrypoints=websecure
-      - traefik.http.routers.netbird-backend.tls=true
-      - traefik.http.routers.netbird-backend.tls.certresolver=letsencrypt
-      - traefik.http.routers.netbird-backend.service=netbird-server
-      - traefik.http.routers.netbird-backend.priority=100
+      - traefik.http.routers.netbirdy-backend.rule=Host(\`$NETBIRD_DOMAIN\`) && (PathPrefix(\`/relay\`) || PathPrefix(\`/ws-proxy/\`) || PathPrefix(\`/api\`) || PathPrefix(\`/oauth2\`))
+      - traefik.http.routers.netbirdy-backend.entrypoints=websecure
+      - traefik.http.routers.netbirdy-backend.tls=true
+      - traefik.http.routers.netbirdy-backend.tls.certresolver=letsencrypt
+      - traefik.http.routers.netbirdy-backend.service=netbirdy-server
+      - traefik.http.routers.netbirdy-backend.priority=100
       # Services
-      - traefik.http.services.netbird-server.loadbalancer.server.port=80
-      - traefik.http.services.netbird-server-h2c.loadbalancer.server.port=80
-      - traefik.http.services.netbird-server-h2c.loadbalancer.server.scheme=h2c
+      - traefik.http.services.netbirdy-server.loadbalancer.server.port=80
+      - traefik.http.services.netbirdy-server-h2c.loadbalancer.server.port=80
+      - traefik.http.services.netbirdy-server-h2c.loadbalancer.server.scheme=h2c
     logging:
       driver: "json-file"
       options:
@@ -1035,7 +1035,7 @@ volumes:
   netbird_traefik_letsencrypt:${proxy_volumes}${crowdsec_volumes}
 
 networks:
-  netbird:
+  netbirdy:
     driver: bridge
     ipam:
       config:
@@ -1047,7 +1047,7 @@ EOF
 
 render_combined_yaml() {
   cat <<EOF
-# Combined NetBird Server Configuration (Simplified)
+# Combined NetBirdy Server Configuration (Simplified)
 # Generated by getting-started.sh
 
 server:
@@ -1113,7 +1113,7 @@ EOF
 
   if [[ "${NETBIRD_AGENT_NETWORK}" == "true" ]]; then
     cat <<EOF
-# Agent-network preset: dashboard hides the standard NetBird surfaces
+# Agent-network preset: dashboard hides the standard NetBirdy surfaces
 # and exposes only the AI Observability + agent-network configuration
 # pages. Paired with NB_PROXY_PRIVATE=true on the proxy side.
 NETBIRD_AGENT_NETWORK_ONLY=true
@@ -1135,10 +1135,10 @@ EOF
 
 render_proxy_env() {
   cat <<EOF
-# NetBird Proxy Configuration
+# NetBirdy Proxy Configuration
 NB_PROXY_DEBUG_LOGS=false
 # Use internal Docker network to connect to management (avoids hairpin NAT issues)
-NB_PROXY_MANAGEMENT_ADDRESS=http://netbird-server:80
+NB_PROXY_MANAGEMENT_ADDRESS=http://netbirdy-server:80
 # Allow insecure gRPC connection to management (required for internal Docker network)
 NB_PROXY_ALLOW_INSECURE=true
 # Public URL where this proxy is reachable (used for cluster registration)
@@ -1177,7 +1177,7 @@ EOF
 }
 
 render_docker_compose_traefik() {
-  local network_name="${TRAEFIK_EXTERNAL_NETWORK:-netbird}"
+  local network_name="${TRAEFIK_EXTERNAL_NETWORK:-netbirdy}"
   local network_config=""
   if [[ -n "$TRAEFIK_EXTERNAL_NETWORK" ]]; then
     network_config="    external: true"
@@ -1214,9 +1214,9 @@ $(if [[ -n "$tls_labels" ]]; then echo "      - traefik.http.routers.netbird-das
         max-file: "2"
 
   # Combined server (Management + Signal + Relay + STUN)
-  netbird-server:
+  netbirdy-server:
     image: $NETBIRD_SERVER_IMAGE
-    container_name: netbird-server
+    container_name: netbirdy-server
     restart: unless-stopped
     networks: [$network_name]
     ports:
@@ -1228,21 +1228,21 @@ $(if [[ -n "$tls_labels" ]]; then echo "      - traefik.http.routers.netbird-das
     labels:
       - traefik.enable=true
       # gRPC router (needs h2c backend for HTTP/2 cleartext)
-      - traefik.http.routers.netbird-grpc.rule=Host(\`$NETBIRD_DOMAIN\`) && (PathPrefix(\`/signalexchange.SignalExchange/\`) || PathPrefix(\`/management.ManagementService/\`))
-      - traefik.http.routers.netbird-grpc.entrypoints=$TRAEFIK_ENTRYPOINT
-      - traefik.http.routers.netbird-grpc.tls=true
-$(if [[ -n "$tls_labels" ]]; then echo "      - traefik.http.routers.netbird-grpc.${tls_labels}"; fi)
-      - traefik.http.routers.netbird-grpc.service=netbird-server-h2c
+      - traefik.http.routers.netbirdy-grpc.rule=Host(\`$NETBIRD_DOMAIN\`) && (PathPrefix(\`/signalexchange.SignalExchange/\`) || PathPrefix(\`/management.ManagementService/\`))
+      - traefik.http.routers.netbirdy-grpc.entrypoints=$TRAEFIK_ENTRYPOINT
+      - traefik.http.routers.netbirdy-grpc.tls=true
+$(if [[ -n "$tls_labels" ]]; then echo "      - traefik.http.routers.netbirdy-grpc.${tls_labels}"; fi)
+      - traefik.http.routers.netbirdy-grpc.service=netbirdy-server-h2c
       # Backend router (relay, WebSocket, API, OAuth2)
-      - traefik.http.routers.netbird-backend.rule=Host(\`$NETBIRD_DOMAIN\`) && (PathPrefix(\`/relay\`) || PathPrefix(\`/ws-proxy/\`) || PathPrefix(\`/api\`) || PathPrefix(\`/oauth2\`))
-      - traefik.http.routers.netbird-backend.entrypoints=$TRAEFIK_ENTRYPOINT
-      - traefik.http.routers.netbird-backend.tls=true
-$(if [[ -n "$tls_labels" ]]; then echo "      - traefik.http.routers.netbird-backend.${tls_labels}"; fi)
-      - traefik.http.routers.netbird-backend.service=netbird-server
+      - traefik.http.routers.netbirdy-backend.rule=Host(\`$NETBIRD_DOMAIN\`) && (PathPrefix(\`/relay\`) || PathPrefix(\`/ws-proxy/\`) || PathPrefix(\`/api\`) || PathPrefix(\`/oauth2\`))
+      - traefik.http.routers.netbirdy-backend.entrypoints=$TRAEFIK_ENTRYPOINT
+      - traefik.http.routers.netbirdy-backend.tls=true
+$(if [[ -n "$tls_labels" ]]; then echo "      - traefik.http.routers.netbirdy-backend.${tls_labels}"; fi)
+      - traefik.http.routers.netbirdy-backend.service=netbirdy-server
       # Services
-      - traefik.http.services.netbird-server.loadbalancer.server.port=80
-      - traefik.http.services.netbird-server-h2c.loadbalancer.server.port=80
-      - traefik.http.services.netbird-server-h2c.loadbalancer.server.scheme=h2c
+      - traefik.http.services.netbirdy-server.loadbalancer.server.port=80
+      - traefik.http.services.netbirdy-server-h2c.loadbalancer.server.port=80
+      - traefik.http.services.netbirdy-server-h2c.loadbalancer.server.scheme=h2c
     logging:
       driver: "json-file"
       options:
@@ -1261,15 +1261,15 @@ EOF
 
 render_docker_compose_exposed_ports() {
   local bind_addr=$(get_bind_address)
-  local networks="[netbird]"
+  local networks="[netbirdy]"
   local networks_config="networks:
-  netbird:"
+  netbirdy:"
 
   # If an external network is specified, add it and include in service networks
   if [[ -n "$EXTERNAL_PROXY_NETWORK" ]]; then
-    networks="[netbird, $EXTERNAL_PROXY_NETWORK]"
+    networks="[netbirdy, $EXTERNAL_PROXY_NETWORK]"
     networks_config="networks:
-  netbird:
+  netbirdy:
   $EXTERNAL_PROXY_NETWORK:
     external: true"
   fi
@@ -1293,9 +1293,9 @@ services:
         max-file: "2"
 
   # Combined server (Management + Signal + Relay + STUN)
-  netbird-server:
+  netbirdy-server:
     image: $NETBIRD_SERVER_IMAGE
-    container_name: netbird-server
+    container_name: netbirdy-server
     restart: unless-stopped
     networks: ${networks}
     ports:
@@ -1325,20 +1325,20 @@ render_nginx_conf() {
   local server_addr="${upstream_host}:${MANAGEMENT_HOST_PORT}"
   local install_note="# 1. Update SSL certificate paths below
 # 2. Copy to your nginx config directory:
-#    Debian/Ubuntu: /etc/nginx/sites-available/netbird (then symlink to sites-enabled)
-#    RHEL/CentOS:   /etc/nginx/conf.d/netbird.conf
+#    Debian/Ubuntu: /etc/nginx/sites-available/netbirdy (then symlink to sites-enabled)
+#    RHEL/CentOS:   /etc/nginx/conf.d/netbirdy.conf
 # 3. Test and reload: nginx -t && systemctl reload nginx"
 
   # If running in Docker network, use container names
   if [[ -n "$EXTERNAL_PROXY_NETWORK" ]]; then
     dashboard_addr="netbird-dashboard:80"
-    server_addr="netbird-server:80"
+    server_addr="netbirdy-server:80"
     install_note="# This config uses container names since Nginx is on the same Docker network.
 # Add this to your nginx.conf or include it from a separate file."
   fi
 
   cat <<EOF
-# NetBird Nginx Configuration
+# NetBirdy Nginx Configuration
 # Generated by getting-started.sh
 #
 ${install_note}
@@ -1441,13 +1441,13 @@ render_external_caddyfile() {
   # If running in Docker network, use container names
   if [[ -n "$EXTERNAL_PROXY_NETWORK" ]]; then
     dashboard_addr="netbird-dashboard:80"
-    server_addr="netbird-server:80"
+    server_addr="netbirdy-server:80"
     install_note="# This config uses container names since Caddy is on the same Docker network.
 # Add this block to your Caddyfile and reload Caddy."
   fi
 
   cat <<EOF
-# NetBird Caddyfile Snippet
+# NetBirdy Caddyfile Snippet
 # Generated by getting-started.sh
 #
 ${install_note}
@@ -1474,7 +1474,7 @@ render_npm_advanced_config() {
 
   # If external network is specified, use container names instead of host addresses
   if [[ -n "$EXTERNAL_PROXY_NETWORK" ]]; then
-    server_addr="netbird-server:80"
+    server_addr="netbirdy-server:80"
   fi
 
   cat <<EOF
@@ -1504,7 +1504,7 @@ location ~ ^/(relay|ws-proxy/) {
 location ~ ^/(signalexchange\.SignalExchange|management\.ManagementService)/ {
     grpc_pass grpc://${server_addr};
     # Overwrite rather than pass through: without this the client's own
-    # x-forwarded-for metadata reaches NetBird as the connection IP.
+    # x-forwarded-for metadata reaches NetBirdy as the connection IP.
     grpc_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
     grpc_read_timeout 1d;
     grpc_send_timeout 1d;
@@ -1530,19 +1530,19 @@ EOF
 print_builtin_traefik_instructions() {
   echo ""
   echo "$MSG_SEPARATOR"
-  echo "  NETBIRD SETUP COMPLETE"
+  echo "  NETBIRDY SETUP COMPLETE"
   echo "$MSG_SEPARATOR"
   echo ""
-  echo "You can access the NetBird dashboard at:"
+  echo "You can access the NetBirdy dashboard at:"
   echo "  $NETBIRD_HTTP_PROTOCOL://$NETBIRD_DOMAIN"
   echo ""
-  echo "Follow the onboarding steps to set up your NetBird instance."
+  echo "Follow the onboarding steps to set up your NetBirdy instance."
   echo ""
   echo "Traefik is handling TLS certificates automatically via Let's Encrypt."
   echo "If you see certificate warnings, wait a moment for certificate issuance to complete."
   echo ""
   echo "Open ports:"
-  echo "  - 443/tcp   (HTTPS - all NetBird services)"
+  echo "  - 443/tcp   (HTTPS - all NetBirdy services)"
   echo "  - 80/tcp    (HTTP - redirects to HTTPS)"
   echo "  - $NETBIRD_STUN_PORT/udp   (STUN - required for NAT traversal)"
   if [[ "$ENABLE_PROXY" == "true" ]]; then
@@ -1553,7 +1553,7 @@ print_builtin_traefik_instructions() {
     echo "For enterprise environments requiring high availability and advanced integrations,"
     echo "consider a commercial on-prem license:"
     echo ""
-    echo "  Commercial license: https://netbird.ai/pricing"
+    echo "  Commercial license: https://netbirdy.ai/pricing"
     echo "  Documentation: https://docs.netbird.io/agent-network"
   else
     echo "This setup is ideal for homelabs and smaller organization deployments."
@@ -1565,7 +1565,7 @@ print_builtin_traefik_instructions() {
   fi
   echo ""
   if [[ "$ENABLE_PROXY" == "true" ]]; then
-    echo "NetBird Proxy:"
+    echo "NetBirdy Proxy:"
     echo "  The proxy service is enabled and running."
     echo "  Any domain NOT matching $NETBIRD_DOMAIN will be passed through to the proxy."
     echo "  The proxy handles its own TLS certificates via ACME TLS-ALPN-01 challenge."
@@ -1580,7 +1580,7 @@ print_builtin_traefik_instructions() {
       echo "  Enable CrowdSec per-service in the dashboard under Access Control."
       echo ""
       echo "  To enroll in CrowdSec Console (optional, for dashboard and premium blocklists):"
-      echo "    docker exec netbird-crowdsec cscli console enroll <your-enrollment-key>"
+      echo "    docker exec netbirdy-crowdsec cscli console enroll <your-enrollment-key>"
       echo "  Get your enrollment key at: https://app.crowdsec.net"
       echo ""
     fi
@@ -1599,7 +1599,7 @@ print_traefik_instructions() {
   echo "  TRAEFIK SETUP"
   echo "$MSG_SEPARATOR"
   echo ""
-  echo "NetBird containers are configured with Traefik labels."
+  echo "NetBirdy containers are configured with Traefik labels."
   echo ""
   echo "Configuration:"
   echo "  Entrypoint: $TRAEFIK_ENTRYPOINT"
@@ -1609,7 +1609,7 @@ print_traefik_instructions() {
   if [[ -n "$TRAEFIK_EXTERNAL_NETWORK" ]]; then
     echo "  Network: $TRAEFIK_EXTERNAL_NETWORK (external)"
   else
-    echo "  Network: netbird"
+    echo "  Network: netbirdy"
   fi
   echo ""
   echo "$MSG_NEXT_STEPS"
@@ -1634,27 +1634,27 @@ print_nginx_instructions() {
   echo "  NGINX SETUP"
   echo "$MSG_SEPARATOR"
   echo ""
-  echo "Generated: nginx-netbird.conf"
+  echo "Generated: nginx-netbirdy.conf"
   echo ""
   echo "IMPORTANT: Nginx requires manual TLS certificate setup."
   echo "You'll need to obtain SSL/TLS certificates and configure the paths in the"
   echo "generated config file. The config includes examples for common certificate sources."
   echo ""
   if [[ -n "$EXTERNAL_PROXY_NETWORK" ]]; then
-    echo "NetBird containers have joined the '$EXTERNAL_PROXY_NETWORK' Docker network."
+    echo "NetBirdy containers have joined the '$EXTERNAL_PROXY_NETWORK' Docker network."
     echo "The config uses container names for upstream servers."
     echo ""
     echo "$MSG_NEXT_STEPS"
     echo "  1. Ensure your Nginx container has access to SSL certificates"
     echo "     (mount certificate directory as volume if needed)"
-    echo "  2. Edit nginx-netbird.conf and update SSL certificate paths"
+    echo "  2. Edit nginx-netbirdy.conf and update SSL certificate paths"
     echo "     The config includes examples for certbot, acme.sh, and custom certs"
     echo "  3. Include the config in your Nginx container's configuration"
     echo "  4. Reload Nginx"
   else
     echo "$MSG_NEXT_STEPS"
     echo "  1. Obtain SSL/TLS certificates (Let's Encrypt recommended)"
-    echo "  2. Edit nginx-netbird.conf and update certificate paths"
+    echo "  2. Edit nginx-netbirdy.conf and update certificate paths"
     echo "  3. Install to /etc/nginx/sites-available/ (Debian) or /etc/nginx/conf.d/ (RHEL)"
     echo "  4. Test and reload: nginx -t && systemctl reload nginx"
     echo ""
@@ -1663,7 +1663,7 @@ print_nginx_instructions() {
     echo ""
     echo "Container ports (bound to ${bind_addr}):"
     echo "  Dashboard:     ${DASHBOARD_HOST_PORT}"
-    echo "  NetBird Server: ${MANAGEMENT_HOST_PORT} (all services)"
+    echo "  NetBirdy Server: ${MANAGEMENT_HOST_PORT} (all services)"
   fi
   return 0
 }
@@ -1679,7 +1679,7 @@ print_npm_instructions() {
   echo "Generated: npm-advanced-config.txt"
   echo ""
   if [[ -n "$EXTERNAL_PROXY_NETWORK" ]]; then
-    echo "NetBird containers have joined the '$EXTERNAL_PROXY_NETWORK' Docker network."
+    echo "NetBirdy containers have joined the '$EXTERNAL_PROXY_NETWORK' Docker network."
     echo ""
     echo "In NPM, create a Proxy Host:"
     echo "  Domain: $NETBIRD_DOMAIN"
@@ -1696,7 +1696,7 @@ print_npm_instructions() {
   else
     echo "Container ports (bound to ${bind_addr}):"
     echo "  Dashboard:     ${DASHBOARD_HOST_PORT}"
-    echo "  NetBird Server: ${MANAGEMENT_HOST_PORT} (all services)"
+    echo "  NetBirdy Server: ${MANAGEMENT_HOST_PORT} (all services)"
     echo ""
     echo "In NPM, create a Proxy Host:"
     echo "  Domain: $NETBIRD_DOMAIN"
@@ -1721,23 +1721,23 @@ print_external_caddy_instructions() {
   echo "  EXTERNAL CADDY SETUP"
   echo "$MSG_SEPARATOR"
   echo ""
-  echo "Generated: caddyfile-netbird.txt"
+  echo "Generated: caddyfile-netbirdy.txt"
   echo ""
   if [[ -n "$EXTERNAL_PROXY_NETWORK" ]]; then
-    echo "NetBird containers have joined the '$EXTERNAL_PROXY_NETWORK' Docker network."
+    echo "NetBirdy containers have joined the '$EXTERNAL_PROXY_NETWORK' Docker network."
     echo "The config uses container names for upstream servers."
     echo ""
     echo "$MSG_NEXT_STEPS"
-    echo "  1. Add the contents of caddyfile-netbird.txt to your Caddyfile"
+    echo "  1. Add the contents of caddyfile-netbirdy.txt to your Caddyfile"
     echo "  2. Reload Caddy"
   else
     echo "$MSG_NEXT_STEPS"
-    echo "  1. Add the contents of caddyfile-netbird.txt to your Caddyfile"
+    echo "  1. Add the contents of caddyfile-netbirdy.txt to your Caddyfile"
     echo "  2. Reload Caddy: caddy reload --config /path/to/Caddyfile"
     echo ""
     echo "Container ports (bound to ${bind_addr}):"
     echo "  Dashboard:     ${DASHBOARD_HOST_PORT}"
-    echo "  NetBird Server: ${MANAGEMENT_HOST_PORT} (all services)"
+    echo "  NetBirdy Server: ${MANAGEMENT_HOST_PORT} (all services)"
   fi
   return 0
 }
@@ -1752,7 +1752,7 @@ print_manual_instructions() {
   echo ""
   echo "Container ports (bound to ${bind_addr}):"
   echo "  Dashboard:     ${DASHBOARD_HOST_PORT}"
-  echo "  NetBird Server: ${MANAGEMENT_HOST_PORT} (all services: management, signal, relay)"
+  echo "  NetBirdy Server: ${MANAGEMENT_HOST_PORT} (all services: management, signal, relay)"
   echo ""
   echo "Configure your reverse proxy with these routes (all go to the same backend):"
   echo ""

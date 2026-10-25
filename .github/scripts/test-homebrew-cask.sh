@@ -15,29 +15,29 @@ fi
 
 readonly test_dir="${RUNNER_TEMP:?}/homebrew-cask"
 readonly results_dir="$test_dir/results"
-readonly app='/Applications/Netbird UI.app'
-readonly plist='/Library/LaunchDaemons/netbird.plist'
-readonly cask='netbirdio/tap/netbird-ui'
-readonly formula='netbirdio/tap/netbird'
-readonly published_cask="$test_dir/published-netbird-ui.rb"
-readonly legacy_cask="$test_dir/legacy-netbird-ui.rb"
-readonly rendered_cask="$test_dir/rendered-netbird-ui.rb"
+readonly app='/Applications/NetBirdy UI.app'
+readonly plist='/Library/LaunchDaemons/netbirdy.plist'
+readonly cask='sudo-ivan/tap/netbirdy-ui'
+readonly formula='sudo-ivan/tap/netbirdy'
+readonly published_cask="$test_dir/published-netbirdy-ui.rb"
+readonly legacy_cask="$test_dir/legacy-netbirdy-ui.rb"
+readonly rendered_cask="$test_dir/rendered-netbirdy-ui.rb"
 readonly fixture_dir="$test_dir/fixture"
 readonly serve_dir="$test_dir/serve"
-readonly fixture_zip="$serve_dir/netbird-ui.zip"
+readonly fixture_zip="$serve_dir/netbirdy-ui.zip"
 readonly fixture_port=18080
-readonly fixture_url="http://127.0.0.1:$fixture_port/netbird-ui.zip"
+readonly fixture_url="http://127.0.0.1:$fixture_port/netbirdy-ui.zip"
 readonly marker="$test_dir/installer.marker"
 
 mkdir -p "$results_dir" "$fixture_dir/netbird_ui_darwin" "$serve_dir" "$test_dir/downloads"
 exec > >(tee "$results_dir/test.log") 2>&1
 
 sudo -n true
-if command -v netbird || [[ -e "$app" || -e "$plist" ]] || pgrep -x netbird-ui; then
-    fail "The runner already has NetBird installed or running."
+if command -v netbirdy || [[ -e "$app" || -e "$plist" ]] || pgrep -x netbirdy-ui; then
+    fail "The runner already has NetBirdy installed or running."
 fi
-if sudo launchctl print system/netbird > "$results_dir/initial-service.log" 2>&1; then
-    fail "The runner already has a NetBird service loaded."
+if sudo launchctl print system/netbirdy > "$results_dir/initial-service.log" 2>&1; then
+    fail "The runner already has a NetBirdy service loaded."
 fi
 
 install_attempted=false
@@ -47,7 +47,7 @@ version=''
 
 stop_ui() {
     local status=0
-    sudo pkill -x netbird-ui || status=$?
+    sudo pkill -x netbirdy-ui || status=$?
     # pkill returns 1 when the UI is already closed.
     [[ $status == 0 || $status == 1 ]]
 }
@@ -60,23 +60,23 @@ cleanup() {
     if [[ $install_attempted == true ]]; then
         stop_ui || status=1
         if [[ -S /var/run/netbird.sock ]]; then
-            sudo netbird down || status=1
+            sudo netbirdy down || status=1
         fi
         if brew list --cask "$cask" >/dev/null 2>&1 || [[ -e "$app" ]]; then
             brew uninstall --cask --force "$cask" || status=1
         fi
         # A failed cask install can leave a daemon even after Homebrew rolls back the app.
-        if sudo launchctl print system/netbird > "$results_dir/cleanup-service.log" 2>&1; then
-            sudo netbird service stop || status=1
+        if sudo launchctl print system/netbirdy > "$results_dir/cleanup-service.log" 2>&1; then
+            sudo netbirdy service stop || status=1
         fi
         if [[ -e "$plist" ]]; then
-            sudo netbird service uninstall || status=1
+            sudo netbirdy service uninstall || status=1
         fi
     fi
     if [[ -f /var/log/netbird/client.log ]]; then
         sudo cat /var/log/netbird/client.log > "$results_dir/client.log" || status=1
     fi
-    if command -v netbird >/dev/null; then
+    if command -v netbirdy >/dev/null; then
         brew uninstall --formula "$formula" || status=1
     fi
     if [[ -n $server_pid ]]; then
@@ -106,7 +106,7 @@ release_fields() {
 
 use_cask() {
     local file=$1
-    cp "$file" "$tap_dir/Casks/netbird-ui.rb"
+    cp "$file" "$tap_dir/Casks/netbirdy-ui.rb"
 }
 
 # The released installer opens the UI as root, which never returns on a headless
@@ -114,8 +114,8 @@ use_cask() {
 # ships a stub bundle that records what it received and starts the daemon.
 build_fixture() {
     local bundle="$fixture_dir/netbird_ui_darwin"
-    printf '#!/bin/sh\nexit 0\n' > "$bundle/netbird-ui"
-    chmod 755 "$bundle/netbird-ui"
+    printf '#!/bin/sh\nexit 0\n' > "$bundle/netbirdy-ui"
+    chmod 755 "$bundle/netbirdy-ui"
     # After a bootout launchd keeps tearing the previous daemon down for a couple of
     # seconds, and loading the same label again fails until that finishes.
     cat > "$bundle/installer.sh" <<EOF
@@ -123,9 +123,9 @@ build_fixture() {
 set -eu
 export PATH=\$PATH:/usr/local/bin:/opt/homebrew/bin
 printf 'version=%s\\nuid=%s\\n' "\$1" "\$(id -u)" > '$marker'
-netbird service install
+netbirdy service install
 attempt=0
-until netbird service start; do
+until netbirdy service start; do
     attempt=\$((attempt + 1))
     [ "\$attempt" -lt 15 ] || exit 1
     sleep 1
@@ -173,7 +173,7 @@ assert_no_deprecations() {
 wait_for_daemon() {
     local attempt
     for attempt in {1..30}; do
-        if sudo launchctl print system/netbird > "$results_dir/service.log" 2>&1 &&
+        if sudo launchctl print system/netbirdy > "$results_dir/service.log" 2>&1 &&
             grep -Eq '^[[:space:]]*state = running$' "$results_dir/service.log"; then
             return
         fi
@@ -195,8 +195,8 @@ wait_for_exit() {
 }
 
 assert_service_absent() {
-    if sudo launchctl print system/netbird > "$results_dir/removed-service.log" 2>&1; then
-        fail "The NetBird service is still loaded after removal."
+    if sudo launchctl print system/netbirdy > "$results_dir/removed-service.log" 2>&1; then
+        fail "The NetBirdy service is still loaded after removal."
     fi
 }
 
@@ -205,7 +205,7 @@ assert_installed() {
     [[ -f $marker ]] || fail "The cask did not run installer.sh."
     grep -qx "version=$version" "$marker" || fail "installer.sh did not receive the cask version: $(cat "$marker")"
     grep -qx 'uid=0' "$marker" || fail "installer.sh did not run as root: $(cat "$marker")"
-    [[ -d "$app" && -x "$app/netbird-ui" ]] || fail "The UI was not installed."
+    [[ -d "$app" && -x "$app/netbirdy-ui" ]] || fail "The UI was not installed."
     for script in installer.sh uninstaller.sh; do
         [[ $(stat -f '%Lp' "$app/$script") == 755 ]] || fail "Incorrect permissions on $script."
     done
@@ -223,12 +223,12 @@ assert_uninstalled() {
     [[ ! -e "$plist" ]] || fail "The daemon plist remains after uninstall."
     assert_service_absent
     wait_for_exit "$daemon_pid"
-    [[ $(netbird version) == "$version" ]] || fail "Cask uninstall removed the CLI dependency."
+    [[ $(netbirdy version) == "$version" ]] || fail "Cask uninstall removed the CLI dependency."
 }
 
 installed_caskfiles() {
     local extension=$1
-    find "$(brew --caskroom)/netbird-ui/.metadata" -name "netbird-ui.$extension" 2>/dev/null
+    find "$(brew --caskroom)/netbirdy-ui/.metadata" -name "netbirdy-ui.$extension" 2>/dev/null
 }
 
 assert_legacy_metadata() {
@@ -248,9 +248,9 @@ brew tap netbirdio/tap "${GITHUB_WORKSPACE:?}/.homebrew-cask-tap"
 tap_dir=$(brew --repository netbirdio/tap)
 readonly tap_dir
 
-[[ -f "$tap_dir/Casks/netbird-ui.rb" ]] || fail "The tap has no Casks/netbird-ui.rb."
-cp "$tap_dir/Casks/netbird-ui.rb" "$published_cask"
-cp "$published_cask" "$results_dir/published-netbird-ui.rb"
+[[ -f "$tap_dir/Casks/netbirdy-ui.rb" ]] || fail "The tap has no Casks/netbirdy-ui.rb."
+cp "$tap_dir/Casks/netbirdy-ui.rb" "$published_cask"
+cp "$published_cask" "$results_dir/published-netbirdy-ui.rb"
 
 version=$(brew info --json=v2 --formula "$formula" | jq -r '.formulae[0].versions.stable')
 readonly version
@@ -263,14 +263,14 @@ fixture_sha=$(shasum -a 256 "$fixture_zip" | cut -d' ' -f1)
 readonly fixture_sha
 start_fixture_server
 
-export PROJECT=netbird-ui VERSION="$version"
+export PROJECT=netbirdy-ui VERSION="$version"
 export AMD="$fixture_zip" ARM="$fixture_zip" AMD_URL="$fixture_url" ARM_URL="$fixture_url"
-gomplate -f "$GITHUB_WORKSPACE/client/ui/netbird-ui.rb.tmpl" -o "$rendered_cask"
-cp "$rendered_cask" "$results_dir/rendered-netbird-ui.rb"
+gomplate -f "$GITHUB_WORKSPACE/client/ui/netbirdy-ui.rb.tmpl" -o "$rendered_cask"
+cp "$rendered_cask" "$results_dir/rendered-netbirdy-ui.rb"
 
 sed -E "s|^([[:space:]]*version) \"[^\"]+\"|\\1 \"$version\"|; s|^([[:space:]]*url) \"[^\"]+\"|\\1 \"$fixture_url\"|; s|^([[:space:]]*sha256) \"[^\"]+\"|\\1 \"$fixture_sha\"|" \
     "$published_cask" > "$legacy_cask"
-cp "$legacy_cask" "$results_dir/legacy-netbird-ui.rb"
+cp "$legacy_cask" "$results_dir/legacy-netbirdy-ui.rb"
 if ! diff <(release_fields "$legacy_cask") <(release_fields "$rendered_cask"); then
     fail "The rendered cask changes release data, not only lifecycle stanzas."
 fi
@@ -282,7 +282,7 @@ assert_no_deprecations "$results_dir/load.log"
 run_logged style brew style --cask --only-cops=Cask/InstallSteps "$cask"
 
 run_logged install-cli brew install --formula "$formula"
-[[ $(netbird version) == "$version" ]] || fail "The installed CLI does not report the formula version."
+[[ $(netbirdy version) == "$version" ]] || fail "The installed CLI does not report the formula version."
 
 for scenario in running stopped missing; do
     echo "::group::Uninstall with $scenario service"
@@ -296,13 +296,13 @@ for scenario in running stopped missing; do
     case "$scenario" in
         running) ;;
         stopped)
-            run_logged stop-daemon sudo netbird service stop
+            run_logged stop-daemon sudo netbirdy service stop
             wait_for_exit "$daemon_pid"
             [[ -f "$plist" ]] || fail "Stopping the daemon unexpectedly removed its plist."
             ;;
         missing)
-            run_logged stop-missing-daemon sudo netbird service stop
-            run_logged remove-daemon sudo netbird service uninstall
+            run_logged stop-missing-daemon sudo netbirdy service stop
+            run_logged remove-daemon sudo netbirdy service uninstall
             wait_for_exit "$daemon_pid"
             [[ ! -e "$plist" ]] || fail "The missing-service scenario still has a plist."
             assert_service_absent

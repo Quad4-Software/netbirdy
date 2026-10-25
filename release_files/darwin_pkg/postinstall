@@ -2,28 +2,28 @@
 
 set -x
 
-APP=/Applications/NetBird.app
-AGENT=/usr/local/bin/netbird
+APP=/Applications/NetBirdy.app
+AGENT=/usr/local/bin/netbirdy
 LOG_FILE=/var/log/netbird/client_post_install.log
 
 mkdir -p /var/log/netbird/
 mkdir -p /usr/local/bin/
 
 {
-    echo "Installing NetBird..."
+    echo "Installing NetBirdy..."
 
     if test -d $APP; then
-        echo "NetBird app copied successfully."
+        echo "NetBirdy app copied successfully."
     else
-        echo "NetBird app could not be copied to the Applications folder."
+        echo "NetBirdy app could not be copied to the Applications folder."
         exit 1
     fi
 
-    ln -fs $APP/Contents/MacOS/netbird $AGENT
+    ln -fs $APP/Contents/MacOS/netbirdy $AGENT
     if test -f $AGENT; then
-        echo "NetBird binary linked successfully."
+        echo "NetBirdy binary linked successfully."
     else
-        echo "NetBird could not create symlink to /usr/local/bin"
+        echo "NetBirdy could not create symlink to /usr/local/bin"
         exit 1
     fi
 
@@ -40,15 +40,15 @@ mkdir -p /usr/local/bin/
             if [ -z "$uid" ]; then
                 echo "Could not resolve uid for console user '$console_user'; skipping UI launch."
             else
-                echo "Launching NetBird UI as console user $console_user (uid $uid)."
+                echo "Launching NetBirdy UI as console user $console_user (uid $uid)."
                 if ! launchctl asuser "$uid" sudo -u "$console_user" -H open "$APP"; then
-                    echo "Failed to launch NetBird UI; if autostart is enabled it will start at next login."
+                    echo "Failed to launch NetBirdy UI; if autostart is enabled it will start at next login."
                 fi
             fi
             ;;
     esac
 
-    echo "Finished Netbird installation successfully"
+    echo "Finished NetBirdy installation successfully"
     exit 0 # all good
 } &> $LOG_FILE
 

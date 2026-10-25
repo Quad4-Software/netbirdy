@@ -18,7 +18,7 @@ import (
 // OpenAI-compatible, so it uses the "vllm" catalog entry (KindCustom) and is
 // reached over plain HTTP — no TLS anywhere on the path:
 //
-//	client --tunnel--> netbird proxy --http--> vllm (:8000, OpenAI-compatible)
+//	client --tunnel--> netbirdy proxy --http--> vllm (:8000, OpenAI-compatible)
 //
 // The mock vLLM server answers /v1/chat/completions with an OpenAI-shaped
 // completion carrying a non-zero usage block. The test asserts the chat returns

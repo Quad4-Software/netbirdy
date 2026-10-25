@@ -1,5 +1,5 @@
 // Package main provides a standalone CLI tool to migrate user IDs from an
-// external IdP format to the embedded Dex IdP format used by NetBird >= v0.62.0.
+// external IdP format to the embedded Dex IdP format used by NetBirdy >= v0.62.0.
 //
 // This tool reads management.json to auto-detect the current external IdP
 // configuration (issuer, clientID, clientSecret, type) and re-encodes all user
@@ -9,7 +9,7 @@
 //
 // Usage:
 //
-//	netbird-idp-migrate --config /etc/netbird/management.json [--dry-run] [--force]
+//	netbirdy-idp-migrate --config /etc/netbird/management.json [--dry-run] [--force]
 package main
 
 import (
@@ -157,7 +157,7 @@ func formatSchemaErrors(errs []migration.SchemaError) string {
 	for _, e := range errs {
 		fmt.Fprintf(&b, "  - %s\n", e.String())
 	}
-	b.WriteString("\nPlease start the NetBird management server (v0.66.4+) at least once so that automatic database migrations create the required schema, then re-run this tool.\n")
+	b.WriteString("\nPlease start the NetBirdy management server (v0.66.4+) at least once so that automatic database migrations create the required schema, then re-run this tool.\n")
 	return b.String()
 }
 
@@ -452,7 +452,7 @@ func printPostMigrationInstructions(cfg *migrationConfig) {
 		authAuthority = "https://<your-domain>/oauth2"
 	}
 
-	log.Info("Congratulations! You have successfully migrated your NetBird management server to the embedded Dex IdP.")
+	log.Info("Congratulations! You have successfully migrated your NetBirdy management server to the embedded Dex IdP.")
 	log.Info("Next steps:")
 	log.Info("1. Make sure the following environment variables are set for your dashboard server:")
 	log.Infof(`

@@ -18,13 +18,13 @@ if [[ "${1:-}" == "--migration" ]]; then
   COMPOSE_PROJECT_NAME=render-only bash -s -- "$script_dir/../migrate.sh" >/dev/null <<'EOF'
 source "$1"
 INSTALL_DIR=$PWD
-DOMAIN=netbird.test
+DOMAIN=netbirdy.test
 generate_dashboard_env
 generate_docker_compose_traefik
 EOF
 else
   TRAEFIK_IMAGE=traefik:v3.7.14
-  NETBIRD_DOMAIN=netbird.test
+  NETBIRD_DOMAIN=netbirdy.test
   NETBIRD_AGENT_NETWORK=false
   initialize_default_values
   COMPOSE_PROJECT_NAME=render-only generate_configuration_files >/dev/null
@@ -34,7 +34,7 @@ assert_network() {
   local expected="$1" actual provider
   shift
   "${compose[@]}" "$@" config --format json >config.json
-  actual=$(jq -r '.networks.netbird.name' config.json)
+  actual=$(jq -r '.networks.netbirdy.name' config.json)
   provider=$(jq -r '.services.traefik.command[] | select(startswith("--providers.docker.network="))' config.json)
   if [[ "$actual" != "$expected" || "$provider" != "--providers.docker.network=$expected" ]]; then
     echo "Expected network '$expected'; Compose chose '$actual', Traefik received '$provider'" >&2

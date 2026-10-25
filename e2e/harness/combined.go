@@ -46,7 +46,7 @@ const (
 	containerIssuer = "http://localhost:8080/oauth2"
 )
 
-// Combined is a running combined NetBird server (management + signal + relay +
+// Combined is a running combined NetBirdy server (management + signal + relay +
 // STUN + embedded IdP) plus the connection details tests need. It owns the
 // shared docker network that the proxy and client containers join.
 type Combined struct {

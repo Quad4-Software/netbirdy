@@ -1,0 +1,45 @@
+# Multi-stage build of the NetBirdy dashboard.
+# Stage 1 builds the Next.js static export with Node 24.
+# Stage 2 reuses the nginx + supervisord runtime from dashboard/docker.
+# Build context is the repository root:
+#   podman build -f podman/Containerfile.dashboard -t localhost/netbirdy-dashboard .
+FROM docker.io/library/node:24-bookworm AS builder
+WORKDIR /app
+
+RUN npm install -g pnpm@12.14.0 && pnpm --version | grep -q "^12\.14\.0$"
+
+COPY pnpm-workspace.yaml pnpm-lock.yaml package.json ./
+COPY dashboard/package.json dashboard/package.json
+COPY proxy/web/package.json proxy/web/package.json
+COPY client/ui/frontend/package.json client/ui/frontend/package.json
+RUN --mount=type=cache,target=/pnpm-store \
+    pnpm config set store-dir /pnpm-store && \
+    pnpm install --filter netbirdy-dashboard... --frozen-lockfile
+
+COPY dashboard/ dashboard/
+# Docs pages with a `source:` front matter pull bodies from repo files
+# relative to dashboard/ (../docs, ../proxy). They must exist at /app/../ .
+COPY docs/ docs/
+COPY proxy/README.md proxy/README.md
+COPY proxy/docs/shield.md proxy/docs/shield.md
+RUN pnpm --filter netbirdy-dashboard build
+
+FROM docker.io/library/alpine:3.24
+RUN apk add --no-cache bash curl less ca-certificates git tzdata zip gettext \
+    nginx supervisor certbot-nginx && \
+    rm -rf /var/cache/apk/* && mkdir -p /run/nginx
+
+STOPSIGNAL SIGINT
+EXPOSE 80
+EXPOSE 443
+ENTRYPOINT ["/usr/bin/supervisord","-c","/etc/supervisord.conf"]
+
+WORKDIR /usr/share/nginx/html
+COPY dashboard/docker/default.conf /etc/nginx/http.d/default.conf
+COPY dashboard/docker/nginx.conf /etc/nginx/nginx.conf
+COPY dashboard/docker/init_cert.sh /usr/local/init_cert.sh
+COPY dashboard/docker/init_react_envs.sh /usr/local/init_react_envs.sh
+RUN chmod +x /usr/local/init_cert.sh /usr/local/init_react_envs.sh && rm /etc/crontabs/root
+
+COPY dashboard/docker/supervisord.conf /etc/supervisord.conf
+COPY --from=builder /app/dashboard/out/ /usr/share/nginx/html/

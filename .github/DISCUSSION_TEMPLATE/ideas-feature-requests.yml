@@ -6,7 +6,7 @@ body:
 
         Use this category for feature requests, enhancements, integrations, and product ideas.
 
-        NetBird uses community traction in discussions — upvotes, replies, affected users, and use-case detail — as an input when deciding what should become a maintainer-curated issue or roadmap item. A clear problem statement is more useful than a solution-only request.
+        NetBirdy uses community traction in discussions — upvotes, replies, affected users, and use-case detail — as an input when deciding what should become a maintainer-curated issue or roadmap item. A clear problem statement is more useful than a solution-only request.
 
         Please search first and add your use case to an existing discussion when one already exists.
 
@@ -41,7 +41,7 @@ body:
         - Relay
         - DNS
         - Routes / Exit nodes
-        - NetBird SSH
+        - NetBirdy SSH
         - Access control policies
         - Posture checks
         - Identity provider / SSO

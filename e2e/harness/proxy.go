@@ -40,7 +40,7 @@ const (
 	AgentNetworkCluster = combinedAlias
 )
 
-// Proxy is a running agent-network gateway (netbird proxy) container.
+// Proxy is a running agent-network gateway (netbirdy proxy) container.
 type Proxy struct {
 	container    testcontainers.Container
 	workDir      string

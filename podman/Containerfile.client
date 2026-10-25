@@ -1,0 +1,14 @@
+FROM docker.io/library/golang:1.27.2-bookworm AS builder
+WORKDIR /src
+COPY go.mod go.sum ./
+RUN go mod download
+COPY . .
+RUN CGO_ENABLED=0 GOOS=linux go build -ldflags "-s -w" -o /out/netbirdy ./client
+
+FROM docker.io/library/alpine:3.21
+RUN apk add --no-cache ca-certificates iptables ip6tables iproute2 bash
+COPY --from=builder /out/netbirdy /usr/local/bin/netbirdy
+RUN chmod 755 /usr/local/bin/netbirdy
+RUN ln -sf netbirdy /usr/local/bin/netbird
+COPY client/netbirdy-entrypoint.sh /usr/local/bin/netbirdy-entrypoint.sh
+ENTRYPOINT ["/usr/local/bin/netbirdy-entrypoint.sh"]

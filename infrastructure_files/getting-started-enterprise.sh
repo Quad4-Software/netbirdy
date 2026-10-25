@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# NetBird Enterprise — Getting Started
-# Single-node bootstrap for a self-hosted NetBird Enterprise stack with the
+# NetBirdy Enterprise — Getting Started
+# Single-node bootstrap for a self-hosted NetBirdy Enterprise stack with the
 # embedded identity provider. Owner is created via first-login flow.
 # Add features to an existing install with --enable-proxy or --enable-traffic-events.
 
@@ -111,8 +111,8 @@ check_nb_domain() {
     echo "The domain cannot be empty." > /dev/stderr
     return 1
   fi
-  if [[ "$domain" == "netbird.example.com" ]]; then
-    echo "The domain cannot be netbird.example.com" > /dev/stderr
+  if [[ "$domain" == "netbirdy.example.com" ]]; then
+    echo "The domain cannot be netbirdy.example.com" > /dev/stderr
     return 1
   fi
   if [[ "$domain" =~ ^[0-9.]+$ ]]; then
@@ -137,7 +137,7 @@ check_domain_resolves() {
 
 read_nb_domain() {
   local value=""
-  echo -n "Enter the FQDN for NetBird (must resolve via DNS, e.g. netbird.my-domain.com): " > /dev/stderr
+  echo -n "Enter the FQDN for NetBirdy (must resolve via DNS, e.g. netbirdy.my-domain.com): " > /dev/stderr
   read -r value < /dev/tty
   if ! check_nb_domain "$value"; then
     read_nb_domain
@@ -239,15 +239,15 @@ read_crowdsec_option() {
   return
 }
 
-# Gate the install on explicit acceptance of the NetBird On-Premise EULA.
+# Gate the install on explicit acceptance of the NetBirdy On-Premise EULA.
 require_eula_acceptance() {
   cat > /dev/stderr <<EOF
 
   ──────────────────────────────────────────────────────────────────────
-   NetBird On-Premise End User License Agreement
+   NetBirdy On-Premise End User License Agreement
   ──────────────────────────────────────────────────────────────────────
-  NetBird's on-premise software is commercial software, licensed and not
-  sold. Your installation, deployment and use are governed by the NetBird
+  NetBirdy's on-premise software is commercial software, licensed and not
+  sold. Your installation, deployment and use are governed by the NetBirdy
   On-Premise End User License Agreement (the "EULA"). Please read the EULA
   in full before continuing:
 
@@ -306,7 +306,7 @@ wait_for_license_verdict() {
 
   echo -n "Waiting for the server to validate the license"
   while [[ $counter -lt 60 ]]; do
-    logs=$($DOCKER_COMPOSE_COMMAND logs --no-color --tail=all netbird-server 2>/dev/null || true)
+    logs=$($DOCKER_COMPOSE_COMMAND logs --no-color --tail=all netbirdy-server 2>/dev/null || true)
 
     if grep -qi "license invalidated" <<< "$logs"; then
       echo " rejected"
@@ -349,7 +349,7 @@ report_license_verdict() {
     echo ""
     echo "     Check the verdict with:"
     echo ""
-    echo "       $DOCKER_COMPOSE_COMMAND logs netbird-server | grep -i license"
+    echo "       $DOCKER_COMPOSE_COMMAND logs netbirdy-server | grep -i license"
     return 0
   fi
 
@@ -403,7 +403,7 @@ wait_crowdsec() {
 }
 
 admin_token() {
-  $DOCKER_COMPOSE_COMMAND run --rm --no-deps -T netbird-server admin token "$@" --config /etc/netbird/config.yaml
+  $DOCKER_COMPOSE_COMMAND run --rm --no-deps -T netbirdy-server admin token "$@" --config /etc/netbird/config.yaml
   return
 }
 
@@ -416,7 +416,7 @@ revoke_proxy_token() {
     return 0
   fi
   echo "Could not revoke the unused proxy token ${PROXY_TOKEN_ID}. Revoke it with:" > /dev/stderr
-  echo "  $DOCKER_COMPOSE_COMMAND run --rm netbird-server admin token revoke ${PROXY_TOKEN_ID} --config /etc/netbird/config.yaml" > /dev/stderr
+  echo "  $DOCKER_COMPOSE_COMMAND run --rm netbirdy-server admin token revoke ${PROXY_TOKEN_ID} --config /etc/netbird/config.yaml" > /dev/stderr
   return
 }
 
@@ -427,14 +427,14 @@ start_proxy() {
   out=$(admin_token create --name default-proxy) || true
   token=$(awk '/^Token:/ {print $2}' <<< "$out")
   PROXY_TOKEN_ID=$(awk '/^Token ID:/ {print $3}' <<< "$out")
-  [[ -n "$token" ]] || die "Could not create the proxy access token. Check the netbird-server logs, then re-run with --enable-proxy."
+  [[ -n "$token" ]] || die "Could not create the proxy access token. Check the netbirdy-server logs, then re-run with --enable-proxy."
 
   if [[ "$NETBIRD_CROWDSEC" == "yes" ]]; then
     echo "Registering the CrowdSec bouncer ..."
     if wait_crowdsec; then
       # "add" fails if an earlier attempt already registered the bouncer.
-      $DOCKER_COMPOSE_COMMAND exec -T crowdsec cscli bouncers delete netbird-proxy &> /dev/null || true
-      key=$($DOCKER_COMPOSE_COMMAND exec -T crowdsec cscli bouncers add netbird-proxy -o raw) || true
+      $DOCKER_COMPOSE_COMMAND exec -T crowdsec cscli bouncers delete netbirdy-proxy &> /dev/null || true
+      key=$($DOCKER_COMPOSE_COMMAND exec -T crowdsec cscli bouncers add netbirdy-proxy -o raw) || true
     fi
     if [[ -z "$key" ]]; then
       revoke_proxy_token
@@ -458,7 +458,7 @@ start_proxy() {
 
 print_proxy_notes() {
   echo ""
-  echo "NetBird Proxy:"
+  echo "NetBirdy Proxy:"
   echo "  Every domain other than ${NETBIRD_DOMAIN} is passed through to the proxy,"
   echo "  which issues its own TLS certificates. Point proxy domains at this host:"
   echo ""
@@ -491,22 +491,22 @@ init_environment() {
   require_eula_acceptance
   NETBIRD_EULA_ACCEPTED_AT=$(date -u +%Y-%m-%dT%H:%M:%SZ)
 
-  echo "NetBird Enterprise bootstrap"
+  echo "NetBirdy Enterprise bootstrap"
   echo ""
   echo "Traffic flow:"
   echo "  Enables traffic events logging on the management server."
-  echo "  When enabled, the NetBird stack also runs NATS along with two"
-  echo "  additional containers: netbird-receiver (the traffic log receiver"
-  echo "  service) and netbird-enricher (the traffic log enricher service)."
+  echo "  When enabled, the NetBirdy stack also runs NATS along with two"
+  echo "  additional containers: netbirdy-receiver (the traffic log receiver"
+  echo "  service) and netbirdy-enricher (the traffic log enricher service)."
   echo "  It still has to be turned on from the dashboard settings afterwards."
   echo "  See https://docs.netbird.io/manage/activity/traffic-events-logging"
   NETBIRD_TRAFFIC_FLOW=$(read_yes_no "Enable traffic flow" "n")
 
   echo ""
-  echo "NetBird Proxy:"
-  echo "  Exposes selected resources from your NetBird network to the internet."
+  echo "NetBirdy Proxy:"
+  echo "  Exposes selected resources from your NetBirdy network to the internet."
   echo "  You choose which resources are exposed from the dashboard."
-  NETBIRD_PROXY=$(read_yes_no "Enable the NetBird Proxy" "n")
+  NETBIRD_PROXY=$(read_yes_no "Enable the NetBirdy Proxy" "n")
   NETBIRD_CROWDSEC="no"
   if [[ "$NETBIRD_PROXY" == "yes" ]]; then
     read_crowdsec_option
@@ -522,8 +522,8 @@ init_environment() {
 
   NETBIRD_LICENSE_KEY=$(read_secret "Enter license key (input hidden)")
 
-  POSTGRES_USER="netbird"
-  POSTGRES_DB="netbird"
+  POSTGRES_USER="netbirdy"
+  POSTGRES_DB="netbirdy"
   POSTGRES_PASSWORD=$(rand_secret)
   NETBIRD_ENCRYPTION_KEY=$(rand_b64_key)
   NETBIRD_SESSION_COOKIE_ENCRYPTION_KEY=$(rand_b64_key)
@@ -585,7 +585,7 @@ init_environment() {
   fi
   echo ""
   echo "Tail logs:"
-  echo "  cd $(pwd) && $DOCKER_COMPOSE_COMMAND logs -f netbird-server traefik"
+  echo "  cd $(pwd) && $DOCKER_COMPOSE_COMMAND logs -f netbirdy-server traefik"
 
   report_license_verdict
 
@@ -637,7 +637,7 @@ enable_features() {
   fi
   # No token means an earlier proxy setup failed, so let it run again.
   if [[ "$want_proxy" == "yes" && -n "$(env_get NETBIRD_PROXY_TOKEN)" ]]; then
-    echo "The NetBird Proxy is already enabled."
+    echo "The NetBirdy Proxy is already enabled."
     want_proxy="no"
   fi
   if [[ "$want_flow" == "no" && "$want_proxy" == "no" ]]; then
@@ -671,7 +671,7 @@ enable_features() {
   fi
   for s in $($DOCKER_COMPOSE_COMMAND config --services); do
     if [[ "$(service_block "$s" < docker-compose.yml)" != "$(printf '%s\n' "$compose" | service_block "$s")" ]] \
-      || [[ "$s" == "netbird-server" && "$want_flow" == "yes" ]]; then
+      || [[ "$s" == "netbirdy-server" && "$want_flow" == "yes" ]]; then
       restarts+=" $s"
     fi
   done
@@ -709,7 +709,7 @@ enable_features() {
   up_all_but_proxy
   if [[ "$want_flow" == "yes" ]]; then
     # Compose does not notice changes to the bind-mounted config.yaml.
-    $DOCKER_COMPOSE_COMMAND restart netbird-server
+    $DOCKER_COMPOSE_COMMAND restart netbirdy-server
   fi
   if [[ "$want_proxy" == "yes" ]]; then
     start_proxy
@@ -739,7 +739,7 @@ rollback() {
     if [[ -f "$f$BACKUP_SUFFIX" ]]; then cp -p "$f$BACKUP_SUFFIX" "$f"; else rm -f "$f"; fi
   done
   $DOCKER_COMPOSE_COMMAND up -d --remove-orphans
-  $DOCKER_COMPOSE_COMMAND restart netbird-server
+  $DOCKER_COMPOSE_COMMAND restart netbirdy-server
   return
 }
 
@@ -752,7 +752,7 @@ render_env() {
 # Generated by getting-started-enterprise.sh
 # Holds all configuration and secrets for the stack. Mode 600.
 
-# NetBird On-Premise EULA acceptance
+# NetBirdy On-Premise EULA acceptance
 NETBIRD_EULA_ACCEPTED=yes
 NETBIRD_EULA_ACCEPTED_AT=${NETBIRD_EULA_ACCEPTED_AT}
 NETBIRD_EULA_URL=${NETBIRD_EULA_URL}
@@ -779,7 +779,7 @@ EOF
     render_env_flow
   fi
   if [[ "$NETBIRD_PROXY" == "yes" ]]; then
-    printf '\n# NetBird Proxy (token and bouncer key are filled in after startup)\n'
+    printf '\n# NetBirdy Proxy (token and bouncer key are filled in after startup)\n'
     render_env_proxy
   fi
 
@@ -873,9 +873,9 @@ render_compose_common() {
   traefik:
     <<: *default
     image: traefik:${NETBIRD_TRAEFIK_TAG}
-    container_name: netbird-traefik
+    container_name: netbirdy-traefik
     networks:
-      netbird:
+      netbirdy:
         ipv4_address: ${NETBIRD_TRAEFIK_IP}
     command:
       # Logging
@@ -884,7 +884,7 @@ render_compose_common() {
       # Docker provider
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
-      - "--providers.docker.network=netbird"
+      - "--providers.docker.network=netbirdy"
       # Entrypoints
       - "--entrypoints.web.address=:80"
       - "--entrypoints.websecure.address=:443"
@@ -924,7 +924,7 @@ EOF
   cat <<'EOF'
     labels:
       - traefik.enable=true
-      # Shared security headers, referenced by every NetBird router below. A
+      # Shared security headers, referenced by every NetBirdy router below. A
       # label-declared middleware only exists while its container runs, so this
       # lives on Traefik itself: declaring it on an app container would drop
       # every router referencing it whenever that container restarts.
@@ -942,7 +942,7 @@ EOF
     <<: *default
     image: ghcr.io/netbirdio/dashboard-cloud:${NETBIRD_DASHBOARD_TAG}
     container_name: netbird-dashboard
-    networks: [netbird]
+    networks: [netbirdy]
     labels:
       - traefik.enable=true
       # Dashboard catch-all: lowest priority so every route below wins
@@ -976,11 +976,11 @@ EOF
 
 render_compose_server() {
   cat <<'EOF'
-  netbird-server:
+  netbirdy-server:
     <<: *default
     image: ghcr.io/netbirdio/netbird-server-cloud:${NETBIRD_SERVER_TAG}
-    container_name: netbird-server
-    networks: [netbird]
+    container_name: netbirdy-server
+    networks: [netbirdy]
     depends_on:
       dashboard:
         condition: service_started
@@ -995,25 +995,25 @@ render_compose_server() {
     labels:
       - traefik.enable=true
       # Signal + Management gRPC (needs an h2c backend for HTTP/2 cleartext)
-      - traefik.http.routers.netbird-grpc.rule=Host(`${NETBIRD_DOMAIN}`) && (PathPrefix(`/signalexchange.SignalExchange/`) || PathPrefix(`/management.ManagementService/`) || PathPrefix(`/management.ProxyService/`))
-      - traefik.http.routers.netbird-grpc.entrypoints=websecure
-      - traefik.http.routers.netbird-grpc.tls=true
-      - traefik.http.routers.netbird-grpc.tls.certresolver=letsencrypt
-      - traefik.http.routers.netbird-grpc.middlewares=nb-security@docker
-      - traefik.http.routers.netbird-grpc.service=netbird-server-h2c
-      - traefik.http.routers.netbird-grpc.priority=100
+      - traefik.http.routers.netbirdy-grpc.rule=Host(`${NETBIRD_DOMAIN}`) && (PathPrefix(`/signalexchange.SignalExchange/`) || PathPrefix(`/management.ManagementService/`) || PathPrefix(`/management.ProxyService/`))
+      - traefik.http.routers.netbirdy-grpc.entrypoints=websecure
+      - traefik.http.routers.netbirdy-grpc.tls=true
+      - traefik.http.routers.netbirdy-grpc.tls.certresolver=letsencrypt
+      - traefik.http.routers.netbirdy-grpc.middlewares=nb-security@docker
+      - traefik.http.routers.netbirdy-grpc.service=netbirdy-server-h2c
+      - traefik.http.routers.netbirdy-grpc.priority=100
       # Relay WebSocket, management API, and the embedded IdP
-      - traefik.http.routers.netbird-backend.rule=Host(`${NETBIRD_DOMAIN}`) && (PathPrefix(`/relay`) || PathPrefix(`/ws-proxy/`) || PathPrefix(`/api`) || PathPrefix(`/oauth2`))
-      - traefik.http.routers.netbird-backend.entrypoints=websecure
-      - traefik.http.routers.netbird-backend.tls=true
-      - traefik.http.routers.netbird-backend.tls.certresolver=letsencrypt
-      - traefik.http.routers.netbird-backend.middlewares=nb-security@docker
-      - traefik.http.routers.netbird-backend.service=netbird-server
-      - traefik.http.routers.netbird-backend.priority=100
+      - traefik.http.routers.netbirdy-backend.rule=Host(`${NETBIRD_DOMAIN}`) && (PathPrefix(`/relay`) || PathPrefix(`/ws-proxy/`) || PathPrefix(`/api`) || PathPrefix(`/oauth2`))
+      - traefik.http.routers.netbirdy-backend.entrypoints=websecure
+      - traefik.http.routers.netbirdy-backend.tls=true
+      - traefik.http.routers.netbirdy-backend.tls.certresolver=letsencrypt
+      - traefik.http.routers.netbirdy-backend.middlewares=nb-security@docker
+      - traefik.http.routers.netbirdy-backend.service=netbirdy-server
+      - traefik.http.routers.netbirdy-backend.priority=100
       # Services
-      - traefik.http.services.netbird-server.loadbalancer.server.port=80
-      - traefik.http.services.netbird-server-h2c.loadbalancer.server.port=80
-      - traefik.http.services.netbird-server-h2c.loadbalancer.server.scheme=h2c
+      - traefik.http.services.netbirdy-server.loadbalancer.server.port=80
+      - traefik.http.services.netbirdy-server-h2c.loadbalancer.server.port=80
+      - traefik.http.services.netbirdy-server-h2c.loadbalancer.server.scheme=h2c
     environment:
       - NB_LICENSE_KEY=${NETBIRD_LICENSE_KEY}
       - NETBIRD_LICENSE_SERVER_BASE_URL=${NETBIRD_LICENSE_SERVER_BASE_URL}
@@ -1027,8 +1027,8 @@ render_compose_flow() {
   nats:
     <<: *default
     image: nats:2
-    container_name: netbird-nats
-    networks: [netbird]
+    container_name: netbirdy-nats
+    networks: [netbirdy]
     volumes:
       - netbird_nats_data:/data
     command: ["-m", "8222", "--jetstream", "--store_dir", "/data"]
@@ -1036,8 +1036,8 @@ render_compose_flow() {
   enricher:
     <<: *default
     image: ghcr.io/netbirdio/flow-enricher-cloud:${NETBIRD_ENRICHER_TAG}
-    container_name: netbird-enricher
-    networks: [netbird]
+    container_name: netbirdy-enricher
+    networks: [netbirdy]
     depends_on:
       postgres:
         condition: service_healthy
@@ -1064,8 +1064,8 @@ render_compose_flow() {
   receiver:
     <<: *default
     image: ghcr.io/netbirdio/flow-receiver-cloud:${NETBIRD_RECEIVER_TAG}
-    container_name: netbird-receiver
-    networks: [netbird]
+    container_name: netbirdy-receiver
+    networks: [netbirdy]
     depends_on:
       nats:
         condition: service_started
@@ -1080,15 +1080,15 @@ render_compose_flow() {
     labels:
       - traefik.enable=true
       # Flow receiver gRPC (h2c backend)
-      - traefik.http.routers.netbird-flow.rule=Host(`${NETBIRD_DOMAIN}`) && PathPrefix(`/flow.FlowService/`)
-      - traefik.http.routers.netbird-flow.entrypoints=websecure
-      - traefik.http.routers.netbird-flow.tls=true
-      - traefik.http.routers.netbird-flow.tls.certresolver=letsencrypt
-      - traefik.http.routers.netbird-flow.middlewares=nb-security@docker
-      - traefik.http.routers.netbird-flow.service=netbird-flow-h2c
-      - traefik.http.routers.netbird-flow.priority=100
-      - traefik.http.services.netbird-flow-h2c.loadbalancer.server.port=80
-      - traefik.http.services.netbird-flow-h2c.loadbalancer.server.scheme=h2c
+      - traefik.http.routers.netbirdy-flow.rule=Host(`${NETBIRD_DOMAIN}`) && PathPrefix(`/flow.FlowService/`)
+      - traefik.http.routers.netbirdy-flow.entrypoints=websecure
+      - traefik.http.routers.netbirdy-flow.tls=true
+      - traefik.http.routers.netbirdy-flow.tls.certresolver=letsencrypt
+      - traefik.http.routers.netbirdy-flow.middlewares=nb-security@docker
+      - traefik.http.routers.netbirdy-flow.service=netbirdy-flow-h2c
+      - traefik.http.routers.netbirdy-flow.priority=100
+      - traefik.http.services.netbirdy-flow-h2c.loadbalancer.server.port=80
+      - traefik.http.services.netbirdy-flow-h2c.loadbalancer.server.scheme=h2c
 
 EOF
   return
@@ -1101,10 +1101,10 @@ render_compose_proxy() {
   proxy:
     <<: *default
     image: ghcr.io/netbirdio/reverse-proxy:${NETBIRD_PROXY_TAG}
-    container_name: netbird-proxy
-    networks: [netbird]
+    container_name: netbirdy-proxy
+    networks: [netbirdy]
     depends_on:
-      netbird-server:
+      netbirdy-server:
         condition: service_started
     ports:
       - '51820:51820/udp'
@@ -1121,7 +1121,7 @@ render_compose_proxy() {
       - traefik.tcp.services.proxy-tls.loadbalancer.serverstransport=pp-v2@file
     environment:
       # Plaintext gRPC over the internal network, not the public address.
-      - NB_PROXY_MANAGEMENT_ADDRESS=http://netbird-server:80
+      - NB_PROXY_MANAGEMENT_ADDRESS=http://netbirdy-server:80
       - NB_PROXY_ALLOW_INSECURE=true
       - NB_PROXY_TOKEN=${NETBIRD_PROXY_TOKEN}
       - NB_PROXY_DOMAIN=${NETBIRD_DOMAIN}
@@ -1140,8 +1140,8 @@ EOF
   crowdsec:
     <<: *default
     image: crowdsecurity/crowdsec:${NETBIRD_CROWDSEC_TAG}
-    container_name: netbird-crowdsec
-    networks: [netbird]
+    container_name: netbirdy-crowdsec
+    networks: [netbirdy]
     environment:
       - COLLECTIONS=crowdsecurity/linux
     volumes:
@@ -1163,8 +1163,8 @@ render_compose_postgres() {
   postgres:
     <<: *default
     image: postgres:17
-    container_name: netbird-postgres
-    networks: [netbird]
+    container_name: netbirdy-postgres
+    networks: [netbirdy]
     environment:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
@@ -1203,8 +1203,8 @@ EOF
   netbird_traefik_letsencrypt:
 
 networks:
-  netbird:
-    name: netbird
+  netbirdy:
+    name: netbirdy
     driver: bridge
     ipam:
       config:
@@ -1216,7 +1216,7 @@ EOF
 
 render_config_yaml() {
   cat <<EOF
-# NetBird Enterprise server configuration.
+# NetBirdy Enterprise server configuration.
 # Generated by getting-started-enterprise.sh. Mode 600.
 
 server:
@@ -1305,11 +1305,11 @@ usage() {
   cat <<EOF
 Usage: $0 [--enable-proxy] [--enable-traffic-events]
 
-Without flags, bootstraps a new NetBird Enterprise stack in the current
+Without flags, bootstraps a new NetBirdy Enterprise stack in the current
 directory. With flags, turns the feature on for the existing installation in
 the current directory.
 
-  --enable-proxy           add the NetBird Proxy, optionally with CrowdSec
+  --enable-proxy           add the NetBirdy Proxy, optionally with CrowdSec
   --enable-traffic-events  add traffic events logging (NATS, receiver, enricher)
   -h, --help               show this help
 EOF

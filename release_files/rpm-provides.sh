@@ -3,7 +3,7 @@
 # Write .goreleaser.generated.yaml with the @RPM_EVR@ placeholder filled in.
 #
 # Red Hat certification (RPM Version Handling) expects rpmbuild's ISA provide,
-# netbird(x86-64) = <evr>. nfpm does not emit it and GoReleaser does not template
+# netbirdy(x86-64) = <evr>. nfpm does not emit it and GoReleaser does not template
 # the provides field, so the version is substituted before GoReleaser runs.
 #
 # The value has to match what nfpm derives from the same tag: a semver

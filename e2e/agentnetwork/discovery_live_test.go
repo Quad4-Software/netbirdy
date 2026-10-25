@@ -85,7 +85,7 @@ const (
 	outcomeFiltered discoveryOutcome = iota
 	// outcomeDenied: no provider of this shape can serve the surface, so the
 	// proxy refuses rather than rewriting the request onto an upstream that
-	// would 404 it. The caller gets a NetBird error, not a vendor one.
+	// would 404 it. The caller gets a NetBirdy error, not a vendor one.
 	outcomeDenied
 	// outcomeUpstreamNoListing: the proxy routes the request to the configured
 	// upstream, and the vendor does not implement the endpoint there. Proxy
@@ -308,7 +308,7 @@ func runLiveDiscoveryCase(t *testing.T, ctx context.Context, tc liveDiscoveryCas
 			tc.name, truncate(body, 2000))
 
 		// Which side refused is the whole distinction between these two
-		// outcomes, and a NetBird error is the thing that tells them apart: the
+		// outcomes, and a NetBirdy error is the thing that tells them apart: the
 		// middleware chain stamps its own name on anything it generates.
 		if tc.outcome == outcomeDenied {
 			assert.True(t, isProxyError(body),

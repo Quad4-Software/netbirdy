@@ -2,11 +2,11 @@ version: 2
 env:
   - SKIP_PUBLISH={{ if index .Env "SKIP_PUBLISH" }}{{ .Env.SKIP_PUBLISH }}{{ else }}true{{ end }}
   - SKIP_DOCKER_PUSH={{ if index .Env "SKIP_DOCKER_PUSH" }}{{ .Env.SKIP_DOCKER_PUSH }}{{ else }}false{{ end }}
-project_name: netbird
+project_name: netbirdy
 builds:
-  - id: netbird-wasm
+  - id: netbirdy-wasm
     dir: client/wasm/cmd
-    binary: netbird
+    binary: netbirdy
     env: [GOOS=js, GOARCH=wasm, CGO_ENABLED=0]
     goos:
       - js
@@ -16,9 +16,9 @@ builds:
       - -s -w -X github.com/netbirdio/netbird/version.version={{.Version}} -X main.commit={{.Commit}} -X main.date={{.CommitDate}} -X main.builtBy=goreleaser
     mod_timestamp: "{{ .CommitTimestamp }}"
 
-  - id: netbird
+  - id: netbirdy
     dir: client
-    binary: netbird
+    binary: netbirdy
     env: [CGO_ENABLED=0]
     goos:
       - linux
@@ -43,9 +43,9 @@ builds:
   # deb and rpm packages target glibc distributions, so on amd64 and arm64, the only
   # architectures with a PKCS#11 driver, they carry the PKCS#11 store, which links libc.
   # Tarballs, the Alpine-based images and the other architectures keep the static build.
-  - id: netbird-pkcs11
+  - id: netbirdy-pkcs11
     dir: client
-    binary: netbird
+    binary: netbirdy
     env: [CGO_ENABLED=0]
     goos:
       - linux
@@ -60,9 +60,9 @@ builds:
       - pkcs11
 
   # The 32-bit deb architectures, which have no PKCS#11 driver.
-  - id: netbird-deb-32bit
+  - id: netbirdy-deb-32bit
     dir: client
-    binary: netbird
+    binary: netbirdy
     env: [CGO_ENABLED=0]
     goos:
       - linux
@@ -78,9 +78,9 @@ builds:
   # Single-arch builds: nfpm provides is not templated, so the RPM splits per arch. The
   # ones with a PKCS#11 driver carry the store like the deb build above.
   - &netbird_rpm_build
-    id: netbird-rpm-amd64
+    id: netbirdy-rpm-amd64
     dir: client
-    binary: netbird
+    binary: netbirdy
     env: [CGO_ENABLED=0]
     goos: [linux]
     goarch: [amd64]
@@ -92,24 +92,24 @@ builds:
       - pkcs11
 
   - <<: *netbird_rpm_build
-    id: netbird-rpm-arm64
+    id: netbirdy-rpm-arm64
     goarch: [arm64]
 
   - <<: *netbird_rpm_build
-    id: netbird-rpm-arm
+    id: netbirdy-rpm-arm
     goarch: [arm]
     tags:
       - load_wgnt_from_rsrc
 
   - <<: *netbird_rpm_build
-    id: netbird-rpm-386
+    id: netbirdy-rpm-386
     goarch: [386]
     tags:
       - load_wgnt_from_rsrc
 
-  - id: netbird-static
+  - id: netbirdy-static
     dir: client
-    binary: netbird
+    binary: netbirdy
     env: [CGO_ENABLED=0]
     goos:
       - linux
@@ -127,7 +127,7 @@ builds:
     tags:
       - load_wgnt_from_rsrc
 
-  - id: netbird-mgmt
+  - id: netbirdy-mgmt
     dir: management
     env:
       - CGO_ENABLED=1
@@ -136,7 +136,7 @@ builds:
           {{- if eq .Arch "arm64"}}CC=aarch64-linux-gnu-gcc{{- end }}
           {{- if eq .Arch "arm"}}CC=arm-linux-gnueabihf-gcc{{- end }}
         {{- end }}
-    binary: netbird-mgmt
+    binary: netbirdy-mgmt
     goos:
       - linux
     goarch:
@@ -149,10 +149,10 @@ builds:
       - -s -w -X github.com/netbirdio/netbird/version.version={{.Version}} -X main.commit={{.Commit}} -X main.date={{.CommitDate}} -X main.builtBy=goreleaser
     mod_timestamp: "{{ .CommitTimestamp }}"
 
-  - id: netbird-signal
+  - id: netbirdy-signal
     dir: signal
     env: [CGO_ENABLED=0]
-    binary: netbird-signal
+    binary: netbirdy-signal
     goos:
       - linux
     goarch:
@@ -165,10 +165,10 @@ builds:
       - -s -w -X github.com/netbirdio/netbird/version.version={{.Version}} -X main.commit={{.Commit}} -X main.date={{.CommitDate}} -X main.builtBy=goreleaser
     mod_timestamp: "{{ .CommitTimestamp }}"
 
-  - id: netbird-relay
+  - id: netbirdy-relay
     dir: relay
     env: [CGO_ENABLED=0]
-    binary: netbird-relay
+    binary: netbirdy-relay
     goos:
       - linux
     goarch:
@@ -181,7 +181,7 @@ builds:
       - -s -w -X github.com/netbirdio/netbird/version.version={{.Version}} -X main.commit={{.Commit}} -X main.date={{.CommitDate}} -X main.builtBy=goreleaser
     mod_timestamp: "{{ .CommitTimestamp }}"
 
-  - id: netbird-server
+  - id: netbirdy-server
     dir: combined
     env:
       - CGO_ENABLED=1
@@ -190,7 +190,7 @@ builds:
           {{- if eq .Arch "arm64"}}CC=aarch64-linux-gnu-gcc{{- end }}
           {{- if eq .Arch "arm"}}CC=arm-linux-gnueabihf-gcc{{- end }}
         {{- end }}
-    binary: netbird-server
+    binary: netbirdy-server
     goos:
       - linux
     goarch:
@@ -203,10 +203,10 @@ builds:
       - -s -w -X github.com/netbirdio/netbird/version.version={{.Version}} -X main.commit={{.Commit}} -X main.date={{.CommitDate}} -X main.builtBy=goreleaser
     mod_timestamp: "{{ .CommitTimestamp }}"
 
-  - id: netbird-upload
+  - id: netbirdy-upload
     dir: upload-server
     env: [CGO_ENABLED=0]
-    binary: netbird-upload
+    binary: netbirdy-upload
     goos:
       - linux
     goarch:
@@ -219,10 +219,10 @@ builds:
       - -s -w -X github.com/netbirdio/netbird/version.version={{.Version}} -X main.commit={{.Commit}} -X main.date={{.CommitDate}} -X main.builtBy=goreleaser
     mod_timestamp: "{{ .CommitTimestamp }}"
 
-  - id: netbird-proxy
+  - id: netbirdy-proxy
     dir: proxy/cmd/proxy
     env: [CGO_ENABLED=0]
-    binary: netbird-proxy
+    binary: netbirdy-proxy
     goos:
       - linux
     goarch:
@@ -258,7 +258,7 @@ builds:
       - -s -w -X github.com/netbirdio/netbird/version.version={{.Version}}
     mod_timestamp: "{{ .CommitTimestamp }}"
 
-  - id: netbird-idp-migrate
+  - id: netbirdy-idp-migrate
     dir: tools/idp-migrate
     env:
       - CGO_ENABLED=1
@@ -267,7 +267,7 @@ builds:
           {{- if eq .Arch "arm64"}}CC=aarch64-linux-gnu-gcc{{- end }}
           {{- if eq .Arch "arm"}}CC=arm-linux-gnueabihf-gcc{{- end }}
         {{- end }}
-    binary: netbird-idp-migrate
+    binary: netbirdy-idp-migrate
     goos:
       - linux
     goarch:
@@ -281,21 +281,21 @@ builds:
     mod_timestamp: "{{ .CommitTimestamp }}"
 
 universal_binaries:
-  - id: netbird
+  - id: netbirdy
 
 archives:
   - builds:
-      - netbird
-      - netbird-static
-  - id: netbird-wasm
+      - netbirdy
+      - netbirdy-static
+  - id: netbirdy-wasm
     builds:
-      - netbird-wasm
+      - netbirdy-wasm
     name_template: "{{ .ProjectName }}_{{ .Version }}"
     format: binary
-  - id: netbird-idp-migrate
+  - id: netbirdy-idp-migrate
     builds:
-      - netbird-idp-migrate
-    name_template: "netbird-idp-migrate_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+      - netbirdy-idp-migrate
+    name_template: "netbirdy-idp-migrate_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
   - id: nblink
     builds:
       - nblink
@@ -307,38 +307,55 @@ archives:
         format: zip
 
 nfpms:
-  - maintainer: Netbird <dev@netbird.io>
-    description: Netbird client.
-    homepage: https://netbird.io/
+  - maintainer: NetBirdy <https://github.com/Sudo-Ivan/netbirdy>
+    description: NetBirdy client.
+    homepage: https://github.com/Sudo-Ivan/netbirdy
     license: BSD-3-Clause
-    vendor: NetBird
+    vendor: NetBirdy
     id: netbird_deb
     bindir: /usr/bin
     builds:
-      - netbird-pkcs11
-      - netbird-deb-32bit
+      - netbirdy-pkcs11
+      - netbirdy-deb-32bit
     formats:
       - deb
+    # Drop-in upgrade for an existing netbird install: apt replaces the old
+    # package in place and the binary symlink keeps scripts calling netbird.
+    provides:
+      - netbird
+    replaces:
+      - netbird
+    conflicts:
+      - netbird
+    contents:
+      - src: netbirdy
+        dst: /usr/bin/netbird
+        type: symlink
     scripts:
       postinstall: "release_files/post_install.sh"
       preremove: "release_files/pre_remove.sh"
 
   - &netbird_rpm
-    maintainer: Netbird <dev@netbird.io>
-    description: Netbird client.
-    homepage: https://netbird.io/
+    maintainer: NetBirdy <https://github.com/Sudo-Ivan/netbirdy>
+    description: NetBirdy client.
+    homepage: https://github.com/Sudo-Ivan/netbirdy
     license: BSD-3-Clause
-    vendor: NetBird
+    vendor: NetBirdy
     id: netbird_rpm_amd64
     bindir: /usr/bin
     ids:
-      - netbird-rpm-amd64
+      - netbirdy-rpm-amd64
     formats:
       - rpm
     # Red Hat certification (RPM Version Handling) requires rpmbuild's ISA
     # provide, which nfpm does not emit. The version is filled in by the release job.
     provides:
-      - "netbird(x86-64) = @RPM_EVR@"
+      - "netbirdy(x86-64) = @RPM_EVR@"
+      - "netbird = @RPM_EVR@"
+    replaces:
+      - netbird
+    conflicts:
+      - netbird
     # The client verifies TLS to management and signal against the system trust
     # store. Red Hat software certification (RPM Dependency Tracking) also
     # rejects packages that declare no dependencies at all.
@@ -351,13 +368,16 @@ nfpms:
     # %license, %doc and %config entries instead of a bare binary.
     contents:
       - src: LICENSE
-        dst: /usr/share/licenses/netbird/LICENSE
+        dst: /usr/share/licenses/netbirdy/LICENSE
         type: license
       - src: README.md
-        dst: /usr/share/doc/netbird/README.md
+        dst: /usr/share/doc/netbirdy/README.md
         type: doc
-      - src: release_files/netbird.sysconfig
-        dst: /etc/sysconfig/netbird
+      - src: netbirdy
+        dst: /usr/bin/netbird
+        type: symlink
+      - src: release_files/netbirdy.sysconfig
+        dst: /etc/sysconfig/netbirdy
         type: config|noreplace
         # May hold the PKCS#11 token PIN (NB_TPM_PIN), so readable by root alone.
         file_info:
@@ -366,46 +386,45 @@ nfpms:
       postinstall: "release_files/post_install.sh"
       preremove: "release_files/pre_remove.sh"
     rpm:
-      summary: NetBird client
+      summary: NetBirdy client
       group: Applications/Internet
-      packager: NetBird <dev@netbird.io>
+      packager: NetBirdy <https://github.com/Sudo-Ivan/netbirdy>
       signature:
         key_file: '{{ if index .Env "GPG_RPM_KEY_FILE" }}{{ .Env.GPG_RPM_KEY_FILE }}{{ end }}'
 
   - <<: *netbird_rpm
     id: netbird_rpm_arm64
     ids:
-      - netbird-rpm-arm64
+      - netbirdy-rpm-arm64
     provides:
-      - "netbird(aarch-64) = @RPM_EVR@"
+      - "netbirdy(aarch-64) = @RPM_EVR@"
 
   - <<: *netbird_rpm
     id: netbird_rpm_arm
     ids:
-      - netbird-rpm-arm
+      - netbirdy-rpm-arm
     provides:
-      - "netbird(armv6hl-32) = @RPM_EVR@"
+      - "netbirdy(armv6hl-32) = @RPM_EVR@"
 
   - <<: *netbird_rpm
     id: netbird_rpm_386
     ids:
-      - netbird-rpm-386
+      - netbirdy-rpm-386
     provides:
-      - "netbird(x86-32) = @RPM_EVR@"
+      - "netbirdy(x86-32) = @RPM_EVR@"
 dockers_v2:
-   - id: netbird
+   - id: netbirdy
      disable: "{{ .Env.SKIP_DOCKER_PUSH }}"
      ids:
-       - netbird
+       - netbirdy
      images:
-       - netbirdio/netbird
-       - ghcr.io/netbirdio/netbird
+       - ghcr.io/sudo-ivan/netbirdy
      tags:
        - "{{ .Version }}"
        - "{{ if eq .Env.SKIP_PUBLISH \"false\" }}latest{{ end }}"
      dockerfile: client/Dockerfile
      extra_files:
-       - client/netbird-entrypoint.sh
+       - client/netbirdy-entrypoint.sh
      platforms:
        - linux/amd64
        - linux/arm64
@@ -416,20 +435,19 @@ dockers_v2:
        "org.opencontainers.image.version": "{{.Version}}"
        "org.opencontainers.image.revision": "{{.FullCommit}}"
        "org.opencontainers.image.source": "{{.GitURL}}"
-       "maintainer": "dev@netbird.io"
-   - id: netbird-rootless
+       "maintainer": "https://github.com/Sudo-Ivan/netbirdy"
+   - id: netbirdy-rootless
      disable: "{{ .Env.SKIP_DOCKER_PUSH }}"
      ids:
-       - netbird
+       - netbirdy
      images:
-       - netbirdio/netbird
-       - ghcr.io/netbirdio/netbird
+       - ghcr.io/sudo-ivan/netbirdy
      tags:
        - "{{ .Version }}-rootless"
        - "{{ if eq .Env.SKIP_PUBLISH \"false\" }}rootless-latest{{ end }}"
      dockerfile: client/Dockerfile-rootless
      extra_files:
-       - client/netbird-entrypoint.sh
+       - client/netbirdy-entrypoint.sh
      platforms:
        - linux/amd64
        - linux/arm64
@@ -440,20 +458,19 @@ dockers_v2:
        "org.opencontainers.image.version": "{{.Version}}"
        "org.opencontainers.image.revision": "{{.FullCommit}}"
        "org.opencontainers.image.source": "{{.GitURL}}"
-       "maintainer": "dev@netbird.io"
-   - id: netbird-rootless-ubi
+       "maintainer": "https://github.com/Sudo-Ivan/netbirdy"
+   - id: netbirdy-rootless-ubi
      disable: "{{ .Env.SKIP_DOCKER_PUSH }}"
      ids:
-       - netbird
+       - netbirdy
      images:
-       - netbirdio/netbird
-       - ghcr.io/netbirdio/netbird
+       - ghcr.io/sudo-ivan/netbirdy
      tags:
        - "{{ .Version }}-rootless-ubi"
        - "{{ if eq .Env.SKIP_PUBLISH \"false\" }}rootless-ubi-latest{{ end }}"
      dockerfile: client/Dockerfile-rootless.ubi
      extra_files:
-       - client/netbird-entrypoint.sh
+       - client/netbirdy-entrypoint.sh
      platforms:
        - linux/amd64
        - linux/arm64
@@ -477,14 +494,13 @@ dockers_v2:
        "org.opencontainers.image.version": "{{.Version}}"
        "org.opencontainers.image.revision": "{{.FullCommit}}"
        "org.opencontainers.image.source": "{{.GitURL}}"
-       "maintainer": "dev@netbird.io"
+       "maintainer": "https://github.com/Sudo-Ivan/netbirdy"
    - id: relay
      disable: "{{ .Env.SKIP_DOCKER_PUSH }}"
      ids:
-       - netbird-relay
+       - netbirdy-relay
      images:
-       - netbirdio/relay
-       - ghcr.io/netbirdio/relay
+       - ghcr.io/sudo-ivan/netbirdy-relay
      tags:
        - "{{ .Version }}"
        - "{{ if eq .Env.SKIP_PUBLISH \"false\" }}latest{{ end }}"
@@ -499,14 +515,13 @@ dockers_v2:
        "org.opencontainers.image.version": "{{.Version}}"
        "org.opencontainers.image.revision": "{{.FullCommit}}"
        "org.opencontainers.image.source": "{{.GitURL}}"
-       "maintainer": "dev@netbird.io"
+       "maintainer": "https://github.com/Sudo-Ivan/netbirdy"
    - id: relay-ubi
      disable: "{{ .Env.SKIP_DOCKER_PUSH }}"
      ids:
-       - netbird-relay
+       - netbirdy-relay
      images:
-       - netbirdio/relay
-       - ghcr.io/netbirdio/relay
+       - ghcr.io/sudo-ivan/netbirdy-relay
      tags:
        - "{{ .Version }}-ubi"
        - "{{ if eq .Env.SKIP_PUBLISH \"false\" }}ubi-latest{{ end }}"
@@ -534,14 +549,13 @@ dockers_v2:
        "org.opencontainers.image.version": "{{.Version}}"
        "org.opencontainers.image.revision": "{{.FullCommit}}"
        "org.opencontainers.image.source": "{{.GitURL}}"
-       "maintainer": "dev@netbird.io"
+       "maintainer": "https://github.com/Sudo-Ivan/netbirdy"
    - id: signal
      disable: "{{ .Env.SKIP_DOCKER_PUSH }}"
      ids:
-       - netbird-signal
+       - netbirdy-signal
      images:
-       - netbirdio/signal
-       - ghcr.io/netbirdio/signal
+       - ghcr.io/sudo-ivan/netbirdy-signal
      tags:
        - "{{ .Version }}"
        - "{{ if eq .Env.SKIP_PUBLISH \"false\" }}latest{{ end }}"
@@ -556,14 +570,13 @@ dockers_v2:
        "org.opencontainers.image.version": "{{.Version}}"
        "org.opencontainers.image.revision": "{{.FullCommit}}"
        "org.opencontainers.image.source": "{{.GitURL}}"
-       "maintainer": "dev@netbird.io"
+       "maintainer": "https://github.com/Sudo-Ivan/netbirdy"
    - id: signal-ubi
      disable: "{{ .Env.SKIP_DOCKER_PUSH }}"
      ids:
-       - netbird-signal
+       - netbirdy-signal
      images:
-       - netbirdio/signal
-       - ghcr.io/netbirdio/signal
+       - ghcr.io/sudo-ivan/netbirdy-signal
      tags:
        - "{{ .Version }}-ubi"
        - "{{ if eq .Env.SKIP_PUBLISH \"false\" }}ubi-latest{{ end }}"
@@ -591,14 +604,13 @@ dockers_v2:
        "org.opencontainers.image.version": "{{.Version}}"
        "org.opencontainers.image.revision": "{{.FullCommit}}"
        "org.opencontainers.image.source": "{{.GitURL}}"
-       "maintainer": "dev@netbird.io"
+       "maintainer": "https://github.com/Sudo-Ivan/netbirdy"
    - id: management
      disable: "{{ .Env.SKIP_DOCKER_PUSH }}"
      ids:
-       - netbird-mgmt
+       - netbirdy-mgmt
      images:
-       - netbirdio/management
-       - ghcr.io/netbirdio/management
+       - ghcr.io/sudo-ivan/netbirdy-management
      tags:
        - "{{ .Version }}"
        - "{{ if eq .Env.SKIP_PUBLISH \"false\" }}latest{{ end }}"
@@ -613,14 +625,13 @@ dockers_v2:
        "org.opencontainers.image.version": "{{.Version}}"
        "org.opencontainers.image.revision": "{{.FullCommit}}"
        "org.opencontainers.image.source": "{{.GitURL}}"
-       "maintainer": "dev@netbird.io"
+       "maintainer": "https://github.com/Sudo-Ivan/netbirdy"
    - id: management-ubi
      disable: "{{ .Env.SKIP_DOCKER_PUSH }}"
      ids:
-       - netbird-mgmt
+       - netbirdy-mgmt
      images:
-       - netbirdio/management
-       - ghcr.io/netbirdio/management
+       - ghcr.io/sudo-ivan/netbirdy-management
      tags:
        - "{{ .Version }}-ubi"
        - "{{ if eq .Env.SKIP_PUBLISH \"false\" }}ubi-latest{{ end }}"
@@ -648,14 +659,13 @@ dockers_v2:
        "org.opencontainers.image.version": "{{.Version}}"
        "org.opencontainers.image.revision": "{{.FullCommit}}"
        "org.opencontainers.image.source": "{{.GitURL}}"
-       "maintainer": "dev@netbird.io"
+       "maintainer": "https://github.com/Sudo-Ivan/netbirdy"
    - id: upload
      disable: "{{ .Env.SKIP_DOCKER_PUSH }}"
      ids:
-       - netbird-upload
+       - netbirdy-upload
      images:
-       - netbirdio/upload
-       - ghcr.io/netbirdio/upload
+       - ghcr.io/sudo-ivan/netbirdy-upload
      tags:
        - "{{ .Version }}"
        - "{{ if eq .Env.SKIP_PUBLISH \"false\" }}latest{{ end }}"
@@ -670,14 +680,13 @@ dockers_v2:
        "org.opencontainers.image.version": "{{.Version}}"
        "org.opencontainers.image.revision": "{{.FullCommit}}"
        "org.opencontainers.image.source": "{{.GitURL}}"
-       "maintainer": "dev@netbird.io"
-   - id: netbird-server
+       "maintainer": "https://github.com/Sudo-Ivan/netbirdy"
+   - id: netbirdy-server
      disable: "{{ .Env.SKIP_DOCKER_PUSH }}"
      ids:
-       - netbird-server
+       - netbirdy-server
      images:
-       - netbirdio/netbird-server
-       - ghcr.io/netbirdio/netbird-server
+       - ghcr.io/sudo-ivan/netbirdy-server
      tags:
        - "{{ .Version }}"
        - "{{ if eq .Env.SKIP_PUBLISH \"false\" }}latest{{ end }}"
@@ -692,14 +701,13 @@ dockers_v2:
        "org.opencontainers.image.version": "{{.Version}}"
        "org.opencontainers.image.revision": "{{.FullCommit}}"
        "org.opencontainers.image.source": "{{.GitURL}}"
-       "maintainer": "dev@netbird.io"
-   - id: netbird-server-ubi
+       "maintainer": "https://github.com/Sudo-Ivan/netbirdy"
+   - id: netbirdy-server-ubi
      disable: "{{ .Env.SKIP_DOCKER_PUSH }}"
      ids:
-       - netbird-server
+       - netbirdy-server
      images:
-       - netbirdio/netbird-server
-       - ghcr.io/netbirdio/netbird-server
+       - ghcr.io/sudo-ivan/netbirdy-server
      tags:
        - "{{ .Version }}-ubi"
        - "{{ if eq .Env.SKIP_PUBLISH \"false\" }}ubi-latest{{ end }}"
@@ -727,14 +735,13 @@ dockers_v2:
        "org.opencontainers.image.version": "{{.Version}}"
        "org.opencontainers.image.revision": "{{.FullCommit}}"
        "org.opencontainers.image.source": "{{.GitURL}}"
-       "maintainer": "dev@netbird.io"
-   - id: netbird-proxy
+       "maintainer": "https://github.com/Sudo-Ivan/netbirdy"
+   - id: netbirdy-proxy
      disable: "{{ .Env.SKIP_DOCKER_PUSH }}"
      ids:
-       - netbird-proxy
+       - netbirdy-proxy
      images:
-       - netbirdio/reverse-proxy
-       - ghcr.io/netbirdio/reverse-proxy
+       - ghcr.io/sudo-ivan/netbirdy-reverse-proxy
      tags:
        - "{{ .Version }}"
        - "{{ if eq .Env.SKIP_PUBLISH \"false\" }}latest{{ end }}"
@@ -749,14 +756,13 @@ dockers_v2:
        "org.opencontainers.image.version": "{{.Version}}"
        "org.opencontainers.image.revision": "{{.FullCommit}}"
        "org.opencontainers.image.source": "{{.GitURL}}"
-       "maintainer": "dev@netbird.io"
+       "maintainer": "https://github.com/Sudo-Ivan/netbirdy"
    - id: nblink
      disable: "{{ .Env.SKIP_DOCKER_PUSH }}"
      ids:
        - nblink
      images:
-       - netbirdio/nblink
-       - ghcr.io/netbirdio/nblink
+       - ghcr.io/sudo-ivan/netbirdy-nblink
      tags:
        - "{{ .Version }}"
        - "{{ if eq .Env.SKIP_PUBLISH \"false\" }}latest{{ end }}"
@@ -771,14 +777,13 @@ dockers_v2:
        "org.opencontainers.image.version": "{{.Version}}"
        "org.opencontainers.image.revision": "{{.FullCommit}}"
        "org.opencontainers.image.source": "{{.GitURL}}"
-       "maintainer": "dev@netbird.io"
+       "maintainer": "https://github.com/Sudo-Ivan/netbirdy"
    - id: proxy-ubi
      disable: "{{ .Env.SKIP_DOCKER_PUSH }}"
      ids:
-       - netbird-proxy
+       - netbirdy-proxy
      images:
-       - netbirdio/reverse-proxy
-       - ghcr.io/netbirdio/reverse-proxy
+       - ghcr.io/sudo-ivan/netbirdy-reverse-proxy
      tags:
        - "{{ .Version }}-ubi"
        - "{{ if eq .Env.SKIP_PUBLISH \"false\" }}ubi-latest{{ end }}"
@@ -806,7 +811,7 @@ dockers_v2:
        "org.opencontainers.image.version": "{{.Version}}"
        "org.opencontainers.image.revision": "{{.FullCommit}}"
        "org.opencontainers.image.source": "{{.GitURL}}"
-       "maintainer": "dev@netbird.io"
+       "maintainer": "https://github.com/Sudo-Ivan/netbirdy"
 
 brews:
   - ids:
@@ -817,11 +822,11 @@ brews:
       name: homebrew-tap
       token: "{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN }}"
     commit_author:
-      name: Netbird
-      email: dev@netbird.io
-    description: Netbird project.
+      name: NetBirdy
+      email: noreply@github.com
+    description: NetBirdy project.
     download_strategy: CurlDownloadStrategy
-    homepage: https://netbird.io/
+    homepage: https://github.com/Sudo-Ivan/netbirdy
     license: "BSD3"
     test: |
       system "#{bin}/{{ .ProjectName	}} version"
@@ -857,7 +862,7 @@ checksum:
     - glob: ./infrastructure_files/migrate-to-enterprise.sh
 
 release:
-  # The signing pipeline (netbirdio/sign-pipelines, dispatched by
+  # The signing pipeline (ghcr.io/sudo-ivan/netbirdy-sign-pipelines, dispatched by
   # trigger_signer) marks the release latest once the Windows and macOS
   # artifacts are signed. Without this override goreleaser marks it latest
   # at publish time, while those artifacts are still unsigned.

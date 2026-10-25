@@ -2,44 +2,44 @@
 
 export PATH=$PATH:/usr/local/bin:/opt/homebrew/bin
 
-# check if netbird is installed
-NB_BIN=$(which netbird)
+# check if netbirdy is installed
+NB_BIN=$(which netbirdy)
 if [ -n "$NB_BIN" ]
 then
-  echo "Stopping and uninstalling Netbird daemon"
-  netbird service stop || true
-  netbird service uninstall || true
+  echo "Stopping and uninstalling NetBirdy daemon"
+  netbirdy service stop || true
+  netbirdy service uninstall || true
 fi
 
-# check if netbird is installed
-NB_BIN=$(which netbird)
+# check if netbirdy is installed
+NB_BIN=$(which netbirdy)
 if [ -z "$NB_BIN" ]
 then
-  echo "Netbird daemon is not installed. Please run: brew install netbirdio/tap/netbird"
+  echo "NetBirdy daemon is not installed. Please run: brew install sudo-ivan/tap/netbirdy"
   exit 1
 fi
 NB_UI_VERSION=$1
-NB_VERSION=$(netbird version)
+NB_VERSION=$(netbirdy version)
 if [ "X-$NB_UI_VERSION" != "X-$NB_VERSION" ]
 then
-  echo "Netbird's daemon is running with a different version than the Netbird's UI:"
-  echo "Netbird UI Version: $NB_UI_VERSION"
-  echo "Netbird Daemon Version: $NB_VERSION"
-  echo "Please run: brew install netbirdio/tap/netbird"
+  echo "NetBirdy's daemon is running with a different version than the NetBirdy's UI:"
+  echo "NetBirdy UI Version: $NB_UI_VERSION"
+  echo "NetBirdy Daemon Version: $NB_VERSION"
+  echo "Please run: brew install sudo-ivan/tap/netbirdy"
   echo "to update it"
 fi
 
 if [ -n "$NB_BIN" ]
 then
-  echo "Stopping NetBird daemon"
-  osascript -e 'quit app "Netbird UI"' 2> /dev/null || true
-  netbird service stop 2> /dev/null || true
+  echo "Stopping NetBirdy daemon"
+  osascript -e 'quit app "NetBirdy UI"' 2> /dev/null || true
+  netbirdy service stop 2> /dev/null || true
 fi
 
-# start netbird daemon service
-echo "Starting Netbird daemon"
-netbird service install 2> /dev/null || true
-netbird service start || true
+# start netbirdy daemon service
+echo "Starting NetBirdy daemon"
+netbirdy service install 2> /dev/null || true
+netbirdy service start || true
 
 # start app
-open /Applications/Netbird\ UI.app
+open /Applications/NetBirdy\ UI.app

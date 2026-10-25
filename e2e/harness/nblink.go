@@ -60,7 +60,7 @@ const (
 // and attribute the difference in the answer to that header alone.
 const ChatPath = "/v1/chat/completions"
 
-// NBLink is a running nblink container: a NetBird peer in userspace mode
+// NBLink is a running nblink container: a NetBirdy peer in userspace mode
 // forwarding a local port to an upstream reached inside the tunnel.
 type NBLink struct {
 	container testcontainers.Container

@@ -77,7 +77,7 @@ jobs:
           echo "Checking for GPL/AGPL/LGPL licensed dependencies..."
           echo ""
 
-          # Check all Go packages for copyleft licenses, excluding internal netbird packages
+          # Check all Go packages for copyleft licenses, excluding internal netbirdy packages
           COPYLEFT_DEPS=$(go-licenses report ./... 2>/dev/null | grep -E 'GPL|AGPL|LGPL' | grep -v 'github.com/netbirdio/netbird/' || true)
 
           if [ -n "$COPYLEFT_DEPS" ]; then

@@ -12,7 +12,7 @@ on:
 env:
   SIGN_PIPE_VER: "v0.1.8"
   GORELEASER_VER: "v2.16.0"
-  PRODUCT_NAME: "NetBird"
+  PRODUCT_NAME: "NetBirdy"
   COPYRIGHT: "NetBird GmbH"
   flags: ""
   SKIP_PUBLISH: "true"
@@ -24,6 +24,7 @@ concurrency:
 
 jobs:
   freebsd_port_trigger:
+    if: github.repository == 'netbirdio/netbird'
     name: "FreeBSD Port / Trigger"
     runs-on: ubuntu-22.04
     outputs:
@@ -66,7 +67,7 @@ jobs:
   release_freebsd_port:
     name: "FreeBSD Port / Build & Test"
     needs: freebsd_port_trigger
-    if: needs.freebsd_port_trigger.outputs.run == 'true'
+    if: (needs.freebsd_port_trigger.outputs.run == 'true') && github.repository == 'netbirdio/netbird'
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout
@@ -83,7 +84,7 @@ jobs:
         id: check_diff
         run: |
           shopt -s nullglob
-          diffs=(netbird-*.diff)
+          diffs=(netbirdy-*.diff)
           if [[ ${#diffs[@]} -gt 0 ]]; then
             echo "diff_exists=true" >> "$GITHUB_OUTPUT"
           else
@@ -95,8 +96,8 @@ jobs:
         if: steps.check_diff.outputs.diff_exists == 'true'
         id: version
         run: |
-          diffs=(netbird-*.diff)
-          VERSION="${diffs[0]#netbird-}"
+          diffs=(netbirdy-*.diff)
+          VERSION="${diffs[0]#netbirdy-}"
           VERSION="${VERSION%.diff}"
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           echo "Generated files for version: $VERSION"
@@ -142,7 +143,7 @@ jobs:
 
             # Find the diff file
             echo "Finding diff file..."
-            DIFF_FILE=$(find $PWD -name "netbird-*.diff" -type f 2>/dev/null | head -1)
+            DIFF_FILE=$(find $PWD -name "netbirdy-*.diff" -type f 2>/dev/null | head -1)
             echo "Found: $DIFF_FILE"
 
             if [[ -z "$DIFF_FILE" ]]; then
@@ -151,19 +152,19 @@ jobs:
               exit 1
             fi
 
-            # Apply the generated diff from /usr/ports (diff has a/security/netbird/... paths)
+            # Apply the generated diff from /usr/ports (diff has a/security/netbirdy/... paths)
             cd /usr/ports
             patch -p1 -V none < "$DIFF_FILE"
 
             # Show patched Makefile
-            version=$(cat security/netbird/Makefile | grep -E '^DISTVERSION=' | awk '{print $NF}')
+            version=$(cat security/netbirdy/Makefile | grep -E '^DISTVERSION=' | awk '{print $NF}')
 
-            cd /usr/ports/security/netbird
+            cd /usr/ports/security/netbirdy
             export BATCH=yes
             make package
-            pkg add ./work/pkg/netbird-*.pkg
+            pkg add ./work/pkg/netbirdy-*.pkg
 
-            netbird version | grep "$version"
+            netbirdy version | grep "$version"
 
             echo "FreeBSD port test completed successfully!"
 
@@ -173,11 +174,12 @@ jobs:
         with:
           name: freebsd-port-files
           path: |
-            ./netbird-*-issue.txt
-            ./netbird-*.diff
+            ./netbirdy-*-issue.txt
+            ./netbirdy-*.diff
           retention-days: 30
 
   release:
+    if: github.repository == 'netbirdio/netbird'
     runs-on: ubuntu-24.04-8-core
     outputs:
       release_artifact_url: ${{ steps.upload_release.outputs.artifact-url }}
@@ -249,10 +251,11 @@ jobs:
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: '22'
+      - name: Install pnpm
+        run: npm install -g pnpm@12.14.0
       - name: Install proxy web dependencies for license collection
         # release_files/collect-licenses.sh -w reads the proxy UI's license terms from node_modules.
-        working-directory: proxy/web
-        run: npm ci --ignore-scripts
+        run: pnpm install --frozen-lockfile --filter web --ignore-scripts
       - name: Set up QEMU
         uses: docker/setup-qemu-action@06116385d9baf250c9f4dcb4858b16962ea869c3 #v4.1.0
       - name: Set up Docker Buildx
@@ -416,9 +419,9 @@ jobs:
           name: linux-packages
           path: |
             dist/netbird_linux**
-            dist/netbird-pkcs11_linux**
-            dist/netbird-deb-32bit_linux**
-            dist/netbird-rpm-*_linux**
+            dist/netbirdy-pkcs11_linux**
+            dist/netbirdy-deb-32bit_linux**
+            dist/netbirdy-rpm-*_linux**
           retention-days: 7
       - name: upload windows packages
         id: upload_windows_packages
@@ -440,7 +443,7 @@ jobs:
   redhat_certification:
     name: "Red Hat"
     needs: release
-    if: |
+    if: (|) && github.repository == 'netbirdio/netbird'
       github.repository == 'netbirdio/netbird' &&
       startsWith(github.ref, 'refs/tags/v') &&
       !contains(github.ref_name, '-')
@@ -454,6 +457,7 @@ jobs:
       PYXIS_API_TOKEN: ${{ secrets.PYXIS_API_TOKEN }}
 
   release_ui:
+    if: github.repository == 'netbirdio/netbird'
     runs-on: ubuntu-latest
     outputs:
       release_ui_artifact_url: ${{ steps.upload_release_ui.outputs.artifact-url }}
@@ -507,7 +511,7 @@ jobs:
         run: git --no-pager diff --exit-code
 
       - name: Set up Node.js
-        uses: actions/setup-node@v7
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: '22'
 
@@ -585,6 +589,7 @@ jobs:
           retention-days: 3
 
   release_ui_gtk3:
+    if: github.repository == 'netbirdio/netbird'
     # Legacy GTK3/WebKit2GTK 4.1 UI build for distros without WebKitGTK 6.0
     # (Ubuntu 22.04, Debian 12, RHEL 9, Fedora <=39). Runs on ubuntu-22.04 so
     # the binary links against the oldest supported glibc.
@@ -711,6 +716,7 @@ jobs:
           retention-days: 3
 
   release_ui_darwin:
+    if: github.repository == 'netbirdio/netbird'
     runs-on: macos-latest
     outputs:
       release_ui_darwin_artifact_url: ${{ steps.upload_release_ui_darwin.outputs.artifact-url }}
@@ -741,7 +747,7 @@ jobs:
       - name: check git status
         run: git --no-pager diff --exit-code
       - name: Set up Node.js
-        uses: actions/setup-node@v7
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: '22'
       - name: Set up pnpm
@@ -771,6 +777,7 @@ jobs:
           retention-days: 3
 
   test_windows_installer:
+    if: github.repository == 'netbirdio/netbird'
     name: "Windows Installer / Build Test"
     runs-on: windows-2022
     needs: [release, release_ui]
@@ -818,7 +825,7 @@ jobs:
           $workdir = "dist\${{ env.PackageWorkdir }}"
           New-Item -ItemType Directory -Force -Path $workdir | Out-Null
           $client = Get-ChildItem -Recurse -Path release -Filter "netbird_*_windows_${{ matrix.arch }}.tar.gz" | Select-Object -First 1
-          $ui = Get-ChildItem -Recurse -Path release-ui -Filter "netbird-ui-windows_*_windows_${{ matrix.arch }}.tar.gz" | Select-Object -First 1
+          $ui = Get-ChildItem -Recurse -Path release-ui -Filter "netbirdy-ui-windows_*_windows_${{ matrix.arch }}.tar.gz" | Select-Object -First 1
           if (-not $client) { Write-Host "::error::client tarball not found for ${{ matrix.arch }}"; exit 1 }
           if (-not $ui) { Write-Host "::error::ui tarball not found for ${{ matrix.arch }}"; exit 1 }
           Write-Host "Client: $($client.FullName)"
@@ -878,7 +885,7 @@ jobs:
           go install github.com/wailsapp/wails/v3/cmd/wails3@$WAILS_VERSION
 
       - name: Stage WebView2 bootstrapper for installers
-        # Both client/installer.nsis and client/netbird.wxs reference
+        # Both client/installer.nsis and client/netbirdy.wxs reference
         # client/MicrosoftEdgeWebview2Setup.exe. wails3 writes it there.
         # The signing pipeline (netbirdio/sign-pipelines) does the same
         # step for release builds; this mirrors it for PR sanity testing.
@@ -898,7 +905,7 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw "makensis failed with exit code $LASTEXITCODE" }
 
       - name: Rename NSIS installer
-        run: mv netbird-installer.exe netbird_installer_test_windows_${{ matrix.arch }}.exe
+        run: mv netbirdy-installer.exe netbird_installer_test_windows_${{ matrix.arch }}.exe
 
       - name: Install WiX
         run: |
@@ -908,7 +915,7 @@ jobs:
       - name: Build MSI installer
         env:
           NETBIRD_VERSION: "${{ steps.semver_parser.outputs.fullversion }}"
-        run: wix build -arch ${{ matrix.arch == 'amd64' && 'x64' || 'arm64' }} -ext WixToolset.Util.wixext -o netbird_installer_test_windows_${{ matrix.arch }}.msi .\client\netbird.wxs -d ProcessorArchitecture=${{ matrix.arch == 'amd64' && 'x64' || 'arm64' }} -d ArchSuffix=${{ matrix.arch }}
+        run: wix build -arch ${{ matrix.arch == 'amd64' && 'x64' || 'arm64' }} -ext WixToolset.Util.wixext -o netbird_installer_test_windows_${{ matrix.arch }}.msi .\client\netbirdy.wxs -d ProcessorArchitecture=${{ matrix.arch == 'amd64' && 'x64' || 'arm64' }} -d ArchSuffix=${{ matrix.arch }}
 
       - name: Upload installer artifacts
         if: always()
@@ -924,7 +931,7 @@ jobs:
     name: Comment release artifacts
     runs-on: ubuntu-latest
     needs: [release, release_ui, release_ui_gtk3, release_ui_darwin]
-    if: ${{ always() && github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository }}
+    if: (${{ always() && github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository }}) && github.repository == 'netbirdio/netbird'
     permissions:
       contents: read
       issues: write
@@ -948,7 +955,7 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const marker = '<!-- netbird-release-artifacts -->';
+            const marker = '<!-- netbirdy-release-artifacts -->';
             const { owner, repo } = context.repo;
             const issue_number = context.payload.pull_request.number;
             const runUrl = `${context.serverUrl}/${owner}/${repo}/actions/runs/${context.runId}`;
@@ -1023,7 +1030,7 @@ jobs:
   trigger_signer:
     runs-on: ubuntu-latest
     needs: [release, release_ui, release_ui_gtk3, release_ui_darwin, test_windows_installer]
-    if: startsWith(github.ref, 'refs/tags/')
+    if: (startsWith(github.ref, 'refs/tags/')) && github.repository == 'netbirdio/netbird'
     steps:
       - name: Trigger binaries sign pipelines
         uses: benc-uk/workflow-dispatch@31e2b3319479a63f0ab15bf800eff9e913504e26 # v1.3.2

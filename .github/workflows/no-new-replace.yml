@@ -35,7 +35,7 @@ jobs:
           set -euo pipefail
 
           # A replace directive only applies when this module is the main
-          # module. Anything importing netbird as a library, the embedded
+          # module. Anything importing netbirdy as a library, the embedded
           # clients among them, resolves the replaced path upstream instead and
           # fails to build against whatever the replacement provides. Requiring
           # a fork under its own module path avoids that; a replace does not.
@@ -65,7 +65,7 @@ jobs:
             echo "$added" | sed 's/^/  /'
             echo ""
             echo "A replace directive applies only to the main module, so it does not"
-            echo "reach anything that imports netbird as a library. Require the module"
+            echo "reach anything that imports netbirdy as a library. Require the module"
             echo "under a path you control instead, as done for github.com/netbirdio/go-nat."
             exit 1
           fi

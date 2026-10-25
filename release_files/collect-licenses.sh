@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# Collect the license terms shipped in /licenses of the UBI images: NetBird's
+# Collect the license terms shipped in /licenses of the UBI images: NetBirdy's
 # own licenses, the Go standard library terms, and the root license files of
 # every module the Go package links on the given architectures.
 #
@@ -43,8 +43,8 @@ if [ -e "$output" ] || [ -L "$output" ]; then
 	printf 'output directory already exists: %s\n' "$output" >&2
 	exit 1
 fi
-modules=$(mktemp "${TMPDIR:-/tmp}/netbird-licenses.modules.XXXXXX")
-sorted_modules=$(mktemp "${TMPDIR:-/tmp}/netbird-licenses.sorted.XXXXXX")
+modules=$(mktemp "${TMPDIR:-/tmp}/netbirdy-licenses.modules.XXXXXX")
+sorted_modules=$(mktemp "${TMPDIR:-/tmp}/netbirdy-licenses.sorted.XXXXXX")
 # Assemble beside the target and rename on success, so a failed run leaves
 # nothing behind that would block the next attempt.
 staging=$(mktemp -d "$output_parent/.$output_name.XXXXXX")

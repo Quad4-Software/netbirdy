@@ -1,21 +1,21 @@
 [Unit]
-Description=Netbird Client (%i)
+Description=NetBirdy Management
 Documentation=https://netbird.io/docs
-After=network-online.target syslog.target NetworkManager.service
+After=network-online.target syslog.target
 Wants=network-online.target
 
 [Service]
 Type=simple
-EnvironmentFile=-/etc/default/netbird
-ExecStart=/usr/bin/netbird service run --log-file /var/log/netbird/client-%i.log --daemon-addr unix:///var/run/netbird/%i.sock $FLAGS
+EnvironmentFile=-/etc/default/netbirdy-management
+ExecStart=/usr/bin/netbirdy-mgmt management $FLAGS
 Restart=on-failure
 RestartSec=5
 TimeoutStopSec=10
-CacheDirectory=netbird
-ConfigurationDirectory=netbird
-LogsDirectory=netbird
-RuntimeDirectory=netbird
-StateDirectory=netbird
+CacheDirectory=netbirdy
+ConfigurationDirectory=netbirdy
+LogsDirectory=netbirdy
+RuntimeDirectory=netbirdy
+StateDirectory=netbirdy
 
 # sandboxing
 LockPersonality=yes
@@ -28,9 +28,8 @@ ProtectControlGroups=yes
 ProtectHome=yes
 ProtectHostname=yes
 ProtectKernelLogs=yes
-# needed to load wg module for kernel-mode WireGuard
-ProtectKernelModules=no
-ProtectKernelTunables=no
+ProtectKernelModules=yes
+ProtectKernelTunables=yes
 ProtectSystem=yes
 RemoveIPC=yes
 RestrictNamespaces=yes

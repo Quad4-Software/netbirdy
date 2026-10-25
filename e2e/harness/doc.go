@@ -1,6 +1,6 @@
 //go:build e2e
 
-// Package harness provides a self-contained, OIDC-free way to stand up NetBird
+// Package harness provides a self-contained, OIDC-free way to stand up NetBirdy
 // components in containers for end-to-end tests. It is feature-agnostic: any
 // suite can ask for a live management server (with an admin PAT minted through
 // the unauthenticated /api/setup bootstrap) and, later, a proxy and client.

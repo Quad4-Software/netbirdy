@@ -1,21 +1,21 @@
 [Unit]
-Description=Netbird Signal
+Description=NetBirdy Signal
 Documentation=https://netbird.io/docs
 After=network-online.target syslog.target
 Wants=network-online.target
 
 [Service]
 Type=simple
-EnvironmentFile=-/etc/default/netbird-signal
-ExecStart=/usr/bin/netbird-signal run $FLAGS
+EnvironmentFile=-/etc/default/netbirdy-signal
+ExecStart=/usr/bin/netbirdy-signal run $FLAGS
 Restart=on-failure
 RestartSec=5
 TimeoutStopSec=10
-CacheDirectory=netbird
-ConfigurationDirectory=netbird
-LogsDirectory=netbird
-RuntimeDirectory=netbird
-StateDirectory=netbird
+CacheDirectory=netbirdy
+ConfigurationDirectory=netbirdy
+LogsDirectory=netbirdy
+RuntimeDirectory=netbirdy
+StateDirectory=netbirdy
 
 # sandboxing
 LockPersonality=yes

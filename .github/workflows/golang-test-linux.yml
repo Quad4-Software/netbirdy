@@ -233,14 +233,14 @@ jobs:
           mkdir -p "$RUNNER_TEMP/softhsm/tokens"
           printf 'directories.tokendir = %s\nobjectstore.backend = file\n' "$RUNNER_TEMP/softhsm/tokens" > "$RUNNER_TEMP/softhsm/softhsm2.conf"
           echo "SOFTHSM2_CONF=$RUNNER_TEMP/softhsm/softhsm2.conf" >> "$GITHUB_ENV"
-          SOFTHSM2_CONF="$RUNNER_TEMP/softhsm/softhsm2.conf" softhsm2-util --init-token --free --label netbird --pin 1234 --so-pin 1234
+          SOFTHSM2_CONF="$RUNNER_TEMP/softhsm/softhsm2.conf" softhsm2-util --init-token --free --label netbirdy --pin 1234 --so-pin 1234
 
       - name: Vet
         run: CGO_ENABLED=0 go vet -tags pkcs11 ./client/internal/pkcs11/... ./client/internal/certproof/...
 
       - name: Test
         env:
-          NB_TEST_PKCS11_URI: "pkcs11:token=netbird?module-path=/usr/lib/softhsm/libsofthsm2.so&pin-value=1234"
+          NB_TEST_PKCS11_URI: "pkcs11:token=netbirdy?module-path=/usr/lib/softhsm/libsofthsm2.so&pin-value=1234"
           NB_TEST_PKCS11_DISPOSABLE: "1"
         run: CGO_ENABLED=0 go test -tags pkcs11 -timeout 5m ./client/internal/pkcs11/... ./client/internal/certproof/...
 
@@ -311,7 +311,7 @@ jobs:
             -e GOCACHE=${CONTAINER_GOCACHE} \
             -e GOMODCACHE=${CONTAINER_GOMODCACHE} \
             -e CONTAINER=${CONTAINER} \
-            golang:1.26.10-alpine \
+            golang:1.27.2-alpine \
             sh -c ' \
               apk update; apk add --no-cache \
                 ca-certificates iptables ip6tables dbus dbus-dev libpcap-dev build-base; \

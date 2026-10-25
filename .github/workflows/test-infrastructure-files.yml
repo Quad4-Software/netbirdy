@@ -26,9 +26,9 @@ jobs:
       postgres:
         image: ${{ (matrix.store == 'postgres') && 'postgres' || '' }}
         env:
-          POSTGRES_USER: netbird
+          POSTGRES_USER: netbirdy
           POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: netbird
+          POSTGRES_DB: netbirdy
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -39,7 +39,7 @@ jobs:
       - name: Set Database Connection String
         run: |
           if [ "${{ matrix.store }}" == "postgres" ]; then
-            echo "NETBIRD_STORE_ENGINE_POSTGRES_DSN=host=$(hostname -I | awk '{print $1}') user=netbird password=postgres dbname=netbird port=5432" >> $GITHUB_ENV
+            echo "NETBIRD_STORE_ENGINE_POSTGRES_DSN=host=$(hostname -I | awk '{print $1}') user=netbirdy password=postgres dbname=netbirdy port=5432" >> $GITHUB_ENV
           else
             echo "NETBIRD_STORE_ENGINE_POSTGRES_DSN==" >> $GITHUB_ENV
           fi
@@ -173,7 +173,7 @@ jobs:
 
       - name: Build management binary
         working-directory: management
-        run: CGO_ENABLED=1 go build -o netbird-mgmt main.go
+        run: CGO_ENABLED=1 go build -o netbirdy-mgmt main.go
 
       - name: Build management docker image
         working-directory: management
@@ -182,7 +182,7 @@ jobs:
 
       - name: Build signal binary
         working-directory: signal
-        run: CGO_ENABLED=0 go build -o netbird-signal main.go
+        run: CGO_ENABLED=0 go build -o netbirdy-signal main.go
 
       - name: Build signal docker image
         working-directory: signal
@@ -191,7 +191,7 @@ jobs:
 
       - name: Build relay binary
         working-directory: relay
-        run: CGO_ENABLED=0 go build -o netbird-relay main.go
+        run: CGO_ENABLED=0 go build -o netbirdy-relay main.go
 
       - name: Build relay docker image
         working-directory: relay
@@ -259,7 +259,7 @@ jobs:
           grep -Fq "Dex support is not deprecated." stderr.txt
           grep -Fq "https://docs.netbird.io/selfhosted/selfhosted-quickstart" stderr.txt
           grep -Fq "https://docs.netbird.io/selfhosted/identity-providers/local" stderr.txt
-          grep -Fq "removed in NetBird v0.80" stderr.txt
+          grep -Fq "removed in NetBirdy v0.80" stderr.txt
 
       - name: Verify Zitadel retirement notice
         run: |
@@ -272,4 +272,4 @@ jobs:
           grep -Fq "https://docs.netbird.io/selfhosted/selfhosted-quickstart" stderr.txt
           grep -Fq "https://docs.netbird.io/selfhosted/identity-providers/zitadel" stderr.txt
           grep -Fq "https://docs.netbird.io/selfhosted/selfhosted-guide" stderr.txt
-          grep -Fq "removed in NetBird v0.80" stderr.txt
+          grep -Fq "removed in NetBirdy v0.80" stderr.txt

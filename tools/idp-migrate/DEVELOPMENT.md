@@ -2,7 +2,7 @@
 
 ## Overview
 
-This tool migrates NetBird deployments from an external IdP (Auth0, Zitadel, Okta, etc.) to the embedded Dex IdP introduced in v0.62.0. It does two things:
+This tool migrates NetBirdy deployments from an external IdP (Auth0, Zitadel, Okta, etc.) to the embedded Dex IdP introduced in v0.62.0. It does two things:
 
 1. **DB migration** — Re-encodes every user ID from `{original_id}` to Dex's protobuf-encoded format `base64(proto{original_id, connector_id})`.
 2. **Config generation** — Transforms `management.json`: removes `IdpManagerConfig`, `PKCEAuthorizationFlow`, and `DeviceAuthorizationFlow`; strips `HttpConfig` to only `CertFile`/`CertKey`; adds `EmbeddedIdP` with the static connector configuration.
@@ -32,13 +32,13 @@ management/server/activity/store/
 
 ## Release / Distribution
 
-The tool is included in `.goreleaser.yaml` as the `netbird-idp-migrate` build target. Each NetBird release produces pre-built archives for Linux (amd64, arm64, arm) that are uploaded to GitHub Releases. The archive naming convention is:
+The tool is included in `.goreleaser.yaml` as the `netbirdy-idp-migrate` build target. Each NetBirdy release produces pre-built archives for Linux (amd64, arm64, arm) that are uploaded to GitHub Releases. The archive naming convention is:
 
 ```
-netbird-idp-migrate_<version>_linux_<arch>.tar.gz
+netbirdy-idp-migrate_<version>_linux_<arch>.tar.gz
 ```
 
-The build requires `CGO_ENABLED=1` because it links the SQLite driver used by `SqlStore`. The cross-compilation setup (CC env for arm64/arm) mirrors the `netbird-mgmt` build.
+The build requires `CGO_ENABLED=1` because it links the SQLite driver used by `SqlStore`. The cross-compilation setup (CC env for arm64/arm) mirrors the `netbirdy-mgmt` build.
 
 ## CLI Flags
 
@@ -204,8 +204,8 @@ When migration tooling is no longer needed, delete:
 4. `management/server/activity/store/sql_store_idp_migration.go` — migration method on activity Store
 5. `management/server/activity/store/sql_store_idp_migration_test.go` — tests for the above
 6. In `.goreleaser.yaml`:
-   - Remove the `netbird-idp-migrate` build entry
-   - Remove the `netbird-idp-migrate` archive entry
+   - Remove the `netbirdy-idp-migrate` build entry
+   - Remove the `netbirdy-idp-migrate` archive entry
 7. Run `go mod tidy`
 
 No core interfaces or mocks need editing — that's the point of the decoupling.

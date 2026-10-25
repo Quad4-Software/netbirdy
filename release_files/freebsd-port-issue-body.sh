@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# FreeBSD Port Issue Body Generator for NetBird
+# FreeBSD Port Issue Body Generator for NetBirdy
 #
 # This script generates the issue body content for submitting a FreeBSD port update
 # to the FreeBSD Bugzilla at https://bugs.freebsd.org/bugzilla/
@@ -10,7 +10,7 @@
 #
 # If no versions are provided, the script will:
 #   - Fetch OLD version from the FreeBSD ports GitHub mirror (current version in ports tree)
-#   - Fetch NEW version from the latest stable NetBird release tag on GitHub
+#   - Fetch NEW version from the latest stable NetBirdy release tag on GitHub
 #
 # Prerelease versions (canary, rc, ...) are rejected: the port only tracks
 # stable releases.
@@ -76,7 +76,7 @@ generate_changelog_section() {
     return 0
 }
 
-OUTPUT_FILE="${OUTPUT_DIR}/netbird-${NEW_VERSION}-issue.txt"
+OUTPUT_FILE="${OUTPUT_DIR}/netbirdy-${NEW_VERSION}-issue.txt"
 
 # Built before the heredoc: a failing substitution inside it would not stop the script.
 CHANGELOG=$(generate_changelog_section)
@@ -87,11 +87,11 @@ BUGZILLA ISSUE DETAILS
 
 Severity: Affects Some People
 
-Summary: security/netbird: Update to ${NEW_VERSION}
+Summary: security/netbirdy: Update to ${NEW_VERSION}
 
 Description:
 ------------
-security/netbird: Update ${OLD_VERSION} => ${NEW_VERSION}
+security/netbirdy: Update ${OLD_VERSION} => ${NEW_VERSION}
 
 ${CHANGELOG}
 
@@ -112,7 +112,7 @@ echo "1. Go to https://bugs.freebsd.org/bugzilla/ and login"
 echo "2. Click 'Report an update or defect to a port'"
 echo "3. Fill in:"
 echo "   - Severity: Affects Some People"
-echo "   - Summary: security/netbird: Update to ${NEW_VERSION}"
+echo "   - Summary: security/netbirdy: Update to ${NEW_VERSION}"
 echo "   - Description: Copy content from ${OUTPUT_FILE}"
-echo "4. Attach diff file: netbird-${NEW_VERSION}.diff"
+echo "4. Attach diff file: netbirdy-${NEW_VERSION}.diff"
 echo "5. Submit the bug report"

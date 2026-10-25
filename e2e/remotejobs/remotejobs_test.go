@@ -28,7 +28,7 @@ const (
 //   - #7153: the peer's remote-jobs opt-in defaults off, is reported to
 //     management (visible via the peers API as remote_jobs_allowed), and gates
 //     job execution on the client — a streamed job is refused until the peer
-//     opts in with `netbird up --allow-remote-jobs`, after which it runs.
+//     opts in with `netbirdy up --allow-remote-jobs`, after which it runs.
 //   - #7147: the debug-bundle job's anonymize_level is validated (an unknown
 //     value is rejected at creation) and normalized (trimmed + lowercased) in
 //     the stored job the API returns.
@@ -51,7 +51,7 @@ func TestRemoteJobsOptInAndBundleParams(t *testing.T) {
 	require.NotEmpty(t, sk.Key, "setup key plaintext")
 	t.Cleanup(func() { _ = srv.API().SetupKeys.Delete(context.Background(), sk.Id) })
 
-	// Start the client with a plain `netbird up` (remote jobs NOT enabled).
+	// Start the client with a plain `netbirdy up` (remote jobs NOT enabled).
 	cl, err := harness.StartClient(ctx, srv, sk.Key)
 	require.NoError(t, err, "start client")
 	t.Cleanup(func() { _ = cl.Terminate(context.Background()) })
@@ -64,7 +64,7 @@ func TestRemoteJobsOptInAndBundleParams(t *testing.T) {
 		require.NoError(t, err)
 		allowed := remoteJobsAllowed(p)
 		require.NotNil(t, allowed, "remote_jobs_allowed must be present on the peer API")
-		assert.False(t, *allowed, "a peer that ran plain `netbird up` must default to opt-out")
+		assert.False(t, *allowed, "a peer that ran plain `netbirdy up` must default to opt-out")
 	})
 
 	t.Run("anonymize_level is validated and normalized (#7147)", func(t *testing.T) {

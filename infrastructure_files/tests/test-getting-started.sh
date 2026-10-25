@@ -17,7 +17,7 @@ assert_image() {
   (
     cd "$case_dir"
     TRAEFIK_IMAGE="$image"
-    NETBIRD_DOMAIN=netbird.test
+    NETBIRD_DOMAIN=netbirdy.test
     NETBIRD_AGENT_NETWORK=false
     initialize_default_values
     generate_configuration_files

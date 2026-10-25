@@ -3,7 +3,7 @@ name: Test Homebrew cask
 on:
   pull_request:
     paths:
-      - "client/ui/netbird-ui.rb.tmpl"
+      - "client/ui/netbirdy-ui.rb.tmpl"
       - ".github/scripts/test-homebrew-cask.sh"
       - ".github/workflows/test-homebrew-cask.yml"
   workflow_dispatch:
@@ -17,6 +17,7 @@ concurrency:
 
 jobs:
   install-uninstall:
+    if: github.repository == 'netbirdio/netbird'
     runs-on: macos-latest
     timeout-minutes: 20
     steps:

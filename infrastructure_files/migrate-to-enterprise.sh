@@ -3,7 +3,7 @@
 set -e
 set -o pipefail
 
-# NetBird — community combined → Enterprise combined migration
+# NetBirdy — community combined → Enterprise combined migration
 #
 # Non-destructive migration: produces docker-compose.override.yml (auto-loaded
 # by docker compose) and config.yaml.enterprise alongside the operator's
@@ -158,15 +158,15 @@ read_yes_no() {
   esac
 }
 
-# Gate the migration on explicit acceptance of the NetBird On-Premise EULA.
+# Gate the migration on explicit acceptance of the NetBirdy On-Premise EULA.
 require_eula_acceptance() {
   cat > /dev/stderr <<EOF
 
   ──────────────────────────────────────────────────────────────────────
-   NetBird On-Premise End User License Agreement
+   NetBirdy On-Premise End User License Agreement
   ──────────────────────────────────────────────────────────────────────
-  NetBird's on-premise software is commercial software, licensed and not
-  sold. Your installation, deployment and use are governed by the NetBird
+  NetBirdy's on-premise software is commercial software, licensed and not
+  sold. Your installation, deployment and use are governed by the NetBirdy
   On-Premise End User License Agreement (the "EULA"). Please read the EULA
   in full before continuing:
 
@@ -375,17 +375,17 @@ EOF
 
   ${POSTGRES_SERVICE}:
     image: postgres:17
-    container_name: netbird-postgres
+    container_name: netbirdy-postgres
     restart: unless-stopped
     networks: [${COMPOSE_NETWORK}]
     environment:
-      POSTGRES_USER: netbird
+      POSTGRES_USER: netbirdy
       POSTGRES_PASSWORD: \${POSTGRES_PASSWORD}
-      POSTGRES_DB: netbird
+      POSTGRES_DB: netbirdy
     volumes:
       - netbird_postgres:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U netbird -d netbird"]
+      test: ["CMD-SHELL", "pg_isready -U netbirdy -d netbirdy"]
       interval: 5s
       timeout: 5s
       retries: 20
@@ -405,7 +405,7 @@ EOF
 
   nats:
     image: nats:2
-    container_name: netbird-nats
+    container_name: netbirdy-nats
     restart: unless-stopped
     networks: [${COMPOSE_NETWORK}]
     command: ["-m", "8222", "--jetstream", "--store_dir", "/data"]
@@ -414,7 +414,7 @@ EOF
 
   flow-enricher:
     image: ghcr.io/netbirdio/flow-enricher-cloud:latest
-    container_name: netbird-flow-enricher
+    container_name: netbirdy-flow-enricher
     restart: unless-stopped
     networks: [${COMPOSE_NETWORK}]
     depends_on:${enricher_depends}
@@ -438,7 +438,7 @@ EOF
 
   flow-receiver:
     image: ghcr.io/netbirdio/flow-receiver-cloud:latest
-    container_name: netbird-flow-receiver
+    container_name: netbirdy-flow-receiver
     restart: unless-stopped
     networks: [${COMPOSE_NETWORK}]
     depends_on:
@@ -454,14 +454,14 @@ EOF
       NB_FLOW_AUTH_SECRET: \${NB_FLOW_AUTH_SECRET}
     labels:
       - traefik.enable=true
-      - traefik.http.routers.netbird-flow.rule=Host(\`${NETBIRD_HOSTNAME}\`) && PathPrefix(\`/flow.FlowService/\`)
-      - traefik.http.routers.netbird-flow.entrypoints=websecure
-      - traefik.http.routers.netbird-flow.tls=true
-      - traefik.http.routers.netbird-flow.tls.certresolver=letsencrypt
-      - traefik.http.routers.netbird-flow.service=netbird-flow-h2c
-      - traefik.http.routers.netbird-flow.priority=100
-      - traefik.http.services.netbird-flow-h2c.loadbalancer.server.port=80
-      - traefik.http.services.netbird-flow-h2c.loadbalancer.server.scheme=h2c
+      - traefik.http.routers.netbirdy-flow.rule=Host(\`${NETBIRD_HOSTNAME}\`) && PathPrefix(\`/flow.FlowService/\`)
+      - traefik.http.routers.netbirdy-flow.entrypoints=websecure
+      - traefik.http.routers.netbirdy-flow.tls=true
+      - traefik.http.routers.netbirdy-flow.tls.certresolver=letsencrypt
+      - traefik.http.routers.netbirdy-flow.service=netbirdy-flow-h2c
+      - traefik.http.routers.netbirdy-flow.priority=100
+      - traefik.http.services.netbirdy-flow-h2c.loadbalancer.server.port=80
+      - traefik.http.services.netbirdy-flow-h2c.loadbalancer.server.scheme=h2c
 EOF
   fi
 
@@ -574,7 +574,7 @@ check_data_directory() {
   if [[ -z "$src" ]]; then
     echo "" > /dev/stderr
     echo "The '$COMBINED_SERVICE' container has nothing mounted at /var/lib/netbird." > /dev/stderr
-    echo "Cannot locate the NetBird store to back it up." > /dev/stderr
+    echo "Cannot locate the NetBirdy store to back it up." > /dev/stderr
     exit 1
   fi
 
@@ -582,10 +582,10 @@ check_data_directory() {
   data_dir_state "$src" || state=$?
   if [[ $state -eq 0 ]]; then
     echo "" > /dev/stderr
-    echo "The NetBird data directory is empty:" > /dev/stderr
+    echo "The NetBirdy data directory is empty:" > /dev/stderr
     echo "  $src" > /dev/stderr
     echo "There is nothing to migrate. Check that you are running this from the" > /dev/stderr
-    echo "deployment directory of the NetBird install you mean to migrate." > /dev/stderr
+    echo "deployment directory of the NetBirdy install you mean to migrate." > /dev/stderr
     exit 1
   fi
   if [[ $state -eq 2 ]]; then
@@ -635,7 +635,7 @@ backup_sqlite() {
     exit 1
   fi
 
-  echo "Backing up the NetBird store to $BACKUP_DIR ..."
+  echo "Backing up the NetBirdy store to $BACKUP_DIR ..."
   docker cp "${container}:/var/lib/netbird/." "$BACKUP_DIR/"
 
   local copied
@@ -750,7 +750,7 @@ rollback() {
     rm -f .env || true
   fi
 
-  # Only ever the volume this run created — never the NetBird data volume.
+  # Only ever the volume this run created — never the NetBirdy data volume.
   if [[ -n "$pg_volume" ]] && [[ "$pg_volume" != "null" ]]; then
     echo "Removing Postgres volume $pg_volume ..."
     docker volume rm "$pg_volume" &> /dev/null || true
@@ -764,7 +764,7 @@ rollback() {
   fi
 
   echo ""
-  echo "Rolled back. Your docker-compose.yml, config.yaml and the NetBird data"
+  echo "Rolled back. Your docker-compose.yml, config.yaml and the NetBirdy data"
   echo "volume were never modified."
   if [[ -n "$BACKUP_DIR" ]] && [[ -d "$BACKUP_DIR" ]]; then
     echo "The SQLite backup taken during this run is kept at:"
@@ -852,7 +852,7 @@ configure_sqlite_store() {
   POSTGRES_PASSWORD=$(rand_password)
   POSTGRES_SERVICE="postgres"
   POSTGRES_DEPENDS_CONDITION="service_healthy"
-  POSTGRES_DSN="host=postgres user=netbird password=${POSTGRES_PASSWORD} dbname=netbird port=5432 sslmode=disable"
+  POSTGRES_DSN="host=postgres user=netbirdy password=${POSTGRES_PASSWORD} dbname=netbirdy port=5432 sslmode=disable"
 }
 
 # An engine this script has never seen. Swapping the images is still
@@ -969,7 +969,7 @@ init_migration() {
 
       NETBIRD_DOMAIN=$(detect_exposed_address)
       if [[ -z "$NETBIRD_DOMAIN" ]] || [[ "$NETBIRD_DOMAIN" == "null" ]]; then
-        NETBIRD_DOMAIN=$(read_required "  Public NetBird URL (e.g. https://netbird.example.com)")
+        NETBIRD_DOMAIN=$(read_required "  Public NetBirdy URL (e.g. https://netbirdy.example.com)")
       fi
       # Strip protocol + port to leave just the hostname for the Traefik Host() rule.
       NETBIRD_HOSTNAME=$(echo "$NETBIRD_DOMAIN" | sed -E 's,^https?://,,' | sed 's,:.*,,' | sed 's,/.*,,')
@@ -1094,7 +1094,7 @@ apply_changes() {
   {
     echo ""
     echo "# Added by migrate-to-enterprise.sh on $(date -u +%Y-%m-%dT%H:%M:%SZ)"
-    echo "# NetBird On-Premise EULA accepted at install time"
+    echo "# NetBirdy On-Premise EULA accepted at install time"
     echo "NETBIRD_EULA_ACCEPTED=yes"
     echo "NETBIRD_EULA_ACCEPTED_AT=${NETBIRD_EULA_ACCEPTED_AT}"
     echo "NETBIRD_EULA_URL=${NETBIRD_EULA_URL}"
@@ -1137,7 +1137,7 @@ apply_changes() {
     # Wait for healthy
     local counter=0
     echo -n "Waiting for Postgres to become ready"
-    while ! $DOCKER_COMPOSE_COMMAND exec -T postgres pg_isready -U netbird -d netbird &> /dev/null; do
+    while ! $DOCKER_COMPOSE_COMMAND exec -T postgres pg_isready -U netbirdy -d netbirdy &> /dev/null; do
       echo -n " ."
       sleep 2
       counter=$((counter + 1))

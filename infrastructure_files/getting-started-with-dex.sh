@@ -7,13 +7,13 @@ Dex support is not deprecated. For new deployments, use getting-started.sh:
 
 https://docs.netbird.io/selfhosted/selfhosted-quickstart
 
-The current installer includes NetBird's embedded Dex-based identity provider.
+The current installer includes NetBirdy's embedded Dex-based identity provider.
 Local users and external identity providers can be managed through the
-NetBird Dashboard:
+NetBirdy Dashboard:
 
 https://docs.netbird.io/selfhosted/identity-providers/local
 
-This compatibility notice will be removed in NetBird v0.80.
+This compatibility notice will be removed in NetBirdy v0.80.
 EOF
 
 exit 1

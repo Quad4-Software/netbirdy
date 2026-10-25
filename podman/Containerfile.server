@@ -1,0 +1,28 @@
+# Multi-stage build of the NetBirdy combined server (netbirdy-server).
+# Build context is the repository root:
+#   podman build -f podman/Containerfile.server -t localhost/netbirdy-server .
+FROM docker.io/library/golang:1.27.2-bookworm AS builder
+WORKDIR /app
+
+RUN apt-get update && apt-get install -y gcc libc6-dev git && rm -rf /var/lib/apt/lists/*
+
+COPY go.mod go.sum ./
+RUN --mount=type=cache,target=/go/pkg/mod go mod download
+
+COPY . .
+
+RUN --mount=type=cache,target=/go/pkg/mod \
+    --mount=type=cache,target=/root/.cache/go-build \
+    CGO_ENABLED=1 GOOS=linux go build \
+    -ldflags="-s -w \
+    -X github.com/netbirdio/netbird/version.version=$(git describe --tags --always --dirty 2>/dev/null || echo 'dev') \
+    -X main.commit=$(git rev-parse --short HEAD 2>/dev/null || echo 'unknown') \
+    -X main.date=$(date -u +%Y-%m-%dT%H:%M:%SZ) \
+    -X main.builtBy=podman" \
+    -o netbirdy-server ./combined
+
+FROM docker.io/library/ubuntu:24.04
+RUN apt-get update && apt-get install -y ca-certificates curl && rm -rf /var/lib/apt/lists/*
+ENTRYPOINT [ "/go/bin/netbirdy-server" ]
+CMD ["--config", "/etc/netbird/config.yaml"]
+COPY --from=builder /app/netbirdy-server /go/bin/netbirdy-server

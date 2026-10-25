@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# FreeBSD Port Diff Generator for NetBird
+# FreeBSD Port Diff Generator for NetBirdy
 #
 # This script generates the diff file required for submitting a FreeBSD port update.
 # It works on macOS, Linux, and FreeBSD by fetching files from the FreeBSD ports
@@ -68,10 +68,10 @@ compute_checksums() {
     fi
 
     echo "TIMESTAMP = $(date +%s)"
-    echo "SHA256 (go/security_netbird/netbird-v${version}/v${version}.mod) = ${mod_sha256}"
-    echo "SIZE (go/security_netbird/netbird-v${version}/v${version}.mod) = ${mod_size}"
-    echo "SHA256 (go/security_netbird/netbird-v${version}/v${version}.zip) = ${zip_sha256}"
-    echo "SIZE (go/security_netbird/netbird-v${version}/v${version}.zip) = ${zip_size}"
+    echo "SHA256 (go/security_netbird/netbirdy-v${version}/v${version}.mod) = ${mod_sha256}"
+    echo "SIZE (go/security_netbird/netbirdy-v${version}/v${version}.mod) = ${mod_size}"
+    echo "SHA256 (go/security_netbird/netbirdy-v${version}/v${version}.zip) = ${zip_sha256}"
+    echo "SIZE (go/security_netbird/netbirdy-v${version}/v${version}.zip) = ${zip_size}"
     return 0
 }
 
@@ -138,21 +138,21 @@ TMPDIR=$(mktemp -d)
 # shellcheck disable=SC2064
 trap "rm -rf '$TMPDIR'" EXIT
 
-mkdir -p "${TMPDIR}/a/security/netbird" "${TMPDIR}/b/security/netbird"
+mkdir -p "${TMPDIR}/a/security/netbirdy" "${TMPDIR}/b/security/netbirdy"
 
-echo "$OLD_MAKEFILE" > "${TMPDIR}/a/security/netbird/Makefile"
-echo "$OLD_DISTINFO" > "${TMPDIR}/a/security/netbird/distinfo"
-echo "$NEW_MAKEFILE" > "${TMPDIR}/b/security/netbird/Makefile"
-echo "$NEW_DISTINFO" > "${TMPDIR}/b/security/netbird/distinfo"
+echo "$OLD_MAKEFILE" > "${TMPDIR}/a/security/netbirdy/Makefile"
+echo "$OLD_DISTINFO" > "${TMPDIR}/a/security/netbirdy/distinfo"
+echo "$NEW_MAKEFILE" > "${TMPDIR}/b/security/netbirdy/Makefile"
+echo "$NEW_DISTINFO" > "${TMPDIR}/b/security/netbirdy/distinfo"
 
 # Generate diff
-OUTPUT_FILE="${OUTPUT_DIR}/netbird-${NEW_VERSION}.diff"
+OUTPUT_FILE="${OUTPUT_DIR}/netbirdy-${NEW_VERSION}.diff"
 
 echo "" >&2
 echo "Generating diff..." >&2
 
 # Generate diff and clean up temp paths to show standard a/b paths
-(cd "${TMPDIR}" && diff -ruN "a/security/netbird" "b/security/netbird") > "$OUTPUT_FILE" || true
+(cd "${TMPDIR}" && diff -ruN "a/security/netbirdy" "b/security/netbirdy") > "$OUTPUT_FILE" || true
 
 if [[ ! -s "$OUTPUT_FILE" ]]; then
     echo "Error: Generated diff is empty" >&2
@@ -174,8 +174,8 @@ echo "2. Submit to https://bugs.freebsd.org/bugzilla/"
 echo "3. Use ./freebsd-port-issue-body.sh to generate the issue content"
 echo ""
 echo "For FreeBSD testing (optional but recommended):"
-echo "  cd /usr/ports/security/netbird"
+echo "  cd /usr/ports/security/netbirdy"
 echo "  patch < ${OUTPUT_FILE}"
 echo "  make stage && make stage-qa && make package && make install"
-echo "  netbird status"
+echo "  netbirdy status"
 echo "  make deinstall"

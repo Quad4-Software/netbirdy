@@ -1,15 +1,15 @@
 #!/bin/bash
 #
-# NetBird Migration Script: Pre-v0.65.0 → Combined Container Setup
+# NetBirdy Migration Script: Pre-v0.65.0 → Combined Container Setup
 #
 # Migrates from the old 5-container deployment (dashboard, signal, relay, management, coturn)
-# to the new 2-container setup (Traefik + combined netbird-server).
+# to the new 2-container setup (Traefik + combined netbirdy-server).
 #
 # Supported: Embedded IdP (Dex) setups with embedded Caddy or custom reverse proxy.
 # Not supported: External IdP (Auth0, Keycloak, etc.) — use getting-started.sh for fresh setup.
 #
 # Usage:
-#   ./migrate.sh [--install-dir /path/to/netbird] [--non-interactive]
+#   ./migrate.sh [--install-dir /path/to/netbirdy] [--non-interactive]
 
 set -euo pipefail
 
@@ -18,8 +18,8 @@ set -euo pipefail
 ############################################
 
 readonly SCRIPT_VERSION="1.0.0"
-readonly DASHBOARD_IMAGE="netbirdio/dashboard:latest"
-readonly NETBIRD_SERVER_IMAGE="netbirdio/netbird-server:latest"
+readonly DASHBOARD_IMAGE="ghcr.io/sudo-ivan/netbirdy-dashboard:latest"
+readonly NETBIRD_SERVER_IMAGE="ghcr.io/sudo-ivan/netbirdy-server:latest"
 readonly SED_STRIP_PADDING='s/=//g'
 readonly MSG_SEPARATOR="=========================================="
 readonly PROXY_TYPE_CADDY="caddy_embedded"
@@ -95,7 +95,7 @@ log_success() {
 print_banner() {
   echo ""
   echo "$MSG_SEPARATOR"
-  echo "  NetBird Migration Tool v${SCRIPT_VERSION}"
+  echo "  NetBirdy Migration Tool v${SCRIPT_VERSION}"
   echo "  Pre-v0.65.0 → Combined Container Setup"
   echo "$MSG_SEPARATOR"
   echo ""
@@ -186,7 +186,7 @@ detect_install_dir() {
   fi
 
   echo ""
-  echo -n "Enter the path to your NetBird installation directory: "
+  echo -n "Enter the path to your NetBirdy installation directory: "
   read -r INSTALL_DIR < /dev/tty
   if [[ ! -d "$INSTALL_DIR" ]]; then
     log_error "Directory does not exist: $INSTALL_DIR"
@@ -205,7 +205,7 @@ validate_old_setup() {
     MANAGEMENT_JSON_PATH="$INSTALL_DIR/artifacts/management.json"
   else
     log_error "Cannot find management.json in $INSTALL_DIR or $INSTALL_DIR/artifacts/"
-    echo "This doesn't appear to be a valid NetBird installation."
+    echo "This doesn't appear to be a valid NetBirdy installation."
     exit 1
   fi
 
@@ -320,7 +320,7 @@ detect_idp_type() {
     echo "External IdP providers (Auth0, Keycloak, Zitadel, etc.) require"
     echo "a fresh installation using getting-started.sh."
     echo ""
-    echo "Please refer to the NetBird documentation for upgrade instructions:"
+    echo "Please refer to the NetBirdy documentation for upgrade instructions:"
     echo "  https://docs.netbird.io/selfhosted/getting-started"
     exit 1
   fi
@@ -356,7 +356,7 @@ detect_volumes() {
   # Check for well-known volume name patterns (exact match)
   local volume_patterns=(
     "wiretrustee-mgmt"
-    "netbird-mgmt"
+    "netbirdy-mgmt"
   )
   for pattern in "${volume_patterns[@]}"; do
     if echo "$volumes_list" | grep -q "^${pattern}$"; then
@@ -368,7 +368,7 @@ detect_volumes() {
 
   # Check compose-prefixed patterns (e.g., netbird_netbird-mgmt, infrastructure_files_netbird-mgmt)
   local compose_prefixed
-  compose_prefixed=$(echo "$volumes_list" | grep -E '(netbird|wiretrustee).*mgmt' | head -n1 || echo "")
+  compose_prefixed=$(echo "$volumes_list" | grep -E '(netbirdy|wiretrustee).*mgmt' | head -n1 || echo "")
   if [[ -n "$compose_prefixed" ]]; then
     MGMT_VOLUME="$compose_prefixed"
     log_success "Found management volume (compose-prefixed): $MGMT_VOLUME"
@@ -383,7 +383,7 @@ detect_volumes() {
     compose_file="$INSTALL_DIR/artifacts/docker-compose.yml"
   fi
   if [[ -n "$compose_file" ]]; then
-    # Look for volume mount on /var/lib/netbird in management or netbird-server service
+    # Look for volume mount on /var/lib/netbird in management or netbirdy-server service
     local vol_name
     vol_name=$(grep -E '^\s+-\s+\S+:/var/lib/netbird' "$compose_file" 2>/dev/null | head -1 | sed 's/.*- //' | sed 's/:.*//' | tr -d ' ' || echo "")
     if [[ -n "$vol_name" && "$vol_name" != "." && "$vol_name" != "/" ]]; then
@@ -606,14 +606,14 @@ create_backup() {
 
   # Record state
   {
-    echo "# NetBird migration backup state"
+    echo "# NetBirdy migration backup state"
     echo "# Created: $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
     echo ""
     echo "## Docker volumes"
-    docker volume ls --format '{{.Name}}' 2>/dev/null | grep -E '(netbird|wiretrustee)' || echo "(none found)"
+    docker volume ls --format '{{.Name}}' 2>/dev/null | grep -E '(netbirdy|wiretrustee)' || echo "(none found)"
     echo ""
     echo "## Running containers"
-    docker ps --format '{{.Names}}\t{{.Image}}\t{{.Status}}' 2>/dev/null | grep -E '(netbird|wiretrustee|dashboard|signal|relay|management|coturn)' || echo "(none running)"
+    docker ps --format '{{.Names}}\t{{.Image}}\t{{.Status}}' 2>/dev/null | grep -E '(netbirdy|wiretrustee|dashboard|signal|relay|management|coturn)' || echo "(none running)"
   } > "$BACKUP_DIR/state.txt"
 
   # Generate rollback script
@@ -628,7 +628,7 @@ generate_rollback_script() {
 #!/bin/bash
 set -euo pipefail
 
-# NetBird Migration Rollback Script
+# NetBirdy Migration Rollback Script
 # Restores the pre-migration configuration and restarts old containers.
 
 ROLLBACK_HEADER
@@ -637,7 +637,7 @@ ROLLBACK_HEADER
 INSTALL_DIR="$INSTALL_DIR"
 BACKUP_DIR="$BACKUP_DIR"
 
-echo "Restoring NetBird configuration from backup..."
+echo "Restoring NetBirdy configuration from backup..."
 
 # Stop new containers if running
 cd "\$INSTALL_DIR"
@@ -740,7 +740,7 @@ generate_config_yaml() {
 
   {
     cat <<EOF
-# Combined NetBird Server Configuration (Simplified)
+# Combined NetBirdy Server Configuration (Simplified)
 # Generated by migrate.sh on $(date -u '+%Y-%m-%d %H:%M:%S UTC')
 
 server:
@@ -827,10 +827,10 @@ services:
   # Traefik reverse proxy (automatic TLS via Let's Encrypt)
   traefik:
     image: traefik:v3.7.14
-    container_name: netbird-traefik
+    container_name: netbirdy-traefik
     restart: unless-stopped
     networks:
-      netbird:
+      netbirdy:
         ipv4_address: 172.30.0.10
     command:
       # Logging
@@ -877,7 +877,7 @@ services:
     image: ${DASHBOARD_IMAGE}
     container_name: netbird-dashboard
     restart: unless-stopped
-    networks: [netbird]
+    networks: [netbirdy]
     env_file:
       - ./dashboard.env
     labels:
@@ -896,11 +896,11 @@ services:
         max-file: "2"
 
   # Combined server (Management + Signal + Relay + STUN)
-  netbird-server:
+  netbirdy-server:
     image: ${NETBIRD_SERVER_IMAGE}
-    container_name: netbird-server
+    container_name: netbirdy-server
     restart: unless-stopped
-    networks: [netbird]
+    networks: [netbirdy]
     ports:
       - '3478:3478/udp'
     volumes:
@@ -910,23 +910,23 @@ services:
     labels:
       - traefik.enable=true
       # gRPC router (needs h2c backend for HTTP/2 cleartext)
-      - traefik.http.routers.netbird-grpc.rule=Host(\`${DOMAIN}\`) && (PathPrefix(\`/signalexchange.SignalExchange/\`) || PathPrefix(\`/management.ManagementService/\`))
-      - traefik.http.routers.netbird-grpc.entrypoints=websecure
-      - traefik.http.routers.netbird-grpc.tls=true
-      - traefik.http.routers.netbird-grpc.tls.certresolver=letsencrypt
-      - traefik.http.routers.netbird-grpc.service=netbird-server-h2c
-      - traefik.http.routers.netbird-grpc.priority=100
+      - traefik.http.routers.netbirdy-grpc.rule=Host(\`${DOMAIN}\`) && (PathPrefix(\`/signalexchange.SignalExchange/\`) || PathPrefix(\`/management.ManagementService/\`))
+      - traefik.http.routers.netbirdy-grpc.entrypoints=websecure
+      - traefik.http.routers.netbirdy-grpc.tls=true
+      - traefik.http.routers.netbirdy-grpc.tls.certresolver=letsencrypt
+      - traefik.http.routers.netbirdy-grpc.service=netbirdy-server-h2c
+      - traefik.http.routers.netbirdy-grpc.priority=100
       # Backend router (relay, WebSocket, API, OAuth2)
-      - traefik.http.routers.netbird-backend.rule=Host(\`${DOMAIN}\`) && (PathPrefix(\`/relay\`) || PathPrefix(\`/ws-proxy/\`) || PathPrefix(\`/api\`) || PathPrefix(\`/oauth2\`))
-      - traefik.http.routers.netbird-backend.entrypoints=websecure
-      - traefik.http.routers.netbird-backend.tls=true
-      - traefik.http.routers.netbird-backend.tls.certresolver=letsencrypt
-      - traefik.http.routers.netbird-backend.service=netbird-server
-      - traefik.http.routers.netbird-backend.priority=100
+      - traefik.http.routers.netbirdy-backend.rule=Host(\`${DOMAIN}\`) && (PathPrefix(\`/relay\`) || PathPrefix(\`/ws-proxy/\`) || PathPrefix(\`/api\`) || PathPrefix(\`/oauth2\`))
+      - traefik.http.routers.netbirdy-backend.entrypoints=websecure
+      - traefik.http.routers.netbirdy-backend.tls=true
+      - traefik.http.routers.netbirdy-backend.tls.certresolver=letsencrypt
+      - traefik.http.routers.netbirdy-backend.service=netbirdy-server
+      - traefik.http.routers.netbirdy-backend.priority=100
       # Services
-      - traefik.http.services.netbird-server.loadbalancer.server.port=80
-      - traefik.http.services.netbird-server-h2c.loadbalancer.server.port=80
-      - traefik.http.services.netbird-server-h2c.loadbalancer.server.scheme=h2c
+      - traefik.http.services.netbirdy-server.loadbalancer.server.port=80
+      - traefik.http.services.netbirdy-server-h2c.loadbalancer.server.port=80
+      - traefik.http.services.netbirdy-server-h2c.loadbalancer.server.scheme=h2c
     logging:
       driver: "json-file"
       options:
@@ -938,7 +938,7 @@ ${volume_config}
   netbird_traefik_letsencrypt:
 
 networks:
-  netbird:
+  netbirdy:
     driver: bridge
     ipam:
       config:
@@ -970,7 +970,7 @@ services:
     image: ${DASHBOARD_IMAGE}
     container_name: netbird-dashboard
     restart: unless-stopped
-    networks: [netbird]
+    networks: [netbirdy]
     ports:
       - '127.0.0.1:8080:80'
     env_file:
@@ -982,11 +982,11 @@ services:
         max-file: "2"
 
   # Combined server (Management + Signal + Relay + STUN)
-  netbird-server:
+  netbirdy-server:
     image: ${NETBIRD_SERVER_IMAGE}
-    container_name: netbird-server
+    container_name: netbirdy-server
     restart: unless-stopped
-    networks: [netbird]
+    networks: [netbirdy]
     ports:
       - '127.0.0.1:8081:80'
       - '3478:3478/udp'
@@ -1004,7 +1004,7 @@ volumes:
 ${volume_config}
 
 networks:
-  netbird:
+  netbirdy:
 EOF
 
   log_success "Generated docker-compose.yml"
@@ -1080,7 +1080,7 @@ wait_for_health() {
     if [[ $attempt -eq 30 ]]; then
       echo ""
       log_warn "Taking longer than expected. Checking container logs..."
-      (cd "$INSTALL_DIR" && $DOCKER_COMPOSE_CMD logs --tail=10 netbird-server 2>/dev/null) || true
+      (cd "$INSTALL_DIR" && $DOCKER_COMPOSE_CMD logs --tail=10 netbirdy-server 2>/dev/null) || true
       echo -n "  Still checking"
     fi
   done
@@ -1179,11 +1179,11 @@ print_summary() {
   echo "  IMPORTANT:"
   echo "    - Existing peers, routes, and policies are preserved in the database."
   echo "    - The embedded IdP data is preserved in the management volume."
-  echo "    - Clients should reconnect automatically; if not: netbird down && netbird up"
+  echo "    - Clients should reconnect automatically; if not: netbirdy down && netbirdy up"
   echo ""
   echo "  Next steps:"
   echo "    - Access the dashboard: https://$DOMAIN"
-  echo "    - Re-authenticate all clients: netbird down && netbird up"
+  echo "    - Re-authenticate all clients: netbirdy down && netbirdy up"
   echo "    - Check logs: cd $INSTALL_DIR && $DOCKER_COMPOSE_CMD logs -f"
   echo ""
   return 0
@@ -1208,12 +1208,12 @@ main() {
         shift
         ;;
       --help|-h)
-        echo "Usage: $0 [--install-dir /path/to/netbird] [--non-interactive]"
+        echo "Usage: $0 [--install-dir /path/to/netbirdy] [--non-interactive]"
         echo ""
-        echo "Migrates a pre-v0.65.0 NetBird deployment to the combined container setup."
+        echo "Migrates a pre-v0.65.0 NetBirdy deployment to the combined container setup."
         echo ""
         echo "Options:"
-        echo "  --install-dir DIR    Path to existing NetBird installation"
+        echo "  --install-dir DIR    Path to existing NetBirdy installation"
         echo "  --non-interactive    Skip confirmation prompts (for automation)"
         echo "  -h, --help           Show this help message"
         exit 0

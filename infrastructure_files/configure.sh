@@ -100,7 +100,7 @@ mkdir -p $artifacts_path
 MGMT_VOLUMENAME="${VOLUME_PREFIX}${MGMT_VOLUMESUFFIX}"
 SIGNAL_VOLUMENAME="${VOLUME_PREFIX}${SIGNAL_VOLUMESUFFIX}"
 LETSENCRYPT_VOLUMENAME="${VOLUME_PREFIX}${LETSENCRYPT_VOLUMESUFFIX}"
-# if volume with wiretrustee- prefix already exists, use it, else create new with netbird-
+# if volume with wiretrustee- prefix already exists, use it, else create new with netbirdy-
 OLD_PREFIX='wiretrustee-'
 if docker volume ls | grep -q "${OLD_PREFIX}${MGMT_VOLUMESUFFIX}"; then
   MGMT_VOLUMENAME="${OLD_PREFIX}${MGMT_VOLUMESUFFIX}"
@@ -161,7 +161,7 @@ if [[ "$NETBIRD_DISABLE_LETSENCRYPT" == "true" ]]; then
   export NETBIRD_RELAY_ENDPOINT="rels://$NETBIRD_DOMAIN:$NETBIRD_RELAY_PORT/relay"
 
   echo "Letsencrypt was disabled, the Https-endpoints cannot be used anymore"
-  echo " and a reverse-proxy with Https needs to be placed in front of netbird!"
+  echo " and a reverse-proxy with Https needs to be placed in front of netbirdy!"
   echo "The following forwards have to be setup:"
   echo "- $NETBIRD_DASHBOARD_ENDPOINT -http-> dashboard:80"
   echo "- $NETBIRD_MGMT_API_ENDPOINT/api -http-> management:$NETBIRD_MGMT_API_PORT"
@@ -230,7 +230,7 @@ if test -f 'management.json'; then
     fi
 fi
 
-env | grep NETBIRD
+env | grep NETBIRDY
 
 bkp_postfix="$(date +%s)"
 if test -f "${artifacts_path}/docker-compose.yml"; then

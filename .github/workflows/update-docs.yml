@@ -10,7 +10,7 @@ on:
 jobs:
   trigger_docs_api_update:
     runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/tags/')
+    if: (startsWith(github.ref, 'refs/tags/')) && github.repository == 'netbirdio/netbird'
     steps:
       - name: Trigger API pages generation
         uses: benc-uk/workflow-dispatch@31e2b3319479a63f0ab15bf800eff9e913504e26 # v1.3.2

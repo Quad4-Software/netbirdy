@@ -46,7 +46,7 @@ func configFromArgs(args []string) (*migrationConfig, error) {
 	var cfg migrationConfig
 	var domain string
 
-	fs := flag.NewFlagSet("netbird-idp-migrate", flag.ContinueOnError)
+	fs := flag.NewFlagSet("netbirdy-idp-migrate", flag.ContinueOnError)
 	fs.StringVar(&domain, "domain", "", "domain for both dashboard and API")
 	fs.StringVar(&cfg.dashboardURL, "dashboard-url", "", "dashboard URL")
 	fs.StringVar(&cfg.apiURL, "api-url", "", "API URL")

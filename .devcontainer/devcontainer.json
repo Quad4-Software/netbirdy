@@ -1,5 +1,5 @@
 {
-	"name": "NetBird",
+	"name": "NetBirdy",
 	"build": {
 		"context": "..",
 		"dockerfile": "Dockerfile"

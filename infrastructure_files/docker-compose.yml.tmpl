@@ -10,7 +10,7 @@ services:
   # UI dashboard
   dashboard:
     <<: *default
-    image: netbirdio/dashboard:$NETBIRD_DASHBOARD_TAG
+    image: ghcr.io/sudo-ivan/netbirdy-dashboard:$NETBIRD_DASHBOARD_TAG
     ports:
       - 80:80
       - 443:443
@@ -39,7 +39,7 @@ services:
   # Signal
   signal:
     <<: *default
-    image: netbirdio/signal:$NETBIRD_SIGNAL_TAG
+    image: ghcr.io/sudo-ivan/netbirdy-signal:$NETBIRD_SIGNAL_TAG
     depends_on:
           - dashboard
     volumes:
@@ -60,7 +60,7 @@ services:
   # Relay
   relay:
     <<: *default
-    image: netbirdio/relay:$NETBIRD_RELAY_TAG
+    image: ghcr.io/sudo-ivan/netbirdy-relay:$NETBIRD_RELAY_TAG
     environment:
     - NB_LOG_LEVEL=info
     - NB_LISTEN_ADDRESS=:$NETBIRD_RELAY_PORT
@@ -73,7 +73,7 @@ services:
   # Management
   management:
     <<: *default
-    image: netbirdio/management:$NETBIRD_MANAGEMENT_TAG
+    image: ghcr.io/sudo-ivan/netbirdy-management:$NETBIRD_MANAGEMENT_TAG
     depends_on:
       - dashboard
     volumes:

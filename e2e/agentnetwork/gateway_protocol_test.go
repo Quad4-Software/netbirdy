@@ -339,7 +339,7 @@ func TestGatewayProtocolProviderMatrix(t *testing.T) {
 		}, 403)
 		require.Equal(t, 403, code, "a model no provider claims must still be refused; body: %s%s", body, diag())
 
-		// The NetBird fields stay where they were for existing consumers.
+		// The NetBirdy fields stay where they were for existing consumers.
 		assert.Contains(t, body, "llm_policy.model_not_routable", "the deny code must be preserved")
 		// And the vendor's own envelope rides alongside, so the client can show
 		// the reason instead of an unexplained API error.

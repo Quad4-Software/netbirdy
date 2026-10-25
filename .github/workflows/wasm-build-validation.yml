@@ -53,15 +53,15 @@ jobs:
         with:
           go-version-file: "go.mod"
       - name: Build Wasm client
-        run: GOOS=js GOARCH=wasm go build -o netbird.wasm ./client/wasm/cmd
+        run: GOOS=js GOARCH=wasm go build -o netbirdy.wasm ./client/wasm/cmd
         env:
           CGO_ENABLED: 0
       - name: Check Wasm build size
         run: |
           echo "Wasm build size:"
-          ls -lh netbird.wasm
+          ls -lh netbirdy.wasm
 
-          SIZE=$(stat -c%s netbird.wasm)
+          SIZE=$(stat -c%s netbirdy.wasm)
           SIZE_MB=$((SIZE / 1024 / 1024))
 
           echo "Size: ${SIZE} bytes (${SIZE_MB} MB)"
