@@ -8,7 +8,7 @@ export default defineConfig({
   base: '/__netbird__/',
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, './src'),
+      '@': path.resolve(import.meta.dirname, './src'),
     },
   },
   server: {

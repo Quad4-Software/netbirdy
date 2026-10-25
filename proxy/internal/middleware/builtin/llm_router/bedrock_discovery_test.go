@@ -32,7 +32,7 @@ func getInput(path string) *middleware.Input {
 	return &middleware.Input{
 		Slot:       middleware.SlotOnRequest,
 		Method:     http.MethodGet,
-		URL:        "https://endpoint.netbird.local" + path,
+		URL:        "https://endpoint.netbirdy.local" + path,
 		UserGroups: []string{defaultTestGroup},
 	}
 }
@@ -60,7 +60,7 @@ func TestBedrockInferenceStillGoesToTheRuntimeHost(t *testing.T) {
 	mw := New(Config{Providers: []ProviderRoute{bedrockRoute(nil, nil)}})
 
 	in := newInputWithModelAndURL("anthropic.claude-haiku-4-5",
-		"https://endpoint.netbird.local/model/eu.anthropic.claude-haiku-4-5-20251001-v1:0/invoke")
+		"https://endpoint.netbirdy.local/model/eu.anthropic.claude-haiku-4-5-20251001-v1:0/invoke")
 	out, err := mw.Invoke(context.Background(), in)
 	require.NoError(t, err)
 	require.Equal(t, middleware.DecisionAllow, out.Decision)

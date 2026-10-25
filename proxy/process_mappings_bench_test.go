@@ -84,7 +84,7 @@ func benchServerWithLatency(b *testing.B, createPeerDelay, statusDelay time.Dura
 	return &Server{
 		Logger:           logger,
 		mgmtClient:       mgmtClient,
-		netbird:          nb,
+		netbirdy:          nb,
 		proxy:            proxy.NewReverseProxy(nil, "auto", nil, logger),
 		auth:             auth.NewMiddleware(logger, nil, nil),
 		mainRouter:       mainRouter,

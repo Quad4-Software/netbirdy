@@ -89,7 +89,7 @@ func newInboundManager(logger *log.Logger, handler http.Handler, tlsConfig *tls.
 	}
 }
 
-// onClientReady is registered with NetBird.SetClientLifecycle so the
+// onClientReady is registered with NetBirdy.SetClientLifecycle so the
 // listener pair comes up exactly when the embedded client reports ready.
 // The returned value is opaque to the roundtrip package; it is handed
 // back verbatim to onClientStop on teardown.
@@ -146,7 +146,7 @@ func (m *inboundManager) bringUp(ctx context.Context, accountID types.AccountID,
 	// markOverlayOrigin stamps every connection accepted by an inbound
 	// listener with a context value middlewares can read to skip
 	// geo/CrowdSec checks (the source address is always inside the
-	// NetBird CGNAT range and won't match either dataset).
+	// NetBirdy CGNAT range and won't match either dataset).
 	markOverlayOrigin := func(ctx context.Context, _ net.Conn) context.Context {
 		return types.WithOverlayOrigin(ctx)
 	}

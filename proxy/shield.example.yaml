@@ -1,0 +1,32 @@
+# NetBirdy reverse-proxy shield example config. All keys optional.
+mode: enforce            # off | observe | enforce
+challenge_at: 40
+tarpit_at: 70
+ban_at: 100
+decay_half_life: 10m
+ban_base_ttl: 15m
+ban_max_ttl: 24h
+ban_escalation: 4
+max_entries: 100000
+max_tarpits: 256
+tarpit_delay: 5s
+rate_per_second: 100
+rate_burst: 300
+probe_window: 2m
+probe_threshold: 12
+enum_window: 1m
+enum_threshold: 60
+challenge_difficulty: 16
+challenge_ttl: 10m
+pass_cookie_ttl: 1h
+ai_crawlers: deny        # deny | allow | challenge
+allow_search_engines: false
+allow_cidrs:
+  - "10.0.0.0/8"
+allow_hosts: []
+extra_honeypots: []
+extra_scanner_ua: []
+state_file: ""           # e.g. /var/lib/netbird-proxy/shield-bans.json
+state_max_bans: 10000
+drop_on_honeypot: false
+# hmac_key: hex or raw secret for multi-replica challenge verification

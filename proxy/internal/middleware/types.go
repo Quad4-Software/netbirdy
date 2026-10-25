@@ -181,9 +181,9 @@ type DenyReason struct {
 	Details map[string]string
 	// Surface names the LLM API dialect the caller speaks (the
 	// llm.provider value), so the rendered body can mirror the denial in
-	// that vendor's error shape alongside the NetBird fields. Empty for
+	// that vendor's error shape alongside the NetBirdy fields. Empty for
 	// non-LLM middlewares and for denials raised before a surface was
-	// resolved; the body then carries the NetBird fields alone.
+	// resolved; the body then carries the NetBirdy fields alone.
 	Surface string
 }
 

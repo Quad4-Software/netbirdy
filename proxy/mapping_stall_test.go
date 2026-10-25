@@ -113,14 +113,14 @@ func TestMappingStream_StallsWhenApplyBlocks(t *testing.T) {
 
 	s := &Server{
 		Logger:       logger,
-		netbird:      nb,
+		netbirdy:      nb,
 		mgmtClient:   noopProxyClient{},
 		routerReady:  closedChan(),
 		lastMappings: make(map[types.ServiceID]*proto.ProxyMapping),
 	}
 
 	// First batch: a CREATED mapping for a brand-new account. addMapping ->
-	// netbird.AddPeer -> createClientEntry -> CreateProxyPeer, which blocks.
+	// netbirdy.AddPeer -> createClientEntry -> CreateProxyPeer, which blocks.
 	// Empty Path keeps setupHTTPMapping a no-op (it returns early), so the
 	// ONLY blocking point is the synchronous CreateProxyPeer in AddPeer —
 	// no routers/auth need wiring. The second batch exists only to detect
@@ -190,7 +190,7 @@ func TestMappingStream_StallsWhenApplyBlocks(t *testing.T) {
 
 // TestMappingStream_StallsWhenRemoveBlocks proves the deadlock for the REMOVE
 // path observed in production: a mapping remove tears down the account's last
-// embedded client via netbird.RemovePeer -> client.Stop -> Engine.Stop, whose
+// embedded client via netbirdy.RemovePeer -> client.Stop -> Engine.Stop, whose
 // jobExecutorWG.Wait() is unbounded. Because the receive loop is single-
 // threaded, a blocked remove wedges the loop: no further mapping updates of any
 // kind (create/modify/remove) are applied, while management keeps sending them
@@ -209,7 +209,7 @@ func TestMappingStream_StallsWhenRemoveBlocks(t *testing.T) {
 		mgmtClient:   noopProxyClient{},
 		routerReady:  closedChan(),
 		lastMappings: make(map[types.ServiceID]*proto.ProxyMapping),
-		// Stand in for netbird.RemovePeer -> client.Stop hanging on
+		// Stand in for netbirdy.RemovePeer -> client.Stop hanging on
 		// Engine.Stop's unbounded jobExecutorWG.Wait(). Only the first remove
 		// blocks; later removes return immediately so the recovery assertion
 		// can observe the loop advancing.

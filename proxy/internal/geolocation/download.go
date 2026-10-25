@@ -18,9 +18,15 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+var (
+	// GeoLite database download URLs. Empty by default on NetBirdy so installs
+	// never fetch from upstream infrastructure. Set NB_GEOLOCATION_CITY_TAR_URL
+	// and NB_GEOLOCATION_CITY_TAR_SHA256_URL to point at a mirror to enable.
+	mmdbTarGZURL  = os.Getenv("NB_GEOLOCATION_CITY_TAR_URL")
+	mmdbSha256URL = os.Getenv("NB_GEOLOCATION_CITY_TAR_SHA256_URL")
+)
+
 const (
-	mmdbTarGZURL  = "https://pkgs.netbird.io/geolocation-dbs/GeoLite2-City/download?suffix=tar.gz"
-	mmdbSha256URL = "https://pkgs.netbird.io/geolocation-dbs/GeoLite2-City/download?suffix=tar.gz.sha256"
 	mmdbInnerName = "GeoLite2-City.mmdb"
 
 	downloadTimeout = 2 * time.Minute
@@ -41,7 +47,11 @@ func ensureMMDB(logger *log.Logger, dataDir string) (string, error) {
 		return mmdbPath, nil
 	}
 
-	logger.Info("geolocation database not found, downloading from pkgs.netbird.io")
+	if mmdbTarGZURL == "" {
+		logger.Info("geolocation database download disabled: set NB_GEOLOCATION_CITY_TAR_URL and NB_GEOLOCATION_CITY_TAR_SHA256_URL to enable")
+		return "", fmt.Errorf("geolocation database not present at %s and download is disabled", dataDir)
+	}
+	logger.Info("geolocation database not found, downloading")
 	return downloadMMDB(logger, dataDir)
 }
 

@@ -1,4 +1,4 @@
-// Package proxy runs a NetBird proxy server.
+// Package proxy runs a NetBirdy proxy server.
 // It attempts to do everything it needs to do within the context
 // of a single request to the server to try to reduce the amount
 // of concurrency coordination that is required. However, it does
@@ -21,6 +21,7 @@ import (
 	"path/filepath"
 	"reflect"
 	"slices"
+	"strings"
 	"sync"
 	"time"
 
@@ -62,6 +63,7 @@ import (
 	"github.com/netbirdio/netbird/proxy/internal/proxy"
 	"github.com/netbirdio/netbird/proxy/internal/restrict"
 	"github.com/netbirdio/netbird/proxy/internal/roundtrip"
+	"github.com/netbirdio/netbird/proxy/internal/shield"
 	nbtcp "github.com/netbirdio/netbird/proxy/internal/tcp"
 	"github.com/netbirdio/netbird/proxy/internal/types"
 	udprelay "github.com/netbirdio/netbird/proxy/internal/udp"
@@ -80,20 +82,27 @@ type portRouter struct {
 }
 
 type Server struct {
-	ctx               context.Context
-	mgmtClient        proto.ProxyServiceClient
-	proxy             *proxy.ReverseProxy
-	netbird           *roundtrip.NetBird
-	acme              *acme.Manager
-	staticCertWatcher *certwatch.Watcher
-	auth              *auth.Middleware
-	http              *http.Server
-	https             *http.Server
-	debug             *http.Server
-	healthServer      *health.Server
-	healthChecker     *health.Checker
-	meter             *proxymetrics.Metrics
-	accessLog         *accesslog.Logger
+	ctx                      context.Context
+	mgmtClient               proto.ProxyServiceClient
+	proxy                    *proxy.ReverseProxy
+	netbirdy                 *roundtrip.NetBirdy
+	acme                     *acme.Manager
+	staticCertWatcher        *certwatch.Watcher
+	auth                     *auth.Middleware
+	http                     *http.Server
+	https                    *http.Server
+	debug                    *http.Server
+	healthServer             *health.Server
+	healthChecker            *health.Checker
+	meter                    *proxymetrics.Metrics
+	accessLog                *accesslog.Logger
+	shield                   *shield.Shield
+	ShieldMode               string
+	ShieldConfigFile         string
+	ShieldStateFile          string
+	ShieldAllowCIDRs         string
+	ShieldAllowSearchEngines bool
+	ShieldAICrawlers         string
 	// middlewareManager drives per-target middleware dispatch. Always
 	// constructed during boot; an empty registry produces empty chains and
 	// the reverse-proxy stays on the no-capture fast path.
@@ -131,7 +140,7 @@ type Server struct {
 	// The mapping worker waits on this before processing updates.
 	routerReady chan struct{}
 
-	// removePeer defaults to netbird.RemovePeer; overridable in tests.
+	// removePeer defaults to netbirdy.RemovePeer; overridable in tests.
 	removePeer func(ctx context.Context, accountID types.AccountID, key roundtrip.ServiceKey) error
 
 	// inbound, when non-nil, manages per-account inbound listeners. Set by
@@ -198,7 +207,7 @@ type Server struct {
 	// forwarding headers from these sources are preserved and appended to
 	// instead of being stripped.
 	TrustedProxies *trustedproxy.List
-	// WireguardPort is the port for the NetBird tunnel interface. Use 0
+	// WireguardPort is the port for the NetBirdy tunnel interface. Use 0
 	// for a random OS-assigned port. A fixed port only works with
 	// single-account deployments; multiple accounts will fail to bind
 	// the same port.
@@ -222,8 +231,8 @@ type Server struct {
 	// in front of this proxy's cluster domain. When true, accounts cannot
 	// create services on the bare cluster domain.
 	RequireSubdomain bool
-	// Private flags this proxy as embedded in a netbird client and serving
-	// exclusively over the WireGuard tunnel (i.e. `netbird proxy`). Reported
+	// Private flags this proxy as embedded in a netbirdy client and serving
+	// exclusively over the WireGuard tunnel (i.e. `netbirdy proxy`). Reported
 	// upstream as a capability so dashboards can distinguish per-peer
 	// clusters from centralised ones, and turns on per-account inbound
 	// listeners on each embedded client's netstack: every account that
@@ -389,7 +398,7 @@ func (s *Server) Start(ctx context.Context) error {
 	}
 	// Create health checker before the mapping worker so it can track
 	// management connectivity from the first stream connection.
-	s.healthChecker = health.NewChecker(s.Logger, s.netbird)
+	s.healthChecker = health.NewChecker(s.Logger, s.netbirdy)
 
 	s.crowdsecRegistry = crowdsec.NewRegistry(s.CrowdSecAPIURL, s.CrowdSecAPIKey, log.NewEntry(s.Logger))
 	s.crowdsecServices = make(map[types.ServiceID]bool)
@@ -409,6 +418,55 @@ func (s *Server) Start(ctx context.Context) error {
 
 	s.auth = auth.NewMiddleware(s.Logger, s.mgmtClient, s.geo)
 	s.accessLog = accesslog.NewLogger(s.mgmtClient, s.Logger, s.TrustedProxies)
+	if s.ShieldMode != "off" {
+		scfg, _ := shield.LoadConfig(s.ShieldConfigFile)
+		if s.ShieldMode != "" {
+			scfg.Mode = shield.Mode(s.ShieldMode)
+		}
+		if s.ShieldStateFile != "" {
+			scfg.StateFile = s.ShieldStateFile
+		}
+		if s.ShieldAllowCIDRs != "" {
+			scfg.AllowCIDRs = strings.Split(s.ShieldAllowCIDRs, ",")
+		}
+		if s.ShieldAllowSearchEngines {
+			scfg.AllowSearchEngines = true
+		}
+		if s.ShieldAICrawlers != "" {
+			scfg.AICrawlers = shield.AICrawlerPolicy(s.ShieldAICrawlers)
+		}
+		var opts []shield.Option
+		opts = append(opts,
+			shield.WithLogger(s.Logger.WithField("component", "shield")),
+			shield.WithSearchVerifier(shield.NewDNSVerifier()),
+			shield.WithKnownHost(s.auth.HasDomain),
+		)
+		if s.meter != nil {
+			if sink, serr := shield.NewOTelSink(s.ctx, s.meter.Meter(), func() (int, int) {
+				if s.shield == nil {
+					return 0, 0
+				}
+				st := s.shield.Stats()
+				return st.Banned, st.ActiveTarpits
+			}); serr == nil {
+				opts = append(opts, shield.WithMetrics(sink))
+			}
+		}
+		opts = append(opts, shield.WithIPResolver(func(r *http.Request) netip.Addr {
+			if cd := proxy.CapturedDataFromContext(r.Context()); cd != nil {
+				return cd.GetClientIP()
+			}
+			h, _, _ := net.SplitHostPort(r.RemoteAddr)
+			ip, _ := netip.ParseAddr(h)
+			return ip
+		}))
+		sh, err := shield.New(scfg, opts...)
+		if err != nil {
+			s.Logger.WithError(err).Warn("shield disabled: invalid config")
+		} else {
+			s.shield = sh
+		}
+	}
 
 	s.startDebugEndpoint()
 
@@ -434,8 +492,16 @@ func (s *Server) Start(ctx context.Context) error {
 		Handler:           handler,
 		TLSConfig:         tlsConfig,
 		ReadHeaderTimeout: httpReadHeaderTimeout,
-		IdleTimeout:       httpIdleTimeout,
-		ErrorLog:          newHTTPServerLogger(s.Logger, logtagValueHTTPS),
+		// OIDC flows carry JWTs in headers and cookies; 64 KiB covers the
+		// largest embedded-IdP tokens with headroom.
+		MaxHeaderBytes: 1 << 16,
+		HTTP2: &http.HTTP2Config{
+			MaxConcurrentStreams:         250,
+			MaxDecoderHeaderTableSize:    32 << 10,
+			PermitProhibitedCipherSuites: false,
+		},
+		IdleTimeout: httpIdleTimeout,
+		ErrorLog:    newHTTPServerLogger(s.Logger, logtagValueHTTPS),
 	}
 
 	startupOK = true
@@ -579,11 +645,11 @@ func (s *Server) initManagementClient() error {
 	return nil
 }
 
-// initNetBirdClient builds the multi-tenant embedded NetBird client used
+// initNetBirdClient builds the multi-tenant embedded NetBirdy client used
 // for outbound RoundTripping and (when --private is on) per-account
 // inbound listeners.
 func (s *Server) initNetBirdClient() error {
-	s.netbird = roundtrip.NewNetBird(s.ctx, s.ID, s.ProxyURL, roundtrip.ClientConfig{
+	s.netbirdy = roundtrip.NewNetBird(s.ctx, s.ID, s.ProxyURL, roundtrip.ClientConfig{
 		MgmtAddr:       s.ManagementAddress,
 		WGPort:         s.WireguardPort,
 		PreSharedKey:   s.PreSharedKey,
@@ -595,8 +661,8 @@ func (s *Server) initNetBirdClient() error {
 		// the embedded client never accepts inbound, so block.
 		BlockInbound: !s.Private,
 	}, s.Logger, s, s.mgmtClient)
-	s.netbird.OnAddPeer = s.meter.RecordAddPeerDuration
-	if err := s.meter.RegisterClientObserver(s.netbird.ClientCount); err != nil {
+	s.netbirdy.OnAddPeer = s.meter.RecordAddPeerDuration
+	if err := s.meter.RegisterClientObserver(s.netbirdy.ClientCount); err != nil {
 		return fmt.Errorf("register client metrics: %w", err)
 	}
 	return nil
@@ -604,11 +670,11 @@ func (s *Server) initNetBirdClient() error {
 
 // initReverseProxy builds the meter-instrumented reverse proxy. MultiTransport
 // routes targets opted into direct_upstream through the host's network stack
-// (stdlib transport); everything else falls through to the embedded NetBird
+// (stdlib transport); everything else falls through to the embedded NetBirdy
 // client. The split is needed so direct_upstream targets resolve DNS via the
 // proxy host's resolver instead of the tunnel's DNS.
 func (s *Server) initReverseProxy() {
-	upstreamRT := roundtrip.NewMultiTransport(s.netbird, s.Logger)
+	upstreamRT := roundtrip.NewMultiTransport(s.netbirdy, s.Logger)
 	var rpOpts []proxy.Option
 	if s.middlewareManager != nil {
 		rpOpts = append(rpOpts, proxy.WithMiddlewareManager(s.middlewareManager))
@@ -635,6 +701,9 @@ func (s *Server) buildHandlerChain() http.Handler {
 	handler := http.Handler(s.proxy)
 	handler = s.auth.Protect(handler)
 	handler = web.AssetHandler(handler)
+	if s.shield != nil {
+		handler = s.shield.Wrap(handler)
+	}
 	handler = s.accessLog.Middleware(handler)
 	handler = s.meter.Middleware(handler)
 	return s.hijackTracker.Middleware(handler)
@@ -667,7 +736,7 @@ func (s *Server) initDefaults() {
 
 	// If no ID is set then one can be generated.
 	if s.ID == "" {
-		s.ID = fmt.Sprintf("netbird-proxy-%s", uuid.NewString())
+		s.ID = fmt.Sprintf("netbirdy-proxy-%s", uuid.NewString())
 	}
 	// Fallback version option in case it is not set.
 	if s.Version == "" {
@@ -686,17 +755,22 @@ func (s *Server) startDebugEndpoint() {
 		return
 	}
 	debugAddr := debugEndpointAddr(s.DebugEndpointAddress)
-	debugHandler := debug.NewHandler(s.netbird, s.healthChecker, s.Logger)
+	debugHandler := debug.NewHandler(s.netbirdy, s.healthChecker, s.Logger)
 	if s.acme != nil {
 		debugHandler.SetCertStatus(s.acme)
 	}
 	if s.inbound != nil {
 		debugHandler.SetInboundProvider(inboundDebugAdapter{mgr: s.inbound})
 	}
+	if s.shield != nil {
+		debugHandler.SetShield(s.shield)
+	}
 	s.debug = &http.Server{
-		Addr:     debugAddr,
-		Handler:  debugHandler,
-		ErrorLog: newHTTPServerLogger(s.Logger, logtagValueDebug),
+		Addr:              debugAddr,
+		Handler:           debugHandler,
+		ReadHeaderTimeout: httpReadHeaderTimeout,
+		IdleTimeout:       httpIdleTimeout,
+		ErrorLog:          newHTTPServerLogger(s.Logger, logtagValueDebug),
 	}
 	go func() {
 		s.Logger.Infof("starting debug endpoint on %s", debugAddr)
@@ -832,7 +906,11 @@ func (s *Server) dialManagement() (*grpc.ClientConn, error) {
 }
 
 func (s *Server) configureTLS(ctx context.Context) (*tls.Config, error) {
-	tlsConfig := &tls.Config{}
+	tlsConfig := &tls.Config{
+		// TLS 1.2 minimum; Go defaults already exclude older versions but
+		// pin it explicitly so config drift cannot weaken it.
+		MinVersion: tls.VersionTLS12,
+	}
 	if !s.GenerateACMECertificates {
 		s.Logger.Debug("ACME certificates disabled, using static certificates with file watching")
 		certPath := filepath.Join(s.CertificateDirectory, s.CertificateFile)
@@ -845,6 +923,7 @@ func (s *Server) configureTLS(ctx context.Context) (*tls.Config, error) {
 		go certWatcher.Watch(ctx)
 		s.staticCertWatcher = certWatcher
 		tlsConfig.GetCertificate = certWatcher.GetCertificate
+		s.shieldObserveTLS(tlsConfig)
 		return tlsConfig, nil
 	}
 
@@ -872,9 +951,12 @@ func (s *Server) configureTLS(ctx context.Context) (*tls.Config, error) {
 
 	if s.ACMEChallengeType == "http-01" {
 		s.http = &http.Server{
-			Addr:     s.ACMEChallengeAddress,
-			Handler:  s.acme.HTTPHandler(nil),
-			ErrorLog: newHTTPServerLogger(s.Logger, logtagValueACME),
+			Addr:              s.ACMEChallengeAddress,
+			Handler:           s.acme.HTTPHandler(nil),
+			ReadHeaderTimeout: httpReadHeaderTimeout,
+			IdleTimeout:       httpIdleTimeout,
+			MaxHeaderBytes:    1 << 13, // challenge requests are tiny
+			ErrorLog:          newHTTPServerLogger(s.Logger, logtagValueACME),
 		}
 		go func() {
 			if err := s.http.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
@@ -887,6 +969,7 @@ func (s *Server) configureTLS(ctx context.Context) (*tls.Config, error) {
 	// autocert.Manager.TLSConfig() wires its own GetCertificate, which
 	// bypasses our override that checks wildcards first.
 	tlsConfig.GetCertificate = s.acme.GetCertificate
+	s.shieldObserveTLS(tlsConfig)
 
 	// ServerName needs to be set to allow for ACME to work correctly
 	// when using CNAME URLs to access the proxy.
@@ -996,14 +1079,14 @@ func (s *Server) shutdownServices() {
 		shutdownHTTP("acme http", s.http.Shutdown)
 	}
 
-	if s.netbird != nil {
+	if s.netbirdy != nil {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
 			ctx, cancel := context.WithTimeout(context.Background(), shutdownDrainTimeout)
 			defer cancel()
-			if err := s.netbird.StopAll(ctx); err != nil {
-				s.Logger.Warnf("stop netbird clients: %v", err)
+			if err := s.netbirdy.StopAll(ctx); err != nil {
+				s.Logger.Warnf("stop netbirdy clients: %v", err)
 			}
 		}()
 	}
@@ -1063,9 +1146,9 @@ func (s *Server) shutdownCrowdSec() {
 }
 
 // resolveDialFunc returns a DialContextFunc that dials through the
-// NetBird tunnel for the given account.
+// NetBirdy tunnel for the given account.
 func (s *Server) resolveDialFunc(accountID types.AccountID) (types.DialContextFunc, error) {
-	client, ok := s.netbird.GetClient(accountID)
+	client, ok := s.netbirdy.GetClient(accountID)
 	if !ok {
 		return nil, fmt.Errorf("no client for account %s", accountID)
 	}
@@ -1080,7 +1163,7 @@ func (s *Server) initPrivateInbound(handler http.Handler, tlsConfig *tls.Config)
 		return
 	}
 	s.inbound = newInboundManager(s.Logger, handler, tlsConfig)
-	s.netbird.SetClientLifecycle(s.inbound.onClientReady, s.inbound.onClientStop)
+	s.netbirdy.SetClientLifecycle(s.inbound.onClientReady, s.inbound.onClientStop)
 	s.Logger.Info("private inbound listeners enabled (per-account :80 + :443)")
 }
 
@@ -1636,13 +1719,13 @@ func (s *Server) addMapping(ctx context.Context, mapping *proto.ProxyMapping) er
 	authToken := mapping.GetAuthToken()
 
 	svcKey := s.serviceKeyForMapping(mapping)
-	if err := s.netbird.AddPeer(ctx, accountID, svcKey, authToken, svcID); err != nil {
+	if err := s.netbirdy.AddPeer(ctx, accountID, svcKey, authToken, svcID); err != nil {
 		return fmt.Errorf("create peer for service %s: %w", svcID, err)
 	}
 
 	if err := s.setupMappingRoutes(ctx, mapping); err != nil {
 		s.cleanupMappingRoutes(mapping)
-		if peerErr := s.netbird.RemovePeer(ctx, accountID, svcKey); peerErr != nil {
+		if peerErr := s.netbirdy.RemovePeer(ctx, accountID, svcKey); peerErr != nil {
 			s.Logger.WithError(peerErr).WithField("service_id", svcID).Warn("failed to remove peer after setup failure")
 		}
 		return err
@@ -1652,7 +1735,7 @@ func (s *Server) addMapping(ctx context.Context, mapping *proto.ProxyMapping) er
 }
 
 // modifyMapping updates a service mapping in place without tearing down the
-// NetBird peer. It cleans up old routes using the previously stored mapping
+// NetBirdy peer. It cleans up old routes using the previously stored mapping
 // state and re-applies them from the new mapping.
 func (s *Server) modifyMapping(ctx context.Context, mapping *proto.ProxyMapping) error {
 	if old := s.loadMapping(types.ServiceID(mapping.GetId())); old != nil {
@@ -1688,7 +1771,7 @@ func (s *Server) modifyMapping(ctx context.Context, mapping *proto.ProxyMapping)
 }
 
 // setupMappingRoutes configures the appropriate routes or relays for the given
-// service mapping based on its mode. The NetBird peer must already exist.
+// service mapping based on its mode. The NetBirdy peer must already exist.
 func (s *Server) setupMappingRoutes(ctx context.Context, mapping *proto.ProxyMapping) error {
 	switch types.ServiceMode(mapping.GetMode()) {
 	case types.ServiceModeTCP:
@@ -2244,7 +2327,7 @@ func buildMiddlewareBindings(svcID types.ServiceID, m proxy.Mapping) []middlewar
 	return bindings
 }
 
-// removeMapping tears down routes/relays and the NetBird peer for a service.
+// removeMapping tears down routes/relays and the NetBirdy peer for a service.
 // Uses the stored mapping state when available to ensure all previously
 // configured routes are cleaned up.
 func (s *Server) removeMapping(ctx context.Context, mapping *proto.ProxyMapping) {
@@ -2252,14 +2335,14 @@ func (s *Server) removeMapping(ctx context.Context, mapping *proto.ProxyMapping)
 	svcKey := s.serviceKeyForMapping(mapping)
 	removePeer := s.removePeer
 	if removePeer == nil {
-		removePeer = s.netbird.RemovePeer
+		removePeer = s.netbirdy.RemovePeer
 	}
 	if err := removePeer(ctx, accountID, svcKey); err != nil {
 		s.Logger.WithFields(log.Fields{
 			"account_id": accountID,
 			"service_id": mapping.GetId(),
 			"error":      err,
-		}).Error("failed to remove NetBird peer, continuing cleanup")
+		}).Error("failed to remove NetBirdy peer, continuing cleanup")
 	}
 
 	if old := s.deleteMapping(types.ServiceID(mapping.GetId())); old != nil {
@@ -2273,7 +2356,7 @@ func (s *Server) removeMapping(ctx context.Context, mapping *proto.ProxyMapping)
 }
 
 // cleanupMappingRoutes removes HTTP/TLS/L4 routes and custom port state for a
-// service without touching the NetBird peer. This is used for both full
+// service without touching the NetBirdy peer. This is used for both full
 // removal and in-place modification of mappings.
 func (s *Server) cleanupMappingRoutes(mapping *proto.ProxyMapping) {
 	svcID := types.ServiceID(mapping.GetId())
@@ -2438,4 +2521,54 @@ func debugEndpointAddr(addr string) string {
 		return defaultDebugAddr
 	}
 	return addr
+}
+
+// shieldObserveTLS wraps GetCertificate to record TLS-level signals. It never
+// alters the handshake outcome; observation only.
+func (s *Server) shieldObserveTLS(c *tls.Config) {
+	if s.shield == nil {
+		return
+	}
+	inner := c.GetCertificate
+	c.GetCertificate = func(hello *tls.ClientHelloInfo) (*tls.Certificate, error) {
+		s.observeSNI(hello)
+		return inner(hello)
+	}
+}
+
+// observeSNI feeds SNI anomalies into the shield. RemoteAddr comes from the
+// accepted connection; with PROXY protocol enabled the wrapped listener has
+// already replaced it with the real client address.
+func (s *Server) observeSNI(hello *tls.ClientHelloInfo) {
+	if s.shield == nil || hello == nil || hello.Conn == nil {
+		return
+	}
+	ip, err := addrFromConn(hello.Conn.RemoteAddr())
+	if err != nil {
+		return
+	}
+	sni := hello.ServerName
+	switch {
+	case sni == "":
+		s.shield.Observe(ip, shield.Event{Kind: shield.EventSNIMissing})
+	case isIPStr(sni):
+		s.shield.Observe(ip, shield.Event{Kind: shield.EventSNIIsIP})
+	case !s.auth.HasDomain(sni):
+		s.shield.Observe(ip, shield.Event{Kind: shield.EventSNIUnknown, Detail: "sni-unknown:" + sni})
+	}
+}
+
+func addrFromConn(a net.Addr) (netip.Addr, error) {
+	h, _, err := net.SplitHostPort(a.String())
+	if err != nil {
+		h = a.String()
+	}
+	return netip.ParseAddr(h)
+}
+
+func isIPStr(h string) bool {
+	if ip, err := netip.ParseAddr(strings.Trim(h, "[]")); err == nil {
+		return ip.IsValid()
+	}
+	return false
 }

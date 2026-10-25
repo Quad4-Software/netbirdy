@@ -1106,9 +1106,9 @@ func TestStampNetBirdIdentity_NoCapturedData_StripsOnly(t *testing.T) {
 	rewrite(pr)
 
 	assert.Empty(t, pr.Out.Header.Get(headerNetBirdUser),
-		"client-supplied X-NetBird-User must be stripped when no captured identity is present")
+		"client-supplied X-NetBirdy-User must be stripped when no captured identity is present")
 	assert.Empty(t, pr.Out.Header.Get(headerNetBirdGroups),
-		"client-supplied X-NetBird-Groups must be stripped when no captured identity is present")
+		"client-supplied X-NetBirdy-Groups must be stripped when no captured identity is present")
 }
 
 func TestStampNetBirdIdentity_StampsFromCapturedData(t *testing.T) {
@@ -1138,7 +1138,7 @@ func TestStampNetBirdIdentity_StampsFromCapturedData(t *testing.T) {
 // TestStampNetBirdIdentity_GroupsOnlyWhenEmailEmpty covers the
 // tunnel-peer-without-user case (machine agents, unattached proxy peers).
 // The proxy must still stamp the peer's groups so downstream services can
-// authorise, but X-NetBird-User stays unset — only its inbound stripping
+// authorise, but X-NetBirdy-User stays unset — only its inbound stripping
 // must happen.
 func TestStampNetBirdIdentity_GroupsOnlyWhenEmailEmpty(t *testing.T) {
 	target, _ := url.Parse("http://backend.internal:8080")
@@ -1158,7 +1158,7 @@ func TestStampNetBirdIdentity_GroupsOnlyWhenEmailEmpty(t *testing.T) {
 	rewrite(pr)
 
 	assert.Empty(t, pr.Out.Header.Get(headerNetBirdUser),
-		"X-NetBird-User must remain unset when CapturedData carries no email")
+		"X-NetBirdy-User must remain unset when CapturedData carries no email")
 	assert.Equal(t, "machines", pr.Out.Header.Get(headerNetBirdGroups),
 		"groups must still be stamped for peers without a user identity")
 }
@@ -1184,7 +1184,7 @@ func TestStampNetBirdIdentity_EmailOnlyWhenGroupsEmpty(t *testing.T) {
 	assert.Equal(t, "carol@netbird.io", pr.Out.Header.Get(headerNetBirdUser),
 		"email must be stamped even when no groups are captured")
 	assert.Empty(t, pr.Out.Header.Get(headerNetBirdGroups),
-		"X-NetBird-Groups must remain unset when CapturedData carries no groups")
+		"X-NetBirdy-Groups must remain unset when CapturedData carries no groups")
 }
 
 func TestStampNetBirdIdentity_FallsBackToGroupIDsWhenNameMissing(t *testing.T) {
@@ -1307,7 +1307,7 @@ func TestStampNetBirdIdentity_OmitsGroupsHeaderWhenAllInvalid(t *testing.T) {
 
 	_, present := pr.Out.Header[http.CanonicalHeaderKey(headerNetBirdGroups)]
 	assert.False(t, present,
-		"X-NetBird-Groups must not be set when every group label is rejected")
+		"X-NetBirdy-Groups must not be set when every group label is rejected")
 }
 
 // nopOKTransport returns 200 for every request without dialing — used
@@ -1427,9 +1427,9 @@ func TestStampNetBirdIdentity_CapturedDataPresentButEmpty(t *testing.T) {
 	rewrite(pr)
 
 	assert.Empty(t, pr.Out.Header.Get(headerNetBirdUser),
-		"X-NetBird-User must be stripped when CapturedData has no email")
+		"X-NetBirdy-User must be stripped when CapturedData has no email")
 	assert.Empty(t, pr.Out.Header.Get(headerNetBirdGroups),
-		"X-NetBird-Groups must be stripped when CapturedData has no groups")
+		"X-NetBirdy-Groups must be stripped when CapturedData has no groups")
 }
 
 // TestBuildRequestInput_PropagatesIdentityAndGroups locks the final wiring link

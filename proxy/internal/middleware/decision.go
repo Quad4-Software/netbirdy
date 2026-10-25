@@ -15,7 +15,7 @@ var codeRegex = regexp.MustCompile(`^[a-z][a-z0-9._-]{0,63}$`)
 // Type and Error mirror the denial in the vendor's own error shape when
 // the request reached a known LLM surface. LLM clients only parse their
 // provider's envelope, so without the mirror a budget stop reaches the
-// user as an unexplained API error. The NetBird fields stay where they
+// user as an unexplained API error. The NetBirdy fields stay where they
 // were, so the body is a superset and existing consumers are unaffected.
 type denyResponse struct {
 	Code       string            `json:"code"`

@@ -14,7 +14,7 @@ import (
 // There is no exported sentinel from gvisor.dev/gvisor/pkg/tcpip that
 // survives gonet's *net.OpError wrapping in a way errors.Is can match,
 // so we fall back to a string check. Stable across the gVisor versions
-// netbird pins.
+// netbirdy pins.
 const gvisorInvalidEndpointMsg = "endpoint is in invalid state"
 
 // IsClosedListenerErr reports whether err signals that an accept loop

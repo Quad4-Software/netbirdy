@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-// AccountID represents a unique identifier for a NetBird account.
+// AccountID represents a unique identifier for a NetBirdy account.
 type AccountID string
 
 // ServiceID represents a unique identifier for a proxy service.
@@ -61,7 +61,7 @@ func DialTimeoutFromContext(ctx context.Context) (time.Duration, bool) {
 type overlayOriginKey struct{}
 
 // WithOverlayOrigin marks the context as originating from the
-// embedded NetBird overlay (tunnel-side inbound listener).
+// embedded NetBirdy overlay (tunnel-side inbound listener).
 func WithOverlayOrigin(ctx context.Context) context.Context {
 	return context.WithValue(ctx, overlayOriginKey{}, true)
 }

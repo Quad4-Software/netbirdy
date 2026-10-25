@@ -58,7 +58,7 @@ func WithMiddlewareManager(m *middleware.Manager) Option {
 	}
 }
 
-// NewReverseProxy configures a new NetBird ReverseProxy.
+// NewReverseProxy configures a new NetBirdy ReverseProxy.
 // This is a wrapper around an httputil.ReverseProxy set
 // to dynamically route requests based on internal mapping
 // between requested URLs and targets.
@@ -840,7 +840,7 @@ func classifyProxyError(err error) (title, message string, code int, status web.
 	case errors.Is(err, roundtrip.ErrNoPeerConnection),
 		errors.Is(err, roundtrip.ErrClientStartFailed):
 		return "Proxy Not Connected",
-			"The proxy is not connected to the NetBird network. Please try again later or contact your administrator.",
+			"The proxy is not connected to the NetBirdy network. Please try again later or contact your administrator.",
 			http.StatusBadGateway,
 			web.ErrorStatus{Proxy: false, Destination: false}
 
@@ -864,7 +864,7 @@ func classifyProxyError(err error) (title, message string, code int, status web.
 
 	case isHostUnreachable(err):
 		return "Peer Not Connected",
-			"The connection to the peer could not be established. Please ensure the peer is running and connected to the NetBird network.",
+			"The connection to the peer could not be established. Please ensure the peer is running and connected to the NetBirdy network.",
 			http.StatusBadGateway,
 			web.ErrorStatus{Proxy: true, Destination: false}
 	}
@@ -914,13 +914,13 @@ const (
 	// (email when the peer is attached to a user, else peer name) onto
 	// upstream requests. Stripped from inbound requests before stamping
 	// so a client can't spoof identity by setting the header themselves.
-	headerNetBirdUser = "X-NetBird-User"
+	headerNetBirdUser = "X-NetBirdy-User"
 	// headerNetBirdGroups carries the user's group display names as a
 	// comma-separated list. Falls back to group IDs at positions where a
 	// name wasn't available at session-mint time. Labels containing a
 	// comma or any non-printable byte are dropped at stamp time so the
 	// list is unambiguously splittable by consumers.
-	headerNetBirdGroups = "X-NetBird-Groups"
+	headerNetBirdGroups = "X-NetBirdy-Groups"
 
 	// observabilityPhaseTimeout bounds the detached response/terminal
 	// metering phase. It runs after the client connection (and its context)
@@ -949,7 +949,7 @@ func isHeaderValueSafe(v string) bool {
 }
 
 // stampNetBirdIdentity injects authenticated identity onto outbound
-// requests as X-NetBird-User and X-NetBird-Groups. Always strips any
+// requests as X-NetBirdy-User and X-NetBirdy-Groups. Always strips any
 // client-sent values first (anti-spoof). Skips when the request didn't
 // carry CapturedData (early-path errors, internal endpoints).
 func stampNetBirdIdentity(r *httputil.ProxyRequest) {

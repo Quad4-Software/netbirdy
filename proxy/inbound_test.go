@@ -104,14 +104,14 @@ func TestServer_PrivateInbound_NotEnabled_NoManager(t *testing.T) {
 }
 
 // TestServer_PrivateInbound_Enabled_WiresLifecycle confirms that
-// --private alone wires the manager into the NetBird transport, so
+// --private alone wires the manager into the NetBirdy transport, so
 // AddPeer / RemovePeer drive the lifecycle.
 func TestServer_PrivateInbound_Enabled_WiresLifecycle(t *testing.T) {
 	s := &Server{Logger: quietLogger(), Private: true}
-	// Construct a NetBird transport. We can't actually start the embedded
+	// Construct a NetBirdy transport. We can't actually start the embedded
 	// client here (that needs a real management server), but we can
 	// confirm that the lifecycle callbacks are registered.
-	s.netbird = roundtrip.NewNetBird(t.Context(), "test", "test", roundtrip.ClientConfig{
+	s.netbirdy = roundtrip.NewNetBird(t.Context(), "test", "test", roundtrip.ClientConfig{
 		MgmtAddr: "http://invalid.test",
 	}, quietLogger(), nil, fakeMgmtClient{})
 
@@ -243,7 +243,7 @@ func TestRouter_PlainHTTP_ForwardedProtoIsHTTP(t *testing.T) {
 // flowing through the per-account handler wrapper carry the peerstore
 // lookup function. Phase 3's local-first deny path depends on this.
 func TestWithTunnelLookup_AttachesLookupToContext(t *testing.T) {
-	expected := auth.PeerIdentity{TunnelIP: netip.MustParseAddr("100.64.0.10"), FQDN: "peer.netbird"}
+	expected := auth.PeerIdentity{TunnelIP: netip.MustParseAddr("100.64.0.10"), FQDN: "peer.netbirdy"}
 	lookup := auth.TunnelLookupFunc(func(_ netip.Addr) (auth.PeerIdentity, bool) {
 		return expected, true
 	})

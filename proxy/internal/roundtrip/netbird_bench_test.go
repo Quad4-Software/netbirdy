@@ -55,7 +55,7 @@ func BenchmarkHasClientDuringAddPeer(b *testing.B) {
 
 	nb := mockNetBird()
 
-	// Add random client entries to the netbird instance.
+	// Add random client entries to the netbirdy instance.
 	// We're trying to test map lock contention, so starting with
 	// a populated map should help with this.
 	// Pick a random one to target for retrieval later.

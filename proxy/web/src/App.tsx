@@ -23,7 +23,7 @@ const methods: NonNullable<Data["methods"]> =
 
 function App() {
   useEffect(() => {
-    document.title = "Authentication Required - NetBird Service";
+    document.title = "Authentication Required - NetBirdy Service";
   }, []);
 
   const [error, setError] = useState<string | null>(null);

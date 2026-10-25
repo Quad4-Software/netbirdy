@@ -4,15 +4,15 @@ ARG TARGETPLATFORM
 ARG VERSION=dev
 ARG RELEASE=1
 
-LABEL name="netbird-reverse-proxy" \
-      maintainer="NetBird <dev@netbird.io>" \
+LABEL name="netbirdy-reverse-proxy" \
+      maintainer="NetBirdy <dev@netbird.io>" \
       vendor="NetBird GmbH" \
       version="${VERSION}" \
       release="${RELEASE}" \
-      summary="NetBird Reverse Proxy" \
-      description="NetBird Reverse Proxy provides an identity-aware entrypoint to services in NetBird networks."
+      summary="NetBirdy Reverse Proxy" \
+      description="NetBirdy Reverse Proxy provides an identity-aware entrypoint to services in NetBirdy networks."
 
-COPY --chmod=0555 ${TARGETPLATFORM}/netbird-proxy /go/bin/netbird-proxy
+COPY --chmod=0555 ${TARGETPLATFORM}/netbirdy-proxy /go/bin/netbirdy-proxy
 COPY licenses/ /licenses/
 # Only the writable directories share the root group for arbitrary non-root UIDs.
 # Runtime-created private keys retain the application's restrictive file modes.
@@ -29,4 +29,4 @@ ENV NB_PROXY_ADDRESS=":8443"
 ENV NB_PROXY_ACME_ADDRESS=":8081"
 EXPOSE 8443
 STOPSIGNAL SIGTERM
-ENTRYPOINT ["/go/bin/netbird-proxy"]
+ENTRYPOINT ["/go/bin/netbirdy-proxy"]

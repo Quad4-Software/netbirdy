@@ -230,7 +230,7 @@ func (c *CapturedData) GetUserGroups() []string {
 
 // SetUserGroupNames records the human-readable display names for the
 // user's groups, ordered identically to UserGroups (positional
-// pairing). Stamped onto upstream requests as X-NetBird-Groups so
+// pairing). Stamped onto upstream requests as X-NetBirdy-Groups so
 // downstream services can read names rather than opaque ids.
 func (c *CapturedData) SetUserGroupNames(names []string) {
 	c.mu.Lock()

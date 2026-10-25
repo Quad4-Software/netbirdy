@@ -19,6 +19,13 @@ import (
 // The standalone binary continues to populate Server fields directly, so
 // adding fields here must not change the zero-value behaviour of Server.
 type Config struct {
+	ShieldMode               string
+	ShieldConfigFile         string
+	ShieldStateFile          string
+	ShieldAllowCIDRs         string
+	ShieldAllowSearchEngines bool
+	ShieldAICrawlers         string
+
 	// ListenAddr is the TCP address the main listener binds. Required.
 	ListenAddr string
 	// ID identifies this proxy instance to management. Empty values are
@@ -86,7 +93,7 @@ type Config struct {
 	// TrustedProxies is the set of trusted upstream proxies that may set
 	// forwarding headers.
 	TrustedProxies *trustedproxy.List
-	// WireguardPort is the UDP port for the embedded NetBird tunnel.
+	// WireguardPort is the UDP port for the embedded NetBirdy tunnel.
 	// Zero asks the OS for a random port.
 	WireguardPort uint16
 	// NATExternalIPs are external IPs advertised as ICE candidates by the
@@ -108,7 +115,7 @@ type Config struct {
 	// RequireSubdomain forces accounts to use a subdomain in front of
 	// the proxy's cluster domain.
 	RequireSubdomain bool
-	// Private flags this proxy as embedded in a netbird client and
+	// Private flags this proxy as embedded in a netbirdy client and
 	// serving exclusively over the WireGuard tunnel. Also enables
 	// per-account inbound listeners on each embedded client's netstack.
 	Private bool

@@ -27,7 +27,7 @@ func (m Method) String() string {
 const (
 	SessionCookieName    = "nb_session"
 	DefaultSessionExpiry = 24 * time.Hour
-	SessionJWTIssuer     = "netbird-management"
+	SessionJWTIssuer     = "netbirdy-management"
 )
 
 // Query parameters management uses to hand the OIDC session to the proxy. The

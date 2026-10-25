@@ -57,7 +57,7 @@ func sortedAccountIDs(m map[types.AccountID]roundtrip.ClientDebugInfo) []types.A
 	return slices.Sorted(maps.Keys(m))
 }
 
-// clientProvider provides access to NetBird clients.
+// clientProvider provides access to NetBirdy clients.
 type clientProvider interface {
 	GetClient(accountID types.AccountID) (*nbembed.Client, bool)
 	ListClientsForDebug() map[types.AccountID]roundtrip.ClientDebugInfo
@@ -147,6 +147,18 @@ func (h *Handler) SetCertStatus(cs certStatus) {
 // SetInboundProvider wires per-account inbound listener observability.
 // Pass nil (or skip the call) to keep the inbound section out of debug
 // responses on proxies that don't run --private.
+// shieldReporter abstracts proxy/internal/shield so debug stays decoupled.
+type shieldReporter interface {
+	StatsJSON() ([]byte, error)
+	BansJSON() ([]byte, error)
+	UnbanIP(ip string) bool
+}
+
+var shieldProvider shieldReporter
+
+// SetShield wires the shield reporter used by /debug/shield/*.
+func (h *Handler) SetShield(sr shieldReporter) { shieldProvider = sr }
+
 func (h *Handler) SetInboundProvider(p InboundProvider) {
 	h.inbound = p
 }
@@ -187,6 +199,12 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		h.handlePerf(w, r)
 	case "/debug/runtime":
 		h.handleRuntime(w, r)
+	case "/debug/shield/stats":
+		h.handleShield(w, r, "stats")
+	case "/debug/shield/bans":
+		h.handleShield(w, r, "bans")
+	case "/debug/shield/unban":
+		h.handleShield(w, r, "unban")
 	default:
 		if h.handleClientRoutes(w, r, path, wantJSON) {
 			return
@@ -255,6 +273,29 @@ type clientData struct {
 	Services  string
 	Age       string
 	Status    string
+}
+
+func (h *Handler) handleShield(w http.ResponseWriter, r *http.Request, kind string) {
+	if shieldProvider == nil {
+		http.Error(w, "shield not enabled", http.StatusServiceUnavailable)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	switch kind {
+	case "stats":
+		b, _ := shieldProvider.StatsJSON()
+		_, _ = w.Write(b)
+	case "bans":
+		b, _ := shieldProvider.BansJSON()
+		_, _ = w.Write(b)
+	case "unban":
+		ip := r.URL.Query().Get("ip")
+		if ip == "" || !shieldProvider.UnbanIP(ip) {
+			http.Error(w, "not banned", http.StatusNotFound)
+			return
+		}
+		_, _ = w.Write([]byte(`{"ok":true}`))
+	}
 }
 
 func (h *Handler) handleIndex(w http.ResponseWriter, _ *http.Request, wantJSON bool) {

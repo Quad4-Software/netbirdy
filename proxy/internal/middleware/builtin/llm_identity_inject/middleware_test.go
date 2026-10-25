@@ -140,7 +140,7 @@ func TestInject_EmptyIdentity_StripsButDoesNotAdd(t *testing.T) {
 		out.Mutations.HeadersRemove,
 		"identity headers must be stripped even when we don't have values to add — anti-spoof")
 	assert.Empty(t, out.Mutations.HeadersAdd,
-		"no NetBird identity available; do not stamp empty / misleading values")
+		"no NetBirdy identity available; do not stamp empty / misleading values")
 }
 
 func TestInject_TagsCSV_DedupesAndSorts(t *testing.T) {
@@ -358,7 +358,7 @@ func TestInject_JSONMetadata_EmptyIdentity_StripsButDoesNotAdd(t *testing.T) {
 	assert.Equal(t, []string{"x-portkey-metadata"}, out.Mutations.HeadersRemove,
 		"strip even with no payload — client can't smuggle identity headers")
 	assert.Empty(t, out.Mutations.HeadersAdd,
-		"no NetBird identity available; do not stamp empty / misleading values")
+		"no NetBirdy identity available; do not stamp empty / misleading values")
 }
 
 // TestFactory_RejectsRuleWithBothShapes pins the configuration-error
@@ -656,7 +656,7 @@ func TestInject_ExtraHeaders_Stamped(t *testing.T) {
 // TestInject_ExtraHeaders_OnlyRule pins that an extras-only rule
 // (no HeaderPair, no JSONMetadata) survives New() and stamps the
 // extras anyway. Useful for hypothetical gateways that need a static
-// routing header but no NetBird identity stamping.
+// routing header but no NetBirdy identity stamping.
 func TestInject_ExtraHeaders_OnlyRule(t *testing.T) {
 	mw := New(Config{Providers: []ProviderInjection{{
 		ProviderID: "ainp_extras-only",

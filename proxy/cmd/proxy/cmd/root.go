@@ -45,6 +45,15 @@ const DefaultManagementURL = "https://api.netbird.io:443"
 const envProxyToken = "NB_PROXY_TOKEN"
 
 var (
+	shieldMode   string
+	shieldConfig string
+	shieldState  string
+	shieldCIDRs  string
+	shieldSearch bool
+	shieldAI     string
+)
+
+var (
 	Version   = "dev"
 	Commit    = "unknown"
 	BuildDate = "unknown"
@@ -89,8 +98,8 @@ var (
 
 var rootCmd = &cobra.Command{
 	Use:          "proxy",
-	Short:        "NetBird reverse proxy server",
-	Long:         "NetBird reverse proxy server for proxying traffic to NetBird networks.",
+	Short:        "NetBirdy reverse proxy server",
+	Long:         "NetBirdy reverse proxy server for proxying traffic to NetBirdy networks.",
 	Version:      Version,
 	SilenceUsage: true,
 	RunE:         runServer,
@@ -101,8 +110,14 @@ func init() {
 	rootCmd.PersistentFlags().BoolVar(&debugLogs, "debug", envBoolOrDefault("NB_PROXY_DEBUG_LOGS", false), "Enable debug logs")
 	_ = rootCmd.PersistentFlags().MarkDeprecated("debug", "use --log-level instead")
 	rootCmd.Flags().StringVar(&mgmtAddr, "mgmt", envStringOrDefault("NB_PROXY_MANAGEMENT_ADDRESS", DefaultManagementURL), "Management address to connect to")
+	rootCmd.Flags().StringVar(&shieldMode, "shield-mode", envStringOrDefault("NB_PROXY_SHIELD_MODE", "enforce"), "Shield mode: off|observe|enforce")
+	rootCmd.Flags().StringVar(&shieldConfig, "shield-config", envStringOrDefault("NB_PROXY_SHIELD_CONFIG", ""), "Shield YAML config path")
+	rootCmd.Flags().StringVar(&shieldState, "shield-state-file", envStringOrDefault("NB_PROXY_SHIELD_STATE_FILE", ""), "Shield bans state file")
+	rootCmd.Flags().StringVar(&shieldCIDRs, "shield-allow-cidrs", envStringOrDefault("NB_PROXY_SHIELD_ALLOW_CIDRS", ""), "Comma-separated allowed CIDRs")
+	rootCmd.Flags().BoolVar(&shieldSearch, "shield-allow-search-engines", envBoolOrDefault("NB_PROXY_SHIELD_ALLOW_SEARCH_ENGINES", false), "Allow verified search engines")
+	rootCmd.Flags().StringVar(&shieldAI, "shield-ai-crawlers", envStringOrDefault("NB_PROXY_SHIELD_AI_CRAWLERS", "deny"), "AI crawler policy")
 	rootCmd.Flags().StringVar(&addr, "addr", envStringOrDefault("NB_PROXY_ADDRESS", ":443"), "Reverse proxy address to listen on")
-	rootCmd.Flags().StringVar(&proxyDomain, "domain", envStringOrDefault("NB_PROXY_DOMAIN", ""), "The Domain at which this proxy will be reached. e.g., netbird.example.com")
+	rootCmd.Flags().StringVar(&proxyDomain, "domain", envStringOrDefault("NB_PROXY_DOMAIN", ""), "The Domain at which this proxy will be reached. e.g., netbirdy.example.com")
 	rootCmd.Flags().StringVar(&certDir, "cert-dir", envStringOrDefault("NB_PROXY_CERTIFICATE_DIRECTORY", "./certs"), "Directory to store certificates")
 	rootCmd.Flags().BoolVar(&acmeCerts, "acme-certs", envBoolOrDefault("NB_PROXY_ACME_CERTIFICATES", false), "Generate ACME certificates automatically")
 	rootCmd.Flags().StringVar(&acmeAddr, "acme-addr", envStringOrDefault("NB_PROXY_ACME_ADDRESS", ":80"), "HTTP address for ACME HTTP-01 challenges (only used when acme-challenge-type is http-01)")
@@ -125,7 +140,7 @@ func init() {
 	rootCmd.Flags().StringVar(&preSharedKey, "preshared-key", envStringOrDefault("NB_PROXY_PRESHARED_KEY", ""), "Define a pre-shared key for the tunnel between proxy and peers")
 	rootCmd.Flags().BoolVar(&supportsCustomPorts, "supports-custom-ports", envBoolOrDefault("NB_PROXY_SUPPORTS_CUSTOM_PORTS", true), "Whether the proxy can bind arbitrary ports for UDP/TCP passthrough")
 	rootCmd.Flags().BoolVar(&requireSubdomain, "require-subdomain", envBoolOrDefault("NB_PROXY_REQUIRE_SUBDOMAIN", false), "Require a subdomain label in front of the cluster domain")
-	rootCmd.Flags().BoolVar(&private, "private", envBoolOrDefault("NB_PROXY_PRIVATE", false), "Enable private services accessible with NetBird-Only authentication mode.")
+	rootCmd.Flags().BoolVar(&private, "private", envBoolOrDefault("NB_PROXY_PRIVATE", false), "Enable private services accessible with NetBirdy-Only authentication mode.")
 	_ = rootCmd.Flags().MarkHidden("private")
 	rootCmd.Flags().DurationVar(&maxDialTimeout, "max-dial-timeout", envDurationOrDefault("NB_PROXY_MAX_DIAL_TIMEOUT", 0), "Cap per-service backend dial timeout (0 = no cap)")
 	rootCmd.Flags().DurationVar(&maxSessionIdleTimeout, "max-session-idle-timeout", envDurationOrDefault("NB_PROXY_MAX_SESSION_IDLE_TIMEOUT", 0), "Cap per-service session idle timeout (0 = no cap)")
@@ -256,6 +271,12 @@ func runServer(cmd *cobra.Command, args []string) error {
 		HealthAddr:               healthAddr,
 		ForwardedProto:           forwardedProto,
 		TrustedProxies:           parsedTrustedProxies,
+		ShieldMode:               shieldMode,
+		ShieldConfigFile:         shieldConfig,
+		ShieldStateFile:          shieldState,
+		ShieldAllowCIDRs:         shieldCIDRs,
+		ShieldAllowSearchEngines: shieldSearch,
+		ShieldAICrawlers:         shieldAI,
 		CertLockMethod:           nbacme.CertLockMethod(certLockMethod),
 		WildcardCertDir:          wildcardCertDir,
 		WireguardPort:            wgPort,

@@ -1,11 +1,11 @@
-# Netbird Reverse Proxy
+# NetBirdy Reverse Proxy
 
-The NetBird Reverse Proxy is a separate service that can act as a public entrypoint to certain resources within a NetBird network.
+The NetBirdy Reverse Proxy is a separate service that can act as a public entrypoint to certain resources within a NetBirdy network.
 At a high level, the way that it operates is:
 - Configured routes are communicated from the Management server to the proxy.
-- For each route the proxy creates a NetBird connection to the NetBird Peer that hosts the resource.
-- When traffic hits the proxy at the address and path configured for the proxied resource, the NetBird Proxy brings up a relevant authentication method for that resource.
-- On successful authentication the proxy will forward traffic onwards to the NetBird Peer.
+- For each route the proxy creates a NetBirdy connection to the NetBirdy Peer that hosts the resource.
+- When traffic hits the proxy at the address and path configured for the proxied resource, the NetBirdy Proxy brings up a relevant authentication method for that resource.
+- On successful authentication the proxy will forward traffic onwards to the NetBirdy Peer.
 
 Proxy Authentication methods supported are:
 - No authentication
@@ -53,8 +53,8 @@ or deleting a target removes its rule, so a less-specific target may then match.
 
 Service IP, country, and reputation restrictions still apply to bypassed paths.
 Bypass is unavailable for private services and Agent Network targets. Bypassed
-requests have no NetBird user identity; configured header-auth credentials,
-NetBird session cookies, and client-supplied NetBird identity headers are still
+requests have no NetBirdy user identity; configured header-auth credentials,
+NetBirdy session cookies, and client-supplied NetBirdy identity headers are still
 removed before forwarding. Custom upstream headers remain target settings, so
 consider their effect when making a target public.
 
@@ -82,23 +82,23 @@ When using ACME, the proxy server will store generated certificates in the speci
 
 The authentication UI is a Vite + React application located in the `web/` directory. It is embedded into the Go binary at build time.
 
-To build the UI:
+To build the UI (the workspace pins pnpm 12.14.0; install with
+`npm install -g pnpm@12.14.0` or corepack):
 ```bash
-cd web
-npm install
-npm run build
+pnpm install --frozen-lockfile
+pnpm --filter web build
 ```
 
 For UI development with hot reload (served at http://localhost:3031):
 ```bash
-npm run dev
+pnpm --filter web dev
 ```
 
 The built assets in `web/dist/` are embedded via `//go:embed` and served by the `web.ServeHTTP` handler.
 
 ## Configuration
 
-NetBird Proxy deployment configuration is via flags or environment variables, with flags taking precedence over the environment.
+NetBirdy Proxy deployment configuration is via flags or environment variables, with flags taking precedence over the environment.
 The following deployment configuration is available:
 
 | Flag             | Env                              | Purpose                                                                                                                            | Default                                            |
@@ -111,7 +111,7 @@ The following deployment configuration is available:
 | `-acme-certs`    | `NB_PROXY_ACME_CERTIFICATES`     | Whether to use ACME to generate certificates.                                                                                      | `false`                                            |
 | `-acme-addr`     | `NB_PROXY_ACME_ADDRESS`          | The HTTP address the proxy will listen on to respond to HTTP-01 ACME challenges                                                    | `":80"`                                            |
 | `-acme-dir`      | `NB_PROXY_ACME_DIRECTORY`        | The directory URL of the ACME server to be used                                                                                    | `"https://acme-v02.api.letsencrypt.org/directory"` |
-| `-oidc-id`       | `NB_PROXY_OIDC_CLIENT_ID`        | The OAuth2 Client ID for OIDC User Authentication                                                                                  | `"netbird-proxy"`                                  |
+| `-oidc-id`       | `NB_PROXY_OIDC_CLIENT_ID`        | The OAuth2 Client ID for OIDC User Authentication                                                                                  | `"netbirdy-proxy"`                                  |
 | `-oidc-secret`   | `NB_PROXY_OIDC_CLIENT_SECRET`    | The OAuth2 Client Secret for OIDC User Authentication                                                                              | `""`                                               |
 | `-oidc-endpoint` | `NB_PROXY_OIDC_ENDPOINT`         | The OAuth2 provider endpoint for OIDC User Authentication                                                                          | `"https://api.netbird.io/oauth2"`                  |
 | `-oidc-scopes`   | `NB_PROXY_OIDC_SCOPES`           | The OAuth2 scopes for OIDC User Authentication, comma separated                                                                    | `"openid,profile,email"`                           |

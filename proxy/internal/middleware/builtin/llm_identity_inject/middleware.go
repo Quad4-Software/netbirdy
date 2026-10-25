@@ -1,5 +1,5 @@
 // Package llm_identity_inject implements the SlotOnRequest middleware
-// that stamps the caller's NetBird identity onto upstream LLM-gateway
+// that stamps the caller's NetBirdy identity onto upstream LLM-gateway
 // requests. It runs after llm_router (which resolves the provider) and
 // looks up the resolved provider id against a per-account injection
 // table built by the synthesiser from the catalog's IdentityInjection
@@ -37,7 +37,7 @@ const ID = "llm_identity_inject"
 // Version is reported via Middleware.Version().
 const Version = "1.0.0"
 
-// Middleware stamps NetBird identity onto upstream requests for the
+// Middleware stamps NetBirdy identity onto upstream requests for the
 // configured set of resolved providers.
 type Middleware struct {
 	cfg  Config

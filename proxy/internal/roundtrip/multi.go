@@ -10,15 +10,15 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-// MultiTransport dispatches each request to either the embedded NetBird
+// MultiTransport dispatches each request to either the embedded NetBirdy
 // http.RoundTripper or a stdlib http.Transport based on a per-request
 // context flag set by the reverse-proxy rewrite step. When the flag is
 // absent (the default for every existing target), requests follow the
-// embedded NetBird path — current behaviour, preserved.
+// embedded NetBirdy path — current behaviour, preserved.
 //
 // The stdlib branch is used when a target was configured with
 // direct_upstream=true. It dials via the host's network stack, which is
-// what private (`netbird proxy`) deployments and centralised proxies
+// what private (`netbirdy proxy`) deployments and centralised proxies
 // fronting host-reachable upstreams (public APIs, LAN services,
 // localhost sidecars) want.
 //
@@ -36,7 +36,7 @@ type MultiTransport struct {
 // the direct branch, which would bypass the WG tunnel.
 var errNoEmbeddedTransport = errors.New("multitransport: embedded roundtripper not configured")
 
-// NewMultiTransport wires both branches. embedded is the existing NetBird
+// NewMultiTransport wires both branches. embedded is the existing NetBirdy
 // roundtripper and must not be nil — pass to NewDirectOnly for a
 // MultiTransport that only ever uses the direct branch. The direct
 // branches honour the same NB_PROXY_* tuning env vars as the embedded
@@ -73,7 +73,7 @@ func NewMultiTransport(embedded http.RoundTripper, logger *log.Logger) *MultiTra
 	// version must be applied first or the source loses HTTP/2 for good.
 	applyUpstreamHTTPVersion(direct, cfg.upstreamHTTPVersion)
 	insecure := direct.Clone()
-	insecure.TLSClientConfig = &tls.Config{InsecureSkipVerify: true} //nolint:gosec // matches the embedded NetBird transport's per-target opt-in
+	insecure.TLSClientConfig = &tls.Config{InsecureSkipVerify: true} //nolint:gosec // matches the embedded NetBirdy transport's per-target opt-in
 
 	return &MultiTransport{
 		embedded: embedded,
@@ -104,7 +104,7 @@ func (noEmbeddedRoundTripper) RoundTrip(*http.Request) (*http.Response, error) {
 // RoundTrip dispatches by reading the direct-upstream flag from the request
 // context. When set, the request is forwarded via the stdlib transport,
 // honouring the existing per-request skip-TLS-verify flag. Otherwise it
-// goes through the embedded NetBird roundtripper.
+// goes through the embedded NetBirdy roundtripper.
 func (m *MultiTransport) RoundTrip(req *http.Request) (*http.Response, error) {
 	if DirectUpstreamFromContext(req.Context()) {
 		if skipTLSVerifyFromContext(req.Context()) {

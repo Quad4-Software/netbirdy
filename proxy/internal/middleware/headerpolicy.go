@@ -29,7 +29,7 @@ var denyHeaderPrefixes = []string{
 	"X-Authenticated-",
 	"X-Forwarded-",
 	"X-Remote-",
-	"X-NetBird-",
+	"X-NetBirdy-",
 }
 
 // IsHeaderMutable reports whether a middleware is allowed to mutate
@@ -108,6 +108,6 @@ func isTrustedIdentityHeader(middlewareID, name string) bool {
 	if middlewareID != trustedIdentityMiddlewareID {
 		return false
 	}
-	return strings.EqualFold(name, "x-netbird-user-id") ||
-		strings.EqualFold(name, "x-netbird-groups")
+	return strings.EqualFold(name, "x-netbirdy-user-id") ||
+		strings.EqualFold(name, "x-netbirdy-groups")
 }

@@ -929,7 +929,7 @@ func TestRouter_AuthorisingGroups_EmitsIntersection(t *testing.T) {
 // TestRouter_EmptyModelsClaimsAnyModel pins that a route with no
 // configured Models matches every model — used by gateway-style
 // providers (LiteLLM, custom OpenAI-compatible endpoints) where the
-// operator can't enumerate the upstream's model catalog in NetBird.
+// operator can't enumerate the upstream's model catalog in NetBirdy.
 func TestRouter_EmptyModelsClaimsAnyModel(t *testing.T) {
 	mw := New(Config{Providers: []ProviderRoute{{
 		ID:              "litellm",

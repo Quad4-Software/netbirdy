@@ -62,9 +62,9 @@ func (m *mockStatusNotifier) calls() []statusCall {
 	return append([]statusCall{}, m.statuses...)
 }
 
-// mockNetBird creates a NetBird instance for testing without actually connecting.
+// mockNetBird creates a NetBirdy instance for testing without actually connecting.
 // It uses an invalid management URL to prevent real connections.
-func mockNetBird() *NetBird {
+func mockNetBird() *NetBirdy {
 	nb := NewNetBird(context.Background(), "test-proxy", "invalid.test", ClientConfig{
 		MgmtAddr:     "http://invalid.test:9999",
 		WGPort:       0,

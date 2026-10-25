@@ -9,7 +9,7 @@ import type { ErrorData } from "@/data";
 
 export function ErrorPage({ code, title, message, proxy = true, destination = true, requestId, simple = false, retryUrl }: Readonly<ErrorData>) {
   useEffect(() => {
-    document.title = `${title} - NetBird Service`;
+    document.title = `${title} - NetBirdy Service`;
   }, [title]);
 
   const [timestamp] = useState(() => new Date().toISOString());

@@ -179,8 +179,8 @@ func TestIntegration_TargetAccessControl_ManagementToUpstream(t *testing.T) {
 
 	bypassHeaders := http.Header{
 		targetAccessHeader: []string{"spoofed-auth"},
-		"X-NetBird-User":   []string{"spoofed@example.com"},
-		"X-NetBird-Groups": []string{"administrators"},
+		"X-NetBirdy-User":   []string{"spoofed@example.com"},
+		"X-NetBirdy-Groups": []string{"administrators"},
 	}
 	res = targetAccessRequestTo(handler, "/public/ready", "198.51.100.10:12000", bypassHeaders)
 	assert.Equal(t, http.StatusOK, res.Code, "bypass target must reach upstream without authenticating")
@@ -189,8 +189,8 @@ func TestIntegration_TargetAccessControl_ManagementToUpstream(t *testing.T) {
 	bypassed := bypassRequests[len(bypassRequests)-1]
 	assert.Equal(t, "/ready", bypassed.path, "routing must retain the existing literal-prefix rewrite")
 	assert.Empty(t, bypassed.headers.Get(targetAccessHeader), "configured auth header must be stripped on bypass")
-	assert.Empty(t, bypassed.headers.Get("X-NetBird-User"), "bypass must not permit spoofed identity")
-	assert.Empty(t, bypassed.headers.Get("X-NetBird-Groups"), "bypass must not permit spoofed groups")
+	assert.Empty(t, bypassed.headers.Get("X-NetBirdy-User"), "bypass must not permit spoofed identity")
+	assert.Empty(t, bypassed.headers.Get("X-NetBirdy-Groups"), "bypass must not permit spoofed groups")
 
 	before = len(bypassRequests)
 	res = targetAccessRequestTo(handler, "/blocked/secret", "198.51.100.10:12000", validHeader)

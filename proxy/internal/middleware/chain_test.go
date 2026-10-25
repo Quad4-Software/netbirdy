@@ -286,25 +286,25 @@ func TestChain_IdentityInjectReplacesReservedNetBirdHeaders(t *testing.T) {
 		mutationsSupported: true,
 		canMutate:          true,
 		mutations: &Mutations{
-			HeadersRemove: []string{"x-netbird-user-id", "x-netbird-groups"},
+			HeadersRemove: []string{"x-netbirdy-user-id", "x-netbirdy-groups"},
 			HeadersAdd: []KV{
-				{Key: "x-netbird-user-id", Value: "trusted-user"},
-				{Key: "x-netbird-groups", Value: "trusted-group"},
+				{Key: "x-netbirdy-user-id", Value: "trusted-user"},
+				{Key: "x-netbirdy-groups", Value: "trusted-group"},
 			},
 		},
 	}
 	c := chainFor(t, mw)
 	req, err := http.NewRequest(http.MethodGet, "https://gateway.example.com/v1/models", nil)
 	require.NoError(t, err)
-	req.Header.Set("x-netbird-user-id", "spoofed-user")
-	req.Header.Set("x-netbird-groups", "spoofed-group")
+	req.Header.Set("x-netbirdy-user-id", "spoofed-user")
+	req.Header.Set("x-netbirdy-groups", "spoofed-group")
 
 	denied, _, _, err := c.RunRequest(context.Background(), req, &Input{}, NewAccumulator(0))
 	require.NoError(t, err)
 	assert.Nil(t, denied, "identity injection must not deny the request")
-	assert.Equal(t, "trusted-user", req.Header.Get("x-netbird-user-id"),
+	assert.Equal(t, "trusted-user", req.Header.Get("x-netbirdy-user-id"),
 		"the built-in identity middleware must replace a spoofed user header")
-	assert.Equal(t, "trusted-group", req.Header.Get("x-netbird-groups"),
+	assert.Equal(t, "trusted-group", req.Header.Get("x-netbirdy-groups"),
 		"the built-in identity middleware must replace spoofed groups")
 }
 
@@ -315,25 +315,25 @@ func TestChain_OtherMiddlewareCannotReplaceReservedNetBirdHeaders(t *testing.T) 
 		mutationsSupported: true,
 		canMutate:          true,
 		mutations: &Mutations{
-			HeadersRemove: []string{"x-netbird-user-id", "x-netbird-groups"},
+			HeadersRemove: []string{"x-netbirdy-user-id", "x-netbirdy-groups"},
 			HeadersAdd: []KV{
-				{Key: "x-netbird-user-id", Value: "replacement-user"},
-				{Key: "x-netbird-groups", Value: "replacement-group"},
+				{Key: "x-netbirdy-user-id", Value: "replacement-user"},
+				{Key: "x-netbirdy-groups", Value: "replacement-group"},
 			},
 		},
 	}
 	c := chainFor(t, mw)
 	req, err := http.NewRequest(http.MethodGet, "https://gateway.example.com/v1/models", nil)
 	require.NoError(t, err)
-	req.Header.Set("x-netbird-user-id", "original-user")
-	req.Header.Set("x-netbird-groups", "original-group")
+	req.Header.Set("x-netbirdy-user-id", "original-user")
+	req.Header.Set("x-netbirdy-groups", "original-group")
 
 	denied, _, _, err := c.RunRequest(context.Background(), req, &Input{}, NewAccumulator(0))
 	require.NoError(t, err)
 	assert.Nil(t, denied, "blocked mutations must not deny the request")
-	assert.Equal(t, "original-user", req.Header.Get("x-netbird-user-id"),
+	assert.Equal(t, "original-user", req.Header.Get("x-netbirdy-user-id"),
 		"other middleware must remain unable to mutate reserved identity headers")
-	assert.Equal(t, "original-group", req.Header.Get("x-netbird-groups"),
+	assert.Equal(t, "original-group", req.Header.Get("x-netbirdy-groups"),
 		"other middleware must remain unable to mutate reserved identity headers")
 }
 

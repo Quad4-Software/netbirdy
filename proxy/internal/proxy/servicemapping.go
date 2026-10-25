@@ -44,7 +44,7 @@ type PathTarget struct {
 	PathRewrite    PathRewriteMode
 	CustomHeaders  map[string]string
 	// DirectUpstream selects the stdlib HTTP transport (host network stack)
-	// over the embedded NetBird WireGuard client when forwarding requests
+	// over the embedded NetBirdy WireGuard client when forwarding requests
 	// to this target. Default false → embedded client (existing behaviour).
 	DirectUpstream bool
 	// Middlewares is the validated per-target middleware chain. Nil or empty

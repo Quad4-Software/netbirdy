@@ -1,22 +1,71 @@
+@font-face { font-family:"Instrument Sans"; font-style:normal; font-weight:100 900; font-display:swap; src:url("./assets/fonts/instrument-sans-latin-wght-normal.woff2") format("woff2"); }
+@font-face { font-family:"JetBrains Mono"; font-style:normal; font-weight:100 800; font-display:swap; src:url("./assets/fonts/jetbrains-mono-latin-wght-normal.woff2") format("woff2"); }
 @import "tailwindcss";
+
+
+
+
+
+
+
 
 @custom-variant dark (&:where(.dark, .dark *));
 
-@font-face {
-  font-family: "Inter";
-  font-style: normal;
-  font-weight: 100 900;
-  font-display: swap;
-  src: url("./assets/fonts/Inter-VariableFont_opsz,wght.ttf") format("truetype");
+/* Light scheme via prefers-color-scheme: same token remap as the dashboard. */
+@media (prefers-color-scheme: light) {
+  :root:not(.dark) {
+    color-scheme: light;
+    --color-nb-gray-50: #1d2320;
+    --color-nb-gray-100: #2a2f2b;
+    --color-nb-gray-200: #3d443c;
+    --color-nb-gray-250: #454b43;
+    --color-nb-gray-300: #5a6158;
+    --color-nb-gray-350: #5a6158;
+    --color-nb-gray-400: #5a6158;
+    --color-nb-gray-500: #6b7268;
+    --color-nb-gray-600: #ddd5c3;
+    --color-nb-gray-700: #ddd5c3;
+    --color-nb-gray-800: #ede7d8;
+    --color-nb-gray-850: #f6f2ea;
+    --color-nb-gray-900: #f6f2ea;
+    --color-nb-gray-910: #fbf8f1;
+    --color-nb-gray-920: #fbf8f1;
+    --color-nb-gray-925: #fbf8f1;
+    --color-nb-gray-930: #fbf8f1;
+    --color-nb-gray-935: #fbf8f1;
+    --color-nb-gray-940: #fbf8f1;
+    --color-nb-gray-950: #fbf8f1;
+    --color-nb-gray-960: #fbf8f1;
+    --color-nb-gray: #f6f2ea;
+    --color-gray-50: #1d2320;
+    --color-gray-100: #2a2f2b;
+    --color-gray-200: #333a35;
+    --color-gray-300: #5a6158;
+    --color-gray-400: #5a6158;
+    --color-gray-500: #5a6158;
+    --color-gray-600: #ddd5c3;
+    --color-gray-700: #ddd5c3;
+    --color-gray-800: #ede7d8;
+    --color-gray-900: #f6f2ea;
+    --color-white: #1d2320;
+    --color-zinc-50: #1d2320;
+    --color-zinc-800: #fbf8f1;
+    --color-neutral-950: #fbf8f1;
+    --color-netbird: #b81e34;
+    --color-netbird-400: #b81e34;
+    --color-netbird-500: #b81e34;
+    --color-netbird-600: #911a2e;
+  }
+  body { background: #f6f2ea; color: #1d2320; }
+  body { background: #f6f2ea; color: #1d2320; }
 }
+/* dark default when prefers-color-scheme is unset */
+:root { color-scheme: dark; }
+html:not(.dark) body { }
 
-@font-face {
-  font-family: "Inter";
-  font-style: italic;
-  font-weight: 100 900;
-  font-display: swap;
-  src: url("./assets/fonts/Inter-Italic-VariableFont_opsz,wght.ttf") format("truetype");
-}
+
+
+
 
 @theme {
   /* Gray */
@@ -115,46 +164,46 @@
   --color-pink-800: #99154B;
   --color-pink-900: #751A3D;
 
-  /* NetBird Gray */
-  --color-nb-gray: #181A1D;
-  --color-nb-gray-50: #f4f6f7;
-  --color-nb-gray-100: #e4e7e9;
-  --color-nb-gray-200: #cbd2d6;
-  --color-nb-gray-250: #b7c0c6;
-  --color-nb-gray-300: #aab4bd;
-  --color-nb-gray-350: #8f9ca8;
-  --color-nb-gray-400: #7c8994;
-  --color-nb-gray-500: #616e79;
-  --color-nb-gray-600: #535d67;
-  --color-nb-gray-700: #474e57;
-  --color-nb-gray-800: #3f444b;
-  --color-nb-gray-850: #363b40;
-  --color-nb-gray-900: #32363D;
-  --color-nb-gray-910: #2b2f33;
-  --color-nb-gray-920: #25282d;
-  --color-nb-gray-925: #1e2123;
-  --color-nb-gray-930: #25282c;
-  --color-nb-gray-935: #1f2124;
-  --color-nb-gray-940: #1c1e21;
-  --color-nb-gray-950: #181a1d;
-  --color-nb-gray-960: #15171a;
+  /* NetBirdy Gray */
+  --color-nb-gray: #000000;
+  --color-nb-gray-50: #f5f5f5;
+  --color-nb-gray-100: #e8e8e8;
+  --color-nb-gray-200: #d0d0d0;
+  --color-nb-gray-250: #bcbcbc;
+  --color-nb-gray-300: #a6a6a6;
+  --color-nb-gray-350: #929292;
+  --color-nb-gray-400: #7d7d7d;
+  --color-nb-gray-500: #636363;
+  --color-nb-gray-600: #4f4f4f;
+  --color-nb-gray-700: #3a3a3a;
+  --color-nb-gray-800: #2c2c2c;
+  --color-nb-gray-850: #242424;
+  --color-nb-gray-900: #1a1a1a;
+  --color-nb-gray-910: #171717;
+  --color-nb-gray-920: #141414;
+  --color-nb-gray-925: #111111;
+  --color-nb-gray-930: #131313;
+  --color-nb-gray-935: #0f0f0f;
+  --color-nb-gray-940: #0c0c0c;
+  --color-nb-gray-950: #080808;
+  --color-nb-gray-960: #050505;
 
-  /* NetBird Orange */
-  --color-netbird: #f68330;
-  --color-netbird-50: #fff6ed;
-  --color-netbird-100: #feecd6;
-  --color-netbird-150: #ffdfb8;
-  --color-netbird-200: #ffd4a6;
-  --color-netbird-300: #fab677;
-  --color-netbird-400: #f68330;
-  --color-netbird-500: #f46d1b;
-  --color-netbird-600: #e55311;
-  --color-netbird-700: #be3e10;
-  --color-netbird-800: #973215;
-  --color-netbird-900: #7a2b14;
-  --color-netbird-950: #421308;
+  /* NetBirdy Orange */
+  --color-netbird: #ff6b7a;
+  --color-netbird-50: #f0fdfa;
+  --color-netbird-100: #ccfbf1;
+  --color-netbird-150: #99f6e4;
+  --color-netbird-200: #5eead4;
+  --color-netbird-300: #f23c52;
+  --color-netbird-400: #ff6b7a;
+  --color-netbird-500: #d92a41;
+  --color-netbird-600: #b81e34;
+  --color-netbird-700: #911a2e;
+  --color-netbird-800: #134e4a;
+  --color-netbird-900: #042f2c;
+  --color-netbird-950: #3f0a14;
 
-  /* NetBird Blue */
+  /* NetBirdy Blue */
   --color-nb-blue: #31e4f5;
   --color-nb-blue-50: #ebffff;
   --color-nb-blue-100: #cefdff;
@@ -195,7 +244,7 @@ html.dark,
 }
 
 body {
-  font-family: "Inter", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+  font-family: "Instrument Sans", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
 }
 
 h1 {
@@ -210,4 +259,37 @@ p {
 
 [placeholder] {
   text-overflow: ellipsis;
+}
+
+/* Auth and full-screen backdrops: subtle static texture, no gradients. */
+.nb-auth-backdrop { position: relative; }
+.nb-auth-backdrop::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background-image: radial-gradient(rgba(255,255,255,0.32) 1px, transparent 1.2px);
+    background-size: 46px 46px;
+    opacity: 0.35;
+}
+@media (prefers-color-scheme: light) {
+  :root:not(.dark) .nb-auth-backdrop::before {
+    background-image: radial-gradient(rgba(201,191,168,0.5) 1px, transparent 1.2px);
+    opacity: 0.5;
+  }
+}
+html, body { min-height: 100dvh; }
+
+/* All proxy SPA pages (auth, error) share the backdrop. */
+body::before {
+    content: ""; position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    -webkit-mask-image: radial-gradient(ellipse at 50% 45%, transparent 25%, black 70%);
+    mask-image: radial-gradient(ellipse at 50% 45%, transparent 25%, black 70%);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='360' height='360'%3E%3Cg stroke='%23fff' stroke-opacity='0.06' fill='%23fff' fill-opacity='0.10'%3E%3Cpath d='M40 60 130 40M130 40 210 90M210 90 300 55M40 60 70 150M70 150 160 190M160 190 250 160M250 160 300 55M160 190 180 290M180 290 290 300M290 300 250 160M70 150 15 220M180 290 90 330M300 55 330 140'/%3E%3Ccircle cx='40' cy='60' r='2'/%3E%3Ccircle cx='130' cy='40' r='1.5'/%3E%3Ccircle cx='210' cy='90' r='2.2'/%3E%3Ccircle cx='300' cy='55' r='1.8'/%3E%3Ccircle cx='70' cy='150' r='2'/%3E%3Ccircle cx='160' cy='190' r='1.6'/%3E%3Ccircle cx='250' cy='160' r='2.4'/%3E%3Ccircle cx='15' cy='220' r='1.5'/%3E%3Ccircle cx='180' cy='290' r='2'/%3E%3Ccircle cx='290' cy='300' r='1.7'/%3E%3Ccircle cx='90' cy='330' r='1.5'/%3E%3Ccircle cx='330' cy='140' r='1.9'/%3E%3C/g%3E%3C/svg%3E");
+}
+@media (prefers-color-scheme: light) {
+  :root:not(.dark) body::before {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='360' height='360'%3E%3Cg stroke='%231d2320' stroke-opacity='0.06' fill='%231d2320' fill-opacity='0.10'%3E%3Cpath d='M40 60 130 40M130 40 210 90M210 90 300 55M40 60 70 150M70 150 160 190M160 190 250 160M250 160 300 55M160 190 180 290M180 290 290 300M290 300 250 160M70 150 15 220M180 290 90 330M300 55 330 140'/%3E%3Ccircle cx='40' cy='60' r='2'/%3E%3Ccircle cx='130' cy='40' r='1.5'/%3E%3Ccircle cx='210' cy='90' r='2.2'/%3E%3Ccircle cx='300' cy='55' r='1.8'/%3E%3Ccircle cx='70' cy='150' r='2'/%3E%3Ccircle cx='160' cy='190' r='1.6'/%3E%3Ccircle cx='250' cy='160' r='2.4'/%3E%3Ccircle cx='15' cy='220' r='1.5'/%3E%3Ccircle cx='180' cy='290' r='2'/%3E%3Ccircle cx='290' cy='300' r='1.7'/%3E%3Ccircle cx='90' cy='330' r='1.5'/%3E%3Ccircle cx='330' cy='140' r='1.9'/%3E%3C/g%3E%3C/svg%3E");
+    opacity: 0.5;
+  }
 }

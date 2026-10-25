@@ -856,7 +856,7 @@ func explicitlyClaiming(routes []ProviderRoute, model string) []ProviderRoute {
 // the given model identifier. An empty Models list is treated as
 // "claim every model" — used by gateway-style providers (LiteLLM,
 // custom OpenAI-compatible endpoints) that proxy an open-ended set of
-// upstream models the operator can't enumerate in NetBird's provider
+// upstream models the operator can't enumerate in NetBirdy's provider
 // config.
 func routeClaimsModel(route ProviderRoute, model string) bool {
 	if len(route.Models) == 0 {

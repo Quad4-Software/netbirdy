@@ -1,0 +1,40 @@
+# Scanner and attack-tool user-agent tokens, matched case-insensitive.
+# Sources: CrowdSec hub http-bad-user-agent scenario, matomo device-detector
+# bot list. Retrieved 2026-10-24. Short and high confidence on purpose.
+nmap
+nikto
+sqlmap
+masscan
+masscan/
+zgrab
+nuclei
+gobuster
+dirbuster
+dirb
+feroxbuster
+ffuf
+wfuzz
+wpscan
+acunetix
+nessus
+openvas
+burpsuite
+burp suite
+zaproxy
+OWASP ZAP
+httpx
+whatweb
+arachni
+jaeles
+netsparker
+appscan
+qualys
+w3af
+hydra
+medusa
+nuclei -
+immuniweb
+CensysInspect
+Shodan
+binaryedge
+internet-measurement.com

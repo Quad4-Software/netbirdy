@@ -2,6 +2,7 @@ package debug
 
 import (
 	"bytes"
+	"net/http/httptest"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -69,3 +70,30 @@ func TestPrintHealth_Minimal(t *testing.T) {
 	assert.NotContains(t, out, "Certificates")
 	assert.NotContains(t, out, "ACCOUNT ID")
 }
+
+func TestShieldRoutes(t *testing.T) {
+	h := &Handler{}
+	h.SetShield(fakeShield{})
+	for _, tc := range []struct {
+		path string
+		code int
+	}{
+		{"/debug/shield/stats", 200},
+		{"/debug/shield/bans", 200},
+		{"/debug/shield/unban?ip=1.2.3.4", 200},
+		{"/debug/shield/unban?ip=", 404},
+	} {
+		req := httptest.NewRequest("GET", tc.path, nil)
+		rec := httptest.NewRecorder()
+		h.ServeHTTP(rec, req)
+		if rec.Code != tc.code {
+			t.Fatalf("%s: got %d", tc.path, rec.Code)
+		}
+	}
+}
+
+type fakeShield struct{}
+
+func (fakeShield) StatsJSON() ([]byte, error) { return []byte(`{"tracked":1}`), nil }
+func (fakeShield) BansJSON() ([]byte, error)  { return []byte(`[]`), nil }
+func (fakeShield) UnbanIP(ip string) bool     { return ip != "" }
