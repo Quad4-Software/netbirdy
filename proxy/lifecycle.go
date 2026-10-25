@@ -23,6 +23,7 @@ type Config struct {
 	ShieldConfigFile         string
 	ShieldStateFile          string
 	ShieldAllowCIDRs         string
+	ShieldLogFile            string
 	ShieldAllowSearchEngines bool
 	ShieldAICrawlers         string
 
@@ -101,6 +102,9 @@ type Config struct {
 	NATExternalIPs []string
 	// ProxyProtocol enables PROXY protocol (v1/v2) on TCP listeners.
 	ProxyProtocol bool
+	// HTTP3 serves HTTP/3 over QUIC on the same port as the TLS listener.
+	HTTP3     bool
+	HTTP3Port int
 	// PreSharedKey is the WireGuard pre-shared key used between the
 	// proxy's embedded clients and peers.
 	PreSharedKey string
@@ -172,6 +176,8 @@ func New(ctx context.Context, cfg Config) *Server {
 		WireguardPort:            cfg.WireguardPort,
 		NATExternalIPs:           cfg.NATExternalIPs,
 		ProxyProtocol:            cfg.ProxyProtocol,
+		HTTP3:                    cfg.HTTP3,
+		HTTP3Port:                cfg.HTTP3Port,
 		PreSharedKey:             cfg.PreSharedKey,
 		Performance:              cfg.Performance,
 		SupportsCustomPorts:      cfg.SupportsCustomPorts,

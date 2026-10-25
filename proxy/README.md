@@ -115,3 +115,7 @@ The following deployment configuration is available:
 | `-oidc-secret`   | `NB_PROXY_OIDC_CLIENT_SECRET`    | The OAuth2 Client Secret for OIDC User Authentication                                                                              | `""`                                               |
 | `-oidc-endpoint` | `NB_PROXY_OIDC_ENDPOINT`         | The OAuth2 provider endpoint for OIDC User Authentication                                                                          | `"https://api.netbird.io/oauth2"`                  |
 | `-oidc-scopes`   | `NB_PROXY_OIDC_SCOPES`           | The OAuth2 scopes for OIDC User Authentication, comma separated                                                                    | `"openid,profile,email"`                           |
+
+## Protocols
+
+Supports HTTP/1.1, HTTP/2, HTTP/3 (QUIC on the same port, `--http3`, default on for TLS), WebSocket (ws/wss), SSE, gRPC, and TCP/UDP passthrough; see docs/protocols.md. HTTP/3 needs UDP open on the main port in addition to TCP.

@@ -13,6 +13,7 @@ import (
 	"crypto/x509"
 	"errors"
 	"fmt"
+	"github.com/netbirdio/netbird/proxy/internal/h3"
 	"io"
 	"net"
 	"net/http"
@@ -103,6 +104,7 @@ type Server struct {
 	ShieldAllowCIDRs         string
 	ShieldAllowSearchEngines bool
 	ShieldAICrawlers         string
+	ShieldLogFile            string
 	// middlewareManager drives per-target middleware dispatch. Always
 	// constructed during boot; an empty registry produces empty chains and
 	// the reverse-proxy stays on the no-capture fast path.
@@ -219,6 +221,11 @@ type Server struct {
 	// embedded client this proxy spawns.
 	Performance embed.Performance
 	// ProxyProtocol enables PROXY protocol (v1/v2) on TCP listeners.
+	//
+	// HTTP3 enables a QUIC listener on the same port for HTTP/3 requests.
+	HTTP3     bool
+	HTTP3Port int
+	h3srv     *h3.Server
 	// When enabled, the real client IP is extracted from the PROXY header
 	// sent by upstream L4 proxies that support PROXY protocol.
 	ProxyProtocol bool
@@ -452,6 +459,13 @@ func (s *Server) Start(ctx context.Context) error {
 				opts = append(opts, shield.WithMetrics(sink))
 			}
 		}
+		if s.ShieldLogFile != "" {
+			if dl, derr := shield.NewDecisionLog(s.ShieldLogFile, 0, 0, s.ShieldMode); derr == nil {
+				opts = append(opts, shield.WithDecisionLog(dl))
+			} else {
+				s.Logger.WithError(derr).Warn("shield log file unavailable")
+			}
+		}
 		opts = append(opts, shield.WithIPResolver(func(r *http.Request) netip.Addr {
 			if cd := proxy.CapturedDataFromContext(r.Context()); cd != nil {
 				return cd.GetClientIP()
@@ -502,6 +516,12 @@ func (s *Server) Start(ctx context.Context) error {
 		},
 		IdleTimeout: httpIdleTimeout,
 		ErrorLog:    newHTTPServerLogger(s.Logger, logtagValueHTTPS),
+	}
+
+	if s.HTTP3 {
+		if err := s.startH3(handler, tlsConfig); err != nil {
+			s.Logger.Warnf("http3 disabled: %v", err)
+		}
 	}
 
 	startupOK = true
@@ -1005,6 +1025,11 @@ func (s *Server) gracefulShutdown() {
 	defer drainCancel()
 
 	s.Logger.Info("draining in-flight connections")
+	if s.h3srv != nil {
+		if err := s.h3srv.Close(); err != nil {
+			s.Logger.Warnf("http3 server close: %v", err)
+		}
+	}
 	if s.https != nil {
 		if err := s.https.Shutdown(drainCtx); err != nil {
 			s.Logger.Warnf("https server drain: %v", err)
@@ -2571,4 +2596,26 @@ func isIPStr(h string) bool {
 		return ip.IsValid()
 	}
 	return false
+}
+
+// startH3 binds the QUIC listener and advertises HTTP/3 via Alt-Svc on the
+// TCP responses. The shield and auth chain is shared, so decisions apply to
+// both transports identically; the client IP is the QUIC remote address.
+// WebSocket and extended CONNECT are not supported over h3 (browsers keep
+// those on h1.1/h2 since Alt-Svc is advisory).
+func (s *Server) startH3(handler http.Handler, tlsConfig *tls.Config) error {
+	srv, err := h3.New(s.ListenAddr, handler, tlsConfig, s.HTTP3Port)
+	if err != nil {
+		return err
+	}
+	s.h3srv = srv
+	// Advertise h3 on the TCP listener only; h3 responses need no Alt-Svc.
+	s.https.Handler = h3.AltSvcMiddleware(srv.AltSvc())(handler)
+	go func() {
+		s.Logger.Debug("starting HTTP/3 server")
+		if err := srv.Serve(); err != nil {
+			s.recordRunErr(fmt.Errorf("http3 server: %w", err))
+		}
+	}()
+	return nil
 }

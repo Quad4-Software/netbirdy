@@ -50,6 +50,7 @@ var (
 	shieldState  string
 	shieldCIDRs  string
 	shieldSearch bool
+	shieldLog    string
 	shieldAI     string
 )
 
@@ -87,6 +88,8 @@ var (
 	wgPort                uint16
 	externalIPMap         []string
 	proxyProtocol         bool
+	http3                 bool
+	http3Port             int
 	preSharedKey          string
 	supportsCustomPorts   bool
 	requireSubdomain      bool
@@ -114,6 +117,7 @@ func init() {
 	rootCmd.Flags().StringVar(&shieldConfig, "shield-config", envStringOrDefault("NB_PROXY_SHIELD_CONFIG", ""), "Shield YAML config path")
 	rootCmd.Flags().StringVar(&shieldState, "shield-state-file", envStringOrDefault("NB_PROXY_SHIELD_STATE_FILE", ""), "Shield bans state file")
 	rootCmd.Flags().StringVar(&shieldCIDRs, "shield-allow-cidrs", envStringOrDefault("NB_PROXY_SHIELD_ALLOW_CIDRS", ""), "Comma-separated allowed CIDRs")
+	rootCmd.Flags().StringVar(&shieldLog, "shield-log-file", envStringOrDefault("NB_PROXY_SHIELD_LOG_FILE", ""), "Shield decisions jsonl log path")
 	rootCmd.Flags().BoolVar(&shieldSearch, "shield-allow-search-engines", envBoolOrDefault("NB_PROXY_SHIELD_ALLOW_SEARCH_ENGINES", false), "Allow verified search engines")
 	rootCmd.Flags().StringVar(&shieldAI, "shield-ai-crawlers", envStringOrDefault("NB_PROXY_SHIELD_AI_CRAWLERS", "deny"), "AI crawler policy")
 	rootCmd.Flags().StringVar(&addr, "addr", envStringOrDefault("NB_PROXY_ADDRESS", ":443"), "Reverse proxy address to listen on")
@@ -136,6 +140,8 @@ func init() {
 	rootCmd.Flags().StringVar(&wildcardCertDir, "wildcard-cert-dir", envStringOrDefault("NB_PROXY_WILDCARD_CERT_DIR", ""), "Directory containing wildcard certificate pairs (<name>.crt/<name>.key). Wildcard patterns are extracted from SANs automatically")
 	rootCmd.Flags().Uint16Var(&wgPort, "wg-port", envUint16OrDefault("NB_PROXY_WG_PORT", 0), "WireGuard listen port (0 = random). Fixed port only works with single-account deployments")
 	rootCmd.Flags().StringSliceVar(&externalIPMap, "external-ip-map", envStringSliceOrDefault("NB_PROXY_EXTERNAL_IP_MAP", nil), "Comma-separated external IPs to advertise as ICE candidates, as IP or IP/internal-IP-or-interface (e.g. '203.0.113.5/10.0.0.5'). Requires a fixed --wg-port forwarded on the NAT")
+	rootCmd.Flags().BoolVar(&http3, "http3", envBoolOrDefault("NB_PROXY_HTTP3", true), "Serve HTTP/3 over QUIC on the main port (UDP)")
+	rootCmd.Flags().IntVar(&http3Port, "http3-port", envIntOrDefault("NB_PROXY_HTTP3_PORT", 0), "HTTP/3 UDP port override (0 = same as main listener)")
 	rootCmd.Flags().BoolVar(&proxyProtocol, "proxy-protocol", envBoolOrDefault("NB_PROXY_PROXY_PROTOCOL", false), "Enable PROXY protocol on TCP listeners to preserve client IPs behind L4 proxies")
 	rootCmd.Flags().StringVar(&preSharedKey, "preshared-key", envStringOrDefault("NB_PROXY_PRESHARED_KEY", ""), "Define a pre-shared key for the tunnel between proxy and peers")
 	rootCmd.Flags().BoolVar(&supportsCustomPorts, "supports-custom-ports", envBoolOrDefault("NB_PROXY_SUPPORTS_CUSTOM_PORTS", true), "Whether the proxy can bind arbitrary ports for UDP/TCP passthrough")
@@ -275,6 +281,7 @@ func runServer(cmd *cobra.Command, args []string) error {
 		ShieldConfigFile:         shieldConfig,
 		ShieldStateFile:          shieldState,
 		ShieldAllowCIDRs:         shieldCIDRs,
+		ShieldLogFile:            shieldLog,
 		ShieldAllowSearchEngines: shieldSearch,
 		ShieldAICrawlers:         shieldAI,
 		CertLockMethod:           nbacme.CertLockMethod(certLockMethod),
@@ -283,6 +290,8 @@ func runServer(cmd *cobra.Command, args []string) error {
 		NATExternalIPs:           externalIPMap,
 		Performance:              perf,
 		ProxyProtocol:            proxyProtocol,
+		HTTP3:                    http3,
+		HTTP3Port:                http3Port,
 		PreSharedKey:             preSharedKey,
 		SupportsCustomPorts:      supportsCustomPorts,
 		RequireSubdomain:         requireSubdomain,
@@ -296,6 +305,15 @@ func runServer(cmd *cobra.Command, args []string) error {
 	})
 
 	return srv.ListenAndServe(ctx, addr)
+}
+
+func envIntOrDefault(key string, def int) int {
+	if v := os.Getenv(key); v != "" {
+		if n, err := strconv.Atoi(v); err == nil {
+			return n
+		}
+	}
+	return def
 }
 
 func envBoolOrDefault(key string, def bool) bool {

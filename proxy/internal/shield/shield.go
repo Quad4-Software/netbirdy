@@ -119,18 +119,19 @@ func ResultFromContext(ctx context.Context) Result {
 
 // Shield is the defense engine.
 type Shield struct {
-	cfg        Config
-	store      *store
-	ipResolver func(*http.Request) netip.Addr
-	knownHost  func(string) bool
-	metrics    MetricsSink
-	log        *log.Entry
-	verifier   SearchVerifier
-	hmacKey    []byte
-	uaCache    sync.Map
-	stopCh     chan struct{}
-	closed     chan struct{}
-	lastPanic  atomic.Int64
+	cfg         Config
+	store       *store
+	ipResolver  func(*http.Request) netip.Addr
+	knownHost   func(string) bool
+	metrics     MetricsSink
+	decisionLog *DecisionLog
+	log         *log.Entry
+	verifier    SearchVerifier
+	hmacKey     []byte
+	uaCache     sync.Map
+	stopCh      chan struct{}
+	closed      chan struct{}
+	lastPanic   atomic.Int64
 }
 
 // New builds a Shield; clock defaults to real time unless WithClock given.
@@ -326,7 +327,7 @@ func (s *Shield) serve(w http.ResponseWriter, r *http.Request, next http.Handler
 		res.Action = ActionBlock
 		res.Reasons = append(res.Reasons, "banned")
 		install()
-		s.emit(res)
+		s.emit(r, res)
 		s.block(w, r)
 		return
 	}
@@ -434,7 +435,7 @@ func (s *Shield) serve(w http.ResponseWriter, r *http.Request, next http.Handler
 		res.Action = ActionBlock
 		res.Reasons = append(res.Reasons, "ai-crawler")
 		install()
-		s.emit(res)
+		s.emit(r, res)
 		if s.cfg.Mode == ModeEnforce {
 			s.block(w, r)
 			return
@@ -444,7 +445,7 @@ func (s *Shield) serve(w http.ResponseWriter, r *http.Request, next http.Handler
 		res.Action = ActionBlock
 		res.Reasons = append(res.Reasons, "rate-limit")
 		install()
-		s.emit(res)
+		s.emit(r, res)
 		if s.cfg.Mode == ModeEnforce {
 			w.Header().Set("Retry-After", "5")
 			http.Error(w, "rate limited", http.StatusTooManyRequests)
@@ -454,7 +455,7 @@ func (s *Shield) serve(w http.ResponseWriter, r *http.Request, next http.Handler
 	if banNow {
 		res.Action = ActionBlock
 		install()
-		s.emit(res)
+		s.emit(r, res)
 		if s.cfg.Mode == ModeEnforce {
 			s.block(w, r)
 			return
@@ -463,7 +464,7 @@ func (s *Shield) serve(w http.ResponseWriter, r *http.Request, next http.Handler
 	if score >= s.cfg.TarpitAt {
 		res.Action = ActionTarpit
 		install()
-		s.emit(res)
+		s.emit(r, res)
 		if s.cfg.Mode == ModeEnforce {
 			if !s.tarpit(w, r) {
 				s.block(w, r)
@@ -474,7 +475,7 @@ func (s *Shield) serve(w http.ResponseWriter, r *http.Request, next http.Handler
 	if score >= s.cfg.ChallengeAt && s.canChallenge(r, browser) {
 		res.Action = ActionChallenge
 		install()
-		s.emit(res)
+		s.emit(r, res)
 		if s.cfg.Mode == ModeEnforce {
 			if s.serveChallenge(w, r, ip) {
 				return
@@ -541,7 +542,7 @@ func (s *Shield) serve(w http.ResponseWriter, r *http.Request, next http.Handler
 	} else {
 		sh.mu.Unlock()
 	}
-	s.emit(res)
+	s.emit(r, res)
 }
 
 // hostOnly strips the port without allocations.
@@ -662,14 +663,17 @@ func (s *Shield) block(w http.ResponseWriter, r *http.Request) {
 	_, _ = w.Write([]byte("forbidden\n"))
 }
 
-func (s *Shield) emit(r Result) {
+func (s *Shield) emit(req *http.Request, res Result) {
 	if s.metrics != nil {
-		for _, reason := range r.Reasons {
-			s.metrics.Decision(string(r.Action), reason)
+		for _, reason := range res.Reasons {
+			s.metrics.Decision(string(res.Action), reason)
 		}
-		if len(r.Reasons) == 0 {
-			s.metrics.Decision(string(r.Action), "")
+		if len(res.Reasons) == 0 {
+			s.metrics.Decision(string(res.Action), "")
 		}
+	}
+	if s.decisionLog != nil && res.Action != ActionPass {
+		s.decisionLog.write(req, res, s.clientIP(req))
 	}
 }
 

@@ -72,7 +72,7 @@ An optional state file persists active bans. Nothing leaves the proxy.
 
 Flags: --shield-mode, --shield-config, --shield-state-file,
 --shield-allow-cidrs, --shield-allow-search-engines, --shield-ai-crawlers
-(env NB_PROXY_SHIELD_*). The chain order is hijack -> meter -> accessLog ->
+(env NB_PROXY_SHIELD_*). `--shield-log-file` (`NB_PROXY_SHIELD_LOG_FILE`) writes non-pass decisions as jsonl lines (schema: ts, type=shield, severity, src_ip, host, method, path, user_agent, action, score, reasons, ban_until, mode, request_id) for SIEM ingestion; rotated at 10 MiB x 3, mode 0600. The chain order is hijack -> meter -> accessLog ->
 shield -> assets -> auth -> proxy, so the client IP comes from CapturedData.
 
 Search engine verification uses forward-confirmed reverse DNS (PTR suffix
