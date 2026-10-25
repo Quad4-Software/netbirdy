@@ -21,7 +21,8 @@ import (
 )
 
 type Installer struct {
-	tempDir string
+	managementURL string
+	tempDir       string
 }
 
 // New used by the service
@@ -186,6 +187,11 @@ func (u *Installer) CleanUpInstallerFiles() error {
 	return merr.ErrorOrNil()
 }
 
+// SetManagementURL records the management URL for the mirror-first download order.
+func (u *Installer) SetManagementURL(mgmtURL string) {
+	u.managementURL = mgmtURL
+}
+
 func (u *Installer) downloadInstaller(ctx context.Context, installerType Type, targetVersion string) (string, error) {
 	fileURL := urlWithVersionArch(installerType, targetVersion)
 
@@ -205,12 +211,24 @@ func (u *Installer) downloadInstaller(ctx context.Context, installerType Type, t
 	}
 
 	outputFilePath := filepath.Join(u.tempDir, fileName)
-	if err := downloader.DownloadToFile(ctx, downloader.DefaultRetryDelay, fileURL, outputFilePath); err != nil {
-		return "", err
+	for _, src := range u.downloadSources(targetVersion, fileName, fileURL) {
+		if err := downloader.DownloadToFile(ctx, downloader.DefaultRetryDelay, src, outputFilePath); err != nil {
+			continue
+		}
+		log.Infof("installer %s fetched from %s", fileName, src)
+		success = true
+		return outputFilePath, nil
 	}
+	return "", fmt.Errorf("all download sources failed for %s", fileName)
+}
 
-	success = true
-	return outputFilePath, nil
+func (u *Installer) downloadSources(version, fileName, fileURL string) []string {
+	var out []string
+	if u.managementURL != "" {
+		out = append(out, strings.TrimRight(u.managementURL, "/")+"/updates/v1/files/"+version+"/"+fileName)
+	}
+	out = append(out, fileURL)
+	return out
 }
 
 func (u *Installer) TempDir() string {

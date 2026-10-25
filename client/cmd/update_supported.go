@@ -4,6 +4,7 @@ package cmd
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -13,25 +14,30 @@ import (
 
 	"github.com/netbirdio/netbird/shared/updater/installer"
 	"github.com/netbirdio/netbird/util"
+	"github.com/netbirdio/netbird/version"
 )
 
 var (
 	updateCmd = &cobra.Command{
 		Use:   "update",
 		Short: "Update the NetBirdy client application",
-		RunE:  updateFunc,
+		RunE:  updateFuncWrapped,
 	}
 
 	tempDirFlag    string
 	installerFile  string
 	serviceDirFlag string
 	dryRunFlag     bool
+	checkOnly      bool
+	yesFlag        bool
 )
 
 func init() {
 	updateCmd.Flags().StringVar(&tempDirFlag, "temp-dir", "", "temporary dir")
 	updateCmd.Flags().StringVar(&installerFile, "installer-file", "", "installer file")
 	updateCmd.Flags().StringVar(&serviceDirFlag, "service-dir", "", "service directory")
+	updateCmd.Flags().BoolVar(&checkOnly, "check", false, "print current version and download source without installing")
+	updateCmd.Flags().BoolVar(&yesFlag, "yes", false, "skip confirmation")
 	updateCmd.Flags().BoolVar(&dryRunFlag, "dry-run", false, "dry run the update process without making any changes")
 }
 
@@ -46,6 +52,14 @@ func isUpdateBinary() bool {
 	name := strings.TrimSuffix(baseName, filepath.Ext(baseName))
 
 	return name == installer.UpdaterBinaryNameWithoutExtension()
+}
+
+func updateFuncWrapped(cmd *cobra.Command, args []string) error {
+	if checkOnly {
+		cmd.Printf("current: %s\nsource: management mirror, then GitHub releases\n", version.NetbirdVersion())
+		return nil
+	}
+	return updateFunc(cmd, args)
 }
 
 func updateFunc(cmd *cobra.Command, args []string) error {
