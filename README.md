@@ -17,6 +17,9 @@ can be moved over without re-enrolling devices.
 
 Website: <https://sudo-ivan.github.io/netbirdy/>
 
+> **Note:** LLMs were used to create and maintain this fork. It is a personal
+> fork for myself, friends and family only.
+
 ## Differences from NetBird
 
 - Dashboard with a black dark theme and a light theme, a command palette, and
@@ -133,13 +136,12 @@ integrations/   Wazuh pack
 site/           project website (GitHub Pages)
 ```
 
-## Contributing
+## Development
 
-Issues and pull requests go to
-[github.com/Sudo-Ivan/netbirdy](https://github.com/Sudo-Ivan/netbirdy). Run
-`tools/rebrand/rebrand.sh --check` after naming changes and
+Run `tools/rebrand/rebrand.sh --check` after naming changes and
 `docs/brand/generate.sh --check` after brand asset changes. Report security
-problems as described in [SECURITY.md](SECURITY.md).
+problems as described in [SECURITY.md](SECURITY.md). This is a personal project,
+so issues and pull requests may not get a quick answer.
 
 ## License
 

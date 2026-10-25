@@ -43,7 +43,7 @@ in this file, not duplicated there.
   the user's call. Only typos, broken links, documentation corrections, and
   one-line fixes that already have an issue can skip this.
 - **Designing in any high-risk area** (see
-  [CONTRIBUTING.md](CONTRIBUTING.md#high-risk-areas)): public API and OpenAPI
+  the high-risk areas listed in this file): public API and OpenAPI
   schema, gRPC protos, behavior existing deployments would notice after an
   upgrade, peer connectivity (ICE, NAT traversal, relay selection, WireGuard® or
   Rosenpass key handling), client system integration (routing, firewall, DNS,
@@ -637,9 +637,7 @@ assert.Equal(t, expectedResult, result, "Result should match expected")
   Multiple tags are comma-separated inside one pair of brackets. Match the tag
   to the component you actually changed, not to the one you read the most.
 
-- **Use the repository's PR template.** Fill in
-  [`.github/pull_request_template.md`](.github/pull_request_template.md) rather
-  than replacing it with your own summary: describe the change, link the issue,
+- **Write a clear PR description.** Instead of a template, give a summary: describe the change, link the issue,
   tick the checklist honestly (including "ran locally" and "single purpose"),
   and complete the documentation section. Do not tick a box you have not
   verified, and do not delete rows that do not apply — the docs gate in CI reads
@@ -780,4 +778,3 @@ repository, so their detail lives on the PR check, not in the Actions logs.
 - Slack: <https://docs.netbird.io/slack-url>
 - Docs: <https://docs.netbird.io>
 - Security: <https://github.com/netbirdio/netbird/security/policy> — never in public
-- Contribution process: [CONTRIBUTING.md](CONTRIBUTING.md)
