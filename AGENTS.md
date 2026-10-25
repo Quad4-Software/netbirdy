@@ -1,6 +1,6 @@
-# NetBird Agent Guidelines
+# NetBirdy Agent Guidelines
 
-**NetBird** is an open source connectivity platform: a WireGuard®-based overlay
+**NetBirdy** is an open source connectivity platform: a WireGuard®-based overlay
 network with a control plane. The **agent** (`client/`) runs on user machines as
 a privileged daemon and manages the WireGuard interface, routing, firewall, and
 DNS. **Management** (`management/`) is the control plane and REST/gRPC API,
@@ -35,7 +35,7 @@ in this file, not duplicated there.
 
 - **Opening a pull request for anything beyond a trivial fix, without an agreed
   ticket.** Ask the user directly: *"Is there a discussion or issue for this
-  change?"* NetBird is discussion-first — community reports start in
+  change?"* NetBirdy is discussion-first — community reports start in
   [Discussions](https://github.com/netbirdio/netbird/discussions), DevRel
   validates them, and only validated discussions become issues. A PR that
   changes behavior with no linked issue may be closed on arrival. If there is no
@@ -92,16 +92,16 @@ PRIV_RUN=TestNftablesManager PRIV_PKGS=./client/firewall/nftables/... make test-
 ./flow/proto/generate.sh
 
 # Run locally (lab only, never on a machine you rely on)
-sudo ./client/netbird up --log-level debug --log-file console
-sudo ./client/netbird down                   # teardown: restores routing, firewall, DNS
+sudo ./client/netbirdy up --log-level debug --log-file console
+sudo ./client/netbirdy down                   # teardown: restores routing, firewall, DNS
 ./signal/signal run --log-level debug --log-file console
 ./management/management management --log-level debug --log-file console --config ./management.json
 ```
 
-`netbird up` needs root and rewrites the host's routing table, firewall rules,
+`netbirdy up` needs root and rewrites the host's routing table, firewall rules,
 DNS configuration, and WireGuard® interface. Run it only in a disposable test
 environment (a VM, container, or throwaway host) that you can rebuild, never on
-a workstation or server whose connectivity matters. Run `sudo netbird down`
+a workstation or server whose connectivity matters. Run `sudo netbirdy down`
 before you stop working, before rebuilding the binary, and on every failure
 path, so the host's networking state is restored instead of left half-applied.
 See [Pitfalls](#pitfalls) for why cleanup on every exit path matters.
@@ -109,8 +109,8 @@ See [Pitfalls](#pitfalls) for why cleanup on every exit path matters.
 ## Structure
 
 ```text
-netbird/
-├── client/              NetBird agent
+netbirdy/
+├── client/              NetBirdy agent
 │   ├── cmd/             agent CLI
 │   ├── internal/        agent business logic (engine, peer, dns, routemanager, ...)
 │   ├── server/          daemon for background execution
@@ -225,7 +225,7 @@ what it should do in the other two — before you write it.
 Do not put "WireGuard" in identifiers or comments unless the code is genuinely
 coupled to WireGuard® specifically — a wireguard-go call, a handshake field, a
 kernel WireGuard® netlink attribute. For the interface, the host, peers, or
-traffic in general, say "the NetBird interface", "the interface", or "the overlay".
+traffic in general, say "the NetBirdy interface", "the interface", or "the overlay".
 Most firewall, routing, and DNS code is transport-agnostic, so a WireGuard®
 reference there is simply inaccurate and rots as the transports change.
 
@@ -617,7 +617,7 @@ assert.Equal(t, expectedResult, result, "Result should match expected")
 - **Protos are consumed by released clients.** An old agent must keep working
   against a new Management, so fields are added, never renumbered or removed.
 - **Windows requires the wintun driver**, and the daemon serves a named pipe
-  (`npipe://netbird`) rather than loopback TCP. Loopback TCP carries no caller
+  (`npipe://netbirdy`) rather than loopback TCP. Loopback TCP carries no caller
   identity, so privileged operations are refused over it.
 
 ## Commits, PRs, releases
@@ -757,7 +757,7 @@ repository, so their detail lives on the PR check, not in the Actions logs.
 - **Read every comment and act on it.** Either fix it, or reply with the reason
   it does not apply. Do not bulk-resolve threads to clear the count, and do not
   silently ignore a finding because the check is advisory.
-- **Bots are frequently wrong here.** NetBird has privileged, platform-specific,
+- **Bots are frequently wrong here.** NetBirdy has privileged, platform-specific,
   and concurrency-heavy code that static analysis reads poorly. A confident
   CodeRabbit or Sonar comment can still be nonsense. Verify the claim against
   the code before you change anything — never edit correct code just to silence

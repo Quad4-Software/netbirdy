@@ -26,7 +26,7 @@ sequenceDiagram
     participant Ctl as network_map.Controller
     participant Synth as agentnetwork.SynthesizeServices
     participant Grpc as management gRPC
-    participant Proxy as netbird-proxy
+    participant Proxy as netbirdy-proxy
     participant Xlate as middleware_translate
     participant Chain as middleware.Chain
 
@@ -75,7 +75,7 @@ messages request through the synthesised reverse-proxy.
 sequenceDiagram
     autonumber
     actor Agent as Agent (local)
-    participant Px as netbird-proxy
+    participant Px as netbirdy-proxy
     participant Auth as auth middleware
     participant Map as service-mapping
     participant Req as llm_request_parser
@@ -107,7 +107,7 @@ sequenceDiagram
         Chk-->>Agent: 429 (or 403 per deny_code)
     else decision == allow
         Chk->>Inj: continue
-        Inj->>Inj: inject NetBird identity headers per provider config
+        Inj->>Inj: inject NetBirdy identity headers per provider config
         Inj->>Grd: continue
         Grd->>Grd: enforce per-provider allowlist (fail-closed backstop)
         Grd->>Up: forward (over WireGuard)

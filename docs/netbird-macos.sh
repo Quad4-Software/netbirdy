@@ -1,16 +1,16 @@
 #!/bin/bash
 #
 # SYNOPSIS
-#   Push the NetBird MDM policy to a macOS device via JumpCloud Commands.
+#   Push the NetBirdy MDM policy to a macOS device via JumpCloud Commands.
 #
 # DESCRIPTION
-#   This is the macOS counterpart of docs/netbird-policy.reg.ps1.
+#   This is the macOS counterpart of docs/netbirdy-policy.reg.ps1.
 #   It writes the values declared in the "POLICY VALUES" block below to
-#   the managed-preferences plist that the NetBird daemon's
+#   the managed-preferences plist that the NetBirdy daemon's
 #   client/mdm/policy_darwin.go loader reads on every 1-minute MDM
 #   reload tick:
 #
-#       /Library/Managed Preferences/io.netbird.client.plist
+#       /Library/Managed Preferences/io.netbirdy.client.plist
 #
 #   Once the plist lands, the daemon picks up the new values without
 #   restart (the ticker calls Config.apply() → applyMDMPolicy() and
@@ -25,7 +25,7 @@
 # IMPORTANT: PERSISTENCE
 #   macOS wipes /Library/Managed Preferences/ at every boot on devices
 #   that are NOT MDM-enrolled. For a persistent fleet rollout, push the
-#   companion docs/netbird-macos.mobileconfig as a Custom Configuration
+#   companion docs/netbirdy-macos.mobileconfig as a Custom Configuration
 #   Profile (Admin Console -> MDM -> Mac Custom Configuration Profiles)
 #   instead of this script. Use this script when:
 #     - the device is MDM-enrolled (file survives reboots), or
@@ -51,8 +51,8 @@ set -euo pipefail
 #
 # Reference for key names + accepted values:
 #   client/mdm/policy.go (Key* constants)
-#   docs/netbird-macos.mobileconfig (sample profile)
-#   docs/netbird.admx + .adml (Windows ADMX schema)
+#   docs/netbirdy-macos.mobileconfig (sample profile)
+#   docs/netbirdy.admx + .adml (Windows ADMX schema)
 #
 NULL='__UNSET__'
 managementURL='https://api.netbird.io:443'
@@ -78,8 +78,8 @@ splitTunnelApps="$NULL"                    # comma-separated app IDs, Android-on
 ##############################################################################
 
 readonly PLIST_DIR='/Library/Managed Preferences'
-readonly PLIST_PATH="$PLIST_DIR/io.netbird.client.plist"
-readonly LOG_TAG='netbird-mdm'
+readonly PLIST_PATH="$PLIST_DIR/io.netbirdy.client.plist"
+readonly LOG_TAG='netbirdy-mdm'
 
 # log sends a message to the system logger using the configured tag and echoes the message to stdout prefixed by an ISO 8601 UTC timestamp and the tag.
 log() {
@@ -163,9 +163,9 @@ emit_int() {
   log "set $key = $value"
 }
 
-# main builds the NetBird MDM plist from configured policy variables, validates and installs it to /Library/Managed Preferences/io.netbird.client.plist (root:wheel, 600 — the daemon reads it directly as root, so it need not be world-readable) and optionally triggers the NetBird daemon to reload.
+# main builds the NetBirdy MDM plist from configured policy variables, validates and installs it to /Library/Managed Preferences/io.netbirdy.client.plist (root:wheel, 600 — the daemon reads it directly as root, so it need not be world-readable) and optionally triggers the NetBirdy daemon to reload.
 main() {
-  log "applying NetBird MDM policy to $PLIST_PATH"
+  log "applying NetBirdy MDM policy to $PLIST_PATH"
   # Restrict the temp plist while it is being built: it carries the same
   # secret-bearing values as the final file, which is installed 0600 below.
   umask 077
@@ -226,11 +226,11 @@ main() {
   # world-writable file, which 0600 satisfies.
   /bin/chmod 600 "$PLIST_PATH"
 
-  log "policy installed; NetBird daemon will pick it up within the next 1-minute reload tick"
+  log "policy installed; NetBirdy daemon will pick it up within the next 1-minute reload tick"
 
   # Optional: kick the daemon for an immediate apply. Safe — does
-  # nothing on a host where NetBird is not yet installed.
-  /bin/launchctl kickstart -k system/io.netbird.client 2>/dev/null || true
+  # nothing on a host where NetBirdy is not yet installed.
+  /bin/launchctl kickstart -k system/io.netbirdy.client 2>/dev/null || true
 }
 
 main "$@"

@@ -2,5 +2,11 @@
 default_license = "BSD-3-Clause"
 
 [[files]]
-paths = ["management/", "signal/", "relay/"]
+paths = ["management/", "signal/", "relay/", "combined/", "dashboard/"]
 license = "AGPL-3.0-only"
+
+[[annotations]]
+copyright = "Wiretrustee UG and AUTHORS"
+license = "BSD-3-Clause"
+paths = ["dashboard/content/docs/upstream/", "dashboard/public/docs-img/"]
+note = "Documentation adapted from github.com/netbirdio/docs @ 2382247"
