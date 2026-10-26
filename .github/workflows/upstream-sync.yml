@@ -14,6 +14,7 @@ jobs:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           fetch-depth: 0
+          token: ${{ secrets.UPSTREAM_SYNC_PAT || secrets.GITHUB_TOKEN }}
       - name: detect new upstream tag
         id: tag
         run: |
@@ -33,11 +34,22 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git checkout -b "sync/${{ steps.tag.outputs.tag }}"
-          git merge --no-edit "upstream/${{ steps.tag.outputs.tag }}" || true
+          git merge --no-edit --no-commit "upstream/${{ steps.tag.outputs.tag }}" || true
           tools/rebrand/rebrand.sh
+          note=""
+          if [ -z "$UPSTREAM_SYNC_PAT" ]; then
+            dropped=$(git status --porcelain -- .github/workflows | sed -e 's/^...//' -e 's/.* -> //' | sort -u)
+            if [ -n "$dropped" ]; then
+              git reset -q HEAD -- .github/workflows
+              git checkout -- .github/workflows || true
+              git clean -fdq -- .github/workflows
+              note=$(printf '\n\nWorkflow file changes were left out because the token used to push cannot update files under `.github/workflows`. Apply them by hand:\n\n```\ngit fetch https://github.com/netbirdio/netbird.git tag %s\ngit checkout FETCH_HEAD -- .github/workflows\n```\n\nFiles affected:\n\n```\n%s\n```' "${{ steps.tag.outputs.tag }}" "$dropped")
+            fi
+          fi
           git add -A
           git commit -m "sync upstream ${{ steps.tag.outputs.tag }}" || true
           git push -u origin "sync/${{ steps.tag.outputs.tag }}"
-          gh pr create --title "sync upstream ${{ steps.tag.outputs.tag }}" --body "Automated upstream sync. Resolve conflicts marked in the diff before merging." --head "sync/${{ steps.tag.outputs.tag }}" --base main || true
+          gh pr create --title "sync upstream ${{ steps.tag.outputs.tag }}" --body "Automated upstream sync. Resolve conflicts marked in the diff before merging.$note" --head "sync/${{ steps.tag.outputs.tag }}" --base main || true
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          UPSTREAM_SYNC_PAT: ${{ secrets.UPSTREAM_SYNC_PAT }}
