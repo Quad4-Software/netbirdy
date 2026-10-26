@@ -250,6 +250,15 @@ func (m *Resolver) scheduleRefresh(question dns.Question, expected *cachedRecord
 // expected pins the cache entry observed at schedule time; mutations only apply
 // if m.records[question] still points at it.
 func (m *Resolver) refreshQuestion(question dns.Question, expected *cachedRecord) error {
+	m.mutex.RLock()
+	superseded := m.records[question] != expected
+	m.mutex.RUnlock()
+	if superseded {
+		log.Debugf("skipping refresh for domain=%s type=%s: entry already refreshed",
+			question.Name, dns.TypeToString[question.Qtype])
+		return nil
+	}
+
 	ctx, cancel := context.WithTimeout(context.Background(), dnsTimeout)
 	defer cancel()
 
