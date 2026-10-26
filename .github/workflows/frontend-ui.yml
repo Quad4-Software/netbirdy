@@ -15,6 +15,7 @@ on:
       - "client/ui/frontend/**"
       - "client/ui/i18n/**"
       - "client/ui/**/*.go"
+      - ".github/workflows/frontend-ui.yml"
 
 permissions:
   contents: read
