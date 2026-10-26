@@ -128,17 +128,21 @@ type Mirror struct {
 	cfg    Config
 	client *http.Client
 
-	mu    sync.Mutex
-	index cacheIndex
-	st    Status
-	etag  map[string]string
-	stop  chan struct{}
+	mu     sync.RWMutex
+	pollMu sync.Mutex
+	index  cacheIndex
+	st     Status
+	etag   map[string]string
+	stop   chan struct{}
 
 	platforms  func() []string      // returns "os/arch" pairs
 	target     func() string        // resolves the configured version target
 	rootKeys   []reposign.PublicKey // nil means use the embedded root
 	artKeys    []reposign.PublicKey // validated artifact keys, cached
+	artKeysAt  time.Time
 	revList    *reposign.RevocationList
+	keysTTL    time.Duration
+	keysCache  map[string]keysCacheEnt
 	limiter    *rate.Limiter
 	transferCh chan struct{}
 }
@@ -151,6 +155,7 @@ func New(cfg Config, platformsFn func() []string, targetFn func() string) *Mirro
 		cfg:       cfg,
 		index:     cacheIndex{Files: map[string]int64{}, Sums: map[string]string{}, LastUsed: map[string]int64{}},
 		etag:      map[string]string{},
+		keysCache: map[string]keysCacheEnt{},
 		stop:      make(chan struct{}),
 		platforms: platformsFn,
 		target:    targetFn,
@@ -188,7 +193,7 @@ func (m *Mirror) loadIndex() error {
 
 func (m *Mirror) saveIndexLocked() {
 	b, _ := json.Marshal(m.index)
-	tmp := m.indexFile() + ".tmp"
+	tmp := fmt.Sprintf("%s.tmp-%d", m.indexFile(), time.Now().UnixNano())
 	if err := os.WriteFile(tmp, b, 0o640); err == nil {
 		_ = os.Rename(tmp, m.indexFile())
 	}
@@ -206,9 +211,11 @@ func (m *Mirror) get(ctx context.Context, raw string, etagKey string) (*http.Res
 			req.Header.Set("Authorization", "Bearer "+tok)
 		}
 	}
-	if e := m.etag[etagKey]; e != "" {
+	m.mu.Lock()
+	if e := m.etag[etagKey]; etagKey != "" && e != "" {
 		req.Header.Set("If-None-Match", e)
 	}
+	m.mu.Unlock()
 	if u, err := url.Parse(raw); err != nil || u.Scheme != "https" {
 		return nil, fmt.Errorf("refusing non-https url: %s", raw)
 	}
@@ -216,9 +223,11 @@ func (m *Mirror) get(ctx context.Context, raw string, etagKey string) (*http.Res
 	if err != nil {
 		return nil, err
 	}
-	if resp.StatusCode == http.StatusOK {
+	if resp.StatusCode == http.StatusOK && etagKey != "" {
 		if e := resp.Header.Get("ETag"); e != "" {
+			m.mu.Lock()
 			m.etag[etagKey] = e
+			m.mu.Unlock()
 		}
 	}
 	return resp, nil
@@ -348,10 +357,17 @@ func (m *Mirror) admit(ctx context.Context, a asset, want map[string]string) err
 	if want[a.Name] != hex.EncodeToString(sum[:]) {
 		return fmt.Errorf("checksum mismatch %q", a.Name)
 	}
-	if err := m.verifyArtifact(ctx, a.URL+".sig", body); err != nil {
+	sigBytes, err := m.verifyArtifact(ctx, a.URL+".sig", body)
+	if err != nil {
 		return fmt.Errorf("signature %q: %w", a.Name, err)
 	}
-	return m.writeCache(path.Join("files", a.Name), body)
+	if err := m.writeCache(path.Join("files", a.Name), body); err != nil {
+		return err
+	}
+	if err := m.writeCache(path.Join("files", a.Name+".sig"), sigBytes); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (m *Mirror) writeCache(rel string, body []byte) error {
@@ -363,7 +379,7 @@ func (m *Mirror) writeCache(rel string, body []byte) error {
 	if err := os.MkdirAll(filepath.Dir(dst), 0o750); err != nil {
 		return err
 	}
-	tmp := dst + ".tmp"
+	tmp := fmt.Sprintf("%s.tmp-%d", dst, time.Now().UnixNano())
 	f, err := os.OpenFile(tmp, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0o640)
 	if err != nil {
 		return err
@@ -409,7 +425,7 @@ func (m *Mirror) evict(target string) {
 	}
 	var es []e
 	for rel := range m.index.Files {
-		if rel == target {
+		if target != "" && strings.Contains(filepath.Base(rel), strings.TrimPrefix(target, "v")) {
 			continue
 		}
 		es = append(es, e{rel, m.index.LastUsed[rel]})
@@ -457,10 +473,41 @@ func (m *Mirror) keysFile(ctx context.Context, name string) ([]byte, error) {
 	return io.ReadAll(io.LimitReader(resp.Body, 1<<20))
 }
 
+type keysCacheEnt struct {
+	data []byte
+	at   time.Time
+}
+
+// keysCached serves key tree files from a short lived in memory cache so the
+// unauthenticated keys route cannot be used to amplify upstream fetches.
+func (m *Mirror) keysCached(ctx context.Context, name string) ([]byte, error) {
+	m.mu.Lock()
+	e, ok := m.keysCache[name]
+	if ok && time.Since(e.at) < 10*time.Minute {
+		m.mu.Unlock()
+		return e.data, nil
+	}
+	m.mu.Unlock()
+	b, err := m.keysFile(ctx, name)
+	if err != nil {
+		return nil, err
+	}
+	m.mu.Lock()
+	m.keysCache[name] = keysCacheEnt{data: b, at: time.Now()}
+	m.mu.Unlock()
+	return b, nil
+}
+
 // trustedArtifactKeys validates the revocation list and artifact key
 // bundle against the root and caches them for the poll cycle.
 func (m *Mirror) trustedArtifactKeys(ctx context.Context) ([]reposign.PublicKey, error) {
-	if m.artKeys != nil {
+	ttl := m.keysTTL
+	if ttl <= 0 {
+		ttl = time.Hour
+	}
+	if m.artKeys != nil && m.revList != nil &&
+		time.Since(m.artKeysAt) < ttl &&
+		(m.revList.ExpiresAt.IsZero() || time.Now().Before(m.revList.ExpiresAt)) {
 		return m.artKeys, nil
 	}
 	root, err := m.root()
@@ -499,38 +546,49 @@ func (m *Mirror) trustedArtifactKeys(ctx context.Context) ([]reposign.PublicKey,
 	if err != nil {
 		return nil, err
 	}
+	if rev != nil && !rev.ExpiresAt.IsZero() && time.Now().After(rev.ExpiresAt) {
+		return nil, errors.New("revocation list expired")
+	}
 	m.revList = rev
 	m.artKeys = keys
+	m.artKeysAt = time.Now()
 	return keys, nil
 }
 
 // verifyArtifact fetches <asset>.sig and validates the artifact bytes.
-func (m *Mirror) verifyArtifact(ctx context.Context, sigURL string, body []byte) error {
+func (m *Mirror) verifyArtifact(ctx context.Context, sigURL string, body []byte) ([]byte, error) {
 	keys, err := m.trustedArtifactKeys(ctx)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	resp, err := m.get(ctx, sigURL, "")
 	if err != nil {
-		return err
+		return nil, err
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("sig fetch: %d", resp.StatusCode)
+		return nil, fmt.Errorf("sig fetch: %d", resp.StatusCode)
 	}
 	sigBytes, err := io.ReadAll(io.LimitReader(resp.Body, 1<<20))
 	if err != nil {
-		return err
+		return nil, err
 	}
 	sig, err := reposign.ParseSignature(sigBytes)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	return reposign.ValidateArtifact(keys, body, *sig)
+	if err := reposign.ValidateArtifact(keys, body, *sig); err != nil {
+		return nil, err
+	}
+	return sigBytes, nil
 }
 
 // PollOnce performs one fetch cycle and returns its error (for tests).
 func (m *Mirror) PollOnce(ctx context.Context) error {
+	if !m.pollMu.TryLock() {
+		return errors.New("poll already in progress")
+	}
+	defer m.pollMu.Unlock()
 	rel, notmod, err := m.fetchRelease(ctx)
 	if err != nil {
 		return err
@@ -617,8 +675,9 @@ func (m *Mirror) Close() { close(m.stop) }
 // --- HTTP handler -------------------------------------------------------
 
 func (m *Mirror) serveVerified(w http.ResponseWriter, r *http.Request, rel string) {
-	want, ok := m.index.Files[rel]
-	_ = want
+	m.mu.RLock()
+	_, ok := m.index.Files[rel]
+	m.mu.RUnlock()
 	if !ok {
 		http.NotFound(w, r)
 		return
@@ -629,15 +688,17 @@ func (m *Mirror) serveVerified(w http.ResponseWriter, r *http.Request, rel strin
 		http.NotFound(w, r)
 		return
 	}
-	b, err := io.ReadAll(f2)
+	h := sha256.New()
+	_, err = io.Copy(h, f2)
 	f2.Close()
 	if err != nil {
 		http.NotFound(w, r)
 		return
 	}
-	sum := sha256.Sum256(b)
+	m.mu.RLock()
 	exp, ok2 := m.index.Sums[rel]
-	if !ok2 || exp != hex.EncodeToString(sum[:]) {
+	m.mu.RUnlock()
+	if !ok2 || exp != hex.EncodeToString(h.Sum(nil)) {
 		// corrupted or pre-index file: drop it and refuse
 		m.mu.Lock()
 		delete(m.index.Files, rel)
@@ -713,9 +774,20 @@ func (m *Mirror) sig(isTag bool) http.HandlerFunc {
 				http.NotFound(w, r)
 				return
 			}
-			rel := filepath.Join("files", name+".sig")
+			if !m.limiter.Allow() {
+				http.Error(w, "rate limited", http.StatusTooManyRequests)
+				return
+			}
+			if !strings.HasSuffix(name, ".sig") {
+				http.NotFound(w, r)
+				return
+			}
+			rel := filepath.Join("files", name)
 			p := filepath.Join(m.cfg.CacheDir, rel)
-			if _, ok := m.index.Files[rel]; !ok {
+			m.mu.RLock()
+			_, ok := m.index.Files[rel]
+			m.mu.RUnlock()
+			if !ok {
 				http.NotFound(w, r)
 				return
 			}
@@ -726,7 +798,11 @@ func (m *Mirror) sig(isTag bool) http.HandlerFunc {
 			http.NotFound(w, r)
 			return
 		}
-		b, err := m.keysFile(r.Context(), name)
+		if !m.limiter.Allow() {
+			http.Error(w, "rate limited", http.StatusTooManyRequests)
+			return
+		}
+		b, err := m.keysCached(r.Context(), name)
 		if err != nil {
 			http.NotFound(w, r)
 			return

@@ -138,7 +138,36 @@ func (e *Engine) onCooldown(rule, subject string, now time.Time) bool {
 		return true
 	}
 	e.cooldownUntil[rule+"/"+subject] = now.Add(e.cfg.Cooldown)
+	e.sweepLocked(now)
 	return false
+}
+
+// sweepLocked drops expired cooldown and prevention entries once the maps
+// grow past a bound so they cannot grow without limit.
+func (e *Engine) sweepLocked(now time.Time) {
+	const maxEntries = 10000
+	if len(e.cooldownUntil) <= maxEntries && len(e.preventCount) <= maxEntries {
+		return
+	}
+	for k, until := range e.cooldownUntil {
+		if now.After(until) {
+			delete(e.cooldownUntil, k)
+		}
+	}
+	cutoff := now.Add(-time.Hour)
+	for k, ts := range e.preventCount {
+		kept := ts[:0]
+		for _, t := range ts {
+			if t.After(cutoff) {
+				kept = append(kept, t)
+			}
+		}
+		if len(kept) == 0 {
+			delete(e.preventCount, k)
+		} else {
+			e.preventCount[k] = kept
+		}
+	}
 }
 
 // emit applies cooldown, severity gating, prevention decisions and sinks.

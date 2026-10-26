@@ -27,17 +27,19 @@ func backupDir(src, dst string) (map[string]string, error) {
 		if err != nil {
 			return err
 		}
-		defer f.Close()
 		h := sha256.New()
 		w, err := os.OpenFile(to, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, info.Mode())
 		if err != nil {
+			f.Close()
 			return err
 		}
 		if _, err := io.Copy(io.MultiWriter(w, h), f); err != nil {
 			w.Close()
+			f.Close()
 			return err
 		}
 		w.Close()
+		f.Close()
 		manifest[rel] = hex.EncodeToString(h.Sum(nil))
 		return nil
 	})

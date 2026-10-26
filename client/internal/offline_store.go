@@ -260,7 +260,9 @@ func updateMgmtAddrs(path string, addrs []string) {
 	if err != nil {
 		return
 	}
-	if err := os.WriteFile(path, out, 0o600); err == nil {
+	tmp := path + ".tmp"
+	if err := os.WriteFile(tmp, out, 0o600); err == nil {
+		os.Rename(tmp, path)
 		lastMgmtAddrsMu.Lock()
 		lastMgmtAddrs = addrs
 		lastMgmtAddrsMu.Unlock()

@@ -407,3 +407,34 @@ func BenchmarkObservePeerSync(b *testing.B) {
 		e.ObservePeerSync(ctx, o)
 	}
 }
+
+func TestSweepDropsExpired(t *testing.T) {
+	e := &Engine{cooldownUntil: map[string]time.Time{}, preventCount: map[string][]time.Time{}}
+	now := time.Now()
+	e.cooldownUntil["r/live"] = now.Add(time.Hour)
+	e.cooldownUntil["r/old"] = now.Add(-time.Hour)
+	e.preventCount["acct-live"] = []time.Time{now}
+	e.preventCount["acct-old"] = []time.Time{now.Add(-2 * time.Hour)}
+	// force over the bound without filling 10k entries: call sweep directly
+	e.cooldownUntil["pad"] = now.Add(-time.Hour)
+	e.mu.Lock()
+	for i := 0; i < 10001; i++ {
+		e.cooldownUntil[string(rune('a'+i%26))+string(rune('a'+i/26))] = now.Add(-time.Hour)
+	}
+	e.mu.Unlock()
+	e.mu.Lock()
+	e.sweepLocked(now)
+	e.mu.Unlock()
+	if _, ok := e.cooldownUntil["r/live"]; !ok {
+		t.Fatal("live cooldown dropped")
+	}
+	if _, ok := e.cooldownUntil["r/old"]; ok {
+		t.Fatal("expired cooldown kept")
+	}
+	if _, ok := e.preventCount["acct-old"]; ok {
+		t.Fatal("expired preventCount kept")
+	}
+	if _, ok := e.preventCount["acct-live"]; !ok {
+		t.Fatal("live preventCount dropped")
+	}
+}

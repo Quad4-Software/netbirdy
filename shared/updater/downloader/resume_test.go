@@ -140,3 +140,32 @@ func TestProgressMonotonic(t *testing.T) {
 		t.Fatalf("ended at %d", last)
 	}
 }
+
+// B5: redirect to plain http is refused.
+func TestRedirectHTTPRefused(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		http.Redirect(w, r, "http://127.0.0.1/x", 302)
+	}))
+	defer srv.Close()
+	f, _ := os.Create(filepath.Join(t.TempDir(), "o"))
+	defer f.Close()
+	if err := downloadToFileOnce(context.Background(), srv.URL, f); err == nil {
+		t.Fatal("http redirect followed")
+	}
+}
+
+// B5: body over the cap is refused.
+func TestSizeCapRefused(t *testing.T) {
+	old := maxDownloadBytes
+	maxDownloadBytes = 8
+	defer func() { maxDownloadBytes = old }()
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte("0123456789abcdef"))
+	}))
+	defer srv.Close()
+	f, _ := os.Create(filepath.Join(t.TempDir(), "o"))
+	defer f.Close()
+	if err := downloadToFileOnce(context.Background(), srv.URL, f); err == nil {
+		t.Fatal("oversize body accepted")
+	}
+}

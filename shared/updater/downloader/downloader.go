@@ -78,7 +78,7 @@ func DownloadToMemory(ctx context.Context, url string, limit int64) ([]byte, err
 	// Add User-Agent header
 	req.Header.Set("User-Agent", fmt.Sprintf(userAgent, version.NetbirdVersion()))
 
-	resp, err := http.DefaultClient.Do(req)
+	resp, err := downloadClient.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("failed to perform HTTP request: %w", err)
 	}
@@ -109,7 +109,7 @@ func downloadToFileOnce(ctx context.Context, url string, out *os.File) error {
 	// Add User-Agent header
 	req.Header.Set("User-Agent", fmt.Sprintf(userAgent, version.NetbirdVersion()))
 
-	resp, err := http.DefaultClient.Do(req)
+	resp, err := downloadClient.Do(req)
 	if err != nil {
 		return fmt.Errorf("failed to perform HTTP request: %w", err)
 	}
@@ -123,11 +123,26 @@ func downloadToFileOnce(ctx context.Context, url string, out *os.File) error {
 		return fmt.Errorf("unexpected HTTP status: %d", resp.StatusCode)
 	}
 
-	if _, err := io.Copy(out, resp.Body); err != nil {
+	if resp.ContentLength > maxDownloadBytes {
+		return fmt.Errorf("response too large: %d bytes", resp.ContentLength)
+	}
+	if _, err := io.Copy(out, io.LimitReader(resp.Body, maxDownloadBytes+1)); err != nil {
 		return fmt.Errorf("failed to write response body to file: %w", err)
 	}
 
 	return nil
+}
+
+var maxDownloadBytes int64 = 1 << 30
+
+var downloadClient = &http.Client{
+	Timeout: 10 * time.Minute,
+	CheckRedirect: func(r *http.Request, via []*http.Request) error {
+		if r.URL.Scheme != "https" || len(via) > 5 {
+			return fmt.Errorf("disallowed redirect to %s", r.URL.Scheme)
+		}
+		return nil
+	},
 }
 
 func sleepWithContext(ctx context.Context, duration time.Duration) error {

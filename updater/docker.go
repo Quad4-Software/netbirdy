@@ -140,9 +140,16 @@ func (e *DockerEngine) inspect(ctx context.Context, id string) (ContainerInfo, e
 	if err := readJSON(resp.Body, &raw); err != nil {
 		return ContainerInfo{}, err
 	}
-	cfg := raw["Config"].(map[string]any)
-	host := raw["HostConfig"].(map[string]any)
+	cfg, ok := raw["Config"].(map[string]any)
+	if !ok {
+		return ContainerInfo{}, fmt.Errorf("inspect %s: missing Config", id)
+	}
+	host, ok := raw["HostConfig"].(map[string]any)
+	if !ok {
+		return ContainerInfo{}, fmt.Errorf("inspect %s: missing HostConfig", id)
+	}
 	netw, _ := raw["NetworkSettings"].(map[string]any)
+	state, _ := raw["State"].(map[string]any)
 	name, _ := raw["Name"].(string)
 	return ContainerInfo{
 		ID:     id,
@@ -150,6 +157,7 @@ func (e *DockerEngine) inspect(ctx context.Context, id string) (ContainerInfo, e
 		Config: cfg,
 		Host:   host,
 		Net:    netw,
+		State:  state,
 	}, nil
 }
 
@@ -175,13 +183,21 @@ func (e *DockerEngine) CreateLike(ctx context.Context, old ContainerInfo, newIma
 		cfg[k] = v
 	}
 	cfg["Image"] = newImage
+	// Reuse the old Config verbatim so entrypoint, env, healthcheck and the
+	// rest survive; only the image is replaced. EndpointsConfig needs the
+	// Networks map from NetworkSettings, not the object itself.
+	networks, _ := old.Net["Networks"].(map[string]any)
 	body := map[string]any{
-		"Hostname": cfg["Hostname"], "Env": cfg["Env"], "Cmd": cfg["Cmd"],
-		"Image": newImage, "Labels": cfg["Labels"],
-		"ExposedPorts": cfg["ExposedPorts"], "Healthcheck": cfg["Healthcheck"],
-		"HostConfig": old.Host, "NetworkingConfig": map[string]any{
-			"EndpointsConfig": old.Net,
+		"Image":      newImage,
+		"HostConfig": old.Host,
+		"NetworkingConfig": map[string]any{
+			"EndpointsConfig": networks,
 		},
+	}
+	for k, v := range old.Config {
+		if k != "Image" {
+			body[k] = v
+		}
 	}
 	resp, err := e.call(ctx, http.MethodPost, "/containers/create?name="+url.QueryEscape(name), body, false)
 	if err != nil {
@@ -220,19 +236,19 @@ func (e *DockerEngine) WaitHealthy(ctx context.Context, id string, timeout time.
 		if err != nil {
 			return err
 		}
-		st, _ := info.Config["State"].(map[string]any)
+		st := info.State
 		if st == nil {
-			st, _ = info.Host["State"].(map[string]any)
+			return fmt.Errorf("inspect %s: no State", id)
+		}
+		if r, _ := st["Status"].(string); r == "exited" || r == "dead" {
+			return fmt.Errorf("container %s is %s", id, r)
 		}
 		if hs, ok := st["Health"].(map[string]any); ok {
-			if s, _ := hs["Status"].(string); s == "healthy" {
+			if s2, _ := hs["Status"].(string); s2 == "healthy" {
 				return nil
 			}
 		} else if r, _ := st["Status"].(string); r == "running" {
 			return nil
-		}
-		if r, _ := st["Status"].(string); r == "exited" {
-			return fmt.Errorf("container exited")
 		}
 		select {
 		case <-ctx.Done():

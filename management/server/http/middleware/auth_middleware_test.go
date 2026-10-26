@@ -842,3 +842,38 @@ func TestAuthMiddleware_MarkPATUsedThrottled(t *testing.T) {
 		})
 	}
 }
+
+// B1: a bare "Bearer"/"Token" header must 401, not panic on authHeader[1].
+func TestBareAuthHeadersNoPanic(t *testing.T) {
+	mockAuth := &auth.MockManager{
+		ValidateAndParseTokenFunc:       mockValidateAndParseToken,
+		EnsureUserAccessByJWTGroupsFunc: mockEnsureUserAccessByJWTGroups,
+		MarkPATUsedFunc:                 mockMarkPATUsed,
+		GetPATInfoFunc:                  mockGetAccountInfoFromPAT,
+	}
+	disabledLimiter := ratelimit.NewAPIRateLimiter(nil)
+	disabledLimiter.SetEnabled(false)
+	authMiddleware := NewAuthMiddleware(
+		mockAuth,
+		func(ctx context.Context, userAuth nbauth.UserAuth) (string, string, error) {
+			return userAuth.AccountId, userAuth.UserId, nil
+		},
+		func(ctx context.Context, userAuth nbauth.UserAuth) error { return nil },
+		func(ctx context.Context, userAuth nbauth.UserAuth) (*types.User, error) {
+			return &types.User{}, nil
+		},
+		disabledLimiter,
+		nil,
+	)
+	next := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) { w.WriteHeader(200) })
+	h := authMiddleware.Handler(next)
+	for _, hv := range []string{"Bearer", "Token", "bearer", "token"} {
+		req := httptest.NewRequest("GET", "http://testing/api/peers", nil)
+		req.Header.Set("Authorization", hv)
+		rec := httptest.NewRecorder()
+		h.ServeHTTP(rec, req)
+		if rec.Code != 401 {
+			t.Fatalf("%q: got %d", hv, rec.Code)
+		}
+	}
+}

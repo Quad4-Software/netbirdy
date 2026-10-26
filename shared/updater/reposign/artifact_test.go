@@ -1078,3 +1078,20 @@ func encodePrivateKey(jsonData []byte, typeTag string) []byte {
 		Bytes: jsonData,
 	})
 }
+
+// B4: expired root keys are skipped in verifyAny.
+func TestVerifyAnySkipsExpiredRoot(t *testing.T) {
+	pub, priv, err := ed25519.GenerateKey(rand.Reader)
+	require.NoError(t, err)
+	msg := []byte("m")
+	sig := ed25519.Sign(priv, msg)
+	valid := PublicKey{Key: pub, Metadata: KeyMetadata{ID: computeKeyID(pub), CreatedAt: time.Now().UTC()}}
+	expired := valid
+	expired.Metadata.ExpiresAt = time.Now().Add(-time.Hour)
+	if verifyAny([]PublicKey{expired}, msg, sig) {
+		t.Fatal("expired root verified")
+	}
+	if !verifyAny([]PublicKey{expired, valid}, msg, sig) {
+		t.Fatal("valid root skipped")
+	}
+}

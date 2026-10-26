@@ -19,6 +19,7 @@ type ContainerInfo struct {
 	Config map[string]any // Config from inspect, Image overridden on create
 	Host   map[string]any // HostConfig
 	Net    map[string]any // NetworkingConfig endpoints
+	State  map[string]any // State from inspect
 }
 
 type Engine interface {

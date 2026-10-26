@@ -24,7 +24,7 @@ func fakeDocker(t *testing.T) (*httptest.Server, *DockerEngine) {
 		w.Write([]byte(`[{"Id":"c1"}]`))
 	})
 	mux.HandleFunc("/v1.41/containers/c1/json", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte(`{"Id":"c1","Name":"/netbirdy-server","Config":{"Image":"old","Env":["A=1"],"Labels":{"l":"v"},"Healthcheck":{"Test":["curl"]},"State":{"Status":"running","Health":{"Status":"healthy"}}},"HostConfig":{"Binds":["x"]},"NetworkSettings":{"Networks":{"net":{"Aliases":["s"]}}}}`))
+		w.Write([]byte(`{"Id":"c1","Name":"/netbirdy-server","Config":{"Image":"old","Env":["A=1"],"Labels":{"l":"v"},"Healthcheck":{"Test":["curl"]}},"State":{"Status":"running","Health":{"Status":"healthy"}},"HostConfig":{"Binds":["x"]},"NetworkSettings":{"Networks":{"net":{"Aliases":["s"]}}}}`))
 	})
 	mux.HandleFunc("/v1.41/containers/c1/stop", func(w http.ResponseWriter, r *http.Request) { w.WriteHeader(204) })
 	mux.HandleFunc("/v1.41/containers/c1", func(w http.ResponseWriter, r *http.Request) { w.WriteHeader(204) })
@@ -33,7 +33,7 @@ func fakeDocker(t *testing.T) (*httptest.Server, *DockerEngine) {
 	mux.HandleFunc("/v1.41/containers/new-c1/stop", func(w http.ResponseWriter, r *http.Request) { w.WriteHeader(204) })
 	mux.HandleFunc("/v1.41/containers/c1/start", func(w http.ResponseWriter, r *http.Request) { w.WriteHeader(204) })
 	mux.HandleFunc("/v1.41/containers/new-c1/json", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte(`{"Config":{"State":{"Status":"running","Health":{"Status":"healthy"}}},"HostConfig":{},"NetworkSettings":{}}`))
+		w.Write([]byte(`{"Config":{},"HostConfig":{},"NetworkSettings":{},"State":{"Status":"running","Health":{"Status":"healthy"}}}`))
 	})
 	mux.HandleFunc("/v1.41/containers/create", func(w http.ResponseWriter, r *http.Request) {
 		b, _ := io.ReadAll(r.Body)
@@ -84,6 +84,33 @@ func TestDockerEngine(t *testing.T) {
 		t.Fatal(err)
 	}
 	if err := eng.Remove(ctx, "c1"); err != nil {
+		t.Fatal(err)
+	}
+}
+
+// CreateLike keeps entrypoint/env and networks from the old container.
+func TestCreateLikePreservesFields(t *testing.T) {
+	srv, eng := fakeDocker(t)
+	defer srv.Close()
+	ctx := context.Background()
+	ci, err := eng.FindContainer(ctx, "p", "s")
+	if err != nil {
+		t.Fatal(err)
+	}
+	ci.Config["Entrypoint"] = []any{"/entry", "-x"}
+	ci.Config["User"] = "netbirdy"
+	ci.Net = map[string]any{"Networks": map[string]any{"net": map[string]any{"Aliases": []any{"s"}}}}
+	nid, err := eng.CreateLike(ctx, ci, "newimg", "n")
+	if err != nil || nid != "new-c1" {
+		t.Fatalf("create like: %v %v", nid, err)
+	}
+}
+
+func TestWaitHealthyPaths(t *testing.T) {
+	srv, eng := fakeDocker(t)
+	defer srv.Close()
+	ctx := context.Background()
+	if err := eng.WaitHealthy(ctx, "new-c1", 3*time.Second); err != nil {
 		t.Fatal(err)
 	}
 }

@@ -159,6 +159,9 @@ func verifyAny(publicRootKeys []PublicKey, msg, sig []byte) bool {
 	// Verify with root keys
 	var rootKeys []ed25519.PublicKey
 	for _, r := range publicRootKeys {
+		if !r.Metadata.ExpiresAt.IsZero() && time.Now().After(r.Metadata.ExpiresAt) {
+			continue
+		}
 		rootKeys = append(rootKeys, r.Key)
 	}
 

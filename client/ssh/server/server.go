@@ -786,6 +786,9 @@ func (s *Server) handleConnectionClose(remoteAddr string) {
 		s.connLogger(state).Info("port forwarding connection closed")
 	}
 	delete(s.connections, key)
+	if exists {
+		delete(s.pendingAuthJWT, newAuthKey(state.username, state.remoteAddr))
+	}
 }
 
 func (s *Server) connLogger(state *connState) *log.Entry {

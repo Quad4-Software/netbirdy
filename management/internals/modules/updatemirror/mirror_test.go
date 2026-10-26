@@ -451,3 +451,48 @@ func TestPlatformsFromPeers(t *testing.T) {
 		t.Fatalf("override %v", p)
 	}
 }
+
+func TestSigRouteServesAfterPoll(t *testing.T) {
+	payload := []byte("msi")
+	sum := sha256.Sum256(payload)
+	keys, roots, art := keyTree(t)
+	sig := sign(t, art, payload)
+	files := map[string][]byte{msi: payload, msi + ".sig": sig}
+	gh := fakeGH(t, files, hex.EncodeToString(sum[:])+"  "+msi+"\n", keys)
+	defer gh.Close()
+	m := mkMirror(t, gh, t.TempDir(), roots)
+	if err := m.PollOnce(context.Background()); err != nil {
+		t.Fatal(err)
+	}
+	srv := httptest.NewServer(m.Handler())
+	defer srv.Close()
+	r, err := http.Get(srv.URL + "/tag/v9.9.9/" + msi + ".sig")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer r.Body.Close()
+	if r.StatusCode != 200 {
+		t.Fatalf("sig route: %d", r.StatusCode)
+	}
+	b, _ := io.ReadAll(r.Body)
+	if string(b) != string(sig) {
+		t.Fatal("sig bytes differ")
+	}
+}
+
+func TestPollOnceConcurrent(t *testing.T) {
+	keys, roots, art := keyTree(t)
+	sum := sha256.Sum256([]byte("p"))
+	files := map[string][]byte{msi: []byte("p"), msi + ".sig": sign(t, art, []byte("p"))}
+	gh := fakeGH(t, files, hex.EncodeToString(sum[:])+"  "+msi+"\n", keys)
+	defer gh.Close()
+	m := mkMirror(t, gh, t.TempDir(), roots)
+	if !m.pollMu.TryLock() {
+		t.Fatal("lock")
+	}
+	err := m.PollOnce(context.Background())
+	m.pollMu.Unlock()
+	if err == nil || err.Error() != "poll already in progress" {
+		t.Fatalf("expected in-progress error, got %v", err)
+	}
+}

@@ -160,6 +160,11 @@ func (m *AuthMiddleware) Handler(h http.Handler) http.Handler {
 			authHeader[0] = authType
 		}
 
+		subjectID := ""
+		if len(authHeader) > 1 {
+			subjectID = securityTokenID(authHeader[1])
+		}
+
 		switch authType {
 		case "bearer":
 			if err := m.checkJWTFromRequest(r, authHeader); err != nil {
@@ -167,7 +172,7 @@ func (m *AuthMiddleware) Handler(h http.Handler) http.Handler {
 				if sec := m.engine(); sec != nil {
 					if src, ok := requestIP(r); ok {
 						sec.ObserveAuthFailure(r.Context(), security.AuthFailure{
-							Kind: security.AuthKindAPI, SourceIP: src, Subject: securityTokenID(authHeader[1]),
+							Kind: security.AuthKindAPI, SourceIP: src, Subject: subjectID,
 						})
 					}
 				}
@@ -175,8 +180,8 @@ func (m *AuthMiddleware) Handler(h http.Handler) http.Handler {
 				return
 			}
 			if m.security != nil {
-				if src, ok := requestIP(r); ok && m.userLoginDedup.firstInHour(securityTokenID(authHeader[1]), time.Now()) {
-					m.security.ObserveUserLogin(r.Context(), "", securityTokenID(authHeader[1]), src)
+				if src, ok := requestIP(r); ok && m.userLoginDedup.firstInHour(subjectID, time.Now()) {
+					m.security.ObserveUserLogin(r.Context(), "", subjectID, src)
 				}
 			}
 			h.ServeHTTP(w, r)
@@ -186,7 +191,7 @@ func (m *AuthMiddleware) Handler(h http.Handler) http.Handler {
 				if sec := m.engine(); sec != nil {
 					if src, ok := requestIP(r); ok {
 						sec.ObserveAuthFailure(r.Context(), security.AuthFailure{
-							Kind: security.AuthKindAPI, SourceIP: src, Subject: securityTokenID(authHeader[1]),
+							Kind: security.AuthKindAPI, SourceIP: src, Subject: subjectID,
 						})
 					}
 				}
@@ -199,7 +204,7 @@ func (m *AuthMiddleware) Handler(h http.Handler) http.Handler {
 			}
 			if m.security != nil {
 				if src, ok := requestIP(r); ok {
-					m.security.ObservePATUse(r.Context(), "", securityTokenID(authHeader[1]), src)
+					m.security.ObservePATUse(r.Context(), "", subjectID, src)
 				}
 			}
 			h.ServeHTTP(w, r)
