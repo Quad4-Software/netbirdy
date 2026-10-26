@@ -534,7 +534,7 @@ func (mw *Middleware) forwardWithTunnelPeer(w http.ResponseWriter, r *http.Reque
 		return false
 	}
 
-	setSessionCookie(w, resp.GetSessionToken(), config.SessionExpiration)
+	setSessionCookie(w, r, resp.GetSessionToken(), config.SessionExpiration)
 	if cd := proxy.CapturedDataFromContext(r.Context()); cd != nil {
 		cd.SetOrigin(proxy.OriginAuth)
 		cd.SetUserID(resp.GetUserId())
@@ -709,7 +709,7 @@ func (mw *Middleware) handleAuthenticatedToken(w http.ResponseWriter, r *http.Re
 	if result.MintedToken != "" {
 		cookieValue = result.MintedToken
 	}
-	setSessionCookie(w, cookieValue, config.SessionExpiration)
+	setSessionCookie(w, r, cookieValue, config.SessionExpiration)
 
 	// Redirect instead of forwarding the auth POST to the backend.
 	// The browser will follow with a GET carrying the new session cookie.
@@ -725,17 +725,23 @@ func (mw *Middleware) handleAuthenticatedToken(w http.ResponseWriter, r *http.Re
 	http.Redirect(w, r, redirectURL, http.StatusSeeOther)
 }
 
-// setSessionCookie writes a session cookie with secure defaults.
-func setSessionCookie(w http.ResponseWriter, token string, expiration time.Duration) {
+// setSessionCookie writes a session cookie with secure defaults. The
+// Secure attribute is dropped only for plain HTTP requests on the overlay
+// listener so tunnel sessions persist there.
+func setSessionCookie(w http.ResponseWriter, r *http.Request, token string, expiration time.Duration) {
 	if expiration == 0 {
 		expiration = auth.DefaultSessionExpiry
+	}
+	secure := true
+	if types.IsOverlayOrigin(r.Context()) && r.TLS == nil {
+		secure = false
 	}
 	http.SetCookie(w, &http.Cookie{
 		Name:     auth.SessionCookieName,
 		Value:    token,
 		Path:     "/",
 		HttpOnly: true,
-		Secure:   true,
+		Secure:   secure,
 		SameSite: http.SameSiteLaxMode,
 		MaxAge:   int(expiration.Seconds()),
 	})

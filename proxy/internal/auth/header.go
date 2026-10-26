@@ -4,6 +4,7 @@ import (
 	"crypto/sha256"
 	"errors"
 	"net/http"
+	"runtime"
 	"sync"
 
 	"github.com/netbirdio/netbird/proxy/auth"
@@ -11,6 +12,10 @@ import (
 )
 
 // Header implements header-based authentication. The service mapping carries
+// argonSem bounds concurrent argon2id verifications so a flood of wrong
+// header values cannot exhaust CPU and memory.
+var argonSem = make(chan struct{}, runtime.NumCPU())
+
 // the argon2id hash of every value accepted for the header, so the proxy
 // verifies the credential locally rather than round-tripping to management.
 type Header struct {
@@ -59,6 +64,15 @@ func (h Header) Verify(r *http.Request) (present, matched bool, unusable error) 
 	digest := sha256.Sum256([]byte(value))
 	if h.verified.has(digest) {
 		return true, true, nil
+	}
+
+	// argon2id costs 19 MiB and real CPU per attempt; bound concurrency so a
+	// flood of wrong header values cannot starve the proxy.
+	select {
+	case argonSem <- struct{}{}:
+		defer func() { <-argonSem }()
+	case <-r.Context().Done():
+		return true, false, r.Context().Err()
 	}
 
 	for _, hash := range h.hashes {

@@ -204,6 +204,11 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	case "/debug/shield/bans":
 		h.handleShield(w, r, "bans")
 	case "/debug/shield/unban":
+		if r.Method != http.MethodPost {
+			w.Header().Set("Allow", http.MethodPost)
+			http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+			return
+		}
 		h.handleShield(w, r, "unban")
 	default:
 		if h.handleClientRoutes(w, r, path, wantJSON) {

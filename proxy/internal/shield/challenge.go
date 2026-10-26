@@ -66,7 +66,7 @@ func (s *Shield) handleVerify(w http.ResponseWriter, r *http.Request, ip netip.A
 	expStr := r.URL.Query().Get("exp")
 	nonce := r.URL.Query().Get("nonce")
 	redir := r.URL.Query().Get("r")
-	if redir == "" || !strings.HasPrefix(redir, "/") {
+	if !safeRedirectPath(redir) {
 		redir = "/"
 	}
 	exp, err := strconv.ParseInt(expStr, 10, 64)
@@ -100,6 +100,20 @@ func (s *Shield) handleVerify(w http.ResponseWriter, r *http.Request, ip netip.A
 	c := &http.Cookie{Name: passCookie, Value: val, Path: "/", HttpOnly: true, SameSite: http.SameSiteLaxMode, Secure: r.TLS != nil, Expires: expC}
 	http.SetCookie(w, c)
 	http.Redirect(w, r, redir, http.StatusFound)
+}
+
+// safeRedirectPath allows only same-origin absolute paths: single leading
+// slash, second character not a slash or backslash, no control characters.
+func safeRedirectPath(p string) bool {
+	if len(p) < 1 || p[0] != '/' || (len(p) > 1 && (p[1] == '/' || p[1] == '\\')) {
+		return false
+	}
+	for i := 0; i < len(p); i++ {
+		if p[i] < 0x20 || p[i] == 0x7f {
+			return false
+		}
+	}
+	return true
 }
 
 func (s *Shield) hasValidPass(r *http.Request, ip netip.Addr) bool {

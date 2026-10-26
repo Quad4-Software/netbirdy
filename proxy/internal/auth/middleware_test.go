@@ -533,7 +533,8 @@ func TestProtect_SchemeAuthRedirectsWithCookie(t *testing.T) {
 
 func TestSetSessionCookieHasRootPath(t *testing.T) {
 	w := httptest.NewRecorder()
-	setSessionCookie(w, "test-token", time.Hour)
+	r := httptest.NewRequest(http.MethodGet, "/", nil)
+	setSessionCookie(w, r, "test-token", time.Hour)
 
 	cookies := w.Result().Cookies()
 	require.Len(t, cookies, 1)
@@ -1602,5 +1603,28 @@ func TestStripSessionTokenParam(t *testing.T) {
 			require.NoError(t, err)
 			assert.Equal(t, tc.want, stripSessionTokenParam(u))
 		})
+	}
+}
+
+// A5: Secure flag is dropped only for overlay plain HTTP.
+func TestSetSessionCookieSecureOverlay(t *testing.T) {
+	ctx := types.WithOverlayOrigin(context.Background())
+	w := httptest.NewRecorder()
+	r := httptest.NewRequest("GET", "/", nil).WithContext(ctx)
+	setSessionCookie(w, r, "tok", time.Hour)
+	if c := w.Result().Cookies(); c[0].Secure {
+		t.Fatal("overlay http cookie is Secure")
+	}
+	w2 := httptest.NewRecorder()
+	r2 := httptest.NewRequest("GET", "/", nil).WithContext(ctx)
+	r2.TLS = &tls.ConnectionState{}
+	setSessionCookie(w2, r2, "tok", time.Hour)
+	if c := w2.Result().Cookies(); !c[0].Secure {
+		t.Fatal("overlay https cookie not Secure")
+	}
+	w3 := httptest.NewRecorder()
+	setSessionCookie(w3, httptest.NewRequest("GET", "/", nil), "tok", time.Hour)
+	if c := w3.Result().Cookies(); !c[0].Secure {
+		t.Fatal("public cookie not Secure")
 	}
 }

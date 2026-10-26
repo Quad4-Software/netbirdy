@@ -434,3 +434,72 @@ func TestDNSVerifier(t *testing.T) {
 		t.Fatal("negative cache not used")
 	}
 }
+
+// A1: enforce mode tarpit must not fall through to the backend.
+func TestTarpitBlocksBackend_POST(t *testing.T) {
+	sh := newShield(t, func(c *Config) { c.Mode = ModeEnforce; c.ChallengeAt = 0.01; c.TarpitAt = 0.1; c.BanAt = 100 })
+	reached := false
+	h := sh.Wrap(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		reached = true
+		w.WriteHeader(200)
+	}))
+	r := httptest.NewRequest("POST", "http://svc.example/api/x", nil)
+	r.Header.Set("User-Agent", "sqlmap/1.8")
+	r.RemoteAddr = "203.0.113.9:1"
+	h.ServeHTTP(httptest.NewRecorder(), r)
+	if reached {
+		t.Fatal("tarpitted POST reached backend")
+	}
+}
+
+// A2: redirect path hardening.
+func TestSafeRedirectPath(t *testing.T) {
+	ok := []string{"/", "/a", "/a/b?x=1"}
+	bad := []string{"//evil.com", "/\\evil.com", "", "/a\n", "/a\rb", "http://x", "a"}
+	for _, p := range ok {
+		if !safeRedirectPath(p) {
+			t.Errorf("safe %q rejected", p)
+		}
+	}
+	for _, p := range bad {
+		if safeRedirectPath(p) {
+			t.Errorf("hostile %q accepted", p)
+		}
+	}
+}
+
+// A7: panicking backend is not re-invoked after a status was written.
+func TestPanicNoDoubleServe(t *testing.T) {
+	calls := 0
+	h := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		calls++
+		w.WriteHeader(500)
+		panic("boom")
+	})
+	sh := newShield(t, func(c *Config) { c.Mode = ModeEnforce; c.ChallengeAt = 100; c.TarpitAt = 100; c.BanAt = 100 })
+	w := httptest.NewRecorder()
+	func() {
+		defer func() { _ = recover() }()
+		sh.Wrap(h).ServeHTTP(w, req("/x", browserUA))
+	}()
+	if calls != 1 {
+		t.Fatalf("backend called %d times", calls)
+	}
+}
+
+func TestPanicRetryWhenNothingWritten(t *testing.T) {
+	calls := 0
+	h := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		calls++
+		if calls == 1 {
+			panic("boom")
+		}
+		w.WriteHeader(200)
+	})
+	sh := newShield(t, func(c *Config) { c.Mode = ModeEnforce; c.ChallengeAt = 100; c.TarpitAt = 100; c.BanAt = 100 })
+	w := httptest.NewRecorder()
+	sh.Wrap(h).ServeHTTP(w, req("/y", browserUA))
+	if calls != 2 {
+		t.Fatalf("expected retry once, got %d calls", calls)
+	}
+}

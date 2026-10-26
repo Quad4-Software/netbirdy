@@ -792,6 +792,11 @@ func (s *Server) startDebugEndpoint() {
 		IdleTimeout:       httpIdleTimeout,
 		ErrorLog:          newHTTPServerLogger(s.Logger, logtagValueDebug),
 	}
+	if host, _, err := net.SplitHostPort(debugAddr); err == nil {
+		if ip := net.ParseIP(host); host != "" && ip != nil && !ip.IsLoopback() {
+			s.Logger.Warnf("debug endpoint on %s is reachable from non-loopback addresses; unauthenticated debug routes expose internals", debugAddr)
+		}
+	}
 	go func() {
 		s.Logger.Infof("starting debug endpoint on %s", debugAddr)
 		if err := s.debug.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {

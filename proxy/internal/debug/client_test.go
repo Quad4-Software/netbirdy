@@ -3,6 +3,7 @@ package debug
 import (
 	"bytes"
 	"net/http/httptest"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -83,7 +84,11 @@ func TestShieldRoutes(t *testing.T) {
 		{"/debug/shield/unban?ip=1.2.3.4", 200},
 		{"/debug/shield/unban?ip=", 404},
 	} {
-		req := httptest.NewRequest("GET", tc.path, nil)
+		method := "GET"
+		if strings.Contains(tc.path, "unban") {
+			method = "POST"
+		}
+		req := httptest.NewRequest(method, tc.path, nil)
 		rec := httptest.NewRecorder()
 		h.ServeHTTP(rec, req)
 		if rec.Code != tc.code {

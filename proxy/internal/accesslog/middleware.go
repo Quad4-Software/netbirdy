@@ -10,6 +10,7 @@ import (
 
 	"github.com/netbirdio/netbird/proxy/internal/proxy"
 	"github.com/netbirdio/netbird/proxy/internal/responsewriter"
+	"github.com/netbirdio/netbird/proxy/internal/types"
 	"github.com/netbirdio/netbird/proxy/web"
 )
 
@@ -44,6 +45,12 @@ func (l *Logger) Middleware(next http.Handler) http.Handler {
 		// Resolve the source IP using trusted proxy configuration before passing
 		// the request on, as the proxy will modify forwarding headers.
 		sourceIp := extractSourceIP(r, l.trustedProxies)
+		if types.IsOverlayOrigin(r.Context()) {
+			// The overlay listener terminates WireGuard peers directly; a
+			// client-supplied X-Forwarded-For would let a peer lie about
+			// its tunnel address even when the socket peer is trusted.
+			sourceIp = extractRemoteAddrIP(r)
+		}
 
 		// Create a mutable struct to capture data from downstream handlers.
 		// We pass a pointer in the context - the pointer itself flows down immutably,

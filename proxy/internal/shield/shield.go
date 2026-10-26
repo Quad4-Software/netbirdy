@@ -272,16 +272,19 @@ func (s *Shield) Wrap(next http.Handler) http.Handler {
 			next.ServeHTTP(w, r)
 			return
 		}
+		sw := newStatusWriter(w)
 		defer func() {
 			if rec := recover(); rec != nil {
 				if n := s.lastPanic.Load(); time.Now().Unix()-n > 60 {
 					s.lastPanic.Store(time.Now().Unix())
 					s.log.Warnf("shield: panic %v (failing open)", rec)
 				}
-				next.ServeHTTP(w, r) // retry; if it panics again it propagates to server recover
+				if sw.status == 0 {
+					next.ServeHTTP(w, r) // retry; if it panics again it propagates to server recover
+				}
 			}
 		}()
-		s.serve(w, r, next)
+		s.serve(sw, r, next)
 	})
 }
 
@@ -468,8 +471,8 @@ func (s *Shield) serve(w http.ResponseWriter, r *http.Request, next http.Handler
 		if s.cfg.Mode == ModeEnforce {
 			if !s.tarpit(w, r) {
 				s.block(w, r)
-				return
 			}
+			return
 		}
 	}
 	if score >= s.cfg.ChallengeAt && s.canChallenge(r, browser) {
@@ -487,7 +490,10 @@ func (s *Shield) serve(w http.ResponseWriter, r *http.Request, next http.Handler
 	}
 
 	// pass through, observe status for post-response signals
-	sw := newStatusWriter(w)
+	sw, _ := w.(*statusWriter)
+	if sw == nil {
+		sw = newStatusWriter(w)
+	}
 	next.ServeHTTP(sw, r)
 	code := sw.status
 	if code == 0 {
