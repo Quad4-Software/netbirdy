@@ -516,6 +516,7 @@ jobs:
           go build -o "$RUNNER_TEMP/signer" ./client/cmd/signer
           export SIGNER="$RUNNER_TEMP/signer"
           sh scripts/release/test.sh
+          rm -f inputs/netbirdy-ui.exe
           merge=""
           for f in inputs/*_checksums.txt; do
             [ -f "$f" ] || continue
@@ -611,7 +612,7 @@ jobs:
 
       - name: Upload signed assets to the release
         run: |
-          find assets -maxdepth 1 -type f \( -name '*.sig' -o -name '*.exe' -o -name '*.pkg' -o -name '*_images.txt' -o -name '*_checksums.txt' -o -name '*.cosign.bundle' \) -print0 \
+          find assets -maxdepth 1 -type f \( -name '*.sig' -o -name '*.exe' -o -name '*.pkg' -o -name '*_images.txt' -o -name '*_checksums.txt' -o -name '*.cosign.bundle' -o -name 'netbirdy-ui_*' -o -name 'netbirdy-ui-linux_*' \) ! -name 'netbirdy-ui.exe*' -print0 \
             | xargs -0 gh release upload "$TAG" --clobber
 
       - name: Mark the release latest
