@@ -17,6 +17,7 @@ import (
 	sshserver "github.com/netbirdio/netbird/client/ssh/server"
 	mgmProto "github.com/netbirdio/netbird/shared/management/proto"
 	sshuserhash "github.com/netbirdio/netbird/shared/sshauth"
+	"github.com/netbirdio/netbird/util/sandbox"
 )
 
 type sshServer interface {
@@ -260,6 +261,9 @@ func (e *Engine) restartSSHListeners() error {
 // with an empty authorizer refuses the logins that arrive in the meantime.
 // Nil leaves it as management has not sent one yet.
 func (e *Engine) startSSHServer(jwtConfig *sshserver.JWTConfig, authConfig *sshauth.Config) error {
+	if sandbox.Active() {
+		return errors.New("the SSH server cannot run while the Landlock sandbox limits the daemon, set NB_LANDLOCK_CLIENT=off and restart the service to use it")
+	}
 	if e.wgInterface == nil {
 		return errors.New("wg interface not initialized")
 	}

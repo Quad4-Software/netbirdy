@@ -50,3 +50,23 @@ func TestHelpers(t *testing.T) {
 	assert.Contains(t, dirs, "/etc")
 	assert.Contains(t, dirs, "/usr")
 }
+
+func TestApplyClientDefaultsOff(t *testing.T) {
+	t.Setenv(EnvClient, "")
+	st, err := ApplyClient(ClientPolicy())
+	assert.NoError(t, err)
+	assert.Equal(t, ModeOff, st.Mode)
+	assert.False(t, st.Enforced)
+	assert.False(t, Active())
+}
+
+func TestClientPolicyKeepsSystemDirsReadOnly(t *testing.T) {
+	p := ClientPolicy()
+	assert.True(t, p.WritesOnly)
+	for _, d := range []string{"/etc", "/var", "/run", "/dev", "/tmp"} {
+		assert.Contains(t, p.ReadWriteDirs, d)
+	}
+	for _, d := range []string{"/usr", "/bin", "/sbin", "/lib", "/boot", "/opt"} {
+		assert.NotContains(t, p.ReadWriteDirs, d)
+	}
+}

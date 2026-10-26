@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"sync/atomic"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -22,7 +23,14 @@ const (
 	EnvExtraRO = "NB_LANDLOCK_RO"
 	// EnvExtraRW lists extra read-write paths separated by the path list separator.
 	EnvExtraRW = "NB_LANDLOCK_RW"
+	// EnvClient selects off (default), on or strict for the client daemon.
+	EnvClient = "NB_LANDLOCK_CLIENT"
 )
+
+var active atomic.Bool
+
+// Active reports whether this process is running under an enforced policy.
+func Active() bool { return active.Load() }
 
 // Mode is the enforcement level.
 type Mode string
@@ -49,6 +57,9 @@ type Policy struct {
 	ReadOnlyDirs []string
 	// ReadOnlyFiles are single files with read access.
 	ReadOnlyFiles []string
+	// WritesOnly limits writes and leaves reads and execution unrestricted,
+	// whatever NB_LANDLOCK_READS says.
+	WritesOnly bool
 }
 
 // Status reports what Apply did.
@@ -92,19 +103,36 @@ func SystemReadOnlyDirs() []string {
 
 // Apply enforces the policy for the whole process according to the environment.
 func Apply(p Policy) (Status, error) {
-	mode := ModeFromEnv()
+	return applyMode(p, ModeFromEnv())
+}
+
+// ApplyClient enforces the policy for the client daemon. It is off unless
+// NB_LANDLOCK_CLIENT is on or strict.
+func ApplyClient(p Policy) (Status, error) {
+	switch strings.ToLower(strings.TrimSpace(os.Getenv(EnvClient))) {
+	case "on", "true", "1", "yes", "best-effort":
+		return applyMode(p, ModeBestEffort)
+	case "strict":
+		return applyMode(p, ModeStrict)
+	default:
+		return Status{Mode: ModeOff}, nil
+	}
+}
+
+func applyMode(p Policy, mode Mode) (Status, error) {
 	if mode == ModeOff {
 		log.Infof("landlock: disabled for %s", p.Name)
 		return Status{Mode: mode}, nil
 	}
 	p = withEnvPaths(p)
-	st, err := apply(p, mode, RestrictReadsFromEnv())
+	st, err := apply(p, mode, RestrictReadsFromEnv() && !p.WritesOnly)
 	switch {
 	case err != nil && mode == ModeStrict:
 		return st, err
 	case err != nil:
 		log.Warnf("landlock: not enforced for %s: %v", p.Name, err)
 	case st.Enforced:
+		active.Store(true)
 		log.Infof("landlock: enforced for %s (ABI %d)", p.Name, st.ABI)
 	default:
 		log.Infof("landlock: not supported by this system, %s runs unrestricted", p.Name)

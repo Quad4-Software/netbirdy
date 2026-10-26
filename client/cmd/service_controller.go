@@ -20,6 +20,7 @@ import (
 	"github.com/netbirdio/netbird/client/server"
 	"github.com/netbirdio/netbird/client/system"
 	"github.com/netbirdio/netbird/util"
+	"github.com/netbirdio/netbird/util/sandbox"
 )
 
 func validateJSONSocketFlags() error {
@@ -62,6 +63,10 @@ func (p *program) Start(svc service.Service) error {
 
 	if err := validateJSONSocketFlags(); err != nil {
 		return err
+	}
+
+	if _, err := sandbox.ApplyClient(sandbox.ClientPolicy()); err != nil {
+		return fmt.Errorf("apply landlock sandbox: %w", err)
 	}
 
 	// Collect static system and platform information

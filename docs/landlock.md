@@ -42,7 +42,18 @@ the sandbox out when debugging.
 
 ## The client
 
-The client daemon is not sandboxed. It configures network interfaces, firewall
-rules and DNS, starts helper programs, and its SSH server starts shells for
-users. A file system policy would be inherited by all of them and break those
-features.
+The client daemon is not sandboxed by default. It configures network
+interfaces, firewall rules and DNS, starts helper programs, and its SSH server
+starts shells for users. A policy is inherited by all of them.
+
+You can opt in to a write-only policy for the daemon with
+`NB_LANDLOCK_CLIENT=on` in the service environment (`strict` stops the daemon
+if the kernel cannot enforce it). Reads and execution stay unrestricted. Writes
+are limited to `/etc`, `/var`, `/run`, `/tmp`, `/dev`, `/proc`, `/sys`,
+`/home`, `/root`, `/mnt`, `/media` and `/srv`, so the daemon and the helpers it
+starts cannot change programs, libraries or boot files under `/usr`, `/bin`,
+`/sbin`, `/lib*`, `/boot` and `/opt`. `NB_LANDLOCK_RW` adds more paths.
+
+The SSH server will not start while this sandbox is active, because shells it
+starts would inherit the write limits. Leave `NB_LANDLOCK_CLIENT` unset on
+peers that accept SSH.
