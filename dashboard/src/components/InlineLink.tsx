@@ -35,8 +35,9 @@ export const linkVariants = cva(
 );
 
 export default function InlineLink({ variant = "default", ...props }: Props) {
+  const extra = props.target === "_blank" ? { rel: "noopener noreferrer" } : {};
   return (
-    <Link {...props} className={cn(props.className, linkVariants({ variant }))}>
+    <Link {...props} {...extra} className={cn(props.className, linkVariants({ variant }))}>
       {props.children}
     </Link>
   );

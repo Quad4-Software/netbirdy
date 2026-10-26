@@ -106,7 +106,13 @@ export function sanitizeHtml(html) {
     .replace(/<(script|style|iframe|object|embed|form)[\s\S]*?<\/\1>/gi, "")
     .replace(/<script[^>]*\/>/gi, "")
     .replace(/\s+on[a-z]+\s*=\s*("[^"]*"|'[^']*'|[^\s>]+)/gi, "")
-    .replace(/href="javascript:[^"]*"/gi, 'href="#"');
+    .replace(/(\s(?:href|src)\s*=\s*)("([^"]*)"|'([^']*)'|([^\s>]+))/gi, (m, pre, q, dq, sq, bare) => {
+      const v = (dq ?? sq ?? bare ?? "").replace(/[\s\u0000-\u0020]+/g, "").toLowerCase();
+      if (v.startsWith("javascript:") || v.startsWith("data:") || v.startsWith("vbscript:")) {
+        return pre + '"#"';
+      }
+      return m;
+    });
 }
 
 // extractHeadings pulls h2/h3 from rendered HTML and gives each an id.

@@ -33,6 +33,10 @@ export interface CertificateHandler {
   handleRDCleanPathResponse(response: RDCleanPathResponse): Promise<boolean>;
 }
 
+function escapeHtml(s: string): string {
+  return s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c] as string);
+}
+
 export class RDPCertificateHandler implements CertificateHandler {
   private readonly STORAGE_KEY = "netbirdy-rdp-trusted-certs";
   private modalElement: HTMLElement | null = null;
@@ -208,13 +212,12 @@ export class RDPCertificateHandler implements CertificateHandler {
       const modal = this.createCertificateModal(hostname, newCert, true);
       // Add warning about certificate change
       const warningDiv = modal.querySelector(".cert-warning") as HTMLElement;
-      warningDiv.innerHTML = `
-        <strong>⚠️ Certificate has changed!</strong><br>
-        <small>Previous fingerprint: ${oldCert.fingerprint.substring(
-          0,
-          32,
-        )}...</small>
-      `;
+      warningDiv.replaceChildren();
+      const warnStrong = document.createElement("strong");
+      warnStrong.textContent = "Certificate has changed!";
+      const warnSmall = document.createElement("small");
+      warnSmall.textContent = "Previous fingerprint: " + oldCert.fingerprint.substring(0, 32) + "...";
+      warningDiv.append(warnStrong, document.createElement("br"), warnSmall);
       const acceptBtn = modal.querySelector(
         "#cert-accept",
       ) as HTMLButtonElement;
@@ -272,22 +275,22 @@ export class RDPCertificateHandler implements CertificateHandler {
       <div class="rdp-cert-dialog">
         <h2>RDP Certificate Verification</h2>
         <div class="cert-warning" style="color: #ff9800; margin-bottom: 15px;"></div>
-        <p>The server <strong>${hostname}</strong> is presenting a certificate:</p>
+        <p>The server <strong>${escapeHtml(hostname)}</strong> is presenting a certificate:</p>
         <div class="cert-details">
           <table>
-            <tr><td><strong>Subject:</strong></td><td>${
-              certInfo.subject || "Unknown"
-            }</td></tr>
-            <tr><td><strong>Issuer:</strong></td><td>${
-              certInfo.issuer || "Unknown"
-            }</td></tr>
+            <tr><td><strong>Subject:</strong></td><td>${escapeHtml(
+              certInfo.subject || "Unknown",
+            )}</td></tr>
+            <tr><td><strong>Issuer:</strong></td><td>${escapeHtml(
+              certInfo.issuer || "Unknown",
+            )}</td></tr>
             ${
               certInfo.serialNumber
-                ? `<tr><td><strong>Serial:</strong></td><td style="font-family: monospace; font-size: 0.9em;">${certInfo.serialNumber}</td></tr>`
+                ? `<tr><td><strong>Serial:</strong></td><td style="font-family: monospace; font-size: 0.9em;">${escapeHtml(certInfo.serialNumber)}</td></tr>`
                 : ""
             }
             <tr><td><strong>SHA-256:</strong></td><td style="font-family: monospace; font-size: 0.9em;">
-              ${certInfo.fingerprint}</td></tr>
+              ${escapeHtml(certInfo.fingerprint)}</td></tr>
           </table>
         </div>
         <div class="cert-question">

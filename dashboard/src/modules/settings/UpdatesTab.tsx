@@ -31,6 +31,15 @@ dayjs.extend(relativeTime);
 const when = (iso?: string) =>
   isZeroTime(iso) ? "Never" : dayjs(iso).fromNow();
 
+export function safeHttpsUrl(u: string | undefined | null): boolean {
+  if (!u) return false;
+  try {
+    return new URL(u).protocol === "https:";
+  } catch {
+    return false;
+  }
+}
+
 export default function UpdatesTab() {
   const { data, mutate } = useFetchApi<UpdatesInfo>("/updates", true, true);
   const reader = useApiCall<UpdatesInfo>("/updates", true);
@@ -136,8 +145,8 @@ export default function UpdatesTab() {
               <div className={"text-xs text-nb-gray-400"}>Latest cached</div>
               <div className={"font-mono"}>{latest || "Unknown"}</div>
             </div>
-            {updateAvailable && data?.latest_release_url && (
-              <InlineLink href={data.latest_release_url} target={"_blank"}>
+            {updateAvailable && safeHttpsUrl(data?.latest_release_url) && (
+              <InlineLink href={String(data?.latest_release_url)} target={"_blank"}>
                 Release notes
               </InlineLink>
             )}

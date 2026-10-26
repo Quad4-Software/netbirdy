@@ -48,3 +48,12 @@ test("transformCallouts: plain quote untouched", () => {
   const q = "<blockquote><p>ordinary quote</p></blockquote>";
   assert.equal(transformCallouts(q), q);
 });
+
+test("sanitizeHtml neutralizes quoted, single quoted and unquoted dangerous URLs", () => {
+  assert.ok(!sanitizeHtml('<a href="javascript:alert(1)">x</a>').includes("javascript:"));
+  assert.ok(!sanitizeHtml("<a href='javascript:alert(1)'>x</a>").includes("javascript:"));
+  assert.ok(!sanitizeHtml("<a href=javascript:alert(1)>x</a>").includes("javascript:"));
+  assert.ok(!sanitizeHtml('<a href=" java\tscript:alert(1)">x</a>').includes("script:alert"));
+  assert.ok(!sanitizeHtml('<img src="data:text/html;base64,AAAA">').includes("data:text/html"));
+  assert.ok(sanitizeHtml('<a href="https://x.test">x</a>').includes("https://x.test"));
+});
