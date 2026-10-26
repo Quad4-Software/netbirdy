@@ -196,7 +196,14 @@ type NetBirdy struct {
 	// startClient runs the post-create client startup. Nil uses runClientStartup;
 	// tests override it to avoid a real embed client.Start.
 	startClient func(accountID types.AccountID, client *embed.Client)
+
+	// startFn starts an embedded client. Nil uses client.Start; tests override it.
+	startFn func(ctx context.Context, client *embed.Client) error
+	// retryDelays overrides the start retry schedule in tests.
+	retryDelays *startRetryDelays
 }
+
+type startRetryDelays struct{ initial, max time.Duration }
 
 // ClientDebugInfo contains debug information about a client.
 type ClientDebugInfo struct {
@@ -457,16 +464,72 @@ func (n *NetBirdy) runClientStartup(accountID types.AccountID, client *embed.Cli
 	startCtx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
-	if err := client.Start(startCtx); err != nil {
+	if err := n.start(startCtx, client); err != nil {
 		if errors.Is(err, context.DeadlineExceeded) {
-			n.logger.WithField("account_id", accountID).Warn("netbirdy client start timed out, will retry on first request")
+			n.logger.WithField("account_id", accountID).Warn("netbirdy client start timed out, retrying in the background")
 		} else {
-			n.logger.WithField("account_id", accountID).WithError(err).Error("failed to start netbirdy client")
+			n.logger.WithField("account_id", accountID).WithError(err).Error("failed to start netbirdy client, retrying in the background")
 		}
+		go n.retryClientStartup(accountID, client)
 		return
 	}
 
 	n.notifyClientReady(accountID, client)
+}
+
+func (n *NetBirdy) start(ctx context.Context, client *embed.Client) error {
+	if n.startFn != nil {
+		return n.startFn(ctx, client)
+	}
+	return client.Start(ctx)
+}
+
+// retryClientStartup keeps starting a client that failed its first start, for
+// example because management was restarting, so the account recovers without
+// waiting for a request or a proxy restart. It runs without the account
+// lifecycle lock and ends when the client starts, is replaced or removed, or
+// the proxy shuts down.
+func (n *NetBirdy) retryClientStartup(accountID types.AccountID, client *embed.Client) {
+	delay, maxDelay := 2*time.Second, time.Minute
+	if d := n.retryDelays; d != nil {
+		delay, maxDelay = d.initial, d.max
+	}
+	for {
+		select {
+		case <-n.ctx.Done():
+			return
+		case <-time.After(delay):
+		}
+		if delay *= 2; delay > maxDelay {
+			delay = maxDelay
+		}
+
+		n.clientsMux.RLock()
+		entry, ok := n.clients[accountID]
+		current := ok && entry.client == client && !entry.started
+		n.clientsMux.RUnlock()
+		if !current {
+			return
+		}
+
+		startCtx, cancel := context.WithTimeout(n.ctx, 30*time.Second)
+		err := n.start(startCtx, client)
+		cancel()
+		if err != nil && !errors.Is(err, embed.ErrClientAlreadyStarted) {
+			n.logger.WithField("account_id", accountID).WithError(err).Debug("netbirdy client start retry failed")
+			continue
+		}
+
+		n.clientsMux.RLock()
+		entry, ok = n.clients[accountID]
+		current = ok && entry.client == client && !entry.started
+		n.clientsMux.RUnlock()
+		if current {
+			n.logger.WithField("account_id", accountID).Info("netbirdy client started after retry")
+			n.notifyClientReady(accountID, client)
+		}
+		return
+	}
 }
 
 // notifyClientReady marks the account's client as started, fires the

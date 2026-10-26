@@ -2,9 +2,11 @@ package roundtrip
 
 import (
 	"context"
+	"errors"
 	"net/http"
 	"net/netip"
 	"sync"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -549,4 +551,62 @@ func TestNotifyClientReady_UsesBackgroundCtx(t *testing.T) {
 	require.NotNil(t, calls[0].ctx, "NotifyStatus must receive a context")
 	require.NoError(t, calls[0].ctx.Err(),
 		"NotifyStatus must receive a background context, not an inherited cancelled one")
+}
+
+func TestRetryClientStartup_NotifiesAfterTransientFailure(t *testing.T) {
+	notifier := &mockStatusNotifier{}
+	nb := NewNetBird(context.Background(), "test-proxy", "invalid.test", ClientConfig{
+		MgmtAddr: "http://invalid.test:9999",
+	}, nil, notifier, &mockMgmtClient{})
+	nb.retryDelays = &startRetryDelays{initial: time.Millisecond, max: 5 * time.Millisecond}
+
+	accountID := types.AccountID("acct-retry")
+	nb.clientsMux.Lock()
+	nb.clients[accountID] = &clientEntry{
+		services: map[ServiceKey]serviceInfo{
+			DomainServiceKey("svc.example"): {serviceID: types.ServiceID("svc-1")},
+		},
+	}
+	nb.clientsMux.Unlock()
+
+	var attempts atomic.Int32
+	nb.startFn = func(context.Context, *embed.Client) error {
+		if attempts.Add(1) < 3 {
+			return errors.New("management unavailable")
+		}
+		return nil
+	}
+
+	nb.runClientStartup(accountID, nil)
+
+	require.Eventually(t, func() bool { return len(notifier.calls()) == 1 }, 2*time.Second, 5*time.Millisecond)
+	assert.EqualValues(t, 3, attempts.Load())
+	nb.clientsMux.RLock()
+	assert.True(t, nb.clients[accountID].started)
+	nb.clientsMux.RUnlock()
+}
+
+func TestRetryClientStartup_StopsWhenAccountRemoved(t *testing.T) {
+	nb := NewNetBird(context.Background(), "test-proxy", "invalid.test", ClientConfig{
+		MgmtAddr: "http://invalid.test:9999",
+	}, nil, &mockStatusNotifier{}, &mockMgmtClient{})
+	nb.retryDelays = &startRetryDelays{initial: time.Millisecond, max: 2 * time.Millisecond}
+
+	var attempts atomic.Int32
+	nb.startFn = func(context.Context, *embed.Client) error {
+		attempts.Add(1)
+		return errors.New("management unavailable")
+	}
+
+	done := make(chan struct{})
+	go func() {
+		nb.retryClientStartup(types.AccountID("gone"), nil)
+		close(done)
+	}()
+	select {
+	case <-done:
+	case <-time.After(2 * time.Second):
+		t.Fatal("retry loop did not stop for a removed account")
+	}
+	assert.Zero(t, attempts.Load())
 }
