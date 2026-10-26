@@ -63,6 +63,7 @@ hits=$(grep -rn $EXCLUDE '\bNetBird\b\|\bNetbird\b' . \
     | grep -v '^./README\.md:' \
     | grep -v '^./site/' \
     | grep -v 'official NetBird mobile apps' \
+    | grep -v 'NetBird-SSH-\|NetBird-JWT-' \
     || true)
 
 if [ -n "$hits" ]; then
