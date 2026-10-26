@@ -129,6 +129,7 @@ type Shield struct {
 	verifier    SearchVerifier
 	hmacKey     []byte
 	uaCache     sync.Map
+	uaCacheLen  atomic.Int64
 	stopCh      chan struct{}
 	closed      chan struct{}
 	lastPanic   atomic.Int64
@@ -583,17 +584,12 @@ func (s *Shield) classifyUA(ua string) (string, bool, bool, bool) {
 		return c.class, c.browser, c.search, c.ai
 	}
 	class, browser, search, ai := classifyUA(ua)
-	if c := cacheLen(&s.uaCache); c > 4096 {
+	if s.uaCacheLen.Add(1) > 4096 {
 		s.uaCache.Range(func(k, _ any) bool { s.uaCache.Delete(k); return true })
+		s.uaCacheLen.Store(0)
 	}
 	s.uaCache.Store(ua, cls{class, browser, search, ai})
 	return class, browser, search, ai
-}
-
-func cacheLen(m *sync.Map) int {
-	n := 0
-	m.Range(func(_, _ any) bool { n++; return n < 4097 })
-	return n
 }
 
 func (s *Shield) clientIP(r *http.Request) netip.Addr {

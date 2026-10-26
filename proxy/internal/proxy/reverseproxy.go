@@ -196,6 +196,7 @@ func (p *ReverseProxy) serveDirect(w http.ResponseWriter, r *http.Request, ctx c
 		Rewrite:       p.rewriteFunc(pt.URL, rewriteMatchedPath, result.passHostHeader, pt.PathRewrite, pt.CustomHeaders, result.stripAuthHeaders),
 		Transport:     p.transport,
 		FlushInterval: -1,
+		BufferPool:    sharedCopyBufferPool,
 		ErrorHandler:  p.proxyErrorHandler,
 	}
 	if result.rewriteRedirects {
@@ -392,6 +393,7 @@ func (p *ReverseProxy) forwardUpstream(respWriter http.ResponseWriter, r *http.R
 		Rewrite:       p.rewriteFunc(effectiveURL, rewriteMatchedPath, result.passHostHeader, pt.PathRewrite, pt.CustomHeaders, result.stripAuthHeaders),
 		Transport:     p.transport,
 		FlushInterval: -1,
+		BufferPool:    sharedCopyBufferPool,
 		ErrorHandler:  p.proxyErrorHandler,
 	}
 	if result.rewriteRedirects {
@@ -747,6 +749,9 @@ func (p *ReverseProxy) setUntrustedForwardingHeaders(r *httputil.ProxyRequest, c
 // stripSessionCookie removes the proxy's session cookie from the outgoing
 // request while preserving all other cookies.
 func stripSessionCookie(r *httputil.ProxyRequest) {
+	if len(r.In.Header["Cookie"]) == 0 {
+		return
+	}
 	cookies := r.In.Cookies()
 	r.Out.Header.Del("Cookie")
 	for _, c := range cookies {
@@ -759,6 +764,14 @@ func stripSessionCookie(r *httputil.ProxyRequest) {
 // stripSessionTokenQuery removes the OIDC session hand-off query parameters
 // from the outgoing URL to prevent credential leakage to backends.
 func stripSessionTokenQuery(r *httputil.ProxyRequest) {
+	// Keys can arrive percent-encoded, so only a query with no escapes and
+	// neither parameter name present can skip the parse.
+	raw := r.Out.URL.RawQuery
+	if raw == "" || (!strings.Contains(raw, "%") &&
+		!strings.Contains(raw, auth.SessionTokenQueryParam) &&
+		!strings.Contains(raw, auth.SessionCodeQueryParam)) {
+		return
+	}
 	q := r.Out.URL.Query()
 	if q.Has(auth.SessionTokenQueryParam) || q.Has(auth.SessionCodeQueryParam) {
 		q.Del(auth.SessionTokenQueryParam)

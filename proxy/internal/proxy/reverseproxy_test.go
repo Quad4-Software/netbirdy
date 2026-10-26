@@ -247,6 +247,23 @@ func TestRewriteFunc_SessionTokenQueryStripping(t *testing.T) {
 			"other query parameters must be preserved")
 	})
 
+	t.Run("strips percent-encoded session_token key", func(t *testing.T) {
+		pr := newProxyRequest(t, "http://example.com/cb?session%5Ftoken=secret123&other=keep", "1.2.3.4:5000")
+
+		rewrite(pr)
+
+		assert.NotContains(t, pr.Out.URL.RawQuery, "secret123")
+		assert.Equal(t, "keep", pr.Out.URL.Query().Get("other"))
+	})
+
+	t.Run("leaves a query without session parameters byte for byte", func(t *testing.T) {
+		pr := newProxyRequest(t, "http://example.com/api?b=2&a=1&c=x+y", "1.2.3.4:5000")
+
+		rewrite(pr)
+
+		assert.Equal(t, "b=2&a=1&c=x+y", pr.Out.URL.RawQuery)
+	})
+
 	t.Run("preserves query when no session_token present", func(t *testing.T) {
 		pr := newProxyRequest(t, "http://example.com/api?foo=bar&baz=qux", "1.2.3.4:5000")
 
