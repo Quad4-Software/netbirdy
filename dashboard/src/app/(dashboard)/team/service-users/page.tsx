@@ -50,7 +50,7 @@ export default function ServiceUsers() {
           Use service users to create API tokens and avoid losing automated
           access.{" "}
           <InlineLink
-            href={docsLink("https://docs.netbird.io/how-to/access-netbirdy-public-api")}
+            href={docsLink("https://docs.netbird.io/how-to/access-netbird-public-api")}
             target={"_blank"}
           >
             Learn more

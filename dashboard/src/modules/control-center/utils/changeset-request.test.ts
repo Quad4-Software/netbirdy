@@ -96,7 +96,7 @@ describe("buildChangeRequest", () => {
             destinations: [{ id: "g2", name: "Admins" }],
             bidirectional: true,
             action: "accept",
-            protocol: "netbirdy-ssh",
+            protocol: "netbird-ssh",
             ports: [],
             authorized_groups: { Admins: ["root"] },
           },

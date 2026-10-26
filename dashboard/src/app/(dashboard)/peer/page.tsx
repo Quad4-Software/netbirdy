@@ -736,7 +736,7 @@ function PeerInformationCard({ peer }: Readonly<{ peer: Peer }>) {
                   UI Version
                 </>
               }
-              value={peer.ui_version?.replace("netbirdy-desktop-ui/", "")}
+              value={peer.ui_version?.replace(/^netbirdy?-desktop-ui\//, "")}
             />
           )}
         </Card.List>

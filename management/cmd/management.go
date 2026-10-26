@@ -283,7 +283,7 @@ func ApplyEmbeddedIdPConfig(ctx context.Context, cfg *nbconfig.Config) error {
 	cfg.HttpConfig.AuthIssuer = issuer
 	cfg.HttpConfig.AuthAudience = "netbird-dashboard"
 	cfg.HttpConfig.AuthClientID = cfg.HttpConfig.AuthAudience
-	cfg.HttpConfig.CLIAuthAudience = "netbirdy-cli"
+	cfg.HttpConfig.CLIAuthAudience = "netbird-cli"
 	cfg.HttpConfig.AuthUserIDClaim = "sub"
 	cfg.HttpConfig.AuthKeysLocation = issuer + "/keys"
 	cfg.HttpConfig.OIDCConfigEndpoint = issuer + "/.well-known/openid-configuration"

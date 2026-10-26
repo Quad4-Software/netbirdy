@@ -1,5 +1,5 @@
 # This code is based on the netbirdy-installer contribution by physk on GitHub.
-# Source: https://github.com/physk/netbirdy-installer
+# Source: https://github.com/physk/netbird-installer
 set -e
 
 CONFIG_FOLDER="/etc/netbird"

@@ -41,7 +41,7 @@ export default function AccessControlSourcesCell({
     >
       <MultipleGroups
         groups={firstRule.sources as Group[]}
-        showUsers={firstRule.protocol === "netbirdy-ssh"}
+        showUsers={firstRule.protocol === "netbird-ssh"}
         disableRedirect={disableRedirect}
         countOnly
       />

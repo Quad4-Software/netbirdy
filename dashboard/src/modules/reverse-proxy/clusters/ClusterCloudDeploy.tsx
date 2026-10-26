@@ -20,10 +20,10 @@ import React, { useEffect, useMemo, useState } from "react";
 import { isClusterConnected } from "@/interfaces/ReverseProxy";
 import { useProxyCluster } from "@/modules/reverse-proxy/clusters/useProxyCluster";
 
-// Synced from templates/reverse-proxy/netbirdy-proxy-cfn.yaml by the
+// Synced from templates/reverse-proxy/netbird-proxy-cfn.yaml by the
 // sync-deploy-templates workflow.
 const CFN_TEMPLATE_URL =
-  "https://netbirdy-deploy-templates.s3.eu-central-1.amazonaws.com/templates/netbirdy-proxy-cfn.yaml";
+  "https://netbird-deploy-templates.s3.eu-central-1.amazonaws.com/templates/netbird-proxy-cfn.yaml";
 
 const DEFAULT_WIREGUARD_PORT = 51820;
 

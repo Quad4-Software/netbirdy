@@ -58,7 +58,7 @@ export const PeerSSHToggle = () => {
     return orderBy(
       policies?.filter((policy) => {
         const rule = policy?.rules?.[0];
-        const isSSHProtocol = rule?.protocol === "netbirdy-ssh";
+        const isSSHProtocol = rule?.protocol === "netbird-ssh";
         if (!isSSHProtocol) return false;
         const destinationResource = policy.rules
           ?.map((rule) => rule?.destinationResource?.id === peer?.id)

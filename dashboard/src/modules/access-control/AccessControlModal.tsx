@@ -362,7 +362,7 @@ export function AccessControlModalContent({
                   <SelectItem value="udp">UDP</SelectItem>
                   <SelectItem value="icmp">ICMP</SelectItem>
                   <SelectItem
-                    value="netbirdy-ssh"
+                    value="netbird-ssh"
                     extra={
                       <HelpTooltip
                         triggerClassName={"ml-[0.01rem]"}
@@ -403,15 +403,15 @@ export function AccessControlModalContent({
                   data-testid={"source-group-selector"}
                   popoverWidth={500}
                   placeholder={"Select source(s)..."}
-                  showRoutes={protocol !== "netbirdy-ssh"}
+                  showRoutes={protocol !== "netbird-ssh"}
                   showResources={false}
-                  showPeers={protocol !== "netbirdy-ssh"}
+                  showPeers={protocol !== "netbird-ssh"}
                   showResourceCounter={false}
                   showPeerCount={allowEditPeers}
                   disableInlineRemoveGroup={false}
                   values={sourceGroups}
                   onChange={setSourceGroups}
-                  users={protocol === "netbirdy-ssh" ? users : undefined}
+                  users={protocol === "netbird-ssh" ? users : undefined}
                   resource={sourceResource}
                   onResourceChange={setSourceResource}
                   additionalPeers={additionalPeers}
@@ -448,7 +448,7 @@ export function AccessControlModalContent({
                   popoverWidth={500}
                   placeholder={"Select destination(s)..."}
                   showRoutes={true}
-                  showResources={protocol !== "netbirdy-ssh"}
+                  showResources={protocol !== "netbird-ssh"}
                   showPeers={!destinationScope}
                   resourceIds={destinationScope?.resourceIds}
                   groupIds={destinationScope?.groupIds}
@@ -490,7 +490,7 @@ export function AccessControlModalContent({
                 </Callout>
               )}
 
-            {protocol === "netbirdy-ssh" ? (
+            {protocol === "netbird-ssh" ? (
               <div>
                 {destinationHasResources && (
                   <Callout

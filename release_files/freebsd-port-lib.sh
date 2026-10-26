@@ -8,7 +8,7 @@
 
 GITHUB_REPO="netbirdio/netbird"
 GITHUB_REPO_URL="https://github.com/${GITHUB_REPO}.git"
-PORTS_MIRROR_BASE="https://raw.githubusercontent.com/freebsd/freebsd-ports/main/security/netbirdy"
+PORTS_MIRROR_BASE="https://raw.githubusercontent.com/freebsd/freebsd-ports/main/security/netbird"
 STABLE_VERSION_RE='^[0-9]+\.[0-9]+\.[0-9]+$'
 
 # is_stable_version reports whether the version is a plain MAJOR.MINOR.PATCH release.

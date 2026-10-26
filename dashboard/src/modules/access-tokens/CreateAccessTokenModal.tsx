@@ -212,7 +212,7 @@ export function AccessTokenModalContent({
           <Paragraph className={"text-sm mt-auto"}>
             Learn more about
             <InlineLink
-              href={docsLink("https://docs.netbird.io/how-to/access-netbirdy-public-api")}
+              href={docsLink("https://docs.netbird.io/how-to/access-netbird-public-api")}
               target={"_blank"}
             >
               Access Tokens

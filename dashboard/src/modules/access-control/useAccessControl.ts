@@ -155,7 +155,7 @@ export const useAccessControl = ({
   );
 
   const [sshAccessType, setSshAccessType] = useState<"full" | "limited">(() => {
-    if (protocol === "netbirdy-ssh") {
+    if (protocol === "netbird-ssh") {
       return firstRule?.authorized_groups !== undefined &&
         Object.keys(firstRule?.authorized_groups).length > 0
         ? "limited"
@@ -264,7 +264,7 @@ export const useAccessControl = ({
     let [newPorts, newPortRanges] = parseAccessControlPorts(ports, portRanges);
 
     let authorizedGroups: AuthorizedGroups = {};
-    if (protocol === "netbirdy-ssh") {
+    if (protocol === "netbird-ssh") {
       newPorts = ["22"];
       newPortRanges = [];
 
@@ -311,7 +311,7 @@ export const useAccessControl = ({
           ports: newPorts,
           port_ranges: newPortRanges,
           authorized_groups:
-            protocol === "netbirdy-ssh" ? authorizedGroups : undefined,
+            protocol === "netbird-ssh" ? authorizedGroups : undefined,
         },
       ],
     } as Policy;

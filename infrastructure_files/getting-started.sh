@@ -1553,7 +1553,6 @@ print_builtin_traefik_instructions() {
     echo "For enterprise environments requiring high availability and advanced integrations,"
     echo "consider a commercial on-prem license:"
     echo ""
-    echo "  Commercial license: https://netbirdy.ai/pricing"
     echo "  Documentation: https://docs.netbird.io/agent-network"
   else
     echo "This setup is ideal for homelabs and smaller organization deployments."

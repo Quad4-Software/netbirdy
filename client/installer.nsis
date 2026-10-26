@@ -1,6 +1,6 @@
 !define APP_NAME "NetBirdy"
 !define COMP_NAME "NetBirdy"
-!define WEB_SITE "NetBirdy.io"
+!define WEB_SITE "github.com/Sudo-Ivan/netbirdy"
 !define VERSION $%APPVER%
 !define COPYRIGHT "NetBirdy Authors, 2022-2026"
 !define DESCRIPTION "Connect your devices into a secure WireGuard-based overlay network with SSO, MFA, and granular access controls."

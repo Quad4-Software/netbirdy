@@ -304,7 +304,7 @@ export default function AccessControlTable({
       { value: "tcp", label: "TCP" },
       { value: "udp", label: "UDP" },
       { value: "icmp", label: "ICMP" },
-      { value: "netbirdy-ssh", label: "NetBirdy SSH" },
+      { value: "netbird-ssh", label: "NetBirdy SSH" },
     ],
     [],
   );

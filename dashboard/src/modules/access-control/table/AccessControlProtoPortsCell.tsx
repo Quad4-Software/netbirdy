@@ -34,7 +34,7 @@ export default function AccessControlProtoPortsCell({
 
   if (!rule) return <EmptyRow />;
 
-  const isNetBirdSSH = rule.protocol?.toLowerCase() === "netbirdy-ssh";
+  const isNetBirdSSH = rule.protocol?.toLowerCase() === "netbird-ssh";
   const protocolLabel = isNetBirdSSH ? "NB-SSH" : rule.protocol;
   const protocolBadge = (
     <Badge

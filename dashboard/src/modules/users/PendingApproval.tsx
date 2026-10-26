@@ -120,7 +120,7 @@ export const PendingApproval = ({ error, onRefresh, onLogout }: Props) => {
         </InlineLink>
         or
         <InlineLink
-          href={docsLink("https://docs.netbird.io/help/netbirdy-support")}
+          href={docsLink("https://docs.netbird.io/help/netbird-support")}
           target={"_blank"}
         >
           Contact Support

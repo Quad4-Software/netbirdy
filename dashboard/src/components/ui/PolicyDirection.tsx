@@ -24,7 +24,7 @@ export default function PolicyDirection({
   protocol,
 }: Readonly<Props>) {
   const toggleDirection = () => {
-    if (protocol === "netbirdy-ssh") return;
+    if (protocol === "netbird-ssh") return;
     if (value == "bi") {
       onChange("in");
     } else {
@@ -33,7 +33,7 @@ export default function PolicyDirection({
   };
 
   useEffect(() => {
-    if (protocol === "netbirdy-ssh") {
+    if (protocol === "netbird-ssh") {
       onChange("in");
       return;
     }
@@ -74,7 +74,7 @@ export default function PolicyDirection({
     <button
       className={cn(
         "flex flex-col gap-2 mt-[23px] cursor-pointer select-none",
-        (disabled || protocol === "netbirdy-ssh") &&
+        (disabled || protocol === "netbird-ssh") &&
           "opacity-50 pointer-events-none",
         "hover:opacity-80 transition-all",
         className,

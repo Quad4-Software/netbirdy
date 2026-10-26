@@ -207,7 +207,7 @@ export default function OktaSSOSetup({ open, onOpenChange }: Props) {
                     <InlineLink
                       className={"inline"}
                       target={"_blank"}
-                      href={"https://www.okta.com/integrations/netbirdy"}
+                      href={"https://www.okta.com/integrations/netbird"}
                     >
                       Okta Integration Network
                     </InlineLink>

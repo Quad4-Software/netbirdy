@@ -215,7 +215,7 @@ export const policies: Policy[] = [
     source_posture_checks: [],
     rules: [
       rule({
-        protocol: "netbirdy-ssh",
+        protocol: "netbird-ssh",
         bidirectional: false,
         sources: [group(GROUP.devops)],
         destinations: [group(GROUP.servers)],
