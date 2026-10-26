@@ -39,7 +39,7 @@ func GetInfo(ctx context.Context) *Info {
 		Platform: detect_platform.Detect(ctx),
 	}
 
-	osName, osVersion := readOsReleaseFile()
+	osName, osVersion := detectBSDDistro("/", osInfo[1])
 
 	systemHostname, _ := os.Hostname()
 

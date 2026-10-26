@@ -645,3 +645,24 @@ func TestPeersHandlerUpdatePeerIP(t *testing.T) {
 		})
 	}
 }
+
+func TestPeerOSString(t *testing.T) {
+	for _, tc := range []struct {
+		meta nbpeer.PeerSystemMeta
+		want string
+	}{
+		{nbpeer.PeerSystemMeta{OS: "Ubuntu", OSVersion: "24.04"}, "Ubuntu 24.04"},
+		{nbpeer.PeerSystemMeta{OS: "OPNsense", Core: "25.1"}, "OPNsense 25.1"},
+		{nbpeer.PeerSystemMeta{GoOS: "freebsd", KernelVersion: "14.2"}, "FreeBSD 14.2"},
+		{nbpeer.PeerSystemMeta{GoOS: "windows", Core: "11"}, "Windows 11"},
+		{nbpeer.PeerSystemMeta{GoOS: "darwin", OSVersion: "15.1"}, "macOS 15.1"},
+		{nbpeer.PeerSystemMeta{GoOS: "android", OSVersion: "14"}, "Android 14"},
+		{nbpeer.PeerSystemMeta{GoOS: "ios", OSVersion: "17"}, "iOS 17"},
+		{nbpeer.PeerSystemMeta{GoOS: "openbsd", Core: "7.6"}, "Openbsd 7.6"},
+		{nbpeer.PeerSystemMeta{}, ""},
+	} {
+		if got := peerOSString(tc.meta); got != tc.want {
+			t.Fatalf("%+v: got %q want %q", tc.meta, got, tc.want)
+		}
+	}
+}

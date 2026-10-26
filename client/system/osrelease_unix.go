@@ -11,9 +11,20 @@ import (
 )
 
 func readOsReleaseFile() (osName string, osVer string) {
-	file, err := os.Open("/etc/os-release")
-	if err != nil {
-		log.Warnf("failed to open file /etc/os-release: %s", err)
+	return readOsReleaseFileAt("/")
+}
+
+func readOsReleaseFileAt(root string) (osName string, osVer string) {
+	var file *os.File
+	for _, p := range []string{root + "etc/os-release", root + "usr/lib/os-release"} {
+		f, err := os.Open(p)
+		if err == nil {
+			file = f
+			break
+		}
+	}
+	if file == nil {
+		log.Warnf("no os-release file under %s", root)
 		return "", ""
 	}
 	defer file.Close()
@@ -21,15 +32,17 @@ func readOsReleaseFile() (osName string, osVer string) {
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
 		line := scanner.Text()
-		if strings.HasPrefix(line, "NAME=") {
-			osName = strings.ReplaceAll(strings.Split(line, "=")[1], "\"", "")
+		kv := strings.SplitN(line, "=", 2)
+		if len(kv) != 2 {
 			continue
 		}
-		if strings.HasPrefix(line, "VERSION_ID=") {
-			osVer = strings.ReplaceAll(strings.Split(line, "=")[1], "\"", "")
-			continue
+		v := strings.Trim(kv[1], `\"`)
+		switch kv[0] {
+		case "NAME":
+			osName = v
+		case "VERSION_ID":
+			osVer = v
 		}
-
 		if osName != "" && osVer != "" {
 			break
 		}

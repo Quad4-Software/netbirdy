@@ -20,7 +20,15 @@ export const isMac =
 
 export const getOperatingSystem = (os: string) => {
   if (!os) return OperatingSystem.LINUX as const;
-  if (os.toLowerCase().includes("freebsd"))
+  const bsd = [
+    "opnsense",
+    "pfsense",
+    "freebsd",
+    "ghostbsd",
+    "hardenedbsd",
+    "midnightbsd",
+  ];
+  if (bsd.some((b) => os.toLowerCase().includes(b)))
     return OperatingSystem.FREEBSD as const;
   if (os.toLowerCase().includes("darwin"))
     return OperatingSystem.APPLE as const;

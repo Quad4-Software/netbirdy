@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/netip"
+	"strings"
 
 	"github.com/gorilla/mux"
 	log "github.com/sirupsen/logrus"
@@ -583,12 +584,47 @@ func toNetworkAddresses(addrs []nbpeer.NetworkAddress) *[]api.NetworkAddress {
 	return &out
 }
 
-func toSinglePeerResponse(peer *nbpeer.Peer, groupsInfo []api.GroupMinimum, dnsDomain string, approved bool, reason string) *api.Peer {
-	osVersion := peer.Meta.OSVersion
-	if osVersion == "" {
-		osVersion = peer.Meta.Core
+// peerOSString renders the peer OS column. When the client reported no OS
+// name (older agents on platforms without os-release) it derives a display
+// name from GoOS and picks the best available version field.
+func peerOSString(meta nbpeer.PeerSystemMeta) string {
+	if meta.OS != "" {
+		v := meta.OSVersion
+		if v == "" {
+			v = meta.Core
+		}
+		return fmt.Sprintf("%s %s", meta.OS, v)
 	}
+	name := meta.GoOS
+	switch name {
+	case "freebsd":
+		name = "FreeBSD"
+	case "linux":
+		name = "Linux"
+	case "windows":
+		name = "Windows"
+	case "darwin":
+		name = "macOS"
+	case "android":
+		name = "Android"
+	case "ios":
+		name = "iOS"
+	case "":
+		return ""
+	default:
+		name = strings.ToUpper(name[:1]) + name[1:]
+	}
+	v := meta.OSVersion
+	if v == "" {
+		v = meta.Core
+	}
+	if v == "" {
+		v = meta.KernelVersion
+	}
+	return fmt.Sprintf("%s %s", name, v)
+}
 
+func toSinglePeerResponse(peer *nbpeer.Peer, groupsInfo []api.GroupMinimum, dnsDomain string, approved bool, reason string) *api.Peer {
 	apiPeer := &api.Peer{
 		CreatedAt:                   peer.CreatedAt,
 		Id:                          peer.ID,
@@ -599,7 +635,7 @@ func toSinglePeerResponse(peer *nbpeer.Peer, groupsInfo []api.GroupMinimum, dnsD
 		ConnectionIp:                peer.Location.ConnectionIP.String(),
 		Connected:                   peer.Status.Connected,
 		LastSeen:                    peer.Status.LastSeen,
-		Os:                          fmt.Sprintf("%s %s", peer.Meta.OS, osVersion),
+		Os:                          peerOSString(peer.Meta),
 		KernelVersion:               peer.Meta.KernelVersion,
 		GeonameId:                   int(peer.Location.GeoNameID),
 		Version:                     peer.Meta.WtVersion,
@@ -642,10 +678,6 @@ func toSinglePeerResponse(peer *nbpeer.Peer, groupsInfo []api.GroupMinimum, dnsD
 }
 
 func toPeerListItemResponse(peer *nbpeer.Peer, groupsInfo []api.GroupMinimum, dnsDomain string, accessiblePeersCount int) *api.PeerBatch {
-	osVersion := peer.Meta.OSVersion
-	if osVersion == "" {
-		osVersion = peer.Meta.Core
-	}
 	return &api.PeerBatch{
 		CreatedAt:                   peer.CreatedAt,
 		Id:                          peer.ID,
@@ -656,7 +688,7 @@ func toPeerListItemResponse(peer *nbpeer.Peer, groupsInfo []api.GroupMinimum, dn
 		ConnectionIp:                peer.Location.ConnectionIP.String(),
 		Connected:                   peer.Status.Connected,
 		LastSeen:                    peer.Status.LastSeen,
-		Os:                          fmt.Sprintf("%s %s", peer.Meta.OS, osVersion),
+		Os:                          peerOSString(peer.Meta),
 		KernelVersion:               peer.Meta.KernelVersion,
 		GeonameId:                   int(peer.Location.GeoNameID),
 		Version:                     peer.Meta.WtVersion,
