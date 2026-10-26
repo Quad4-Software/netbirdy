@@ -43,9 +43,10 @@ func validateUsername(username string) error {
 		return fmt.Errorf("username cannot be '.' or '..'")
 	}
 
-	// Warn if username is fully numeric (can cause issues with UID/username ambiguity)
+	// Numeric names are rejected: NSS lookups can resolve them as UIDs, so "0" would
+	// address root while bypassing name based policy and root checks.
 	if isFullyNumeric(username) {
-		log.Warnf("fully numeric username '%s' may cause issues with some commands", username)
+		return errors.New("numeric usernames are not allowed")
 	}
 
 	return nil

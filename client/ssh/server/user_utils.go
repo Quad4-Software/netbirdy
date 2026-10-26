@@ -82,7 +82,7 @@ func (s *Server) CheckPrivileges(req PrivilegeCheckRequest) PrivilegeCheckResult
 
 	// Handle empty username case - but still check root access controls
 	if req.RequestedUsername == "" {
-		if isPrivilegedOrUnknown(context.currentUser.Username) && !context.allowRoot {
+		if isPrivilegedUser(context.currentUser) && !context.allowRoot {
 			return PrivilegeCheckResult{
 				Allowed: false,
 				Error:   &PrivilegedUserError{Username: context.currentUser.Username},
@@ -142,7 +142,7 @@ func (s *Server) checkUserRequest(ctx *privilegeCheckContext, req PrivilegeCheck
 
 	needsUserSwitching := !isSameResolvedUser(resolvedUser, ctx.currentUser)
 
-	if isPrivilegedOrUnknown(resolvedUser.Username) && !ctx.allowRoot {
+	if isPrivilegedUser(resolvedUser) && !ctx.allowRoot {
 		return PrivilegeCheckResult{
 			Allowed:               false,
 			Error:                 &PrivilegedUserError{Username: resolvedUser.Username},
@@ -305,6 +305,15 @@ func isPrivilegedOrUnknown(username string) bool {
 		return username == "root"
 	}
 	return getWindowsAccountPrivilegedOrUnknown(username)
+}
+
+// isPrivilegedUser reports whether a resolved account is privileged. On Unix any
+// account with UID 0 counts, whatever its name.
+func isPrivilegedUser(u *user.User) bool {
+	if u == nil || isPrivilegedOrUnknown(u.Username) {
+		return true
+	}
+	return isPlatformUnix() && u.Uid == "0"
 }
 
 // isCurrentProcessPrivileged checks if the current process is running with elevated privileges.

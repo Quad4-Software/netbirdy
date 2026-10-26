@@ -538,6 +538,10 @@ func TestUsernameValidation_Unix(t *testing.T) {
 		{"reserved_dotdot", "..", true, "cannot be '.' or '..'"},
 		{"username_with_at_symbol", "user@domain", true, "invalid characters"}, // Not allowed in bare Unix usernames
 		{"username_with_backslash", "user\\name", true, "invalid characters"},  // Not allowed in Unix usernames
+		{"numeric_root_uid", "0", true, "numeric usernames"},
+		{"numeric_uid", "1000", true, "numeric usernames"},
+		{"flag_like_getent", "-i", true, "invalid characters"},
+		{"flag_like_long", "--no-idn", true, "invalid characters"},
 	}
 
 	for _, tt := range tests {
