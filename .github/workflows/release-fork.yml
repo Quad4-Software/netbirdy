@@ -221,6 +221,15 @@ jobs:
           version: "~> v2"
           args: ${{ needs.meta.outputs.publish == 'true' && 'release --config .goreleaser_ui.yaml --clean --skip=publish,sign' || 'release --config .goreleaser_ui.yaml --snapshot --clean --skip=publish,sign' }}
 
+      - name: Build AppImage
+        env:
+          APPVER: ${{ needs.meta.outputs.appver }}
+        run: |
+          set -eu
+          bin=$(find dist -type f -name netbirdy-ui -path '*linux*amd64*' | head -n 1)
+          test -n "$bin"
+          sh scripts/release/build-appimage.sh "$bin" "$APPVER" linux-ui
+
       - name: Collect files
         run: |
           mkdir -p linux-ui windows-ui

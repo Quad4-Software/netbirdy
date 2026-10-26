@@ -109,3 +109,11 @@ prefix and digests from the root signed list are applied. Backups live
 in the netbirdy-updater-backups volume, pruned to the newest 5, and can
 be restored by hand from the manifest. Status persists in
 backups/status.json.
+
+## AppImage
+
+The desktop UI also ships as a thin AppImage for amd64. It needs the
+netbirdy daemon package installed and running, and host GTK4 and
+WebKitGTK 6.0 (Debian/Ubuntu: libgtk-4-1 libwebkitgtk-6.0-4, Fedora:
+gtk4 webkitgtk6.0). chmod +x and run it; on hosts without FUSE it
+runs with --appimage-extract-and-run.
