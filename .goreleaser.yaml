@@ -423,6 +423,8 @@ dockers_v2:
        - "{{ .Version }}"
        - "{{ if eq .Env.SKIP_PUBLISH \"false\" }}latest{{ end }}"
      dockerfile: client/Dockerfile
+     flags:
+       - --output=type=image,compression=zstd,compression-level=3,force-compression=true,oci-mediatypes=true
      extra_files:
        - client/netbirdy-entrypoint.sh
      platforms:
@@ -446,6 +448,8 @@ dockers_v2:
        - "{{ .Version }}-rootless"
        - "{{ if eq .Env.SKIP_PUBLISH \"false\" }}rootless-latest{{ end }}"
      dockerfile: client/Dockerfile-rootless
+     flags:
+       - --output=type=image,compression=zstd,compression-level=3,force-compression=true,oci-mediatypes=true
      extra_files:
        - client/netbirdy-entrypoint.sh
      platforms:
@@ -469,6 +473,8 @@ dockers_v2:
        - "{{ .Version }}-rootless-ubi"
        - "{{ if eq .Env.SKIP_PUBLISH \"false\" }}rootless-ubi-latest{{ end }}"
      dockerfile: client/Dockerfile-rootless.ubi
+     flags:
+       - --output=type=image,compression=zstd,compression-level=3,force-compression=true,oci-mediatypes=true
      extra_files:
        - client/netbirdy-entrypoint.sh
      platforms:
@@ -505,6 +511,8 @@ dockers_v2:
        - "{{ .Version }}"
        - "{{ if eq .Env.SKIP_PUBLISH \"false\" }}latest{{ end }}"
      dockerfile: relay/Dockerfile
+     flags:
+       - --output=type=image,compression=zstd,compression-level=3,force-compression=true,oci-mediatypes=true
      platforms:
        - linux/amd64
        - linux/arm64
@@ -526,6 +534,8 @@ dockers_v2:
        - "{{ .Version }}-ubi"
        - "{{ if eq .Env.SKIP_PUBLISH \"false\" }}ubi-latest{{ end }}"
      dockerfile: relay/Dockerfile.ubi
+     flags:
+       - --output=type=image,compression=zstd,compression-level=3,force-compression=true,oci-mediatypes=true
      platforms:
        - linux/amd64
        - linux/arm64
@@ -560,6 +570,8 @@ dockers_v2:
        - "{{ .Version }}"
        - "{{ if eq .Env.SKIP_PUBLISH \"false\" }}latest{{ end }}"
      dockerfile: signal/Dockerfile
+     flags:
+       - --output=type=image,compression=zstd,compression-level=3,force-compression=true,oci-mediatypes=true
      platforms:
        - linux/amd64
        - linux/arm64
@@ -581,6 +593,8 @@ dockers_v2:
        - "{{ .Version }}-ubi"
        - "{{ if eq .Env.SKIP_PUBLISH \"false\" }}ubi-latest{{ end }}"
      dockerfile: signal/Dockerfile.ubi
+     flags:
+       - --output=type=image,compression=zstd,compression-level=3,force-compression=true,oci-mediatypes=true
      platforms:
        - linux/amd64
        - linux/arm64
@@ -615,6 +629,8 @@ dockers_v2:
        - "{{ .Version }}"
        - "{{ if eq .Env.SKIP_PUBLISH \"false\" }}latest{{ end }}"
      dockerfile: management/Dockerfile
+     flags:
+       - --output=type=image,compression=zstd,compression-level=3,force-compression=true,oci-mediatypes=true
      platforms:
        - linux/amd64
        - linux/arm64
@@ -636,6 +652,8 @@ dockers_v2:
        - "{{ .Version }}-ubi"
        - "{{ if eq .Env.SKIP_PUBLISH \"false\" }}ubi-latest{{ end }}"
      dockerfile: management/Dockerfile.ubi
+     flags:
+       - --output=type=image,compression=zstd,compression-level=3,force-compression=true,oci-mediatypes=true
      platforms:
        - linux/amd64
        - linux/arm64
@@ -670,6 +688,8 @@ dockers_v2:
        - "{{ .Version }}"
        - "{{ if eq .Env.SKIP_PUBLISH \"false\" }}latest{{ end }}"
      dockerfile: upload-server/Dockerfile.release
+     flags:
+       - --output=type=image,compression=zstd,compression-level=3,force-compression=true,oci-mediatypes=true
      platforms:
        - linux/amd64
        - linux/arm64
@@ -691,6 +711,8 @@ dockers_v2:
        - "{{ .Version }}"
        - "{{ if eq .Env.SKIP_PUBLISH \"false\" }}latest{{ end }}"
      dockerfile: combined/Dockerfile
+     flags:
+       - --output=type=image,compression=zstd,compression-level=3,force-compression=true,oci-mediatypes=true
      platforms:
        - linux/amd64
        - linux/arm64
@@ -712,6 +734,8 @@ dockers_v2:
        - "{{ .Version }}-ubi"
        - "{{ if eq .Env.SKIP_PUBLISH \"false\" }}ubi-latest{{ end }}"
      dockerfile: combined/Dockerfile.ubi
+     flags:
+       - --output=type=image,compression=zstd,compression-level=3,force-compression=true,oci-mediatypes=true
      platforms:
        - linux/amd64
        - linux/arm64
@@ -746,6 +770,8 @@ dockers_v2:
        - "{{ .Version }}"
        - "{{ if eq .Env.SKIP_PUBLISH \"false\" }}latest{{ end }}"
      dockerfile: proxy/Dockerfile
+     flags:
+       - --output=type=image,compression=zstd,compression-level=3,force-compression=true,oci-mediatypes=true
      platforms:
        - linux/amd64
        - linux/arm64
@@ -767,6 +793,8 @@ dockers_v2:
        - "{{ .Version }}"
        - "{{ if eq .Env.SKIP_PUBLISH \"false\" }}latest{{ end }}"
      dockerfile: client/Dockerfile-nblink
+     flags:
+       - --output=type=image,compression=zstd,compression-level=3,force-compression=true,oci-mediatypes=true
      platforms:
        - linux/amd64
        - linux/arm64
@@ -788,6 +816,8 @@ dockers_v2:
        - "{{ .Version }}-ubi"
        - "{{ if eq .Env.SKIP_PUBLISH \"false\" }}ubi-latest{{ end }}"
      dockerfile: proxy/Dockerfile.ubi
+     flags:
+       - --output=type=image,compression=zstd,compression-level=3,force-compression=true,oci-mediatypes=true
      platforms:
        - linux/amd64
        - linux/arm64

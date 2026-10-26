@@ -72,6 +72,9 @@ Jobs:
   checksums, image list and images with cosign, attests build provenance and
   marks stable releases latest.
 
+Images are pushed with zstd compressed layers and OCI media types, which GHCR
+supports. Pulling them needs Docker 23 or newer, or Podman 4 or newer.
+
 Image tags have no leading v (`ghcr.io/sudo-ivan/netbirdy-server:1.2.3`).
 Prerelease tags (a hyphen in the version, for example `v1.0.0-rc.1`) stay
 GitHub prereleases and never move the `latest` image tag.

@@ -450,6 +450,7 @@ jobs:
               [ "$STABLE" = "true" ] && tags="$tags -t ${IMAGE_PREFIX}${svc}:latest"
               # shellcheck disable=SC2086
               docker buildx build --platform linux/amd64,linux/arm64 --push \
+                --output type=image,compression=zstd,compression-level=3,force-compression=true,oci-mediatypes=true \
                 --metadata-file "meta-${svc}.json" -f "podman/Containerfile.${svc}" $tags .
               digest=$(jq -r '."containerimage.digest"' "meta-${svc}.json")
               echo "${svc}_digest=${digest}" >> "$GITHUB_ENV"
