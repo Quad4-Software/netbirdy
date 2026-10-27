@@ -189,5 +189,12 @@ func New(ctx context.Context, cfg Config) *Server {
 		GeoDataDir:               cfg.GeoDataDir,
 		CrowdSecAPIURL:           cfg.CrowdSecAPIURL,
 		CrowdSecAPIKey:           cfg.CrowdSecAPIKey,
+		ShieldMode:               cfg.ShieldMode,
+		ShieldConfigFile:         cfg.ShieldConfigFile,
+		ShieldStateFile:          cfg.ShieldStateFile,
+		ShieldAllowCIDRs:         cfg.ShieldAllowCIDRs,
+		ShieldLogFile:            cfg.ShieldLogFile,
+		ShieldAllowSearchEngines: cfg.ShieldAllowSearchEngines,
+		ShieldAICrawlers:         cfg.ShieldAICrawlers,
 	}
 }
