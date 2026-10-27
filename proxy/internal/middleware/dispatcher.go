@@ -9,6 +9,8 @@ import (
 	"time"
 
 	log "github.com/sirupsen/logrus"
+
+	"github.com/netbirdio/netbird/shared/observability"
 )
 
 // Dispatcher reliability kinds reported via
@@ -64,6 +66,7 @@ func (d *Dispatcher) Invoke(ctx context.Context, spec Spec, mw Middleware, in *I
 	go func() {
 		defer func() {
 			if r := recover(); r != nil {
+				observability.CaptureError(fmt.Errorf("middleware %s panic: %v", spec.ID, r))
 				stack := make([]byte, 4<<10)
 				n := runtime.Stack(stack, false)
 				requestID := ""

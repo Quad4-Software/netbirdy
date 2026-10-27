@@ -21,8 +21,16 @@ import (
 	"github.com/netbirdio/netbird/client/ui/preferences"
 	"github.com/netbirdio/netbird/client/ui/services"
 	"github.com/netbirdio/netbird/client/ui/updater"
+	"github.com/netbirdio/netbird/shared/observability"
 	"github.com/netbirdio/netbird/util"
+	"github.com/netbirdio/netbird/version"
 )
+
+// envSentryDSN is the environment variable that supplies the Sentry DSN when
+// --sentry-dsn is not passed. It is the same variable the daemon reads: a
+// service installed with the DSN in its environment reports it through the
+// flag, while the GUI picks it up here.
+const envSentryDSN = "NB_SENTRY_DSN"
 
 //go:embed all:frontend/dist
 var assets embed.FS
@@ -68,6 +76,7 @@ type registeredServices struct {
 	profileSwitcher *services.ProfileSwitcher
 	bundle          *i18n.Bundle
 	prefStore       *preferences.Store
+	sentryDSN       string
 }
 
 func init() {
@@ -89,7 +98,16 @@ func main() {
 		os.Exit(runPrivilegedSettings(os.Args[1:]))
 	}
 
-	daemonAddr, userSetLogFile := parseFlagsAndInitLog()
+	daemonAddr, sentryDSN, userSetLogFile := parseFlagsAndInitLog()
+
+	// Opt-in error reporting: no DSN leaves every helper a no-op.
+	flushSentry, err := observability.InitSentry(sentryDSN, "netbirdy-ui", version.NetbirdVersion())
+	if err != nil {
+		logrus.Warnf("failed to initialize sentry: %v", err)
+	}
+	defer flushSentry()
+	defer observability.RecoverPanic()
+
 	conn := NewConn(daemonAddr)
 
 	// Without --log-file, the GUI manages a gui-client.log that follows the
@@ -150,6 +168,7 @@ func main() {
 		profileSwitcher: profileSwitcher,
 		bundle:          bundle,
 		prefStore:       prefStore,
+		sentryDSN:       sentryDSN,
 	})
 
 	windowManager := services.NewWindowManager(app, nil, bundle, prefStore, iconWindow)
@@ -241,14 +260,15 @@ func requestNotificationAuthorization(notifier *Notifier) {
 // daemon-driven gui-client.log. The flag default is empty (not "console") so
 // "no flag" and an explicit "--log-file console" stay distinguishable; empty
 // falls back to console for InitLog.
-func parseFlagsAndInitLog() (string, bool) {
-	daemonAddr := flag.String("daemon-addr", DaemonAddr(), "Daemon gRPC address: unix:///path or tcp://host:port")
+func parseFlagsAndInitLog() (daemonAddr string, sentryDSN string, userSetLogFile bool) {
+	daemonAddrFlag := flag.String("daemon-addr", DaemonAddr(), "Daemon gRPC address: unix:///path or tcp://host:port")
+	sentryDSNFlag := flag.String("sentry-dsn", os.Getenv(envSentryDSN), "Sentry-compatible DSN (Sentry.io, GlitchTip, Bugsink) enabling opt-in panic and error reporting. Defaults to "+envSentryDSN+".")
 	logFiles := &stringList{}
 	flag.Var(logFiles, "log-file", "Log destination. Repeat to log to multiple targets at once, e.g. `--log-file console --log-file Y:/netbirdy-ui.log`. Each value is one of: console, syslog, or a file path. File destinations are rotated by lumberjack (same as the daemon). Defaults to console. Passing any value disables the daemon-debug-driven gui-client.log.")
 	logLevel := flag.String("log-level", "info", "Log level: trace|debug|info|warn|error.")
 	flag.Parse()
 
-	userSetLogFile := len(logFiles.values) > 0
+	userSetLogFile = len(logFiles.values) > 0
 	targets := logFiles.values
 	if !userSetLogFile {
 		targets = []string{"console"}
@@ -257,7 +277,7 @@ func parseFlagsAndInitLog() (string, bool) {
 	if err := util.InitLog(*logLevel, targets...); err != nil {
 		log.Fatalf("init log: %v", err)
 	}
-	return *daemonAddr, userSetLogFile
+	return *daemonAddrFlag, *sentryDSNFlag, userSetLogFile
 }
 
 // newApplication constructs the Wails application. onSecondInstance fires when
@@ -347,6 +367,7 @@ func registerServices(app *application.App, conn *Conn, s registeredServices) {
 	app.RegisterService(application.NewService(services.NewAutostart(app.Autostart)))
 	app.RegisterService(application.NewService(services.NewVersion()))
 	app.RegisterService(application.NewService(services.NewUILog()))
+	app.RegisterService(application.NewService(services.NewObservability(s.sentryDSN)))
 	app.RegisterService(application.NewService(s.compat))
 }
 

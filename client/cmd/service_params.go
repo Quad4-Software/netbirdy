@@ -35,6 +35,7 @@ type serviceParams struct {
 	DisableNetworks       bool              `json:"disable_networks,omitempty"`
 	EnableJSONSocket      bool              `json:"enable_json_socket,omitempty"`
 	ServiceEnvVars        map[string]string `json:"service_env_vars,omitempty"`
+	SentryDSN             string            `json:"sentry_dsn,omitempty"`
 }
 
 // serviceParamsPath returns the path to the service params file.
@@ -111,6 +112,7 @@ func currentServiceParams() *serviceParams {
 		EnableCapture:         captureEnabled,
 		DisableNetworks:       networksDisabled,
 		EnableJSONSocket:      enableJSONSocket,
+		SentryDSN:             sentryDSN,
 	}
 
 	if len(serviceEnvVars) > 0 {
@@ -195,6 +197,10 @@ func applyServiceParams(cmd *cobra.Command, params *serviceParams) {
 
 	if !serviceCmd.PersistentFlags().Changed("disable-networks") {
 		networksDisabled = params.DisableNetworks
+	}
+
+	if !serviceCmd.PersistentFlags().Changed("sentry-dsn") {
+		sentryDSN = params.SentryDSN
 	}
 
 	applyServiceEnvParams(cmd, params)

@@ -19,8 +19,10 @@ import (
 	"github.com/netbirdio/netbird/client/proto"
 	"github.com/netbirdio/netbird/client/server"
 	"github.com/netbirdio/netbird/client/system"
+	"github.com/netbirdio/netbird/shared/observability"
 	"github.com/netbirdio/netbird/util"
 	"github.com/netbirdio/netbird/util/sandbox"
+	"github.com/netbirdio/netbird/version"
 )
 
 func validateJSONSocketFlags() error {
@@ -61,6 +63,13 @@ func (p *program) Start(svc service.Service) error {
 	// Start should not block. Do the actual work async.
 	log.Info("starting NetBirdy service") //nolint
 
+	// Opt-in error reporting: no DSN leaves every helper a no-op.
+	flushSentry, err := observability.InitSentry(sentryDSN, "netbirdy", version.NetbirdVersion())
+	if err != nil {
+		log.Warnf("failed to initialize sentry: %v", err)
+	}
+	p.sentryFlush = flushSentry
+
 	if err := validateJSONSocketFlags(); err != nil {
 		return err
 	}
@@ -94,6 +103,8 @@ func (p *program) Start(svc service.Service) error {
 	}
 
 	go func() {
+		defer p.sentryFlush()
+		defer observability.RecoverPanic()
 		// Fatal here rather than inside serve, so serve's deferred listener
 		// closes run before the process exits.
 		if err := p.serve(daemonListener, jsonListener); err != nil {
@@ -209,6 +220,9 @@ func (p *program) Stop(srv service.Service) error {
 	}
 
 	time.Sleep(time.Second * 2)
+	if p.sentryFlush != nil {
+		p.sentryFlush()
+	}
 	log.Info("stopped NetBirdy service") //nolint
 	return nil
 }
@@ -251,6 +265,8 @@ var runCmd = &cobra.Command{
 	Use:   "run",
 	Short: "runs NetBirdy as service",
 	RunE: func(cmd *cobra.Command, args []string) error {
+		defer observability.RecoverPanic()
+
 		ctx, cancel := context.WithCancel(cmd.Context())
 
 		SetupCloseHandler(ctx, cancel)

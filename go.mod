@@ -33,6 +33,7 @@ require (
 	github.com/eko/gocache/store/go_cache/v4 v4.2.10
 	github.com/eko/gocache/store/redis/v4 v4.2.12
 	github.com/fsnotify/fsnotify v1.10.1
+	github.com/getsentry/sentry-go v0.50.0
 	github.com/gliderlabs/ssh v0.3.8
 	github.com/go-jose/go-jose/v4 v4.1.6
 	github.com/go-ole/go-ole v1.3.0

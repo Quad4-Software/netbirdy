@@ -36,6 +36,7 @@ import (
 	"github.com/netbirdio/netbird/relay/server/listener/ws"
 	syncgrpc "github.com/netbirdio/netbird/shared/management/grpc"
 	sharedMetrics "github.com/netbirdio/netbird/shared/metrics"
+	"github.com/netbirdio/netbird/shared/observability"
 	"github.com/netbirdio/netbird/shared/relay/auth"
 	"github.com/netbirdio/netbird/shared/signal/proto"
 	signalServer "github.com/netbirdio/netbird/signal/server"
@@ -43,7 +44,12 @@ import (
 	"github.com/netbirdio/netbird/util"
 	"github.com/netbirdio/netbird/util/wsproxy"
 	wsproxyserver "github.com/netbirdio/netbird/util/wsproxy/server"
+	"github.com/netbirdio/netbird/version"
 )
+
+// envSentryDSN enables panic and error reporting when set to a
+// Sentry-compatible DSN.
+const envSentryDSN = "NB_SENTRY_DSN"
 
 var (
 	configPath string
@@ -87,6 +93,13 @@ func waitForExitSignal() {
 }
 
 func execute(cmd *cobra.Command, _ []string) error {
+	flushSentry, err := observability.InitSentry(os.Getenv(envSentryDSN), "netbirdy-server", version.NetbirdVersion())
+	if err != nil {
+		log.Warnf("failed to initialize sentry: %v", err)
+	}
+	defer flushSentry()
+	defer observability.RecoverPanic()
+
 	if err := initializeConfig(); err != nil {
 		return err
 	}

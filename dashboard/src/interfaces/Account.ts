@@ -31,6 +31,12 @@ export interface Account {
     auto_update_version: string;
     auto_update_always: boolean;
     metrics_push_enabled?: boolean;
+    // error_reporting_* configure opt-in browser error reporting to a
+    // Sentry-compatible endpoint. Sent on settings updates; the management
+    // API does not persist them yet, so the dashboard mirrors them in
+    // localStorage (see modules/error-reporting).
+    error_reporting_enabled?: boolean;
+    error_reporting_dsn?: string;
     peer_hostname_collision_rejected?: boolean;
     local_auth_disabled?: boolean;
     local_mfa_enabled?: boolean;

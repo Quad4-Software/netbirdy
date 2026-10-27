@@ -60,6 +60,12 @@ type Settings struct {
 	// LazyConnectionEnabled indicates if the experimental feature is enabled or disabled
 	LazyConnectionEnabled bool `gorm:"default:false"`
 
+	// ErrorReportingEnabled indicates if opt-in error reporting is enabled
+	ErrorReportingEnabled bool `gorm:"default:false"`
+
+	// ErrorReportingDSN is the Sentry-compatible DSN error reports are sent to
+	ErrorReportingDSN string `gorm:"default:''"`
+
 	// AutoUpdateVersion client auto-update version
 	AutoUpdateVersion string `gorm:"default:'disabled'"`
 
@@ -120,6 +126,8 @@ func (s *Settings) Copy() *Settings {
 		PeerExposeEnabled:               s.PeerExposeEnabled,
 		PeerExposeGroups:                slices.Clone(s.PeerExposeGroups),
 		LazyConnectionEnabled:           s.LazyConnectionEnabled,
+		ErrorReportingEnabled:           s.ErrorReportingEnabled,
+		ErrorReportingDSN:               s.ErrorReportingDSN,
 		DNSDomain:                       s.DNSDomain,
 		NetworkRange:                    s.NetworkRange,
 		NetworkRangeV6:                  s.NetworkRangeV6,

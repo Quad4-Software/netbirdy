@@ -18,11 +18,16 @@ import { initI18n } from "@/lib/i18n";
 import { initPlatform } from "@/lib/platform";
 import { initLogForwarding } from "@/lib/logs";
 import { initStallWatch } from "@/lib/stallwatch";
+import { initSentry } from "@/lib/sentry";
 
 // Must run first so even init-time logs reach the Go log pipeline.
 initLogForwarding();
 
 initStallWatch();
+
+// Fire and forget: the DSN arrives over a bound service call, so errors that
+// precede its resolution are not captured.
+initSentry();
 
 welcome();
 

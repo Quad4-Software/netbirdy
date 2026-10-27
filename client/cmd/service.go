@@ -55,6 +55,7 @@ var (
 	serviceEnvVars   []string
 	jsonSocket       string
 	enableJSONSocket bool
+	sentryDSN        string
 )
 
 type program struct {
@@ -70,6 +71,9 @@ type program struct {
 	jsonServMu       sync.Mutex
 	serverInstance   *server.Server
 	serverInstanceMu sync.Mutex
+	// sentryFlush drains buffered error reports on shutdown. Always non-nil
+	// after Start, also when no DSN is configured (the call is a no-op then).
+	sentryFlush func()
 }
 
 func init() {
@@ -85,6 +89,7 @@ func init() {
 	serviceCmd.PersistentFlags().BoolVar(&networksDisabled, "disable-networks", false, "Disables network selection. If enabled, the client will not allow listing, selecting, or deselecting networks. To persist, use: netbirdy service install --disable-networks")
 	serviceCmd.PersistentFlags().BoolVar(&enableJSONSocket, "enable-json-socket", false, "Enables the HTTP/JSON API socket served by grpc-gateway. To persist, use: netbirdy service install --enable-json-socket")
 	serviceCmd.PersistentFlags().StringVar(&jsonSocket, "json-socket", defaultJSONSocket, "HTTP/JSON API socket address [unix|tcp]://[path|host:port]. Requires --enable-json-socket to serve. To persist, use: netbirdy service install --enable-json-socket --json-socket")
+	serviceCmd.PersistentFlags().StringVar(&sentryDSN, "sentry-dsn", "", "Sentry-compatible DSN (Sentry.io, GlitchTip, Bugsink) enabling opt-in daemon panic and error reporting. Can also be set with NB_SENTRY_DSN. To persist, use: netbirdy service install --sentry-dsn")
 
 	rootCmd.PersistentFlags().StringVarP(&serviceName, "service", "s", defaultServiceName, "NetBirdy system service name")
 	serviceEnvDesc := `Sets extra environment variables for the service. ` +

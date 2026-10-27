@@ -16,6 +16,7 @@ import (
 
 	"github.com/netbirdio/netbird/proxy/internal/proxy"
 	"github.com/netbirdio/netbird/proxy/web"
+	"github.com/netbirdio/netbird/shared/observability"
 	"time"
 
 	log "github.com/sirupsen/logrus"
@@ -342,6 +343,7 @@ func (s *Shield) Wrap(next http.Handler) http.Handler {
 				if n := s.lastPanic.Load(); time.Now().Unix()-n > 60 {
 					s.lastPanic.Store(time.Now().Unix())
 					s.log.Warnf("shield: panic %v (failing open)", rec)
+					observability.CaptureError(fmt.Errorf("shield panic: %v", rec))
 				}
 				if sw.status == 0 {
 					next.ServeHTTP(w, r) // retry; if it panics again it propagates to server recover

@@ -1,5 +1,5 @@
 import type { Meta } from "@storybook/nextjs-vite";
-import { screen } from "storybook/test";
+import { screen, userEvent } from "storybook/test";
 import SettingsPage from "@/app/(dashboard)/settings/page";
 import {
   click,
@@ -52,6 +52,17 @@ export const Permissions = shows("permissions", "Permissions");
 export const Networks = shows("networks", "Networks");
 export const Clients = shows("clients", "Clients");
 export const Metrics = shows("metrics", "Metrics");
+
+export const MetricsErrorReporting: Story = {
+  parameters: tab("metrics"),
+  play: async () => {
+    await text("Error Reporting");
+    const labelEl = await text("Enable error reporting");
+    await click(labelEl.closest("[role=switch]")!);
+    const input = await screen.findByTestId("error-reporting-dsn-input");
+    await userEvent.type(input, "https://abc123@o0.ingest.sentry.io/0");
+  },
+};
 export const DangerZone = shows("danger-zone", "Delete NetBirdy account");
 
 export const IdentityProviders: Story = {

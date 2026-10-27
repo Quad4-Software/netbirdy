@@ -22,6 +22,7 @@ import (
 	"github.com/netbirdio/netbird/shared/metrics"
 
 	"github.com/netbirdio/netbird/encryption"
+	"github.com/netbirdio/netbird/shared/observability"
 	"github.com/netbirdio/netbird/shared/signal/proto"
 	"github.com/netbirdio/netbird/signal/server"
 	"github.com/netbirdio/netbird/util"
@@ -42,6 +43,9 @@ const (
 	// defaultLetsencryptListenAddress is where Let's Encrypt connects for
 	// TLS-ALPN-01 challenges unless public port 443 is forwarded elsewhere.
 	defaultLetsencryptListenAddress = ":443"
+	// envSentryDSN enables panic and error reporting when set to a
+	// Sentry-compatible DSN.
+	envSentryDSN = "NB_SIGNAL_SENTRY_DSN"
 )
 
 var (
@@ -99,6 +103,13 @@ var (
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			flag.Parse()
+
+			flushSentry, err := observability.InitSentry(os.Getenv(envSentryDSN), "signal", version.NetbirdVersion())
+			if err != nil {
+				log.Warnf("failed to initialize sentry: %v", err)
+			}
+			defer flushSentry()
+			defer observability.RecoverPanic()
 
 			if _, err := sandbox.Apply(sandbox.Policy{
 				Name:           "signal server",

@@ -16,8 +16,9 @@ import ApplicationProvider, {
 import CountryProvider from "@/contexts/CountryProvider";
 import GroupsProvider from "@/contexts/GroupsProvider";
 import UsersProvider from "@/contexts/UsersProvider";
-import Navigation from "@/layouts/Navigation";
 import { useShortcuts } from "@/hooks/useShortcuts";
+import Navigation from "@/layouts/Navigation";
+import ErrorReportingInit from "@/modules/error-reporting/ErrorReportingInit";
 import { OnboardingProvider } from "@/modules/onboarding/OnboardingProvider";
 import Header, { headerHeight } from "./Header";
 
@@ -29,23 +30,17 @@ export default function DashboardLayout({
   const shortcutsUI = useShortcuts();
   return (
     <ApplicationProvider>
-      
-        
-          <UsersProvider>
-            
-              
-                <GroupsProvider>
-                  <CountryProvider>
-                    
-                    {!isNetBirdCloud() && <OnboardingProvider />}
-                    <DashboardPageContent>{children}{shortcutsUI}</DashboardPageContent>
-                  </CountryProvider>
-                </GroupsProvider>
-              
-            
-          </UsersProvider>
-        
-      
+      <UsersProvider>
+        <GroupsProvider>
+          <CountryProvider>
+            {!isNetBirdCloud() && <OnboardingProvider />}
+            <DashboardPageContent>
+              {children}
+              {shortcutsUI}
+            </DashboardPageContent>
+          </CountryProvider>
+        </GroupsProvider>
+      </UsersProvider>
     </ApplicationProvider>
   );
 }
@@ -65,9 +60,12 @@ function DashboardPageContent({
   const bannerHeight = 0;
   return (
     <div className={cn("flex flex-col h-screen", mobileNavOpen && "flex")}>
+      <ErrorReportingInit />
       {mobileNavOpen && (
         <motion.div
-          className={"h-screen bg-gray-50 dark:bg-nb-gray-950 w-11/12 max-w-[22rem]"}
+          className={
+            "h-screen bg-gray-50 dark:bg-nb-gray-950 w-11/12 max-w-[22rem]"
+          }
           layout={true}
           transition={{
             type: "spring",

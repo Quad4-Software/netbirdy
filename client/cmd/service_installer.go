@@ -71,6 +71,10 @@ func buildServiceArguments() []string {
 		args = append(args, "--enable-json-socket", "--json-socket", jsonSocket)
 	}
 
+	if sentryDSN != "" {
+		args = append(args, "--sentry-dsn", sentryDSN)
+	}
+
 	return args
 }
 

@@ -28,10 +28,16 @@ import (
 	nbconfig "github.com/netbirdio/netbird/management/internals/server/config"
 	nbdomain "github.com/netbirdio/netbird/shared/management/domain"
 	"github.com/netbirdio/netbird/shared/management/grpc"
+	"github.com/netbirdio/netbird/shared/observability"
 	"github.com/netbirdio/netbird/util"
 	"github.com/netbirdio/netbird/util/crypt"
 	"github.com/netbirdio/netbird/util/sandbox"
+	"github.com/netbirdio/netbird/version"
 )
+
+// envSentryDSN enables panic and error reporting when set to a
+// Sentry-compatible DSN.
+const envSentryDSN = "NB_SENTRY_DSN"
 
 var newServer = func(cfg *server.Config) server.Server {
 	return server.NewServer(cfg)
@@ -93,12 +99,19 @@ var (
 		RunE: func(cmd *cobra.Command, args []string) error {
 			flag.Parse()
 
+			flushSentry, err := observability.InitSentry(os.Getenv(envSentryDSN), "management", version.NetbirdVersion())
+			if err != nil {
+				log.Warnf("failed to initialize sentry: %v", err)
+			}
+			defer flushSentry()
+			defer observability.RecoverPanic()
+
 			ctx, cancel := context.WithCancel(cmd.Context())
 			defer cancel()
 			//nolint
 			ctx = context.WithValue(ctx, hook.ExecutionContextKey, hook.SystemSource)
 
-			err := handleRebrand(cmd)
+			err = handleRebrand(cmd)
 			if err != nil {
 				return fmt.Errorf("migrate files %v", err)
 			}

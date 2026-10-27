@@ -19,3 +19,4 @@
 - ci-crow.md - self-hosted Crow CI pipelines
 - dashboard/content/docs/ - dashboard-embedded copies of these guides
 - landlock.md - Landlock file system sandbox for the server processes
+- error-tracking.md - opt-in Sentry/GlitchTip/Bugsink panic and error reporting

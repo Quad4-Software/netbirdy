@@ -1654,8 +1654,14 @@ type AccountSettings struct {
 	DnsDomain *string `json:"dns_domain,omitempty"`
 
 	// EmbeddedIdpEnabled Indicates whether the embedded identity provider (Dex) is enabled for this account. This is a read-only field.
-	EmbeddedIdpEnabled *bool                 `json:"embedded_idp_enabled,omitempty"`
-	Extra              *AccountExtraSettings `json:"extra,omitempty"`
+	EmbeddedIdpEnabled *bool `json:"embedded_idp_enabled,omitempty"`
+
+	// ErrorReportingDsn Sentry-compatible DSN for error reporting (Sentry, GlitchTip, Bugsink)
+	ErrorReportingDsn *string `json:"error_reporting_dsn,omitempty"`
+
+	// ErrorReportingEnabled Enables opt-in error reporting to a Sentry-compatible endpoint
+	ErrorReportingEnabled *bool                 `json:"error_reporting_enabled,omitempty"`
+	Extra                 *AccountExtraSettings `json:"extra,omitempty"`
 
 	// GroupsPropagationEnabled Allows propagate the new user auto groups to peers that belongs to the user
 	GroupsPropagationEnabled *bool `json:"groups_propagation_enabled,omitempty"`

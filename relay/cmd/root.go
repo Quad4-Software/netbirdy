@@ -22,12 +22,18 @@ import (
 	"github.com/netbirdio/netbird/relay/healthcheck"
 	"github.com/netbirdio/netbird/relay/server"
 	"github.com/netbirdio/netbird/shared/metrics"
+	"github.com/netbirdio/netbird/shared/observability"
 	"github.com/netbirdio/netbird/shared/relay/auth"
 	"github.com/netbirdio/netbird/stun"
 	"github.com/netbirdio/netbird/trustedproxy"
 	"github.com/netbirdio/netbird/util"
 	"github.com/netbirdio/netbird/util/sandbox"
+	"github.com/netbirdio/netbird/version"
 )
+
+// envSentryDSN enables panic and error reporting when set to a
+// Sentry-compatible DSN.
+const envSentryDSN = "NB_RELAY_SENTRY_DSN"
 
 type Config struct {
 	ListenAddress string
@@ -140,8 +146,15 @@ func waitForExitSignal() {
 }
 
 func execute(cmd *cobra.Command, args []string) error {
+	flushSentry, err := observability.InitSentry(os.Getenv(envSentryDSN), "relay", version.NetbirdVersion())
+	if err != nil {
+		log.Debugf("failed to initialize sentry: %v", err)
+	}
+	defer flushSentry()
+	defer observability.RecoverPanic()
+
 	wg := sync.WaitGroup{}
-	err := cobraConfig.Validate()
+	err = cobraConfig.Validate()
 	if err != nil {
 		log.Debugf("invalid config: %s", err)
 		return fmt.Errorf("invalid config: %s", err)

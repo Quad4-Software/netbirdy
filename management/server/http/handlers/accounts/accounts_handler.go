@@ -264,6 +264,12 @@ func (h *handler) updateAccountRequestSettings(req api.PutApiAccountsAccountIdJS
 	if req.Settings.LazyConnectionEnabled != nil {
 		returnSettings.LazyConnectionEnabled = *req.Settings.LazyConnectionEnabled
 	}
+	if req.Settings.ErrorReportingEnabled != nil {
+		returnSettings.ErrorReportingEnabled = *req.Settings.ErrorReportingEnabled
+	}
+	if req.Settings.ErrorReportingDsn != nil {
+		returnSettings.ErrorReportingDSN = *req.Settings.ErrorReportingDsn
+	}
 	if req.Settings.AutoUpdateVersion != nil {
 		_, err := goversion.NewSemver(*req.Settings.AutoUpdateVersion)
 		if *req.Settings.AutoUpdateVersion == autoUpdateLatestVersion ||
@@ -430,6 +436,8 @@ func toAccountResponse(accountID string, settings *types.Settings, meta *types.A
 		PeerExposeEnabled:               settings.PeerExposeEnabled,
 		PeerExposeGroups:                settings.PeerExposeGroups,
 		LazyConnectionEnabled:           &settings.LazyConnectionEnabled,
+		ErrorReportingEnabled:           &settings.ErrorReportingEnabled,
+		ErrorReportingDsn:               &settings.ErrorReportingDSN,
 		DnsDomain:                       &settings.DNSDomain,
 		AutoUpdateVersion:               &settings.AutoUpdateVersion,
 		AutoUpdateAlways:                &settings.AutoUpdateAlways,

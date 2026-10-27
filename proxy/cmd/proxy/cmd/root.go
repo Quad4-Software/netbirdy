@@ -16,6 +16,7 @@ import (
 
 	"github.com/netbirdio/netbird/shared/externalipmap"
 	"github.com/netbirdio/netbird/shared/management/domain"
+	"github.com/netbirdio/netbird/shared/observability"
 	"github.com/netbirdio/netbird/shared/profiling"
 	"github.com/netbirdio/netbird/util/sandbox"
 
@@ -98,6 +99,7 @@ var (
 	geoDataDir            string
 	crowdsecAPIURL        string
 	crowdsecAPIKey        string
+	sentryDSN             string
 )
 
 var rootCmd = &cobra.Command{
@@ -154,6 +156,7 @@ func init() {
 	rootCmd.Flags().StringVar(&geoDataDir, "geo-data-dir", envStringOrDefault("NB_PROXY_GEO_DATA_DIR", "/var/lib/netbird/geolocation"), "Directory for the GeoLite2 MMDB file (auto-downloaded if missing)")
 	rootCmd.Flags().StringVar(&crowdsecAPIURL, "crowdsec-api-url", envStringOrDefault("NB_PROXY_CROWDSEC_API_URL", ""), "CrowdSec LAPI URL for IP reputation checks")
 	rootCmd.Flags().StringVar(&crowdsecAPIKey, "crowdsec-api-key", envStringOrDefault("NB_PROXY_CROWDSEC_API_KEY", ""), "CrowdSec bouncer API key")
+	rootCmd.Flags().StringVar(&sentryDSN, "sentry-dsn", envStringOrDefault("NB_PROXY_SENTRY_DSN", ""), "Sentry-compatible DSN for panic and error reporting (Sentry, GlitchTip, Bugsink); empty disables reporting")
 }
 
 // Execute runs the root command.
@@ -188,6 +191,13 @@ func runServer(cmd *cobra.Command, args []string) error {
 	_ = util.InitLogger(logger, level, util.LogConsole)
 
 	logger.Infof("configured log level: %s", level)
+
+	flushSentry, err := observability.InitSentry(sentryDSN, applicationName, Version)
+	if err != nil {
+		logger.Warnf("failed to initialize sentry: %v", err)
+	}
+	defer flushSentry()
+	defer observability.RecoverPanic()
 
 	stopProfiling := profiling.Start(applicationName)
 	defer stopProfiling()
@@ -237,7 +247,7 @@ func runServer(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("invalid --forwarded-proto value %q: must be auto, http, or https", forwardedProto)
 	}
 
-	_, err := domain.ValidateDomains([]string{proxyDomain})
+	_, err = domain.ValidateDomains([]string{proxyDomain})
 	if err != nil {
 		return fmt.Errorf("invalid domain value %q: %w", proxyDomain, err)
 	}
