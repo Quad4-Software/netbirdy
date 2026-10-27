@@ -15,6 +15,7 @@ import (
 	"sync/atomic"
 
 	"github.com/netbirdio/netbird/proxy/internal/proxy"
+	"github.com/netbirdio/netbird/proxy/web"
 	"time"
 
 	log "github.com/sirupsen/logrus"
@@ -704,10 +705,7 @@ func (s *Shield) tarpit(w http.ResponseWriter, r *http.Request) bool {
 		return true
 	case <-t.C:
 	}
-	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
-	w.Header().Set("Cache-Control", "no-store")
-	w.WriteHeader(http.StatusForbidden)
-	_, _ = w.Write([]byte("forbidden\n"))
+	s.writeBlockPage(w, r)
 	return true
 }
 
@@ -721,10 +719,18 @@ func (s *Shield) block(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 	}
-	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
+	s.writeBlockPage(w, r)
+}
+
+// writeBlockPage renders the styled block page for denied requests. The
+// request id ties the page to the shield decision log and access log entry.
+func (s *Shield) writeBlockPage(w http.ResponseWriter, r *http.Request) {
+	var requestID string
+	if cd := proxy.CapturedDataFromContext(r.Context()); cd != nil {
+		requestID = cd.GetRequestID()
+	}
 	w.Header().Set("Cache-Control", "no-store")
-	w.WriteHeader(http.StatusForbidden)
-	_, _ = w.Write([]byte("forbidden\n"))
+	web.ServeAccessDeniedPage(w, r, http.StatusForbidden, "Blocked", "This request was blocked by the proxy shield.", requestID)
 }
 
 func (s *Shield) emit(req *http.Request, res Result) {
