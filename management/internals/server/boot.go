@@ -42,6 +42,7 @@ import (
 	"github.com/netbirdio/netbird/management/server/api/v1alpha1"
 	nbcache "github.com/netbirdio/netbird/management/server/cache"
 	nbContext "github.com/netbirdio/netbird/management/server/context"
+	"github.com/netbirdio/netbird/management/server/eventstream"
 	nbhttp "github.com/netbirdio/netbird/management/server/http"
 	"github.com/netbirdio/netbird/management/server/http/middleware"
 	"github.com/netbirdio/netbird/management/server/idp"
@@ -160,20 +161,23 @@ func (s *BaseServer) EventStore() activity.Store {
 		if err != nil {
 			log.Fatalf("failed to initialize event store: %v", err)
 		}
+
+		var store activity.Store = eventStore
 		if sc := s.Config.Security; sc != nil && sc.AuditLogFile != "" {
 			path := sc.AuditLogFile
 			if !filepath.IsAbs(path) {
 				path = filepath.Join(s.Config.Datadir, path)
 			}
-			as, err := security.NewAuditStore(eventStore, path)
+			as, err := security.NewAuditStore(store, path)
 			if err != nil {
 				log.Warnf("audit log mirror %s unavailable: %v", path, err)
 			} else {
-				return as
+				store = as
 			}
 		}
 
-		return eventStore
+		// Fan out every saved event to the event streaming forwarder.
+		return eventstream.NewStore(store, s.EventStreamForwarder())
 	})
 }
 
@@ -205,6 +209,7 @@ func (s *BaseServer) APIHandler() http.Handler {
 		s.registerUpdatesAPI(apiRouter)
 		s.registerBackupAPI(apiRouter)
 		s.registerSecurityAPI(apiRouter)
+		s.registerEventStreamAPI(apiRouter)
 		s.registerShieldAPI(apiRouter)
 		return apiRouter
 	})

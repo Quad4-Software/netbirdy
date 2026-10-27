@@ -21,3 +21,4 @@
 - landlock.md - Landlock file system sandbox for the server processes
 - error-tracking.md - opt-in Sentry/GlitchTip/Bugsink panic and error reporting
 - backups.md - encrypted S3 store backups and offline restore
+- event-streaming.md - streaming activity events to generic HTTP endpoints and Datadog

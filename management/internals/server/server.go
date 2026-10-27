@@ -257,6 +257,10 @@ func (s *BaseServer) start(ctx context.Context) error {
 	backupManager.Start(srvCtx)
 	s.OnStop(backupManager.Stop)
 
+	forwarder := s.EventStreamForwarder()
+	forwarder.Start(srvCtx)
+	s.OnStop(forwarder.Stop)
+
 	return nil
 }
 func (s *BaseServer) startDomainCleanup(ctx context.Context) {

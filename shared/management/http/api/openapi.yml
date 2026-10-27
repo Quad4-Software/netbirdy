@@ -2465,6 +2465,118 @@ components:
         - initiator_email
         - target_id
         - meta
+    EventStreamConfig:
+      type: object
+      description: |
+        Platform specific configuration of an event streaming integration. generic_http uses url, headers and body_template. datadog uses api_key and api_url. access_key, secret_key, bucket_name, stream_name and region belong to the AWS platforms, which are not supported on self-hosted installs. Secret fields are masked as "********" in responses; on update an empty or masked secret field keeps the stored value.
+      properties:
+        url:
+          description: Delivery endpoint for the generic_http platform.
+          type: string
+          example: "https://receiver.internal/events"
+        headers:
+          description: JSON encoded object of request headers for generic_http, for example '{"Authorization":"Bearer token"}'. Secret header values (authorization, proxy-authorization, x-api-key, dd-api-key) are masked in responses.
+          type: string
+          example: '{"Authorization":"********"}'
+        body_template:
+          description: "Optional Go template rendered over the event JSON fields. Example: {\"event\": \"{{ .activity_code }}\"}. Empty sends the event JSON unchanged."
+          type: string
+        api_key:
+          description: Datadog API key, sent as the DD-API-KEY header. Masked in responses.
+          type: string
+          format: password
+        api_url:
+          description: Datadog logs intake URL.
+          type: string
+          example: "https://http-intake.logs.datadoghq.com/api/v2/logs"
+        access_key:
+          description: AWS access key (s3, firehose). Unsupported on self-hosted.
+          type: string
+          format: password
+        secret_key:
+          description: AWS secret key (s3, firehose). Unsupported on self-hosted.
+          type: string
+          format: password
+        bucket_name:
+          description: AWS S3 bucket name. Unsupported on self-hosted.
+          type: string
+        stream_name:
+          description: AWS Firehose stream name. Unsupported on self-hosted.
+          type: string
+        region:
+          description: AWS region. Unsupported on self-hosted.
+          type: string
+      required:
+        - api_key
+        - api_url
+    EventStream:
+      type: object
+      description: One configured event streaming integration.
+      properties:
+        id:
+          description: The numeric identifier of the integration.
+          type: integer
+          format: int64
+          example: 1
+        account_id:
+          description: The account owning the integration.
+          type: string
+          example: "chad9d86lnnc59g18ou0"
+        enabled:
+          description: Whether the integration receives events. At most one integration per account is enabled.
+          type: boolean
+          example: true
+        platform:
+          description: The delivery platform.
+          type: string
+          enum: [ generic_http, datadog, s3, firehose ]
+          example: "generic_http"
+        created_at:
+          description: Creation timestamp.
+          type: string
+          format: date-time
+        updated_at:
+          description: Last modification timestamp.
+          type: string
+          format: date-time
+        config:
+          $ref: '#/components/schemas/EventStreamConfig'
+      required:
+        - id
+        - account_id
+        - enabled
+        - platform
+        - created_at
+        - updated_at
+        - config
+    EventStreamRequest:
+      type: object
+      description: Event streaming integration to create.
+      properties:
+        platform:
+          description: The delivery platform. Only generic_http and datadog are supported on self-hosted installs.
+          type: string
+          enum: [ generic_http, datadog, s3, firehose ]
+          example: "generic_http"
+        enabled:
+          description: Whether the integration starts enabled.
+          type: boolean
+          example: true
+        config:
+          $ref: '#/components/schemas/EventStreamConfig'
+      required:
+        - platform
+        - enabled
+        - config
+    EventStreamUpdateRequest:
+      type: object
+      description: Fields to update on an event streaming integration. Omitted fields keep their stored values.
+      properties:
+        enabled:
+          description: New enabled state. Omitted keeps the current state.
+          type: boolean
+        config:
+          $ref: '#/components/schemas/EventStreamConfig'
     NetworkTrafficLocation:
       type: object
       properties:
@@ -10386,6 +10498,128 @@ paths:
           $ref: "#/components/responses/requires_authentication"
         "500":
           $ref: "#/components/responses/internal_error"
+  /api/integrations/event-streaming:
+    get:
+      summary: List event streaming integrations
+      description: Returns the account's event streaming integrations with secret config fields masked. Requires the event_streaming read permission.
+      tags: [ Integrations ]
+      security:
+        - BearerAuth: [ ]
+        - TokenAuth: [ ]
+      responses:
+        '200':
+          description: Event streaming integrations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EventStream'
+        '401':
+          "$ref": "#/components/responses/requires_authentication"
+        '403':
+          "$ref": "#/components/responses/forbidden"
+        '500':
+          "$ref": "#/components/responses/internal_error"
+    post:
+      summary: Create an event streaming integration
+      description: |
+        Creates an event streaming integration. Supported platforms on self-hosted installs are generic_http and datadog; s3 and firehose return 501. Enabling an integration disables the account's other integrations. Requires the event_streaming create permission.
+      tags: [ Integrations ]
+      security:
+        - BearerAuth: [ ]
+        - TokenAuth: [ ]
+      requestBody:
+        description: Event streaming integration to create
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventStreamRequest'
+      responses:
+        '200':
+          description: Created integration with secrets masked
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventStream'
+        '400':
+          "$ref": "#/components/responses/bad_request"
+        '401':
+          "$ref": "#/components/responses/requires_authentication"
+        '403':
+          "$ref": "#/components/responses/forbidden"
+        '500':
+          "$ref": "#/components/responses/internal_error"
+        '501':
+          description: Platform not supported on self-hosted
+  /api/integrations/event-streaming/{id}:
+    put:
+      summary: Update an event streaming integration
+      description: |
+        Updates the config and enabled state of an integration. Empty or masked ("********") secret fields keep the stored values. Enabling the integration disables the account's other integrations. Requires the event_streaming update permission.
+      tags: [ Integrations ]
+      security:
+        - BearerAuth: [ ]
+        - TokenAuth: [ ]
+      parameters:
+        - in: path
+          name: id
+          description: The numeric identifier of the integration
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        description: Fields to update
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventStreamUpdateRequest'
+      responses:
+        '200':
+          description: Updated integration with secrets masked
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventStream'
+        '400':
+          "$ref": "#/components/responses/bad_request"
+        '401':
+          "$ref": "#/components/responses/requires_authentication"
+        '403':
+          "$ref": "#/components/responses/forbidden"
+        '404':
+          "$ref": "#/components/responses/not_found"
+        '500':
+          "$ref": "#/components/responses/internal_error"
+    delete:
+      summary: Delete an event streaming integration
+      description: Deletes an event streaming integration. Requires the event_streaming delete permission.
+      tags: [ Integrations ]
+      security:
+        - BearerAuth: [ ]
+        - TokenAuth: [ ]
+      parameters:
+        - in: path
+          name: id
+          description: The numeric identifier of the integration
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Integration deleted
+        '401':
+          "$ref": "#/components/responses/requires_authentication"
+        '403':
+          "$ref": "#/components/responses/forbidden"
+        '404':
+          "$ref": "#/components/responses/not_found"
+        '500':
+          "$ref": "#/components/responses/internal_error"
   /api/integrations/billing/invoices/{id}/pdf:
     get:
       summary: Get account invoice URL to Stripe.

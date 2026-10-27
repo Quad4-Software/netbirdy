@@ -512,6 +512,54 @@ func (e EventActivityCode) Valid() bool {
 	}
 }
 
+// Defines values for EventStreamPlatform.
+const (
+	EventStreamPlatformDatadog     EventStreamPlatform = "datadog"
+	EventStreamPlatformFirehose    EventStreamPlatform = "firehose"
+	EventStreamPlatformGenericHttp EventStreamPlatform = "generic_http"
+	EventStreamPlatformS3          EventStreamPlatform = "s3"
+)
+
+// Valid indicates whether the value is a known member of the EventStreamPlatform enum.
+func (e EventStreamPlatform) Valid() bool {
+	switch e {
+	case EventStreamPlatformDatadog:
+		return true
+	case EventStreamPlatformFirehose:
+		return true
+	case EventStreamPlatformGenericHttp:
+		return true
+	case EventStreamPlatformS3:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for EventStreamRequestPlatform.
+const (
+	EventStreamRequestPlatformDatadog     EventStreamRequestPlatform = "datadog"
+	EventStreamRequestPlatformFirehose    EventStreamRequestPlatform = "firehose"
+	EventStreamRequestPlatformGenericHttp EventStreamRequestPlatform = "generic_http"
+	EventStreamRequestPlatformS3          EventStreamRequestPlatform = "s3"
+)
+
+// Valid indicates whether the value is a known member of the EventStreamRequestPlatform enum.
+func (e EventStreamRequestPlatform) Valid() bool {
+	switch e {
+	case EventStreamRequestPlatformDatadog:
+		return true
+	case EventStreamRequestPlatformFirehose:
+		return true
+	case EventStreamRequestPlatformGenericHttp:
+		return true
+	case EventStreamRequestPlatformS3:
+		return true
+	default:
+		return false
+	}
+}
+
 // Defines values for GeoLocationCheckAction.
 const (
 	GeoLocationCheckActionAllow GeoLocationCheckAction = "allow"
@@ -3416,6 +3464,90 @@ type Event struct {
 
 // EventActivityCode The string code of the activity that occurred during the event
 type EventActivityCode string
+
+// EventStream One configured event streaming integration.
+type EventStream struct {
+	// AccountId The account owning the integration.
+	AccountId string `json:"account_id"`
+
+	// Config Platform specific configuration of an event streaming integration. generic_http uses url, headers and body_template. datadog uses api_key and api_url. access_key, secret_key, bucket_name, stream_name and region belong to the AWS platforms, which are not supported on self-hosted installs. Secret fields are masked as "********" in responses; on update an empty or masked secret field keeps the stored value.
+	Config EventStreamConfig `json:"config"`
+
+	// CreatedAt Creation timestamp.
+	CreatedAt time.Time `json:"created_at"`
+
+	// Enabled Whether the integration receives events. At most one integration per account is enabled.
+	Enabled bool `json:"enabled"`
+
+	// Id The numeric identifier of the integration.
+	Id int64 `json:"id"`
+
+	// Platform The delivery platform.
+	Platform EventStreamPlatform `json:"platform"`
+
+	// UpdatedAt Last modification timestamp.
+	UpdatedAt time.Time `json:"updated_at"`
+}
+
+// EventStreamPlatform The delivery platform.
+type EventStreamPlatform string
+
+// EventStreamConfig Platform specific configuration of an event streaming integration. generic_http uses url, headers and body_template. datadog uses api_key and api_url. access_key, secret_key, bucket_name, stream_name and region belong to the AWS platforms, which are not supported on self-hosted installs. Secret fields are masked as "********" in responses; on update an empty or masked secret field keeps the stored value.
+type EventStreamConfig struct {
+	// AccessKey AWS access key (s3, firehose). Unsupported on self-hosted.
+	AccessKey *string `json:"access_key,omitempty"`
+
+	// ApiKey Datadog API key, sent as the DD-API-KEY header. Masked in responses.
+	ApiKey string `json:"api_key"`
+
+	// ApiUrl Datadog logs intake URL.
+	ApiUrl string `json:"api_url"`
+
+	// BodyTemplate Optional Go template rendered over the event JSON fields. Example: {"event": "{{ .activity_code }}"}. Empty sends the event JSON unchanged.
+	BodyTemplate *string `json:"body_template,omitempty"`
+
+	// BucketName AWS S3 bucket name. Unsupported on self-hosted.
+	BucketName *string `json:"bucket_name,omitempty"`
+
+	// Headers JSON encoded object of request headers for generic_http, for example '{"Authorization":"Bearer token"}'. Secret header values (authorization, proxy-authorization, x-api-key, dd-api-key) are masked in responses.
+	Headers *string `json:"headers,omitempty"`
+
+	// Region AWS region. Unsupported on self-hosted.
+	Region *string `json:"region,omitempty"`
+
+	// SecretKey AWS secret key (s3, firehose). Unsupported on self-hosted.
+	SecretKey *string `json:"secret_key,omitempty"`
+
+	// StreamName AWS Firehose stream name. Unsupported on self-hosted.
+	StreamName *string `json:"stream_name,omitempty"`
+
+	// Url Delivery endpoint for the generic_http platform.
+	Url *string `json:"url,omitempty"`
+}
+
+// EventStreamRequest Event streaming integration to create.
+type EventStreamRequest struct {
+	// Config Platform specific configuration of an event streaming integration. generic_http uses url, headers and body_template. datadog uses api_key and api_url. access_key, secret_key, bucket_name, stream_name and region belong to the AWS platforms, which are not supported on self-hosted installs. Secret fields are masked as "********" in responses; on update an empty or masked secret field keeps the stored value.
+	Config EventStreamConfig `json:"config"`
+
+	// Enabled Whether the integration starts enabled.
+	Enabled bool `json:"enabled"`
+
+	// Platform The delivery platform. Only generic_http and datadog are supported on self-hosted installs.
+	Platform EventStreamRequestPlatform `json:"platform"`
+}
+
+// EventStreamRequestPlatform The delivery platform. Only generic_http and datadog are supported on self-hosted installs.
+type EventStreamRequestPlatform string
+
+// EventStreamUpdateRequest Fields to update on an event streaming integration. Omitted fields keep their stored values.
+type EventStreamUpdateRequest struct {
+	// Config Platform specific configuration of an event streaming integration. generic_http uses url, headers and body_template. datadog uses api_key and api_url. access_key, secret_key, bucket_name, stream_name and region belong to the AWS platforms, which are not supported on self-hosted installs. Secret fields are masked as "********" in responses; on update an empty or masked secret field keeps the stored value.
+	Config *EventStreamConfig `json:"config,omitempty"`
+
+	// Enabled New enabled state. Omitted keeps the current state.
+	Enabled *bool `json:"enabled,omitempty"`
+}
 
 // FleetDMMatchAttributes Attribute conditions to match when approving FleetDM hosts. Most attributes work with FleetDM's free/open source version. Premium-only attributes are marked accordingly
 type FleetDMMatchAttributes struct {
@@ -6753,6 +6885,12 @@ type CreateSentinelOneEDRIntegrationJSONRequestBody = EDRSentinelOneRequest
 
 // UpdateSentinelOneEDRIntegrationJSONRequestBody defines body for UpdateSentinelOneEDRIntegration for application/json ContentType.
 type UpdateSentinelOneEDRIntegrationJSONRequestBody = EDRSentinelOneRequest
+
+// PostApiIntegrationsEventStreamingJSONRequestBody defines body for PostApiIntegrationsEventStreaming for application/json ContentType.
+type PostApiIntegrationsEventStreamingJSONRequestBody = EventStreamRequest
+
+// PutApiIntegrationsEventStreamingIdJSONRequestBody defines body for PutApiIntegrationsEventStreamingId for application/json ContentType.
+type PutApiIntegrationsEventStreamingIdJSONRequestBody = EventStreamUpdateRequest
 
 // CreateGoogleIntegrationJSONRequestBody defines body for CreateGoogleIntegration for application/json ContentType.
 type CreateGoogleIntegrationJSONRequestBody = CreateGoogleIntegrationRequest
