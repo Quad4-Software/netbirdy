@@ -204,6 +204,11 @@ func NewManager(ctx context.Context, config Config, appMetrics telemetry.AppMetr
 			APIToken:           config.ExtraConfig["ApiToken"],
 			ManagementEndpoint: config.ExtraConfig["ManagementEndpoint"],
 		}, appMetrics)
+	case "quad4":
+		return NewQuad4Manager(Quad4ClientConfig{
+			APIToken:           config.ExtraConfig["ApiToken"],
+			ManagementEndpoint: config.ExtraConfig["ManagementEndpoint"],
+		}, appMetrics)
 	case "dex":
 		return NewDexManager(DexClientConfig{
 			GRPCAddr: config.ExtraConfig["GRPCAddr"],

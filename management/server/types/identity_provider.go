@@ -34,6 +34,8 @@ const (
 	IdentityProviderTypeOkta IdentityProviderType = "okta"
 	// IdentityProviderTypePocketID is the PocketID identity provider
 	IdentityProviderTypePocketID IdentityProviderType = "pocketid"
+	// IdentityProviderTypeQuad4 is the Quad4 ID identity provider
+	IdentityProviderTypeQuad4 IdentityProviderType = "quad4"
 	// IdentityProviderTypeMicrosoft is the Microsoft identity provider
 	IdentityProviderTypeMicrosoft IdentityProviderType = "microsoft"
 	// IdentityProviderTypeAuthentik is the Authentik identity provider
@@ -124,8 +126,8 @@ func (t IdentityProviderType) IsValid() bool {
 	switch t {
 	case IdentityProviderTypeOIDC, IdentityProviderTypeZitadel, IdentityProviderTypeEntra,
 		IdentityProviderTypeGoogle, IdentityProviderTypeOkta, IdentityProviderTypePocketID,
-		IdentityProviderTypeMicrosoft, IdentityProviderTypeAuthentik, IdentityProviderTypeKeycloak,
-		IdentityProviderTypeADFS:
+		IdentityProviderTypeQuad4, IdentityProviderTypeMicrosoft, IdentityProviderTypeAuthentik,
+		IdentityProviderTypeKeycloak, IdentityProviderTypeADFS:
 		return true
 	}
 	return false

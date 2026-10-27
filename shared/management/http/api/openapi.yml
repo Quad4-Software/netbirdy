@@ -1462,7 +1462,7 @@ components:
         protocol:
           description: Policy rule type of the traffic
           type: string
-          enum: [ "all", "tcp", "udp", "icmp", "netbirdy-ssh" ]
+          enum: [ "all", "tcp", "udp", "icmp", "netbird-ssh" ]
           example: "tcp"
         ports:
           description: Policy rule affected ports. Mutually exclusive with `port_ranges`. A rule accepts either individual ports or port ranges, not both.
@@ -2824,6 +2824,7 @@ components:
         - google
         - okta
         - pocketid
+        - quad4
         - microsoft
         - adfs
       example: oidc

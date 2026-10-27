@@ -19,6 +19,7 @@ type PocketIdManager struct {
 	credentials        ManagerCredentials
 	helper             ManagerHelper
 	appMetrics         telemetry.AppMetrics
+	providerName       string
 }
 
 type pocketIdCustomClaimDto struct {
@@ -109,6 +110,7 @@ func NewPocketIdManager(config PocketIdClientConfig, appMetrics telemetry.AppMet
 		credentials:        credentials,
 		helper:             helper,
 		appMetrics:         appMetrics,
+		providerName:       "PocketID",
 	}, nil
 }
 
@@ -154,7 +156,7 @@ func (p *PocketIdManager) request(ctx context.Context, method, resource string, 
 			p.appMetrics.IDPMetrics().CountRequestStatusError()
 		}
 
-		return nil, fmt.Errorf("received unexpected status code from PocketID API: %d", resp.StatusCode)
+		return nil, fmt.Errorf("received unexpected status code from %s API: %d", p.providerName, resp.StatusCode)
 	}
 
 	return io.ReadAll(resp.Body)

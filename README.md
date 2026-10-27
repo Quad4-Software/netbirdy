@@ -37,8 +37,9 @@ Website: <https://sudo-ivan.github.io/netbirdy/>
   [docs/security-monitoring.md](docs/security-monitoring.md).
 - JSON audit and security logs, an optional syslog sink, and a Wazuh 4.x rule
   pack. See [docs/wazuh.md](docs/wazuh.md).
-- Pocket ID setup helper in the dashboard, a compose profile and a script. See
-  [docs/pocket-id.md](docs/pocket-id.md).
+- Pocket ID and Quad4 ID setup helpers in the dashboard, compose profiles
+  and scripts. See [docs/pocket-id.md](docs/pocket-id.md) and
+  [docs/quad4-id.md](docs/quad4-id.md).
 - Signed releases, a server-side cache for client updates, and an optional
   updater container that backs up and rolls back. See
   [docs/updating.md](docs/updating.md) and [docs/update-mirror.md](docs/update-mirror.md).
@@ -111,6 +112,7 @@ the desktop app is not code-signed, and there is no Windows MSI.
 | [docs/security-monitoring.md](docs/security-monitoring.md) | Anomaly detection, audit log, syslog |
 | [docs/wazuh.md](docs/wazuh.md) | Wazuh integration |
 | [docs/pocket-id.md](docs/pocket-id.md) | Pocket ID sign-in |
+| [docs/quad4-id.md](docs/quad4-id.md) | Quad4 ID sign-in |
 | [docs/updating.md](docs/updating.md) | Updating servers, packages and clients |
 | [docs/update-mirror.md](docs/update-mirror.md) | Client update cache on the server |
 | [docs/landlock.md](docs/landlock.md) | Landlock sandbox for server processes |

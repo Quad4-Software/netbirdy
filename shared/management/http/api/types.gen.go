@@ -581,6 +581,7 @@ const (
 	IdentityProviderTypeOidc      IdentityProviderType = "oidc"
 	IdentityProviderTypeOkta      IdentityProviderType = "okta"
 	IdentityProviderTypePocketid  IdentityProviderType = "pocketid"
+	IdentityProviderTypeQuad4     IdentityProviderType = "quad4"
 	IdentityProviderTypeZitadel   IdentityProviderType = "zitadel"
 )
 
@@ -600,6 +601,8 @@ func (e IdentityProviderType) Valid() bool {
 	case IdentityProviderTypeOkta:
 		return true
 	case IdentityProviderTypePocketid:
+		return true
+	case IdentityProviderTypeQuad4:
 		return true
 	case IdentityProviderTypeZitadel:
 		return true
@@ -1635,7 +1638,7 @@ type AccountRequest struct {
 
 // AccountSettings defines model for AccountSettings.
 type AccountSettings struct {
-	// AgentNetworkOnly Limits the dashboard to the Agent Network surface for this account. Set for accounts created via netbird.ai signups and can be disabled later. Enabling this requires dashboard_features.agent_network to be true in the same request.
+	// AgentNetworkOnly Limits the dashboard to the Agent Network surface for this account. Set for accounts created via netbirdy.ai signups and can be disabled later. Enabling this requires dashboard_features.agent_network to be true in the same request.
 	AgentNetworkOnly *bool `json:"agent_network_only,omitempty"`
 
 	// AutoUpdateAlways When true, updates are installed automatically in the background. When false, updates require user interaction from the UI.

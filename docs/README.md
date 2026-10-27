@@ -5,6 +5,7 @@
 - security-monitoring.md - anomaly detection, audit JSONL, syslog
 - wazuh.md - Wazuh 4.x SIEM integration
 - pocket-id.md - Pocket ID sign-in setup
+- quad4-id.md - Quad4 ID sign-in setup
 - updating.md - updating server, packages, clients
 - maintaining.md - fork maintenance, releases
 - frontend-supply-chain.md - frontend dependency policies

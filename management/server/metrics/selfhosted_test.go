@@ -515,6 +515,7 @@ func TestExtractIdpType(t *testing.T) {
 		{"entra-xyz789", "entra"},
 		{"google-abc123", "google"},
 		{"pocketid-abc123", "pocketid"},
+		{"quad4-abc123", "quad4"},
 		{"microsoft-abc123", "microsoft"},
 		{"authentik-abc123", "authentik"},
 		{"keycloak-d5uv82dra0haedlf6kv0", "keycloak"},

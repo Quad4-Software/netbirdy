@@ -46,6 +46,7 @@ export const idpTypeLabels: Record<SSOIdentityProviderType, string> = {
   google: "Google",
   okta: "Okta",
   pocketid: "PocketID",
+  quad4: "Quad4 ID",
   microsoft: "Microsoft",
   authentik: "Authentik",
   keycloak: "Keycloak",

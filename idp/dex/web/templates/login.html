@@ -39,6 +39,8 @@
             {{- $iconClass = "nb-icon-jumpcloud" -}}
         {{- else if or (contains "pocket" $nameLower) (contains "pocket" $idLower) -}}
             {{- $iconClass = "nb-icon-pocketid" -}}
+        {{- else if or (contains "quad4" $nameLower) (contains "quad4" $idLower) -}}
+            {{- $iconClass = "nb-icon-quad4" -}}
         {{- else if or (contains "zitadel" $nameLower) (contains "zitadel" $idLower) -}}
             {{- $iconClass = "nb-icon-zitadel" -}}
         {{- else if or (contains "authentik" $nameLower) (contains "authentik" $idLower) -}}

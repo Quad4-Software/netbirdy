@@ -7,6 +7,7 @@ import KeycloakIcon from "@/assets/icons/KeycloakIcon";
 import MicrosoftIcon from "@/assets/icons/MicrosoftIcon";
 import OktaIcon from "@/assets/icons/OktaIcon";
 import PocketIdIcon from "@/assets/icons/PocketIdIcon";
+import Quad4Icon from "@/assets/icons/Quad4Icon";
 import ZitadelIcon from "@/assets/icons/ZitadelIcon";
 import { SSOIdentityProviderType } from "@/interfaces/IdentityProvider";
 
@@ -20,6 +21,7 @@ export const idpIcon = (
     entra: <EntraIcon size={size} />,
     okta: <OktaIcon size={size} className="text-nb-gray-300" />,
     pocketid: <PocketIdIcon size={size} />,
+    quad4: <Quad4Icon size={size} />,
     zitadel: <ZitadelIcon size={size} />,
     authentik: <AuthentikIcon size={size} />,
     keycloak: <KeycloakIcon size={size} />,

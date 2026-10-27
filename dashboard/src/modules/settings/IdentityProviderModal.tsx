@@ -50,6 +50,7 @@ const issuerHints: Partial<Record<SSOIdentityProviderType, string>> = {
   okta: "https://{ORG}.okta.com",
   entra: "https://login.microsoftonline.com/{TENANT_ID}/v2.0",
   pocketid: "https://pocketid.example.com",
+  quad4: "https://auth.quad4.io",
   adfs: "https://adfs.example.com/adfs",
 };
 
@@ -61,6 +62,7 @@ const defaultNames: Record<SSOIdentityProviderType, string> = {
   okta: "Okta",
   zitadel: "Zitadel",
   pocketid: "PocketID",
+  quad4: "Quad4 ID",
   authentik: "Authentik",
   keycloak: "Keycloak",
   adfs: "Microsoft AD FS",
@@ -235,6 +237,18 @@ export default function IdentityProviderModal({
                   <HelpText margin={false} className={"mt-1.5"}>
                     Your Pocket ID URL, no trailing slash.{" "}
                     <InlineLink href={"/docs/guides/pocket-id"} target={"_blank"}>
+                      Setup guide
+                    </InlineLink>
+                  </HelpText>
+                )}
+                {type === "quad4" && (
+                  <HelpText margin={false} className={"mt-1.5"}>
+                    Your Quad4 ID URL, no trailing slash. Public instance:{" "}
+                    <InlineLink href={"https://auth.quad4.io"} target={"_blank"}>
+                      auth.quad4.io
+                    </InlineLink>
+                    .{" "}
+                    <InlineLink href={"/docs/guides/quad4-id"} target={"_blank"}>
                       Setup guide
                     </InlineLink>
                   </HelpText>

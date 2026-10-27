@@ -256,7 +256,7 @@ func (c *Connector) ToStorageConnector() (storage.Connector, error) {
 // are stored with types that Dex can open.
 func mapConnectorToDex(connType string, config map[string]interface{}) (string, map[string]interface{}) {
 	switch connType {
-	case "oidc", "zitadel", "entra", "okta", "pocketid", "authentik", "keycloak", "adfs":
+	case "oidc", "zitadel", "entra", "okta", "pocketid", "quad4", "authentik", "keycloak", "adfs":
 		return "oidc", applyOIDCDefaults(connType, config)
 	default:
 		return connType, config
@@ -279,7 +279,7 @@ func applyOIDCDefaults(connType string, config map[string]interface{}) map[strin
 		setDefault(augmented, "getUserInfo", true)
 	case "entra":
 		setDefault(augmented, "claimMapping", map[string]string{"email": "preferred_username"})
-	case "okta", "pocketid":
+	case "okta", "pocketid", "quad4":
 		augmented["scopes"] = []string{"openid", "profile", "email", "groups"}
 	case "adfs":
 		augmented["scopes"] = []string{"openid", "profile", "email", "allatclaims"}

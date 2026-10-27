@@ -86,6 +86,7 @@ export type SSOIdentityProviderType =
   | "google"
   | "okta"
   | "pocketid"
+  | "quad4"
   | "microsoft"
   | "authentik"
   | "keycloak"
@@ -102,6 +103,7 @@ export const SSOIdentityProviderOptions: {
   { value: "okta", label: "Okta" },
   { value: "zitadel", label: "Zitadel" },
   { value: "pocketid", label: "PocketID" },
+  { value: "quad4", label: "Quad4 ID" },
   { value: "authentik", label: "Authentik" },
   { value: "keycloak", label: "Keycloak" },
   { value: "adfs", label: "Microsoft AD FS" },

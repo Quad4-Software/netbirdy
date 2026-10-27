@@ -18,7 +18,8 @@ In scope: management server, client (`netbirdy`), signal and relay,
 reverse proxy and its shield, the anomaly detection engine, the
 dashboard, and the Podman preview stack.
 
-Out of scope: third-party integrations deployed separately (Pocket ID,
+Out of scope: third-party integrations deployed separately (Pocket ID, Quad4
+ID,
 Wazuh), social engineering, denial of service against upstream
 upstream NetBird infrastructure.
 Bugs that are upstream issues should also be reported

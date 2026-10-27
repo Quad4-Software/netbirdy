@@ -65,6 +65,23 @@ services:
     volumes:
       - pocketid-data:/app/backend/data
 
+  # Optional: local Quad4 ID for passkey login testing.
+  # First-run admin setup happens in the browser at http://localhost:1412
+  # (requires a secure context; localhost works). The public hosted
+  # instance is https://auth.quad4.io.
+  quad4:
+    profiles: ["quad4"]
+    image: ghcr.io/quad4-software/quad4-id:v0.1.0
+    restart: unless-stopped
+    ports:
+      - "1412:1411"
+    environment:
+      APP_URL: "http://localhost:1412"
+      TRUST_PROXY: "true"
+      ENCRYPTION_KEY: "${QUAD4_ENCRYPTION_KEY:-change-me-please-32-bytes!!}"
+    volumes:
+      - quad4-data:/app/data
+
   updater:
     profiles: ["updater"]
     image: localhost/netbirdy-updater:latest
@@ -101,4 +118,5 @@ services:
 volumes:
   netbirdy-server-data:
   pocketid-data:
+  quad4-data:
   netbirdy-updater-backups:

@@ -51,7 +51,7 @@ func TestBuildOIDCConnectorConfig_EntraSetsUserIDKey(t *testing.T) {
 func TestBuildOIDCConnectorConfig_NonEntraDoesNotSetUserIDKey(t *testing.T) {
 	// ensures the Entra userIDKey override does not leak into other OIDC providers,
 	// which already use a stable sub claim.
-	for _, typ := range []string{"oidc", "zitadel", "okta", "pocketid", "authentik", "keycloak", "adfs"} {
+	for _, typ := range []string{"oidc", "zitadel", "okta", "pocketid", "quad4", "authentik", "keycloak", "adfs"} {
 		t.Run(typ, func(t *testing.T) {
 			data, err := buildOIDCConnectorConfig(&ConnectorConfig{Type: typ}, "https://example.com/oauth2/callback")
 			require.NoError(t, err)
