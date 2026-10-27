@@ -68,4 +68,59 @@ export const coreFixtures: Record<string, Handler> = {
   },
 
   "GET /identity-providers": identityProviders,
+
+  "GET /server/backup": {
+    config: {
+      s3_endpoint: "https://s3.eu-central-1.amazonaws.com",
+      s3_region: "eu-central-1",
+      s3_bucket: "netbirdy-backups",
+      s3_access_key: "********",
+      s3_secret_key: "********",
+      s3_prefix: "mgmt/",
+      interval: "6h",
+      encryption_key: "********",
+    },
+    status: {
+      enabled: true,
+      running: false,
+      last_run: "2026-10-07T12:00:00Z",
+      last_error: "",
+      last_snapshot: "mgmt/snapshot-2026-10-07T12-00-00Z.nbbackup",
+      next_run: "2026-10-08T12:00:00Z",
+    },
+  },
+  "PUT /server/backup": (ctx: HandlerContext) => ({
+    config: ctx.body,
+    status: {
+      enabled: true,
+      running: false,
+      last_run: "2026-10-07T12:00:00Z",
+      last_error: "",
+      last_snapshot: "mgmt/snapshot-2026-10-07T12-00-00Z.nbbackup",
+      next_run: "2026-10-08T12:00:00Z",
+    },
+  }),
+  "POST /server/backup/run": {
+    key: "mgmt/snapshot-2026-10-08T09-30-00Z.nbbackup",
+    size: 2480934,
+  },
+  "GET /server/backup/snapshots": {
+    snapshots: [
+      {
+        key: "mgmt/snapshot-2026-10-07T12-00-00Z.nbbackup",
+        size: 2480934,
+        last_modified: "2026-10-07T12:00:00Z",
+      },
+      {
+        key: "mgmt/snapshot-2026-10-06T12-00-00Z.nbbackup",
+        size: 2377610,
+        last_modified: "2026-10-06T12:00:00Z",
+      },
+      {
+        key: "mgmt/snapshot-2026-10-05T12-00-00Z.nbbackup",
+        size: 2290154,
+        last_modified: "2026-10-05T12:00:00Z",
+      },
+    ],
+  },
 };

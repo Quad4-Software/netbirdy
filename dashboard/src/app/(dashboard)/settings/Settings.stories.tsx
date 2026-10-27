@@ -52,6 +52,40 @@ export const Permissions = shows("permissions", "Permissions");
 export const Networks = shows("networks", "Networks");
 export const Clients = shows("clients", "Clients");
 export const Metrics = shows("metrics", "Metrics");
+export const Backups = shows("backups", "Backups");
+
+export const BackupsEmpty: Story = {
+  parameters: {
+    ...tab("backups"),
+    api: {
+      "GET /server/backup": {
+        config: null,
+        status: {
+          enabled: false,
+          running: false,
+          last_run: "",
+          last_error: "",
+          last_snapshot: "",
+          next_run: "",
+        },
+      },
+      "GET /server/backup/snapshots": { snapshots: [] },
+    },
+  },
+  play: async () => {
+    await text("S3 destination");
+    await text("No snapshots yet.");
+  },
+};
+
+export const BackupsFilled: Story = {
+  parameters: tab("backups"),
+  play: async () => {
+    await text("S3 destination");
+    const input = await screen.findByTestId("backup-access-key-input");
+    await userEvent.type(input, "AKIAIOSFODNN7EXAMPLE");
+  },
+};
 
 export const MetricsErrorReporting: Story = {
   parameters: tab("metrics"),

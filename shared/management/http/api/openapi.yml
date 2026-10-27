@@ -37,6 +37,8 @@ tags:
     description: Interact with and view information about reverse proxy services.
   - name: Instance
     description: Instance setup and status endpoints for initial configuration.
+  - name: Server
+    description: Manage server-level features such as encrypted backups.
   - name: Jobs
     description: Interact with and view information about remote jobs.
     x-experimental: true
@@ -6437,6 +6439,145 @@ components:
       required:
         - name
         - limits
+    ServerBackupConfig:
+      type: object
+      description: Encrypted S3 backup configuration. Secret fields are masked as "********" in responses. On update, an empty or masked secret field keeps the stored value.
+      properties:
+        s3_endpoint:
+          description: S3 endpoint as host[:port] or http(s) URL. Empty resolves the AWS endpoint from the region. Works with S3, MinIO, Backblaze B2 and Cloudflare R2.
+          type: string
+          example: "minio.internal:9000"
+        s3_region:
+          description: S3 signing region.
+          type: string
+          example: "us-east-1"
+        s3_bucket:
+          description: Destination bucket. Empty disables backups.
+          type: string
+          example: "netbirdy-backups"
+        s3_access_key:
+          description: S3 access key. Masked in responses.
+          type: string
+          format: password
+        s3_secret_key:
+          description: S3 secret key. Masked in responses.
+          type: string
+          format: password
+        s3_prefix:
+          description: Object key prefix snapshots are stored under.
+          type: string
+          example: "netbirdy-backups/"
+        interval:
+          description: Go duration between scheduled backups, for example "24h". Empty or "0" means manual runs only.
+          type: string
+          example: "24h"
+        encryption_key:
+          description: age passphrase used to encrypt every snapshot. Masked in responses. Backups refuse to run while unset.
+          type: string
+          format: password
+      required:
+        - s3_endpoint
+        - s3_region
+        - s3_bucket
+        - s3_access_key
+        - s3_secret_key
+        - s3_prefix
+        - interval
+        - encryption_key
+    ServerBackupStatus:
+      type: object
+      description: Runtime status of the backup scheduler.
+      properties:
+        enabled:
+          description: Whether a bucket is configured and the feature is on.
+          type: boolean
+          example: true
+        running:
+          description: Whether a backup run is currently in progress.
+          type: boolean
+          example: false
+        last_run:
+          description: RFC 3339 timestamp of the last finished run. Empty when it never ran.
+          type: string
+          example: "2026-10-26T02:00:00Z"
+        last_error:
+          description: Error of the last run. Empty when it succeeded or never ran.
+          type: string
+          example: ""
+        last_snapshot:
+          description: Object key of the last successful upload. Empty when no upload succeeded yet.
+          type: string
+          example: "netbirdy-backups/netbirdy-backup-20261026T020000Z.tar.gz.age"
+        next_run:
+          description: RFC 3339 timestamp of the next scheduled run. Empty when scheduling is off.
+          type: string
+          example: "2026-10-27T02:00:00Z"
+      required:
+        - enabled
+        - running
+        - last_run
+        - last_error
+        - last_snapshot
+        - next_run
+    ServerBackupState:
+      type: object
+      description: Backup configuration and scheduler status.
+      properties:
+        config:
+          $ref: '#/components/schemas/ServerBackupConfig'
+        status:
+          $ref: '#/components/schemas/ServerBackupStatus'
+      required:
+        - config
+        - status
+    ServerBackupRunResult:
+      type: object
+      description: Result of a completed backup run.
+      properties:
+        key:
+          description: Object key the snapshot was stored under.
+          type: string
+          example: "netbirdy-backups/netbirdy-backup-20261026T020000Z.tar.gz.age"
+        size:
+          description: Stored object size in bytes.
+          type: integer
+          format: int64
+          example: 1048576
+      required:
+        - key
+        - size
+    ServerBackupSnapshot:
+      type: object
+      description: One stored backup snapshot.
+      properties:
+        key:
+          description: Object key of the snapshot.
+          type: string
+          example: "netbirdy-backups/netbirdy-backup-20261026T020000Z.tar.gz.age"
+        size:
+          description: Object size in bytes.
+          type: integer
+          format: int64
+          example: 1048576
+        last_modified:
+          description: RFC 3339 timestamp of the last modification.
+          type: string
+          example: "2026-10-26T02:00:00Z"
+      required:
+        - key
+        - size
+        - last_modified
+    ServerBackupSnapshotList:
+      type: object
+      description: List of stored backup snapshots.
+      properties:
+        snapshots:
+          description: Stored snapshots.
+          type: array
+          items:
+            $ref: '#/components/schemas/ServerBackupSnapshot'
+      required:
+        - snapshots
   responses:
     not_found:
       description: Resource not found
@@ -14341,5 +14482,100 @@ paths:
           "$ref": "#/components/responses/forbidden"
         '404':
           "$ref": "#/components/responses/not_found"
+        '500':
+          "$ref": "#/components/responses/internal_error"
+  /api/server/backup:
+    get:
+      summary: Get Backup Configuration and Status
+      description: Returns the S3 backup configuration with secrets masked and the scheduler status. Requires admin or owner role.
+      tags: [ Server ]
+      security:
+        - BearerAuth: [ ]
+        - TokenAuth: [ ]
+      responses:
+        '200':
+          description: Backup configuration and status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServerBackupState'
+        '401':
+          "$ref": "#/components/responses/requires_authentication"
+        '403':
+          "$ref": "#/components/responses/forbidden"
+        '500':
+          "$ref": "#/components/responses/internal_error"
+    put:
+      summary: Update Backup Configuration
+      description: |
+        Updates the S3 backup configuration and persists it to backup.json in the datadir. Empty or masked secret fields (s3_access_key, s3_secret_key, encryption_key) keep their stored values. Requires admin or owner role.
+      tags: [ Server ]
+      security:
+        - BearerAuth: [ ]
+        - TokenAuth: [ ]
+      requestBody:
+        description: Backup configuration update
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ServerBackupConfig'
+      responses:
+        '200':
+          description: Updated backup configuration and status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServerBackupState'
+        '400':
+          "$ref": "#/components/responses/bad_request"
+        '401':
+          "$ref": "#/components/responses/requires_authentication"
+        '403':
+          "$ref": "#/components/responses/forbidden"
+        '500':
+          "$ref": "#/components/responses/internal_error"
+  /api/server/backup/run:
+    post:
+      summary: Run Backup Now
+      description: Triggers an immediate backup run and returns the stored snapshot object key. Requires admin or owner role.
+      tags: [ Server ]
+      security:
+        - BearerAuth: [ ]
+        - TokenAuth: [ ]
+      responses:
+        '200':
+          description: Completed backup run
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServerBackupRunResult'
+        '400':
+          "$ref": "#/components/responses/bad_request"
+        '401':
+          "$ref": "#/components/responses/requires_authentication"
+        '403':
+          "$ref": "#/components/responses/forbidden"
+        '500':
+          "$ref": "#/components/responses/internal_error"
+  /api/server/backup/snapshots:
+    get:
+      summary: List Backup Snapshots
+      description: Lists every snapshot object stored under the configured prefix. Requires admin or owner role.
+      tags: [ Server ]
+      security:
+        - BearerAuth: [ ]
+        - TokenAuth: [ ]
+      responses:
+        '200':
+          description: Stored backup snapshots
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServerBackupSnapshotList'
+        '401':
+          "$ref": "#/components/responses/requires_authentication"
+        '403':
+          "$ref": "#/components/responses/forbidden"
         '500':
           "$ref": "#/components/responses/internal_error"

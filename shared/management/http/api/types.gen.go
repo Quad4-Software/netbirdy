@@ -5057,6 +5057,90 @@ type SentinelOneMatchAttributes struct {
 // SentinelOneMatchAttributesNetworkStatus The current network connectivity status of the device
 type SentinelOneMatchAttributesNetworkStatus string
 
+// ServerBackupConfig Encrypted S3 backup configuration. Secret fields are masked as "********" in responses. On update, an empty or masked secret field keeps the stored value.
+type ServerBackupConfig struct {
+	// EncryptionKey age passphrase used to encrypt every snapshot. Masked in responses. Backups refuse to run while unset.
+	EncryptionKey string `json:"encryption_key"`
+
+	// Interval Go duration between scheduled backups, for example "24h". Empty or "0" means manual runs only.
+	Interval string `json:"interval"`
+
+	// S3AccessKey S3 access key. Masked in responses.
+	S3AccessKey string `json:"s3_access_key"`
+
+	// S3Bucket Destination bucket. Empty disables backups.
+	S3Bucket string `json:"s3_bucket"`
+
+	// S3Endpoint S3 endpoint as host[:port] or http(s) URL. Empty resolves the AWS endpoint from the region. Works with S3, MinIO, Backblaze B2 and Cloudflare R2.
+	S3Endpoint string `json:"s3_endpoint"`
+
+	// S3Prefix Object key prefix snapshots are stored under.
+	S3Prefix string `json:"s3_prefix"`
+
+	// S3Region S3 signing region.
+	S3Region string `json:"s3_region"`
+
+	// S3SecretKey S3 secret key. Masked in responses.
+	S3SecretKey string `json:"s3_secret_key"`
+}
+
+// ServerBackupRunResult Result of a completed backup run.
+type ServerBackupRunResult struct {
+	// Key Object key the snapshot was stored under.
+	Key string `json:"key"`
+
+	// Size Stored object size in bytes.
+	Size int64 `json:"size"`
+}
+
+// ServerBackupSnapshot One stored backup snapshot.
+type ServerBackupSnapshot struct {
+	// Key Object key of the snapshot.
+	Key string `json:"key"`
+
+	// LastModified RFC 3339 timestamp of the last modification.
+	LastModified string `json:"last_modified"`
+
+	// Size Object size in bytes.
+	Size int64 `json:"size"`
+}
+
+// ServerBackupSnapshotList List of stored backup snapshots.
+type ServerBackupSnapshotList struct {
+	// Snapshots Stored snapshots.
+	Snapshots []ServerBackupSnapshot `json:"snapshots"`
+}
+
+// ServerBackupState Backup configuration and scheduler status.
+type ServerBackupState struct {
+	// Config Encrypted S3 backup configuration. Secret fields are masked as "********" in responses. On update, an empty or masked secret field keeps the stored value.
+	Config ServerBackupConfig `json:"config"`
+
+	// Status Runtime status of the backup scheduler.
+	Status ServerBackupStatus `json:"status"`
+}
+
+// ServerBackupStatus Runtime status of the backup scheduler.
+type ServerBackupStatus struct {
+	// Enabled Whether a bucket is configured and the feature is on.
+	Enabled bool `json:"enabled"`
+
+	// LastError Error of the last run. Empty when it succeeded or never ran.
+	LastError string `json:"last_error"`
+
+	// LastRun RFC 3339 timestamp of the last finished run. Empty when it never ran.
+	LastRun string `json:"last_run"`
+
+	// LastSnapshot Object key of the last successful upload. Empty when no upload succeeded yet.
+	LastSnapshot string `json:"last_snapshot"`
+
+	// NextRun RFC 3339 timestamp of the next scheduled run. Empty when scheduling is off.
+	NextRun string `json:"next_run"`
+
+	// Running Whether a backup run is currently in progress.
+	Running bool `json:"running"`
+}
+
 // Service defines model for Service.
 type Service struct {
 	// AccessGroups NetBirdy group IDs whose peers may reach this private service over the tunnel. Required when private=true; ignored otherwise. Mutually exclusive with bearer auth (SSO).
@@ -6411,6 +6495,9 @@ type PostApiRoutesJSONRequestBody = RouteRequest
 
 // PutApiRoutesRouteIdJSONRequestBody defines body for PutApiRoutesRouteId for application/json ContentType.
 type PutApiRoutesRouteIdJSONRequestBody = RouteRequest
+
+// PutApiServerBackupJSONRequestBody defines body for PutApiServerBackup for application/json ContentType.
+type PutApiServerBackupJSONRequestBody = ServerBackupConfig
 
 // PostApiSetupJSONRequestBody defines body for PostApiSetup for application/json ContentType.
 type PostApiSetupJSONRequestBody = SetupRequest

@@ -253,6 +253,10 @@ func (s *BaseServer) start(ctx context.Context) error {
 	})
 	s.startDomainCleanup(srvCtx)
 
+	backupManager := s.BackupManager()
+	backupManager.Start(srvCtx)
+	s.OnStop(backupManager.Stop)
+
 	return nil
 }
 func (s *BaseServer) startDomainCleanup(ctx context.Context) {

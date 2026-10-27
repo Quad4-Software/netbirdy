@@ -6,6 +6,7 @@ import {
   AlertOctagonIcon,
   ArrowUpCircleIcon,
   ChartNoAxesCombined,
+  DatabaseBackupIcon,
   FingerprintIcon,
   FolderGit2Icon,
   KeyRound,
@@ -21,6 +22,7 @@ import { useLoggedInUser } from "@/contexts/UsersProvider";
 import PageContainer from "@/layouts/PageContainer";
 import { useAccount } from "@/modules/account/useAccount";
 import AuthenticationTab from "@/modules/settings/AuthenticationTab";
+import BackupsTab from "@/modules/settings/BackupsTab";
 import ClientSettingsTab from "@/modules/settings/ClientSettingsTab";
 import DangerZoneTab from "@/modules/settings/DangerZoneTab";
 import GroupsSettings from "@/modules/settings/GroupsSettings";
@@ -112,13 +114,22 @@ export default function NetBirdSettings() {
                 Metrics
               </VerticalTabs.Trigger>
               {isOwnerOrAdmin && (
-                <VerticalTabs.Trigger
-                  value="updates"
-                  data-testid="settings-tab-updates"
-                >
-                  <ArrowUpCircleIcon size={14} />
-                  Updates
-                </VerticalTabs.Trigger>
+                <>
+                  <VerticalTabs.Trigger
+                    value="backups"
+                    data-testid="settings-tab-backups"
+                  >
+                    <DatabaseBackupIcon size={14} />
+                    Backups
+                  </VerticalTabs.Trigger>
+                  <VerticalTabs.Trigger
+                    value="updates"
+                    data-testid="settings-tab-updates"
+                  >
+                    <ArrowUpCircleIcon size={14} />
+                    Updates
+                  </VerticalTabs.Trigger>
+                </>
               )}
             </>
           )}
@@ -138,6 +149,7 @@ export default function NetBirdSettings() {
             {account && <NetworkSettingsTab account={account} />}
             {account && <ClientSettingsTab account={account} />}
             {account && <MetricsTab account={account} />}
+            {isOwnerOrAdmin && <BackupsTab />}
             {isOwnerOrAdmin && <UpdatesTab />}
             {account && <DangerZoneTab account={account} />}
           </div>
