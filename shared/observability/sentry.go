@@ -6,6 +6,7 @@ package observability
 
 import (
 	"os"
+	"strings"
 	"time"
 
 	"github.com/getsentry/sentry-go"
@@ -23,6 +24,25 @@ const (
 	// buffered events to reach the server.
 	flushTimeout = 2 * time.Second
 )
+
+// DefaultDSN is the project error tracker baked into released binaries.
+// Deployments override it through the NB_*_SENTRY_DSN environment
+// variables or service flags.
+const DefaultDSN = "https://5c4d47e774814404aae82100635eb31f@bugs.quad4.io/10"
+
+// ResolveDSN maps a configured DSN value to the effective one. An empty
+// value falls back to DefaultDSN, while "off" or "none" disables
+// reporting entirely.
+func ResolveDSN(dsn string) string {
+	switch strings.ToLower(strings.TrimSpace(dsn)) {
+	case "":
+		return DefaultDSN
+	case "off", "none":
+		return ""
+	default:
+		return dsn
+	}
+}
 
 // InitSentry initializes the Sentry client for a service. An empty dsn
 // leaves error tracking disabled and every other helper stays a no-op.

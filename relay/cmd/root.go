@@ -146,7 +146,7 @@ func waitForExitSignal() {
 }
 
 func execute(cmd *cobra.Command, args []string) error {
-	flushSentry, err := observability.InitSentry(os.Getenv(envSentryDSN), "relay", version.NetbirdVersion())
+	flushSentry, err := observability.InitSentry(observability.ResolveDSN(os.Getenv(envSentryDSN)), "relay", version.NetbirdVersion())
 	if err != nil {
 		log.Debugf("failed to initialize sentry: %v", err)
 	}

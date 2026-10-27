@@ -5,8 +5,11 @@ Sentry-compatible endpoint. This covers sentry.io as well as self-hosted
 GlitchTip and Bugsink, which speak the same protocol and use the same DSN
 format.
 
-Reporting is strictly opt-in. With no DSN configured the services do not
-initialize a client and every reporting path is a no-op.
+Released binaries ship with a default DSN pointing at the project's own
+tracker, so error reporting is on unless it is disabled. Set the service
+environment variable or flag to your own DSN to report elsewhere, or to
+`off` to disable reporting completely. With reporting disabled every
+reporting path is a no-op.
 
 ## Enabling per service
 

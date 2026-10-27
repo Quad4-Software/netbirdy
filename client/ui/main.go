@@ -99,8 +99,9 @@ func main() {
 	}
 
 	daemonAddr, sentryDSN, userSetLogFile := parseFlagsAndInitLog()
+	sentryDSN = observability.ResolveDSN(sentryDSN)
 
-	// Opt-in error reporting: no DSN leaves every helper a no-op.
+	// Error reporting: resolve produced a DSN unless reporting was disabled.
 	flushSentry, err := observability.InitSentry(sentryDSN, "netbirdy-ui", version.NetbirdVersion())
 	if err != nil {
 		logrus.Warnf("failed to initialize sentry: %v", err)
@@ -262,7 +263,7 @@ func requestNotificationAuthorization(notifier *Notifier) {
 // falls back to console for InitLog.
 func parseFlagsAndInitLog() (daemonAddr string, sentryDSN string, userSetLogFile bool) {
 	daemonAddrFlag := flag.String("daemon-addr", DaemonAddr(), "Daemon gRPC address: unix:///path or tcp://host:port")
-	sentryDSNFlag := flag.String("sentry-dsn", os.Getenv(envSentryDSN), "Sentry-compatible DSN (Sentry.io, GlitchTip, Bugsink) enabling opt-in panic and error reporting. Defaults to "+envSentryDSN+".")
+	sentryDSNFlag := flag.String("sentry-dsn", os.Getenv(envSentryDSN), "Sentry-compatible DSN (Sentry.io, GlitchTip, Bugsink) for panic and error reporting. Defaults to the built-in project DSN; set to off to disable. Defaults to "+envSentryDSN+".")
 	logFiles := &stringList{}
 	flag.Var(logFiles, "log-file", "Log destination. Repeat to log to multiple targets at once, e.g. `--log-file console --log-file Y:/netbirdy-ui.log`. Each value is one of: console, syslog, or a file path. File destinations are rotated by lumberjack (same as the daemon). Defaults to console. Passing any value disables the daemon-debug-driven gui-client.log.")
 	logLevel := flag.String("log-level", "info", "Log level: trace|debug|info|warn|error.")

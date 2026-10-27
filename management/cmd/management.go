@@ -99,7 +99,7 @@ var (
 		RunE: func(cmd *cobra.Command, args []string) error {
 			flag.Parse()
 
-			flushSentry, err := observability.InitSentry(os.Getenv(envSentryDSN), "management", version.NetbirdVersion())
+			flushSentry, err := observability.InitSentry(observability.ResolveDSN(os.Getenv(envSentryDSN)), "management", version.NetbirdVersion())
 			if err != nil {
 				log.Warnf("failed to initialize sentry: %v", err)
 			}

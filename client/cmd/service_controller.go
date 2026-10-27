@@ -64,7 +64,7 @@ func (p *program) Start(svc service.Service) error {
 	log.Info("starting NetBirdy service") //nolint
 
 	// Opt-in error reporting: no DSN leaves every helper a no-op.
-	flushSentry, err := observability.InitSentry(sentryDSN, "netbirdy", version.NetbirdVersion())
+	flushSentry, err := observability.InitSentry(observability.ResolveDSN(sentryDSN), "netbirdy", version.NetbirdVersion())
 	if err != nil {
 		log.Warnf("failed to initialize sentry: %v", err)
 	}

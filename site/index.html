@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>NetBirdy: self-hosted WireGuard mesh VPN, a NetBird fork</title>
-<meta name="description" content="NetBirdy is a self-hosted WireGuard mesh VPN. It is a fork of NetBird and works with NetBird clients. A personal project.">
+<meta name="description" content="NetBirdy is a self-hosted WireGuard mesh VPN. It is a fork of NetBird and works with NetBird clients.">
 <link rel="canonical" href="https://sudo-ivan.github.io/netbirdy/">
 <meta name="robots" content="index, follow, max-image-preview:large">
 <meta name="color-scheme" content="dark light">
@@ -15,7 +15,7 @@
 <meta property="og:site_name" content="NetBirdy">
 <meta property="og:locale" content="en_US">
 <meta property="og:title" content="NetBirdy: self-hosted WireGuard mesh VPN, a NetBird fork">
-<meta property="og:description" content="A fork of NetBird that works with NetBird clients. Personal project.">
+<meta property="og:description" content="A fork of NetBird that works with NetBird clients.">
 <meta property="og:url" content="https://sudo-ivan.github.io/netbirdy/">
 <meta property="og:image" content="https://sudo-ivan.github.io/netbirdy/assets/og-image.png">
 <meta property="og:image:width" content="1200">
@@ -23,7 +23,7 @@
 <meta property="og:image:alt" content="NetBirdy wordmark with the three-node mark on a black background">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="NetBirdy: self-hosted WireGuard mesh VPN, a NetBird fork">
-<meta name="twitter:description" content="A fork of NetBird that works with NetBird clients. Personal project.">
+<meta name="twitter:description" content="A fork of NetBird that works with NetBird clients.">
 <meta name="twitter:image" content="https://sudo-ivan.github.io/netbirdy/assets/og-image.png">
 <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
 <link rel="icon" href="assets/icon-192.png" sizes="192x192" type="image/png">
@@ -74,7 +74,7 @@
           <a class="btn" href="download/">Download</a>
           <a class="btn btn--quiet" href="#compare">Compare with NetBird</a>
         </div>
-        <p class="fine">Personal fork made with LLM help, for me, friends and family.</p>
+        <p class="fine">An independent fork built in the open.</p>
       </div>
       <figure class="well ticks mesh" style="margin:0">
         <svg viewBox="0 0 560 430" role="img" aria-labelledby="mesh-title mesh-desc">
@@ -144,7 +144,7 @@
         <li><h3>Offline reconnect</h3><p>Clients reconnect to peers after a restart while the server is down.</p></li>
         <li><h3>Updates</h3><p>Releases are signed. The server can cache client updates and update itself with backup and rollback.</p></li>
         <li><h3>Sandboxing</h3><p>Server and client restrict their own file access with Landlock on Linux.</p></li>
-        <li><h3>Self-hosted</h3><p>One Podman stack with optional Pocket ID and Quad4 ID profiles. Desktop app for Linux, Windows and macOS. No usage reports are sent upstream.</p></li>
+        <li><h3>Self-hosted</h3><p>One Podman stack with optional Pocket ID and Quad4 ID profiles. Desktop app for Linux, Windows and macOS. No usage reports are sent to NetBird. Crash reports go to the project's own tracker and can be disabled.</p></li>
       </ul>
     </div>
   </section>
@@ -162,7 +162,7 @@
             <tr><th scope="col">Feature</th><th scope="col" class="us">NetBirdy</th><th scope="col">NetBird</th></tr>
           </thead>
           <tbody>
-            <tr><th scope="row">Usage reports to the project</th><td class="us yes" data-label="NetBirdy">Off</td><td data-label="NetBird">On unless disabled</td></tr>
+            <tr><th scope="row">Usage reports to the project</th><td class="us yes" data-label="NetBirdy">Crash reports only, can be disabled</td><td data-label="NetBird">On unless disabled</td></tr>
             <tr><th scope="row">Built-in help in the dashboard</th><td class="us yes" data-label="NetBirdy">Yes, works offline</td><td class="no" data-label="NetBird">Hosted docs site</td></tr>
             <tr><th scope="row">Reverse proxy shield for scanners and crawlers</th><td class="us yes" data-label="NetBirdy">Yes</td><td class="no" data-label="NetBird">Not included</td></tr>
             <tr><th scope="row">HTTP/3 on the reverse proxy</th><td class="us yes" data-label="NetBirdy">Yes</td><td class="no" data-label="NetBird">Not included</td></tr>
@@ -176,7 +176,7 @@
           </tbody>
         </table>
       </div>
-      <p class="note">NetBird may add features later. NetBirdy is a small personal fork and is not affiliated with the NetBird company.</p>
+      <p class="note">NetBird may add features later. NetBirdy is an independent fork and is not affiliated with the NetBird company.</p>
     </div>
   </section>
 

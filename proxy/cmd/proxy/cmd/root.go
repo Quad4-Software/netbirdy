@@ -156,7 +156,7 @@ func init() {
 	rootCmd.Flags().StringVar(&geoDataDir, "geo-data-dir", envStringOrDefault("NB_PROXY_GEO_DATA_DIR", "/var/lib/netbird/geolocation"), "Directory for the GeoLite2 MMDB file (auto-downloaded if missing)")
 	rootCmd.Flags().StringVar(&crowdsecAPIURL, "crowdsec-api-url", envStringOrDefault("NB_PROXY_CROWDSEC_API_URL", ""), "CrowdSec LAPI URL for IP reputation checks")
 	rootCmd.Flags().StringVar(&crowdsecAPIKey, "crowdsec-api-key", envStringOrDefault("NB_PROXY_CROWDSEC_API_KEY", ""), "CrowdSec bouncer API key")
-	rootCmd.Flags().StringVar(&sentryDSN, "sentry-dsn", envStringOrDefault("NB_PROXY_SENTRY_DSN", ""), "Sentry-compatible DSN for panic and error reporting (Sentry, GlitchTip, Bugsink); empty disables reporting")
+	rootCmd.Flags().StringVar(&sentryDSN, "sentry-dsn", envStringOrDefault("NB_PROXY_SENTRY_DSN", ""), "Sentry-compatible DSN for panic and error reporting (Sentry, GlitchTip, Bugsink); set to off to disable reporting")
 }
 
 // Execute runs the root command.
@@ -192,7 +192,7 @@ func runServer(cmd *cobra.Command, args []string) error {
 
 	logger.Infof("configured log level: %s", level)
 
-	flushSentry, err := observability.InitSentry(sentryDSN, applicationName, Version)
+	flushSentry, err := observability.InitSentry(observability.ResolveDSN(sentryDSN), applicationName, Version)
 	if err != nil {
 		logger.Warnf("failed to initialize sentry: %v", err)
 	}
