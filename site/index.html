@@ -127,16 +127,24 @@
   <section class="section" id="features">
     <div class="container">
       <div class="section__head">
-        <h2>Differences from NetBird</h2>
-        <p>The rest matches NetBird.</p>
+        <h2>What is in the box</h2>
+        <p>Everything NetBird does, plus what the fork adds.</p>
       </div>
       <ul class="rows">
-        <li><h3>Dashboard</h3><p>Dark and light themes, a command palette and built-in help that works offline.</p></li>
-        <li><h3>Reverse proxy</h3><p>Slows or blocks scanners and AI crawlers. Supports HTTP/3.</p></li>
+        <li><h3>Mesh VPN</h3><p>Devices talk directly to each other over encrypted WireGuard tunnels. No concentrator in the data path.</p></li>
+        <li><h3>NAT traversal</h3><p>Peers connect through NAT and firewalls without port forwarding. A relay carries traffic when no direct path exists.</p></li>
+        <li><h3>Sign-in</h3><p>Built-in identity service with OIDC connectors: Google, Microsoft Entra, Okta, Zitadel, Keycloak, Authentik, Pocket ID and Quad4 ID.</p></li>
+        <li><h3>Access rules</h3><p>Groups, policies and posture checks decide which peers reach what. Setup keys enroll servers and devices without user accounts.</p></li>
+        <li><h3>Dashboard</h3><p>Web UI for peers, groups, policies and DNS. Dark and light themes, a command palette and built-in help that works offline.</p></li>
+        <li><h3>SSH and DNS</h3><p>Built-in SSH between peers, mesh hostnames and per-domain nameserver groups.</p></li>
+        <li><h3>Routing</h3><p>Subnet routes through routing peers and exit nodes for full-tunnel traffic.</p></li>
+        <li><h3>Reverse proxy</h3><p>An identity-aware proxy in front of your services that slows or blocks scanners and AI crawlers. Supports HTTP/3.</p></li>
         <li><h3>Anomaly detection</h3><p>Flags new peer locations, failed login bursts and setup key misuse. Can require approval.</p></li>
+        <li><h3>Audit and SIEM</h3><p>JSON audit and security logs, an optional syslog sink and a Wazuh 4.x rule pack.</p></li>
         <li><h3>Offline reconnect</h3><p>Clients reconnect to peers after a restart while the server is down.</p></li>
-        <li><h3>Updates</h3><p>Releases are signed. The server can cache client updates and update itself.</p></li>
-        <li><h3>Other</h3><p>Podman stack, Pocket ID and Quad4 ID setup, Wazuh rules. No usage reports are sent upstream.</p></li>
+        <li><h3>Updates</h3><p>Releases are signed. The server can cache client updates and update itself with backup and rollback.</p></li>
+        <li><h3>Sandboxing</h3><p>Server and client restrict their own file access with Landlock on Linux.</p></li>
+        <li><h3>Self-hosted</h3><p>One Podman stack with optional Pocket ID and Quad4 ID profiles. Desktop app for Linux, Windows and macOS. No usage reports are sent upstream.</p></li>
       </ul>
     </div>
   </section>
