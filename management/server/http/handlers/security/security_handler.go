@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"os"
 	"path/filepath"
 	"strconv"
 	"time"
@@ -38,9 +37,9 @@ type Options struct {
 	Engine func() *nbsecurity.Engine
 	// LogFile is the security event log path tailed by the events endpoint.
 	LogFile string
-	// ConfigPath is the management config file the mode is persisted into
-	// when no running engine can take it. Empty disables persistence.
-	ConfigPath string
+	// SetMode applies a mode change, starting the engine lazily and
+	// persisting the choice so it survives restarts.
+	SetMode func(mode string) error
 }
 
 type handler struct {
@@ -164,28 +163,18 @@ func (h *handler) updateMode(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	engine := h.opts.Engine()
-	if engine == nil {
-		if err := persistMode(h.opts.ConfigPath, string(mode)); err != nil {
-			util.WriteError(r.Context(), fmt.Errorf("persist security mode: %w", err), w)
-			return
-		}
-		util.WriteJSONObject(r.Context(), w, api.SecurityModeResponse{
-			Mode:    api.SecurityModeResponseMode(mode),
-			Applied: false,
-			Note:    "takes effect after restart",
-		})
+	if h.opts.SetMode == nil {
+		util.WriteError(r.Context(), fmt.Errorf("security mode updates are not configured"), w)
 		return
 	}
-
-	if err := engine.SetMode(mode); err != nil {
-		util.WriteErrorResponse(err.Error(), http.StatusBadRequest, w)
+	if err := h.opts.SetMode(string(mode)); err != nil {
+		util.WriteError(r.Context(), fmt.Errorf("set security mode: %w", err), w)
 		return
 	}
 	util.WriteJSONObject(r.Context(), w, api.SecurityModeResponse{
 		Mode:    api.SecurityModeResponseMode(mode),
 		Applied: true,
-		Note:    "runtime only; update security.mode in the management config file to persist across restarts",
+		Note:    "persisted to security-state.json",
 	})
 }
 
@@ -212,48 +201,6 @@ func optionalString(s string) *string {
 		return nil
 	}
 	return &s
-}
-
-// persistMode sets security.mode in the JSON management config file,
-// preserving every other key. The file is replaced atomically and kept at
-// 0600 like other management state.
-func persistMode(configPath, mode string) error {
-	if configPath == "" {
-		return fmt.Errorf("no management config file configured")
-	}
-	raw, err := os.ReadFile(configPath)
-	if err != nil {
-		return err
-	}
-	var doc map[string]any
-	if err := json.Unmarshal(raw, &doc); err != nil {
-		return fmt.Errorf("parse %s: %w", configPath, err)
-	}
-	// encoding/json matches keys case-insensitively, so deployments may spell
-	// the section "Security". Update whichever spelling the file uses.
-	key := "security"
-	if _, ok := doc["Security"]; ok {
-		key = "Security"
-	}
-	sec, _ := doc[key].(map[string]any)
-	if sec == nil {
-		sec = map[string]any{}
-	}
-	sec["mode"] = mode
-	doc[key] = sec
-	out, err := json.MarshalIndent(doc, "", "  ")
-	if err != nil {
-		return err
-	}
-	tmp := configPath + ".tmp"
-	if err := os.WriteFile(tmp, out, 0o600); err != nil {
-		return err
-	}
-	if err := os.Rename(tmp, configPath); err != nil {
-		os.Remove(tmp)
-		return err
-	}
-	return nil
 }
 
 // LogFileForConfig resolves the event log path the way the engine does:

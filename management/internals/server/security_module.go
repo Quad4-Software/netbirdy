@@ -2,17 +2,19 @@ package server
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"net"
 	"net/netip"
+	"os"
 	"path/filepath"
+	"sync"
 	"time"
 
 	"github.com/gorilla/mux"
 	log "github.com/sirupsen/logrus"
 
-	nbconfig "github.com/netbirdio/netbird/management/internals/server/config"
 	"github.com/netbirdio/netbird/management/server/activity"
 	"github.com/netbirdio/netbird/management/server/geolocation"
 	securityhandlers "github.com/netbirdio/netbird/management/server/http/handlers/security"
@@ -217,37 +219,138 @@ func (a managementActions) emitActionEvent(ctx context.Context, accountID, peerI
 	})
 }
 
-// SecurityEngine is the anomaly-detection singleton; nil when the
-// `security:` config section is absent or mode is off.
+// securityHolder carries the anomaly engine so the dashboard can start it
+// lazily when a mode is enabled at runtime.
+type securityHolder struct {
+	mu          sync.Mutex
+	engine      *security.Engine
+	initialized bool
+}
+
+func (s *BaseServer) securityHolder() *securityHolder {
+	return Create(s, func() *securityHolder { return &securityHolder{} })
+}
+
+// SecurityEngine is the anomaly-detection singleton; nil when no mode is
+// configured and none was enabled at runtime.
 func (s *BaseServer) SecurityEngine() *security.Engine {
-	return Create(s, func() *security.Engine {
-		sc := s.Config.Security
-		if sc == nil || sc.Mode == "" || sc.Mode == string(security.ModeOff) {
-			return nil
+	h := s.securityHolder()
+	h.mu.Lock()
+	defer h.mu.Unlock()
+	if !h.initialized {
+		h.initialized = true
+		h.engine = s.buildSecurityEngine("")
+	}
+	return h.engine
+}
+
+// SetSecurityMode switches the anomaly mode at runtime, building the
+// engine on first enable, and persists the choice to security-state.json
+// in the datadir so it survives restarts without touching the read-only
+// management config file.
+func (s *BaseServer) SetSecurityMode(mode string) error {
+	switch security.Mode(mode) {
+	case security.ModeOff, security.ModeObserve, security.ModePrevent:
+	default:
+		return fmt.Errorf("invalid mode %q", mode)
+	}
+	h := s.securityHolder()
+	h.mu.Lock()
+	defer h.mu.Unlock()
+	if h.engine == nil && mode != string(security.ModeOff) {
+		h.engine = s.buildSecurityEngine(mode)
+		if h.engine == nil {
+			return fmt.Errorf("failed to start the security engine")
 		}
+		h.initialized = true
+	} else if !h.initialized {
+		h.initialized = true
+		h.engine = s.buildSecurityEngine("")
+	}
+	if h.engine != nil {
+		if err := h.engine.SetMode(security.Mode(mode)); err != nil {
+			return err
+		}
+	}
+	return s.writeSecurityState(mode)
+}
+
+func (s *BaseServer) securityStatePath() string {
+	return filepath.Join(s.Config.Datadir, "security-state.json")
+}
+
+func (s *BaseServer) securityStateMode() string {
+	b, err := os.ReadFile(s.securityStatePath())
+	if err != nil {
+		return ""
+	}
+	var st struct {
+		Mode string `json:"mode"`
+	}
+	if err := json.Unmarshal(b, &st); err != nil {
+		return ""
+	}
+	return st.Mode
+}
+
+func (s *BaseServer) writeSecurityState(mode string) error {
+	b, err := json.Marshal(struct {
+		Mode string `json:"mode"`
+	}{Mode: mode})
+	if err != nil {
+		return err
+	}
+	tmp := s.securityStatePath() + ".tmp"
+	if err := os.WriteFile(tmp, b, 0o600); err != nil {
+		return err
+	}
+	return os.Rename(tmp, s.securityStatePath())
+}
+
+// buildSecurityEngine constructs the engine from the config file, the
+// runtime state file and an optional explicit mode. Returns nil when the
+// effective mode is off.
+func (s *BaseServer) buildSecurityEngine(modeOverride string) *security.Engine {
+	sc := s.Config.Security
+	mode := modeOverride
+	if mode == "" {
+		mode = s.securityStateMode()
+	}
+	if mode == "" && sc != nil {
+		mode = sc.Mode
+	}
+	if mode == "" || mode == string(security.ModeOff) {
+		return nil
+	}
+	{
 		cfg := security.DefaultConfig()
-		cfg.Mode = security.Mode(sc.Mode)
-		if sc.LearningPeriod != "" {
-			if d, err := time.ParseDuration(sc.LearningPeriod); err == nil {
-				cfg.LearningPeriod = d
-			}
-		}
-		for _, c := range sc.TrustedCIDRs {
-			if p, err := netip.ParsePrefix(c); err == nil {
-				cfg.TrustedCIDRs = append(cfg.TrustedCIDRs, p)
-			}
-		}
-		for name, rc := range sc.Rules {
-			if r, ok := cfg.Rules[name]; ok {
-				if rc.Enabled != nil {
-					r.Enabled = *rc.Enabled
-				}
-				if rc.Action != "" {
-					r.Action = security.Action(rc.Action)
+		cfg.Mode = security.Mode(mode)
+		if sc != nil {
+			if sc.LearningPeriod != "" {
+				if d, err := time.ParseDuration(sc.LearningPeriod); err == nil {
+					cfg.LearningPeriod = d
 				}
 			}
+			for _, c := range sc.TrustedCIDRs {
+				if p, err := netip.ParsePrefix(c); err == nil {
+					cfg.TrustedCIDRs = append(cfg.TrustedCIDRs, p)
+				}
+			}
+			for name, rc := range sc.Rules {
+				if r, ok := cfg.Rules[name]; ok {
+					if rc.Enabled != nil {
+						r.Enabled = *rc.Enabled
+					}
+					if rc.Action != "" {
+						r.Action = security.Action(rc.Action)
+					}
+				}
+			}
 		}
-		logPath := sc.LogFile
+		logPath := ""
+		if sc != nil {
+			logPath = sc.LogFile
+		}
 		if logPath == "" {
 			logPath = filepath.Join(s.Config.Datadir, "security-events.jsonl")
 		}
@@ -260,7 +363,7 @@ func (s *BaseServer) SecurityEngine() *security.Engine {
 		if fileSink != nil {
 			sinks = append(sinks, fileSink)
 		}
-		if sc.Syslog != nil && sc.Syslog.Enabled {
+		if sc != nil && sc.Syslog != nil && sc.Syslog.Enabled {
 			ss, err := security.NewSyslogSink(security.SyslogConfig{
 				Network: sc.Syslog.Network, Address: sc.Syslog.Address,
 				Facility: sc.Syslog.Facility, CAFile: sc.Syslog.CAFile,
@@ -281,7 +384,10 @@ func (s *BaseServer) SecurityEngine() *security.Engine {
 		if g := s.GeoLocationManager(); g != nil {
 			geo = geoAdapter{geo: g}
 		}
-		auditPath := sc.AuditLogFile
+		auditPath := ""
+		if sc != nil {
+			auditPath = sc.AuditLogFile
+		}
 		e := security.NewEngine(cfg, security.SystemClock{}, geo, sink, managementActions{am: s.AccountManager()})
 		baselinePath := filepath.Join(s.Config.Datadir, "security-baseline.json")
 		if err := e.LoadSnapshot(baselinePath); err != nil {
@@ -291,7 +397,7 @@ func (s *BaseServer) SecurityEngine() *security.Engine {
 		go e.RunSnapshotLoop(baselinePath, 5*time.Minute)
 		log.Infof("security monitoring enabled: mode=%s learning=%s log=%s audit=%s", cfg.Mode, cfg.LearningPeriod, logPath, auditPath)
 		return e
-	})
+	}
 }
 
 // registerSecurityAPI mounts the authenticated admin and owner security
@@ -303,8 +409,8 @@ func (s *BaseServer) registerSecurityAPI(router *mux.Router) {
 		logFile = sc.LogFile
 	}
 	securityhandlers.AddEndpoints(s.AccountManager(), securityhandlers.Options{
-		Engine:     s.SecurityEngine,
-		LogFile:    securityhandlers.LogFileForConfig(logFile, s.Config.Datadir),
-		ConfigPath: nbconfig.MgmtConfigPath,
+		Engine:  s.SecurityEngine,
+		LogFile: securityhandlers.LogFileForConfig(logFile, s.Config.Datadir),
+		SetMode: s.SetSecurityMode,
 	}, router)
 }
