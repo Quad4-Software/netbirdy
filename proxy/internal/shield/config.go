@@ -95,6 +95,12 @@ type Config struct {
 	AllowSearchEngines bool            `yaml:"allow_search_engines"`
 	AICrawlers         AICrawlerPolicy `yaml:"ai_crawlers"`
 
+	// AllowLocal lets loopback, RFC1918, ULA and link-local sources bypass
+	// the shield entirely. Defaults true: clients on the same LAN or a
+	// private range cannot be internet scanners. The overlay CGNAT range
+	// (100.64.0.0/10) is not included; add it to allow_cidrs if needed.
+	AllowLocal *bool `yaml:"allow_local"`
+
 	// Persistence of bans across restarts. Empty disables.
 	StateFile    string `yaml:"state_file"`
 	StateMaxBans int    `yaml:"state_max_bans"`
@@ -188,6 +194,9 @@ func (c *Config) validate() error {
 		}
 		prefixes = append(prefixes, p.Masked())
 	}
+	if c.allowLocal() {
+		prefixes = append(localPrefixes, prefixes...)
+	}
 	c.cidrs = prefixes
 	hosts := map[string]bool{}
 	for _, h := range c.AllowHosts {
@@ -195,6 +204,21 @@ func (c *Config) validate() error {
 	}
 	c.hosts = hosts
 	return nil
+}
+
+var localPrefixes = []netip.Prefix{
+	netip.MustParsePrefix("127.0.0.0/8"),
+	netip.MustParsePrefix("10.0.0.0/8"),
+	netip.MustParsePrefix("172.16.0.0/12"),
+	netip.MustParsePrefix("192.168.0.0/16"),
+	netip.MustParsePrefix("169.254.0.0/16"),
+	netip.MustParsePrefix("::1/128"),
+	netip.MustParsePrefix("fc00::/7"),
+	netip.MustParsePrefix("fe80::/10"),
+}
+
+func (c *Config) allowLocal() bool {
+	return c.AllowLocal == nil || *c.AllowLocal
 }
 
 func (c *Config) allowIP(ip netip.Addr) bool {

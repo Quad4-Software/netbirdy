@@ -36,10 +36,10 @@ func (s *Shield) serveChallenge(w http.ResponseWriter, r *http.Request, ip netip
 		s.handleVerify(w, r, ip)
 		return true
 	}
-	exp := time.Now().Add(s.cfg.ChallengeTTL)
+	exp := time.Now().Add(s.cfg().ChallengeTTL)
 	payload := s.challengePayload(ip, ua, host, exp)
 	sig := s.sign(payload)
-	bits := s.cfg.ChallengeDifficulty
+	bits := s.cfg().ChallengeDifficulty
 	nonce := fmt.Sprintf("%x", sha256.Sum256([]byte(payload+sig)))
 	diff := "0000" // hex prefix target derived from bits
 	// bits -> hex digits of leading zeros
@@ -83,7 +83,7 @@ func (s *Shield) handleVerify(w http.ResponseWriter, r *http.Request, ip netip.A
 	}
 	// verify proof: sha256(nonce:counter) has the required leading zeros
 	counter := r.URL.Query().Get("n")
-	diffBits := s.cfg.ChallengeDifficulty
+	diffBits := s.cfg().ChallengeDifficulty
 	solved := sha256.Sum256([]byte(nonce + ":" + counter))
 	zeros := diffBits / 4
 	if zeros < 1 {
@@ -94,7 +94,7 @@ func (s *Shield) handleVerify(w http.ResponseWriter, r *http.Request, ip netip.A
 		http.Error(w, "bad proof", http.StatusForbidden)
 		return
 	}
-	expC := time.Now().Add(s.cfg.PassCookieTTL)
+	expC := time.Now().Add(s.cfg().PassCookieTTL)
 	mac := s.sign(ip.String() + "|" + ua + "|" + host + "|" + strconv.FormatInt(expC.Unix(), 10) + "|pass")
 	val := base64.RawURLEncoding.EncodeToString([]byte(strconv.FormatInt(expC.Unix(), 10) + "." + mac))
 	c := &http.Cookie{Name: passCookie, Value: val, Path: "/", HttpOnly: true, SameSite: http.SameSiteLaxMode, Secure: r.TLS != nil, Expires: expC}

@@ -37,7 +37,7 @@ type shard struct {
 }
 
 type store struct {
-	cfg           Config
+	cfgPtr        atomic.Pointer[Config]
 	clock         func() time.Time
 	shards        [shards]*shard
 	activeTarpits atomic.Int32
@@ -45,7 +45,8 @@ type store struct {
 }
 
 func newStore(cfg Config, clock func() time.Time) *store {
-	s := &store{cfg: cfg, clock: clock, dirty: make(chan struct{}, 1)}
+	s := &store{clock: clock, dirty: make(chan struct{}, 1)}
+	s.cfgPtr.Store(&cfg)
 	for i := range s.shards {
 		s.shards[i] = &shard{entries: map[netip.Addr]*sourceState{}}
 	}
@@ -59,6 +60,10 @@ func key(ip netip.Addr) netip.Addr {
 	return ip
 }
 
+func (s *store) cfg() *Config {
+	return s.cfgPtr.Load()
+}
+
 func (s *store) get(ip netip.Addr) (*shard, *sourceState) {
 	k := key(ip)
 	sh := s.shards[k.As16()[0]&byte(shards-1)]
@@ -67,7 +72,7 @@ func (s *store) get(ip netip.Addr) (*shard, *sourceState) {
 	st := sh.entries[k]
 	if st == nil {
 		// evict least recently seen non-banned when at cap
-		if len(sh.entries)*shards >= s.cfg.MaxEntries {
+		if len(sh.entries)*shards >= s.cfg().MaxEntries {
 			var oldest netip.Addr
 			var oldT time.Time
 			now := s.clock()
@@ -101,7 +106,7 @@ func (s *store) decay(st *sourceState) {
 	now := s.clock()
 	el := now.Sub(st.lastSeen)
 	if st.score > 0 && el > 0 {
-		half := float64(s.cfg.DecayHalfLife)
+		half := float64(s.cfg().DecayHalfLife)
 		st.score *= pow2(-float64(el) / half)
 	}
 	st.lastSeen = now
@@ -127,14 +132,14 @@ func (s *store) ban(st *sourceState) time.Duration {
 		return st.banUntil.Sub(now)
 	}
 	// quiet period resets the escalation ladder
-	if !st.banUntil.IsZero() && now.Sub(st.banUntil) > s.cfg.BanQuietReset {
+	if !st.banUntil.IsZero() && now.Sub(st.banUntil) > s.cfg().BanQuietReset {
 		st.banCount = 0
 	}
-	ttl := s.cfg.BanBaseTTL
+	ttl := s.cfg().BanBaseTTL
 	for i := 0; i < st.banCount; i++ {
-		ttl *= time.Duration(s.cfg.BanEscalation)
-		if ttl >= s.cfg.BanMaxTTL {
-			ttl = s.cfg.BanMaxTTL
+		ttl *= time.Duration(s.cfg().BanEscalation)
+		if ttl >= s.cfg().BanMaxTTL {
+			ttl = s.cfg().BanMaxTTL
 			break
 		}
 	}
@@ -151,15 +156,15 @@ type banRecord struct {
 }
 
 func (s *store) saveBans() error {
-	if s.cfg.StateFile == "" {
+	if s.cfg().StateFile == "" {
 		return nil
 	}
 	now := s.clock()
-	recs := make([]banRecord, 0, s.cfg.StateMaxBans)
+	recs := make([]banRecord, 0, s.cfg().StateMaxBans)
 	for _, sh := range s.shards {
 		sh.mu.Lock()
 		for a, e := range sh.entries {
-			if e.banUntil.After(now) && len(recs) < s.cfg.StateMaxBans {
+			if e.banUntil.After(now) && len(recs) < s.cfg().StateMaxBans {
 				recs = append(recs, banRecord{IP: a.String(), Until: e.banUntil, Count: e.banCount})
 			}
 		}
@@ -169,18 +174,18 @@ func (s *store) saveBans() error {
 	if err != nil {
 		return err
 	}
-	tmp := s.cfg.StateFile + ".tmp"
+	tmp := s.cfg().StateFile + ".tmp"
 	if err := os.WriteFile(tmp, b, 0o600); err != nil {
 		return err
 	}
-	return os.Rename(tmp, s.cfg.StateFile)
+	return os.Rename(tmp, s.cfg().StateFile)
 }
 
 func (s *store) loadBans() {
-	if s.cfg.StateFile == "" {
+	if s.cfg().StateFile == "" {
 		return
 	}
-	b, err := os.ReadFile(filepath.Clean(s.cfg.StateFile))
+	b, err := os.ReadFile(filepath.Clean(s.cfg().StateFile))
 	if err != nil {
 		return
 	}

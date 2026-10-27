@@ -21,6 +21,7 @@ challenge_ttl: 10m
 pass_cookie_ttl: 1h
 ai_crawlers: deny        # deny | allow | challenge
 allow_search_engines: false
+allow_local: true        # bypass the shield for loopback/private/link-local sources
 allow_cidrs:
   - "10.0.0.0/8"
 allow_hosts: []

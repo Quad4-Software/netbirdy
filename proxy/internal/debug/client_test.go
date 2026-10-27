@@ -102,3 +102,6 @@ type fakeShield struct{}
 func (fakeShield) StatsJSON() ([]byte, error) { return []byte(`{"tracked":1}`), nil }
 func (fakeShield) BansJSON() ([]byte, error)  { return []byte(`[]`), nil }
 func (fakeShield) UnbanIP(ip string) bool     { return ip != "" }
+func (fakeShield) Mode() string               { return "enforce" }
+func (fakeShield) SetMode(mode string) error  { return nil }
+func (fakeShield) Reload() error              { return nil }

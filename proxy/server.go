@@ -466,6 +466,9 @@ func (s *Server) Start(ctx context.Context) error {
 				s.Logger.WithError(derr).Warn("shield log file unavailable")
 			}
 		}
+		if s.ShieldConfigFile != "" {
+			opts = append(opts, shield.WithConfigPath(s.ShieldConfigFile))
+		}
 		opts = append(opts, shield.WithIPResolver(func(r *http.Request) netip.Addr {
 			if cd := proxy.CapturedDataFromContext(r.Context()); cd != nil {
 				return cd.GetClientIP()

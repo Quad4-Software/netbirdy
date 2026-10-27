@@ -152,6 +152,9 @@ type shieldReporter interface {
 	StatsJSON() ([]byte, error)
 	BansJSON() ([]byte, error)
 	UnbanIP(ip string) bool
+	Mode() string
+	SetMode(mode string) error
+	Reload() error
 }
 
 var shieldProvider shieldReporter
@@ -210,6 +213,15 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		h.handleShield(w, r, "unban")
+	case "/debug/shield/mode":
+		h.handleShield(w, r, "mode")
+	case "/debug/shield/reload":
+		if r.Method != http.MethodPost {
+			w.Header().Set("Allow", http.MethodPost)
+			http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+			return
+		}
+		h.handleShield(w, r, "reload")
 	default:
 		if h.handleClientRoutes(w, r, path, wantJSON) {
 			return
@@ -297,6 +309,21 @@ func (h *Handler) handleShield(w http.ResponseWriter, r *http.Request, kind stri
 		ip := r.URL.Query().Get("ip")
 		if ip == "" || !shieldProvider.UnbanIP(ip) {
 			http.Error(w, "not banned", http.StatusNotFound)
+			return
+		}
+		_, _ = w.Write([]byte(`{"ok":true}`))
+	case "mode":
+		if r.Method == http.MethodPost {
+			mode := r.URL.Query().Get("mode")
+			if err := shieldProvider.SetMode(mode); err != nil {
+				http.Error(w, err.Error(), http.StatusBadRequest)
+				return
+			}
+		}
+		fmt.Fprintf(w, `{"mode":%q}`, shieldProvider.Mode())
+	case "reload":
+		if err := shieldProvider.Reload(); err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
 		_, _ = w.Write([]byte(`{"ok":true}`))

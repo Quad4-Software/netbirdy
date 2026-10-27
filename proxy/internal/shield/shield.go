@@ -85,7 +85,7 @@ func WithLogger(l *log.Entry) Option {
 	return func(s *Shield) { s.log = l }
 }
 func WithClock(c func() time.Time) Option {
-	return func(s *Shield) { s.store = newStore(s.cfg, c) }
+	return func(s *Shield) { s.store = newStore(*s.cfg(), c) }
 }
 
 // VerifyPeer is an optional DNS resolver for claimed search engines.
@@ -96,6 +96,12 @@ type SearchVerifier interface {
 
 func WithSearchVerifier(v SearchVerifier) Option {
 	return func(s *Shield) { s.verifier = v }
+}
+
+// WithConfigPath records the YAML file the config came from so Reload can
+// re-read it later.
+func WithConfigPath(path string) Option {
+	return func(s *Shield) { s.cfgPath = path }
 }
 
 type ctxKey struct{}
@@ -119,7 +125,8 @@ func ResultFromContext(ctx context.Context) Result {
 
 // Shield is the defense engine.
 type Shield struct {
-	cfg         Config
+	cfgPtr      atomic.Pointer[Config]
+	cfgPath     string
 	store       *store
 	ipResolver  func(*http.Request) netip.Addr
 	knownHost   func(string) bool
@@ -144,9 +151,10 @@ func New(cfg Config, opts ...Option) (*Shield, error) {
 		// hex or raw
 	}
 	s := &Shield{
-		cfg: cfg, log: log.NewEntry(log.StandardLogger()),
+		log:    log.NewEntry(log.StandardLogger()),
 		stopCh: make(chan struct{}), closed: make(chan struct{}),
 	}
+	s.cfgPtr.Store(&cfg)
 	s.store = newStore(cfg, time.Now)
 	if cfg.HMACKey != "" {
 		if b, err := hex.DecodeString(cfg.HMACKey); err == nil && len(b) >= 16 {
@@ -193,7 +201,7 @@ func (s *Shield) Close() {
 
 // Observe injects an out-of-band signal for a source.
 func (s *Shield) Observe(ip netip.Addr, ev Event) {
-	if !ip.IsValid() || s.cfg.Mode == ModeOff || s.cfg.allowIP(ip) {
+	if !ip.IsValid() || s.cfg().Mode == ModeOff || s.cfg().allowIP(ip) {
 		return
 	}
 	_, st := s.store.get(ip)
@@ -202,9 +210,9 @@ func (s *Shield) Observe(ip netip.Addr, ev Event) {
 	var reason string
 	switch ev.Kind {
 	case EventSNIMissing, EventSNIIsIP, EventSNIUnknown:
-		w, reason = s.cfg.WeightTLS, ev.Detail
+		w, reason = s.cfg().WeightTLS, ev.Detail
 	case EventAuthFailure:
-		w, reason = s.cfg.WeightAuthFailure, "auth-failure"
+		w, reason = s.cfg().WeightAuthFailure, "auth-failure"
 	}
 	st.score += w
 	s.maybeBan(st, reason)
@@ -257,7 +265,7 @@ func (s *Shield) Unban(ip netip.Addr) bool {
 }
 
 func (s *Shield) maybeBan(st *sourceState, reason string) {
-	if st.score >= s.cfg.BanAt {
+	if st.score >= s.cfg().BanAt {
 		sh := s.store.shards[st.key.As16()[0]&byte(shards-1)]
 		sh.mu.Lock()
 		ttl := s.store.ban(st)
@@ -266,10 +274,64 @@ func (s *Shield) maybeBan(st *sourceState, reason string) {
 	}
 }
 
+// cfg returns the active configuration. The pointer is swapped atomically
+// by Reload and SetMode, so reads stay race-free without locking.
+func (s *Shield) cfg() *Config {
+	return s.cfgPtr.Load()
+}
+
+// Mode reports the current shield mode.
+func (s *Shield) Mode() string {
+	return string(s.cfg().Mode)
+}
+
+// SetMode switches the shield mode at runtime without touching other
+// settings. Changes take effect on the next request.
+func (s *Shield) SetMode(mode string) error {
+	m := Mode(mode)
+	switch m {
+	case ModeOff, ModeObserve, ModeEnforce:
+	default:
+		return fmt.Errorf("unknown shield mode %q", mode)
+	}
+	for {
+		old := s.cfg()
+		next := *old
+		next.Mode = m
+		if s.cfgPtr.CompareAndSwap(old, &next) {
+			s.store.cfgPtr.Store(&next)
+			s.log.Infof("shield: mode %s -> %s", old.Mode, m)
+			return nil
+		}
+	}
+}
+
+// Reload re-reads the YAML config the shield was built from and applies it
+// live. Returns an error when no config file was supplied at startup or the
+// new file fails validation; in both cases the running config is unchanged.
+func (s *Shield) Reload() error {
+	if s.cfgPath == "" {
+		return fmt.Errorf("shield was not built from a config file")
+	}
+	cfg, err := LoadConfig(s.cfgPath)
+	if err != nil {
+		return err
+	}
+	s.cfgPtr.Store(&cfg)
+	s.store.cfgPtr.Store(&cfg)
+	s.log.Infof("shield: reloaded config from %s", s.cfgPath)
+	return nil
+}
+
+// ConfigPath reports the file Reload reads, empty when none was given.
+func (s *Shield) ConfigPath() string {
+	return s.cfgPath
+}
+
 // Wrap wraps the request path. Fail-open on panic.
 func (s *Shield) Wrap(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if s.cfg.Mode == ModeOff {
+		if s.cfg().Mode == ModeOff {
 			next.ServeHTTP(w, r)
 			return
 		}
@@ -316,7 +378,7 @@ func (s *Shield) serve(w http.ResponseWriter, r *http.Request, next http.Handler
 		return
 	}
 	host := hostOnly(r.Host)
-	if s.cfg.allowIP(ip) || s.cfg.hosts[host] {
+	if s.cfg().allowIP(ip) || s.cfg().hosts[host] {
 		next.ServeHTTP(w, r)
 		return
 	}
@@ -342,13 +404,13 @@ func (s *Shield) serve(w http.ResponseWriter, r *http.Request, next http.Handler
 	}
 	sh.mu.Lock()
 	if st.limiter == nil {
-		st.limiter = &rateBucket{tokens: float64(s.cfg.RateBurst), last: now}
+		st.limiter = &rateBucket{tokens: float64(s.cfg().RateBurst), last: now}
 	}
 	overRate := false
 	el := now.Sub(st.limiter.last).Seconds()
-	st.limiter.tokens += el * s.cfg.RatePerSecond
-	if st.limiter.tokens > float64(s.cfg.RateBurst) {
-		st.limiter.tokens = float64(s.cfg.RateBurst)
+	st.limiter.tokens += el * s.cfg().RatePerSecond
+	if st.limiter.tokens > float64(s.cfg().RateBurst) {
+		st.limiter.tokens = float64(s.cfg().RateBurst)
 	}
 	st.limiter.last = now
 	if st.limiter.tokens < 1 {
@@ -359,12 +421,12 @@ func (s *Shield) serve(w http.ResponseWriter, r *http.Request, next http.Handler
 	p := r.URL.Path
 	st.paths[p] = now
 	enum := false
-	if len(st.paths) > s.cfg.EnumThreshold {
+	if len(st.paths) > s.cfg().EnumThreshold {
 		enum = true
 		st.paths = map[string]time.Time{p: now}
 	} else if st.enumPrune.Before(now.Add(-time.Minute)) {
 		for k, t := range st.paths {
-			if t.Before(now.Add(-s.cfg.EnumWindow * 2)) {
+			if t.Before(now.Add(-s.cfg().EnumWindow * 2)) {
 				delete(st.paths, k)
 			}
 		}
@@ -383,41 +445,41 @@ func (s *Shield) serve(w http.ResponseWriter, r *http.Request, next http.Handler
 		}
 	}
 	if !known || isIPLiteralHost(r.Host) {
-		addSig(s.cfg.WeightUnknownHost, "unknown-host")
+		addSig(s.cfg().WeightUnknownHost, "unknown-host")
 	}
 	switch class {
 	case "scanner":
-		addSig(s.cfg.WeightScannerUA, "scanner-ua")
+		addSig(s.cfg().WeightScannerUA, "scanner-ua")
 	case "research-scanner":
-		addSig(s.cfg.WeightResearchUA, "research-ua")
+		addSig(s.cfg().WeightResearchUA, "research-ua")
 	case "empty":
-		addSig(s.cfg.WeightEmptyUA, "empty-ua")
+		addSig(s.cfg().WeightEmptyUA, "empty-ua")
 	case "fake-ua":
-		addSig(s.cfg.WeightFakeBrowserUA, "fake-ua")
+		addSig(s.cfg().WeightFakeBrowserUA, "fake-ua")
 	case "search":
-		if !s.cfg.AllowSearchEngines {
+		if !s.cfg().AllowSearchEngines {
 			addSig(0, "search-blocked")
 		} else if s.verifier != nil && !s.verifier.Verify(r.Context(), ip, ua) {
-			addSig(s.cfg.WeightFakeSearchBot, "fake-search-bot")
+			addSig(s.cfg().WeightFakeSearchBot, "fake-search-bot")
 		}
 	}
-	if ai && s.cfg.AICrawlers == AIChallenge {
-		addSig(s.cfg.ChallengeAt, "ai-crawler")
+	if ai && s.cfg().AICrawlers == AIChallenge {
+		addSig(s.cfg().ChallengeAt, "ai-crawler")
 	}
 	if browser && browserLikeMissingHeaders(r) {
-		addSig(s.cfg.WeightFakeBrowserUA/4, "browser-inconsistent")
+		addSig(s.cfg().WeightFakeBrowserUA/4, "browser-inconsistent")
 	}
 	if r.Method == http.MethodTrace || r.Method == http.MethodConnect ||
 		r.ProtoMajor < 1 || len(r.Header) > 64 ||
 		reJNDI.MatchString(r.URL.RawPath+r.URL.RawQuery+ua) ||
 		reShellMeta.MatchString(r.URL.RawQuery) {
-		addSig(s.cfg.WeightOddRequest, "odd-request")
+		addSig(s.cfg().WeightOddRequest, "odd-request")
 	}
 	if overRate {
-		addSig(s.cfg.WeightRate, "rate-limit")
+		addSig(s.cfg().WeightRate, "rate-limit")
 	}
 	if enum {
-		addSig(s.cfg.WeightEnumeration, "enumeration")
+		addSig(s.cfg().WeightEnumeration, "enumeration")
 	}
 	s.store.decay(st)
 	for k := 0; k < sigN; k++ {
@@ -427,20 +489,20 @@ func (s *Shield) serve(w http.ResponseWriter, r *http.Request, next http.Handler
 		}
 	}
 	score := st.score
-	banNow := score >= s.cfg.BanAt
-	if banNow && s.cfg.Mode == ModeEnforce {
+	banNow := score >= s.cfg().BanAt
+	if banNow && s.cfg().Mode == ModeEnforce {
 		s.store.ban(st)
 	}
 	sh.mu.Unlock()
 	res.Score = score
 
 	// hard AI deny does not depend on score
-	if ai && s.cfg.AICrawlers == AIDeny {
+	if ai && s.cfg().AICrawlers == AIDeny {
 		res.Action = ActionBlock
 		res.Reasons = append(res.Reasons, "ai-crawler")
 		install()
 		s.emit(r, res)
-		if s.cfg.Mode == ModeEnforce {
+		if s.cfg().Mode == ModeEnforce {
 			s.block(w, r)
 			return
 		}
@@ -450,7 +512,7 @@ func (s *Shield) serve(w http.ResponseWriter, r *http.Request, next http.Handler
 		res.Reasons = append(res.Reasons, "rate-limit")
 		install()
 		s.emit(r, res)
-		if s.cfg.Mode == ModeEnforce {
+		if s.cfg().Mode == ModeEnforce {
 			w.Header().Set("Retry-After", "5")
 			http.Error(w, "rate limited", http.StatusTooManyRequests)
 			return
@@ -460,27 +522,27 @@ func (s *Shield) serve(w http.ResponseWriter, r *http.Request, next http.Handler
 		res.Action = ActionBlock
 		install()
 		s.emit(r, res)
-		if s.cfg.Mode == ModeEnforce {
+		if s.cfg().Mode == ModeEnforce {
 			s.block(w, r)
 			return
 		}
 	}
-	if score >= s.cfg.TarpitAt {
+	if score >= s.cfg().TarpitAt {
 		res.Action = ActionTarpit
 		install()
 		s.emit(r, res)
-		if s.cfg.Mode == ModeEnforce {
+		if s.cfg().Mode == ModeEnforce {
 			if !s.tarpit(w, r) {
 				s.block(w, r)
 			}
 			return
 		}
 	}
-	if score >= s.cfg.ChallengeAt && s.canChallenge(r, browser) {
+	if score >= s.cfg().ChallengeAt && s.canChallenge(r, browser) {
 		res.Action = ActionChallenge
 		install()
 		s.emit(r, res)
-		if s.cfg.Mode == ModeEnforce {
+		if s.cfg().Mode == ModeEnforce {
 			if s.serveChallenge(w, r, ip) {
 				return
 			}
@@ -507,7 +569,7 @@ func (s *Shield) serve(w http.ResponseWriter, r *http.Request, next http.Handler
 	sh.mu.Lock()
 	if code == 404 || code == 403 || code == 400 || code == 405 {
 		st.probes = append(st.probes, now)
-		pcut := now.Add(-s.cfg.ProbeWindow)
+		pcut := now.Add(-s.cfg().ProbeWindow)
 		pk := st.probes[:0]
 		for _, t := range st.probes {
 			if t.After(pcut) {
@@ -515,18 +577,18 @@ func (s *Shield) serve(w http.ResponseWriter, r *http.Request, next http.Handler
 			}
 		}
 		st.probes = pk
-		if len(st.probes) > s.cfg.ProbeThreshold*4 {
-			st.probes = st.probes[len(st.probes)-s.cfg.ProbeThreshold*2:]
+		if len(st.probes) > s.cfg().ProbeThreshold*4 {
+			st.probes = st.probes[len(st.probes)-s.cfg().ProbeThreshold*2:]
 		}
-		if len(st.probes) >= s.cfg.ProbeThreshold && postN < len(post) {
-			post[postN] = signal{s.cfg.WeightProbeRate, "probe-rate"}
+		if len(st.probes) >= s.cfg().ProbeThreshold && postN < len(post) {
+			post[postN] = signal{s.cfg().WeightProbeRate, "probe-rate"}
 			postN++
 		}
 	}
-	if isHoneypotPath(r.URL.Path, s.cfg.ExtraHoneypots, s.cfg.RemoveHoneypots) &&
+	if isHoneypotPath(r.URL.Path, s.cfg().ExtraHoneypots, s.cfg().RemoveHoneypots) &&
 		(!known || code == 404 || code == 403 || code == 400 || code == 405) &&
 		postN < len(post) {
-		post[postN] = signal{s.cfg.WeightHoneypot, "honeypot"}
+		post[postN] = signal{s.cfg().WeightHoneypot, "honeypot"}
 		postN++
 	}
 	if postN > 0 {
@@ -538,7 +600,7 @@ func (s *Shield) serve(w http.ResponseWriter, r *http.Request, next http.Handler
 		res.Score = st.score
 		banReason := post[postN-1].reason
 		var ttl time.Duration
-		if st.score >= s.cfg.BanAt && s.cfg.Mode == ModeEnforce {
+		if st.score >= s.cfg().BanAt && s.cfg().Mode == ModeEnforce {
 			ttl = s.store.ban(st)
 		}
 		sh.mu.Unlock()
@@ -632,10 +694,10 @@ func (s *Shield) canChallenge(r *http.Request, browserUA bool) bool {
 func (s *Shield) tarpit(w http.ResponseWriter, r *http.Request) bool {
 	n := s.store.activeTarpits.Add(1)
 	defer s.store.activeTarpits.Add(-1)
-	if n > int32(s.cfg.MaxTarpits) {
+	if n > int32(s.cfg().MaxTarpits) {
 		return false
 	}
-	t := time.NewTimer(s.cfg.TarpitDelay)
+	t := time.NewTimer(s.cfg().TarpitDelay)
 	defer t.Stop()
 	select {
 	case <-r.Context().Done():
@@ -650,7 +712,7 @@ func (s *Shield) tarpit(w http.ResponseWriter, r *http.Request) bool {
 }
 
 func (s *Shield) block(w http.ResponseWriter, r *http.Request) {
-	if s.cfg.DropOnHoneypot && r.ProtoMajor == 1 {
+	if s.cfg().DropOnHoneypot && r.ProtoMajor == 1 {
 		if hj, ok := w.(http.Hijacker); ok {
 			c, _, err := hj.Hijack()
 			if err == nil {

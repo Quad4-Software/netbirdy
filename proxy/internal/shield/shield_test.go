@@ -80,7 +80,7 @@ func TestHoneypotServedByServiceIsNotPunished(t *testing.T) {
 	rec := httptest.NewRecorder()
 	sh.Wrap(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {})).ServeHTTP(rec, req("/.env", browserUA))
 	_, st := sh.store.get(testIP)
-	if st.score >= sh.cfg.BanAt {
+	if st.score >= sh.cfg().BanAt {
 		t.Fatalf("score %v reached ban threshold", st.score)
 	}
 }
@@ -121,7 +121,7 @@ func TestSpoofedGooglebot(t *testing.T) {
 	rec := httptest.NewRecorder()
 	sh.Wrap(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {})).ServeHTTP(rec, req("/", "Googlebot/2.1"))
 	_, st := sh.store.get(testIP)
-	if st.score < sh.cfg.WeightFakeSearchBot {
+	if st.score < sh.cfg().WeightFakeSearchBot {
 		t.Fatalf("fake googlebot not scored: %v", st.score)
 	}
 }
