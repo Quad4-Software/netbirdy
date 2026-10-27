@@ -1519,9 +1519,13 @@ func (s *Server) handleSyncMappingsStream(ctx context.Context, stream proto.Prox
 			}
 			s.Logger.Debug("Processing mapping update completed")
 			tracker.recordBatch(ctx, s, msg.GetMapping(), msg.GetInitialSyncComplete(), batchStart)
+			s.applyShieldConfig(msg.GetShieldConfig())
+			s.applyShieldCommands(msg.GetShieldCommands())
 
 			if err := stream.Send(&proto.SyncMappingsRequest{
-				Msg: &proto.SyncMappingsRequest_Ack{Ack: &proto.SyncMappingsAck{}},
+				Msg: &proto.SyncMappingsRequest_Ack{Ack: &proto.SyncMappingsAck{
+					ShieldStatus: s.shieldStatusProto(),
+				}},
 			}); err != nil {
 				return fmt.Errorf("send ack: %w", err)
 			}
@@ -1605,6 +1609,7 @@ func (s *Server) handleMappingStream(ctx context.Context, mappingClient proto.Pr
 			}
 			s.Logger.Debug("Processing mapping update completed")
 			tracker.recordBatch(ctx, s, msg.GetMapping(), msg.GetInitialSyncComplete(), batchStart)
+			s.applyShieldConfig(msg.GetShieldConfig())
 		}
 	}
 }

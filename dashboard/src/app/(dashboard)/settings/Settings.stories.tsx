@@ -53,6 +53,42 @@ export const Networks = shows("networks", "Networks");
 export const Clients = shows("clients", "Clients");
 export const Metrics = shows("metrics", "Metrics");
 export const Backups = shows("backups", "Backups");
+export const Security = shows("security", "Security");
+
+export const SecurityOff: Story = {
+  parameters: {
+    ...tab("security"),
+    api: {
+      "GET /security/status": {
+        mode: "off",
+        learning_period: "168h",
+        rules: [],
+        findings_total: 0,
+        findings_by_rule: {},
+      },
+      "GET /security/events": { events: [] },
+    },
+  },
+  play: async () => {
+    await text("Security");
+    await text(/The security engine is off/);
+  },
+};
+
+export const SecurityUnavailable: Story = {
+  parameters: {
+    ...tab("security"),
+    api: {
+      "GET /security/status": () => {
+        throw new Error("not found");
+      },
+    },
+  },
+  play: async () => {
+    await text("Security");
+    await text(/security status could not be loaded/);
+  },
+};
 
 export const BackupsEmpty: Story = {
   parameters: {

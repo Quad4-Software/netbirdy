@@ -9,13 +9,17 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/gorilla/mux"
+	log "github.com/sirupsen/logrus"
+
+	nbconfig "github.com/netbirdio/netbird/management/internals/server/config"
 	"github.com/netbirdio/netbird/management/server/activity"
 	"github.com/netbirdio/netbird/management/server/geolocation"
+	securityhandlers "github.com/netbirdio/netbird/management/server/http/handlers/security"
 	nbpeer "github.com/netbirdio/netbird/management/server/peer"
 	"github.com/netbirdio/netbird/management/server/security"
 	"github.com/netbirdio/netbird/management/server/store"
 	"github.com/netbirdio/netbird/management/server/types"
-	log "github.com/sirupsen/logrus"
 )
 
 // geoAdapter feeds the engine the geolite country when a DB is loaded.
@@ -288,4 +292,19 @@ func (s *BaseServer) SecurityEngine() *security.Engine {
 		log.Infof("security monitoring enabled: mode=%s learning=%s log=%s audit=%s", cfg.Mode, cfg.LearningPeriod, logPath, auditPath)
 		return e
 	})
+}
+
+// registerSecurityAPI mounts the authenticated admin and owner security
+// endpoints. The engine getter stays lazy so a nil engine (mode off) still
+// serves status and events.
+func (s *BaseServer) registerSecurityAPI(router *mux.Router) {
+	var logFile string
+	if sc := s.Config.Security; sc != nil {
+		logFile = sc.LogFile
+	}
+	securityhandlers.AddEndpoints(s.AccountManager(), securityhandlers.Options{
+		Engine:     s.SecurityEngine,
+		LogFile:    securityhandlers.LogFileForConfig(logFile, s.Config.Datadir),
+		ConfigPath: nbconfig.MgmtConfigPath,
+	}, router)
 }

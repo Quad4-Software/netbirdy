@@ -156,6 +156,10 @@ type ProxyServiceServer struct {
 	// Defaults to defaultSnapshotAckTimeout when zero.
 	snapshotAckTimeout time.Duration
 
+	// shield tracks the management-controlled shield config, queued shield
+	// commands and the per-proxy status cache.
+	shield shieldControl
+
 	cancel context.CancelFunc
 }
 
@@ -505,7 +509,7 @@ func (s *ProxyServiceServer) SyncMappings(stream proto.ProxyService_SyncMappings
 
 	errChan := make(chan error, 2)
 	go s.sender(conn, errChan)
-	go s.drainRecv(stream, errChan)
+	go s.drainRecv(conn, stream, errChan)
 
 	return s.serveProxyConnection(conn, proxyRecord, errChan, true)
 }
@@ -646,15 +650,17 @@ func (s *ProxyServiceServer) cleanupFailedSnapshot(ctx context.Context, conn *pr
 	}
 }
 
-// drainRecv consumes and discards messages from a bidirectional stream.
-// The proxy sends an ack for every incremental update; we don't need them
-// after the snapshot phase. Recv errors are forwarded to errChan.
-func (s *ProxyServiceServer) drainRecv(stream proto.ProxyService_SyncMappingsServer, errChan chan<- error) {
+// drainRecv consumes post-snapshot messages from a bidirectional stream.
+// The proxy sends an ack after every incremental update, optionally
+// carrying its shield status. Recv errors are forwarded to errChan.
+func (s *ProxyServiceServer) drainRecv(conn *proxyConnection, stream proto.ProxyService_SyncMappingsServer, errChan chan<- error) {
 	for {
-		if _, err := stream.Recv(); err != nil {
+		msg, err := stream.Recv()
+		if err != nil {
 			errChan <- err
 			return
 		}
+		s.recordShieldStatus(conn.proxyID, msg.GetAck().GetShieldStatus())
 	}
 }
 
@@ -738,11 +744,13 @@ func (s *ProxyServiceServer) sendSnapshotSync(ctx context.Context, conn *proxyCo
 		if err := stream.Send(&proto.SyncMappingsResponse{
 			Mapping:             mappings[i:end],
 			InitialSyncComplete: end == len(mappings),
+			ShieldConfig:        s.shieldProto(),
+			ShieldCommands:      s.drainShieldCommands(conn.proxyID),
 		}); err != nil {
 			return fmt.Errorf("send snapshot batch: %w", err)
 		}
 
-		if err := waitForAck(ctx, stream, s.snapshotAckWait()); err != nil {
+		if err := s.waitForAck(ctx, conn, stream, s.snapshotAckWait()); err != nil {
 			return err
 		}
 	}
@@ -750,11 +758,13 @@ func (s *ProxyServiceServer) sendSnapshotSync(ctx context.Context, conn *proxyCo
 	if len(mappings) == 0 {
 		if err := stream.Send(&proto.SyncMappingsResponse{
 			InitialSyncComplete: true,
+			ShieldConfig:        s.shieldProto(),
+			ShieldCommands:      s.drainShieldCommands(conn.proxyID),
 		}); err != nil {
 			return fmt.Errorf("send snapshot completion: %w", err)
 		}
 
-		if err := waitForAck(ctx, stream, s.snapshotAckWait()); err != nil {
+		if err := s.waitForAck(ctx, conn, stream, s.snapshotAckWait()); err != nil {
 			return err
 		}
 	}
@@ -765,7 +775,8 @@ func (s *ProxyServiceServer) sendSnapshotSync(ctx context.Context, conn *proxyCo
 // waitForAck waits for the proxy to ack a snapshot batch. It gives up when ctx
 // is canceled or no ack arrives within timeout, since a proxy that abandoned the
 // stream without closing it would otherwise block the handler indefinitely.
-func waitForAck(ctx context.Context, stream proto.ProxyService_SyncMappingsServer, timeout time.Duration) error {
+// A shield status attached to the ack is recorded on the connection's proxy.
+func (s *ProxyServiceServer) waitForAck(ctx context.Context, conn *proxyConnection, stream proto.ProxyService_SyncMappingsServer, timeout time.Duration) error {
 	type recvResult struct {
 		msg *proto.SyncMappingsRequest
 		err error
@@ -788,6 +799,7 @@ func waitForAck(ctx context.Context, stream proto.ProxyService_SyncMappingsServe
 		if r.msg.GetAck() == nil {
 			return fmt.Errorf("expected ack, got %T", r.msg.GetMsg())
 		}
+		s.recordShieldStatus(conn.proxyID, r.msg.GetAck().GetShieldStatus())
 		return nil
 	case <-ctx.Done():
 		return fmt.Errorf("wait for ack: %w", ctx.Err())
@@ -858,6 +870,7 @@ func (s *ProxyServiceServer) sendSnapshot(ctx context.Context, conn *proxyConnec
 		if err := conn.stream.Send(&proto.GetMappingUpdateResponse{
 			Mapping:             mappings[i:end],
 			InitialSyncComplete: end == len(mappings),
+			ShieldConfig:        s.shieldProto(),
 		}); err != nil {
 			return fmt.Errorf("send snapshot batch: %w", err)
 		}
@@ -866,6 +879,7 @@ func (s *ProxyServiceServer) sendSnapshot(ctx context.Context, conn *proxyConnec
 	if len(mappings) == 0 {
 		if err := conn.stream.Send(&proto.GetMappingUpdateResponse{
 			InitialSyncComplete: true,
+			ShieldConfig:        s.shieldProto(),
 		}); err != nil {
 			return fmt.Errorf("send snapshot completion: %w", err)
 		}
@@ -961,7 +975,7 @@ func (s *ProxyServiceServer) sender(conn *proxyConnection, errChan chan<- error)
 	for {
 		select {
 		case resp := <-conn.sendChan:
-			if err := conn.sendResponse(resp); err != nil {
+			if err := s.sendResponse(conn, resp); err != nil {
 				errChan <- err
 				log.WithContext(conn.ctx).Tracef("Failed to send response to proxy %s: %v", conn.proxyID, err)
 				return
@@ -973,15 +987,25 @@ func (s *ProxyServiceServer) sender(conn *proxyConnection, errChan chan<- error)
 	}
 }
 
-// sendResponse sends a mapping update on whichever stream the proxy connected with.
-func (conn *proxyConnection) sendResponse(resp *proto.GetMappingUpdateResponse) error {
+// sendResponse sends a mapping update on whichever stream the proxy connected
+// with, attaching the managed shield config and any queued shield commands.
+// Runs on the sender goroutine only, which owns the stream's Send side.
+func (s *ProxyServiceServer) sendResponse(conn *proxyConnection, resp *proto.GetMappingUpdateResponse) error {
 	if conn.syncStream != nil {
 		return conn.syncStream.Send(&proto.SyncMappingsResponse{
 			Mapping:             resp.Mapping,
 			InitialSyncComplete: resp.InitialSyncComplete,
+			ShieldConfig:        s.shieldProto(),
+			ShieldCommands:      s.drainShieldCommands(conn.proxyID),
 		})
 	}
-	return conn.stream.Send(resp)
+	// Build a fresh message instead of mutating resp: callers may share the
+	// same response across connections.
+	return conn.stream.Send(&proto.GetMappingUpdateResponse{
+		Mapping:             resp.Mapping,
+		InitialSyncComplete: resp.InitialSyncComplete,
+		ShieldConfig:        s.shieldProto(),
+	})
 }
 
 // SendAccessLog processes access log from proxy

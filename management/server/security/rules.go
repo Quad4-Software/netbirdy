@@ -68,9 +68,9 @@ func (e *Engine) peerNewIP(obs PeerObservation, b *peerBaseline, now time.Time) 
 
 func (e *Engine) peerIPFlap(obs PeerObservation, now time.Time) (score int, reason string) {
 	key := obs.AccountID + "/" + obs.PeerID
-	n := e.ipFlapCounts.add(key, obs.SrcIP.String(), now, e.cfg.FlapWindow, e.cfg.MaxAuthKeys)
-	if n > e.cfg.FlapThreshold {
-		return 70, fmt.Sprintf("%d distinct IPs in %s", n, e.cfg.FlapWindow)
+	n := e.ipFlapCounts.add(key, obs.SrcIP.String(), now, e.cfg().FlapWindow, e.cfg().MaxAuthKeys)
+	if n > e.cfg().FlapThreshold {
+		return 70, fmt.Sprintf("%d distinct IPs in %s", n, e.cfg().FlapWindow)
 	}
 	return 0, ""
 }
@@ -112,7 +112,7 @@ func (e *Engine) concurrentConnection(key, srcIP string, now time.Time) (score i
 		return 0, "", ""
 	}
 	for ip, opened := range ips {
-		if ip != srcIP && now.Sub(opened) > e.cfg.ConcurrentGracePeriod {
+		if ip != srcIP && now.Sub(opened) > e.cfg().ConcurrentGracePeriod {
 			return 85, fmt.Sprintf("same peer key live from %s and %s", ip, srcIP), ip
 		}
 	}
@@ -121,15 +121,15 @@ func (e *Engine) concurrentConnection(key, srcIP string, now time.Time) (score i
 
 func (e *Engine) authFailureBurst(f AuthFailure, now time.Time) (score int, reason string) {
 	key := string(f.Kind) + "/" + f.SourceIP.String()
-	n := e.failCounts.hit(key, now, e.cfg.AuthFailWindow, e.cfg.MaxAuthKeys)
-	if n > e.cfg.AuthFailThreshold {
-		return 70, fmt.Sprintf("%d failures from %s in %s", n, f.SourceIP, e.cfg.AuthFailWindow)
+	n := e.failCounts.hit(key, now, e.cfg().AuthFailWindow, e.cfg().MaxAuthKeys)
+	if n > e.cfg().AuthFailThreshold {
+		return 70, fmt.Sprintf("%d failures from %s in %s", n, f.SourceIP, e.cfg().AuthFailWindow)
 	}
 	// per-subject too (credential stuffing against one identity)
 	if f.Subject != "" {
 		subj := string(f.Kind) + "/subj/" + f.Subject
-		if e.failCounts.hit(subj, now, e.cfg.AuthFailWindow, e.cfg.MaxAuthKeys) > e.cfg.AuthFailThreshold {
-			return 75, fmt.Sprintf("%d failures against %s in %s", n, f.Subject, e.cfg.AuthFailWindow)
+		if e.failCounts.hit(subj, now, e.cfg().AuthFailWindow, e.cfg().MaxAuthKeys) > e.cfg().AuthFailThreshold {
+			return 75, fmt.Sprintf("%d failures against %s in %s", n, f.Subject, e.cfg().AuthFailWindow)
 		}
 	}
 	return 0, ""
@@ -140,20 +140,20 @@ func (e *Engine) authSuccessAfterFailures(s AuthSuccess, now time.Time) (score i
 		return 0, ""
 	}
 	subj := string(s.Kind) + "/subj/" + s.Subject
-	if e.failCounts.count(subj, now, e.cfg.AuthFailWindow) >= e.cfg.AuthSuccessAfterFails {
+	if e.failCounts.count(subj, now, e.cfg().AuthFailWindow) >= e.cfg().AuthSuccessAfterFails {
 		return 55, "successful auth after a failure burst"
 	}
 	return 0, ""
 }
 
 func (e *Engine) setupKeyMisuse(o SetupKeyObservation, now time.Time) (score int, reason string) {
-	ips := e.setupKeyIPs.add(o.KeyID, o.SourceIP.String(), now, e.cfg.SetupKeyIPWindow, e.cfg.MaxAuthKeys)
-	regs := e.setupKeyRegs.hit(o.KeyID, now, e.cfg.SetupKeyRegWindow, e.cfg.MaxAuthKeys)
-	if regs > e.cfg.SetupKeyRegThreshold {
-		return 75, fmt.Sprintf("%d registrations via setup key in %s", regs, e.cfg.SetupKeyRegWindow)
+	ips := e.setupKeyIPs.add(o.KeyID, o.SourceIP.String(), now, e.cfg().SetupKeyIPWindow, e.cfg().MaxAuthKeys)
+	regs := e.setupKeyRegs.hit(o.KeyID, now, e.cfg().SetupKeyRegWindow, e.cfg().MaxAuthKeys)
+	if regs > e.cfg().SetupKeyRegThreshold {
+		return 75, fmt.Sprintf("%d registrations via setup key in %s", regs, e.cfg().SetupKeyRegWindow)
 	}
-	if ips > e.cfg.SetupKeyIPThreshold {
-		return 60, fmt.Sprintf("setup key used from %d distinct IPs in %s", ips, e.cfg.SetupKeyIPWindow)
+	if ips > e.cfg().SetupKeyIPThreshold {
+		return 60, fmt.Sprintf("setup key used from %d distinct IPs in %s", ips, e.cfg().SetupKeyIPWindow)
 	}
 	return 0, ""
 }
@@ -180,7 +180,7 @@ func (e *Engine) userNewCountry(accountID, userID, country string, now time.Time
 
 func (e *Engine) patNewIP(accountID, tokenID string, src netip.Addr, now time.Time) (score int, reason string) {
 	key := accountID + "/" + tokenID
-	n := e.patIPs.add(key, src.String(), now, 30*24*time.Hour, e.cfg.MaxAuthKeys)
+	n := e.patIPs.add(key, src.String(), now, 30*24*time.Hour, e.cfg().MaxAuthKeys)
 	if n > 1 { // first use seeds silently
 		return 55, "PAT used from a new IP"
 	}

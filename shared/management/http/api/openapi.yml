@@ -6578,6 +6578,286 @@ components:
             $ref: '#/components/schemas/ServerBackupSnapshot'
       required:
         - snapshots
+    SecurityRule:
+      type: object
+      description: Runtime state of one anomaly-detection rule.
+      properties:
+        name:
+          description: Rule identifier, for example "peer_new_ip".
+          type: string
+          example: "peer_new_ip"
+        enabled:
+          description: Whether the rule is evaluated.
+          type: boolean
+          example: true
+        action:
+          description: Prevention action the rule triggers in prevent mode.
+          type: string
+          enum: [ alert, require_approval, expire_login, block_peer ]
+          example: "alert"
+      required:
+        - name
+        - enabled
+        - action
+    SecurityStatus:
+      type: object
+      description: Anomaly-detection engine status. When the security section is absent or mode is off the engine does not run and mode reports "off".
+      properties:
+        mode:
+          description: Engine mode.
+          type: string
+          enum: [ off, observe, prevent ]
+          example: "observe"
+        learning_period:
+          description: Go duration of the baseline learning window, for example "168h0m0s".
+          type: string
+          example: "168h0m0s"
+        rules:
+          description: Per-rule runtime state.
+          type: array
+          items:
+            $ref: '#/components/schemas/SecurityRule'
+        findings_total:
+          description: Total findings emitted since the engine started.
+          type: integer
+          format: int64
+          example: 12
+        findings_by_rule:
+          description: Findings emitted since the engine started, grouped by rule.
+          type: object
+          additionalProperties:
+            type: integer
+            format: int64
+      required:
+        - mode
+        - learning_period
+        - rules
+        - findings_total
+        - findings_by_rule
+    SecurityEvent:
+      type: object
+      description: One anomaly-detection finding from the security event log.
+      properties:
+        time:
+          description: RFC 3339 timestamp of the finding.
+          type: string
+          example: "2026-10-26T02:00:00Z"
+        type:
+          description: Event category (peer, auth, setup_key, user or pat).
+          type: string
+          example: "peer"
+        rule:
+          description: Rule that produced the finding.
+          type: string
+          example: "peer_new_ip"
+        severity:
+          description: Finding severity.
+          type: string
+          enum: [ info, low, medium, high ]
+          example: "medium"
+        action:
+          description: Prevention action taken (alert when none ran).
+          type: string
+          example: "alert"
+        account_id:
+          description: Account the finding belongs to.
+          type: string
+        peer_id:
+          description: Peer the finding refers to, when applicable.
+          type: string
+        peer_name:
+          description: Peer hostname, when applicable.
+          type: string
+        user_id:
+          description: User or token the finding refers to, when applicable.
+          type: string
+        src_ip:
+          description: Source IP that triggered the finding.
+          type: string
+        reason:
+          description: Human-readable explanation of the score.
+          type: string
+        would_prevent:
+          description: Whether the rule would have acted in prevent mode.
+          type: boolean
+          example: false
+      required:
+        - time
+        - type
+        - rule
+        - severity
+        - action
+        - would_prevent
+    SecurityEventList:
+      type: object
+      description: Security findings, newest first.
+      properties:
+        events:
+          description: Security findings, newest first.
+          type: array
+          items:
+            $ref: '#/components/schemas/SecurityEvent'
+      required:
+        - events
+    SecurityModeRequest:
+      type: object
+      description: Security engine mode update.
+      properties:
+        mode:
+          description: Requested mode.
+          type: string
+          enum: [ off, observe, prevent ]
+          example: "observe"
+      required:
+        - mode
+    SecurityModeResponse:
+      type: object
+      description: Result of a security mode update.
+      properties:
+        mode:
+          description: Mode now in effect or persisted.
+          type: string
+          enum: [ off, observe, prevent ]
+          example: "observe"
+        applied:
+          description: Whether the mode was applied to the running engine. False means the change was persisted and takes effect after restart.
+          type: boolean
+          example: true
+        note:
+          description: Operational note, for example when the change only takes effect after restart.
+          type: string
+          example: ""
+      required:
+        - mode
+        - applied
+        - note
+    ProxyShieldConfig:
+      type: object
+      description: Management-controlled proxy shield configuration pushed over the sync stream.
+      properties:
+        mode:
+          description: Shield mode.
+          type: string
+          enum: [ off, observe, enforce ]
+          example: "observe"
+        allow_cidrs:
+          description: Source ranges that always bypass the shield.
+          type: array
+          items:
+            type: string
+          example: [ "10.0.0.0/8" ]
+        ai_crawlers:
+          description: Policy for known AI training crawlers.
+          type: string
+          enum: [ deny, allow, challenge ]
+          example: "deny"
+        allow_search_engines:
+          description: Whether verified search-engine crawlers may pass.
+          type: boolean
+          example: false
+        allow_local:
+          description: Whether loopback, RFC1918, ULA and link-local sources bypass the shield.
+          type: boolean
+          example: true
+      required:
+        - mode
+        - allow_cidrs
+        - ai_crawlers
+        - allow_search_engines
+        - allow_local
+    ProxyShieldStatus:
+      type: object
+      description: Shield status last reported by one proxy.
+      properties:
+        mode:
+          description: Shield mode the proxy currently runs.
+          type: string
+          example: "enforce"
+        banned:
+          description: Currently banned sources.
+          type: integer
+          format: int64
+          example: 3
+        active_tarpits:
+          description: In-flight tarpit responses.
+          type: integer
+          format: int64
+          example: 0
+        tracked_sources:
+          description: Sources in the score table.
+          type: integer
+          format: int64
+          example: 512
+        banned_ips:
+          description: Currently banned source IPs.
+          type: array
+          items:
+            type: string
+      required:
+        - mode
+        - banned
+        - active_tarpits
+        - tracked_sources
+        - banned_ips
+    ProxyShieldProxy:
+      type: object
+      description: One connected proxy and its last reported shield status.
+      properties:
+        proxy_id:
+          description: Identifier the proxy registered with.
+          type: string
+        status:
+          description: Last shield status reported over the sync stream. Null when the proxy has not reported yet or uses the legacy update stream.
+          $ref: '#/components/schemas/ProxyShieldStatus'
+      required:
+        - proxy_id
+    ProxyShieldState:
+      type: object
+      description: Shield configuration and per-proxy status.
+      properties:
+        managed:
+          description: Whether a shield configuration is managed by management and pushed to proxies. When false, proxies keep their local shield configuration and config is null.
+          type: boolean
+          example: true
+        config:
+          description: The pushed shield configuration. Null when managed is false.
+          $ref: '#/components/schemas/ProxyShieldConfig'
+        proxies:
+          description: Connected proxies and their last reported shield status.
+          type: array
+          items:
+            $ref: '#/components/schemas/ProxyShieldProxy'
+      required:
+        - managed
+        - proxies
+    ProxyShieldUpdateResult:
+      type: object
+      description: Result of a shield configuration update.
+      properties:
+        config:
+          $ref: '#/components/schemas/ProxyShieldConfig'
+        pushed:
+          description: Number of connected proxies the new config was pushed to immediately.
+          type: integer
+          example: 2
+      required:
+        - config
+        - pushed
+    ProxyShieldUnbanResult:
+      type: object
+      description: Result of a shield unban command.
+      properties:
+        ip:
+          description: Source IP the unban command targets.
+          type: string
+          example: "203.0.113.10"
+        pushed:
+          description: Number of connected proxies the command was pushed to immediately. Remaining connected proxies receive it on their next sync-stream message.
+          type: integer
+          example: 2
+      required:
+        - ip
+        - pushed
   responses:
     not_found:
       description: Resource not found
@@ -14573,6 +14853,169 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ServerBackupSnapshotList'
+        '401':
+          "$ref": "#/components/responses/requires_authentication"
+        '403':
+          "$ref": "#/components/responses/forbidden"
+        '500':
+          "$ref": "#/components/responses/internal_error"
+  /api/security/status:
+    get:
+      summary: Get Security Engine Status
+      description: Returns the anomaly-detection engine mode, learning period, per-rule state and findings counters. Requires admin or owner role.
+      tags: [ Server ]
+      security:
+        - BearerAuth: [ ]
+        - TokenAuth: [ ]
+      responses:
+        '200':
+          description: Security engine status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SecurityStatus'
+        '401':
+          "$ref": "#/components/responses/requires_authentication"
+        '403':
+          "$ref": "#/components/responses/forbidden"
+        '500':
+          "$ref": "#/components/responses/internal_error"
+  /api/security/events:
+    get:
+      summary: List Security Events
+      description: Returns findings from the security event log, newest first. Requires admin or owner role.
+      tags: [ Server ]
+      security:
+        - BearerAuth: [ ]
+        - TokenAuth: [ ]
+      parameters:
+        - name: limit
+          in: query
+          description: Maximum number of events to return
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 1000
+            default: 200
+      responses:
+        '200':
+          description: Security findings, newest first
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SecurityEventList'
+        '401':
+          "$ref": "#/components/responses/requires_authentication"
+        '403':
+          "$ref": "#/components/responses/forbidden"
+        '500':
+          "$ref": "#/components/responses/internal_error"
+  /api/security/mode:
+    put:
+      summary: Update Security Engine Mode
+      description: |
+        Switches the anomaly-detection mode. When the engine is running the change is applied immediately; when it is not running the mode is persisted to the management config file and takes effect after restart. Requires admin or owner role.
+      tags: [ Server ]
+      security:
+        - BearerAuth: [ ]
+        - TokenAuth: [ ]
+      requestBody:
+        description: Security mode update
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SecurityModeRequest'
+      responses:
+        '200':
+          description: Security mode update result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SecurityModeResponse'
+        '400':
+          "$ref": "#/components/responses/bad_request"
+        '401':
+          "$ref": "#/components/responses/requires_authentication"
+        '403':
+          "$ref": "#/components/responses/forbidden"
+        '500':
+          "$ref": "#/components/responses/internal_error"
+  /api/proxy/shield:
+    get:
+      summary: Get Proxy Shield Configuration and Status
+      description: Returns the management-controlled shield configuration and the last reported shield status of every connected proxy. Requires admin or owner role.
+      tags: [ Proxy ]
+      security:
+        - BearerAuth: [ ]
+        - TokenAuth: [ ]
+      responses:
+        '200':
+          description: Shield configuration and per-proxy status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProxyShieldState'
+        '401':
+          "$ref": "#/components/responses/requires_authentication"
+        '403':
+          "$ref": "#/components/responses/forbidden"
+        '500':
+          "$ref": "#/components/responses/internal_error"
+    put:
+      summary: Update Proxy Shield Configuration
+      description: Persists the shield configuration to shield-config.json in the datadir and pushes it to every connected proxy over the sync stream. Requires admin or owner role.
+      tags: [ Proxy ]
+      security:
+        - BearerAuth: [ ]
+        - TokenAuth: [ ]
+      requestBody:
+        description: Shield configuration update
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProxyShieldConfig'
+      responses:
+        '200':
+          description: Updated shield configuration
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProxyShieldUpdateResult'
+        '400':
+          "$ref": "#/components/responses/bad_request"
+        '401':
+          "$ref": "#/components/responses/requires_authentication"
+        '403':
+          "$ref": "#/components/responses/forbidden"
+        '500':
+          "$ref": "#/components/responses/internal_error"
+  /api/proxy/shield/unban:
+    post:
+      summary: Unban a Shield Source IP
+      description: Pushes an unban command for one source IP to every connected proxy over the sync stream. Proxies that cannot be reached immediately receive the command on their next sync-stream message. Requires admin or owner role.
+      tags: [ Proxy ]
+      security:
+        - BearerAuth: [ ]
+        - TokenAuth: [ ]
+      parameters:
+        - name: ip
+          in: query
+          description: Source IP to unban
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Unban command result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProxyShieldUnbanResult'
+        '400':
+          "$ref": "#/components/responses/bad_request"
         '401':
           "$ref": "#/components/responses/requires_authentication"
         '403':

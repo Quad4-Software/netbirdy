@@ -899,6 +899,48 @@ func (e ProxyClusterType) Valid() bool {
 	}
 }
 
+// Defines values for ProxyShieldConfigAiCrawlers.
+const (
+	ProxyShieldConfigAiCrawlersAllow     ProxyShieldConfigAiCrawlers = "allow"
+	ProxyShieldConfigAiCrawlersChallenge ProxyShieldConfigAiCrawlers = "challenge"
+	ProxyShieldConfigAiCrawlersDeny      ProxyShieldConfigAiCrawlers = "deny"
+)
+
+// Valid indicates whether the value is a known member of the ProxyShieldConfigAiCrawlers enum.
+func (e ProxyShieldConfigAiCrawlers) Valid() bool {
+	switch e {
+	case ProxyShieldConfigAiCrawlersAllow:
+		return true
+	case ProxyShieldConfigAiCrawlersChallenge:
+		return true
+	case ProxyShieldConfigAiCrawlersDeny:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for ProxyShieldConfigMode.
+const (
+	ProxyShieldConfigModeEnforce ProxyShieldConfigMode = "enforce"
+	ProxyShieldConfigModeObserve ProxyShieldConfigMode = "observe"
+	ProxyShieldConfigModeOff     ProxyShieldConfigMode = "off"
+)
+
+// Valid indicates whether the value is a known member of the ProxyShieldConfigMode enum.
+func (e ProxyShieldConfigMode) Valid() bool {
+	switch e {
+	case ProxyShieldConfigModeEnforce:
+		return true
+	case ProxyShieldConfigModeObserve:
+		return true
+	case ProxyShieldConfigModeOff:
+		return true
+	default:
+		return false
+	}
+}
+
 // Defines values for ResourceType.
 const (
 	ResourceTypeDomain ResourceType = "domain"
@@ -935,6 +977,117 @@ func (e ReverseProxyDomainType) Valid() bool {
 	case ReverseProxyDomainTypeCustom:
 		return true
 	case ReverseProxyDomainTypeFree:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for SecurityEventSeverity.
+const (
+	SecurityEventSeverityHigh   SecurityEventSeverity = "high"
+	SecurityEventSeverityInfo   SecurityEventSeverity = "info"
+	SecurityEventSeverityLow    SecurityEventSeverity = "low"
+	SecurityEventSeverityMedium SecurityEventSeverity = "medium"
+)
+
+// Valid indicates whether the value is a known member of the SecurityEventSeverity enum.
+func (e SecurityEventSeverity) Valid() bool {
+	switch e {
+	case SecurityEventSeverityHigh:
+		return true
+	case SecurityEventSeverityInfo:
+		return true
+	case SecurityEventSeverityLow:
+		return true
+	case SecurityEventSeverityMedium:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for SecurityModeRequestMode.
+const (
+	SecurityModeRequestModeObserve SecurityModeRequestMode = "observe"
+	SecurityModeRequestModeOff     SecurityModeRequestMode = "off"
+	SecurityModeRequestModePrevent SecurityModeRequestMode = "prevent"
+)
+
+// Valid indicates whether the value is a known member of the SecurityModeRequestMode enum.
+func (e SecurityModeRequestMode) Valid() bool {
+	switch e {
+	case SecurityModeRequestModeObserve:
+		return true
+	case SecurityModeRequestModeOff:
+		return true
+	case SecurityModeRequestModePrevent:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for SecurityModeResponseMode.
+const (
+	SecurityModeResponseModeObserve SecurityModeResponseMode = "observe"
+	SecurityModeResponseModeOff     SecurityModeResponseMode = "off"
+	SecurityModeResponseModePrevent SecurityModeResponseMode = "prevent"
+)
+
+// Valid indicates whether the value is a known member of the SecurityModeResponseMode enum.
+func (e SecurityModeResponseMode) Valid() bool {
+	switch e {
+	case SecurityModeResponseModeObserve:
+		return true
+	case SecurityModeResponseModeOff:
+		return true
+	case SecurityModeResponseModePrevent:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for SecurityRuleAction.
+const (
+	SecurityRuleActionAlert           SecurityRuleAction = "alert"
+	SecurityRuleActionBlockPeer       SecurityRuleAction = "block_peer"
+	SecurityRuleActionExpireLogin     SecurityRuleAction = "expire_login"
+	SecurityRuleActionRequireApproval SecurityRuleAction = "require_approval"
+)
+
+// Valid indicates whether the value is a known member of the SecurityRuleAction enum.
+func (e SecurityRuleAction) Valid() bool {
+	switch e {
+	case SecurityRuleActionAlert:
+		return true
+	case SecurityRuleActionBlockPeer:
+		return true
+	case SecurityRuleActionExpireLogin:
+		return true
+	case SecurityRuleActionRequireApproval:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for SecurityStatusMode.
+const (
+	SecurityStatusModeObserve SecurityStatusMode = "observe"
+	SecurityStatusModeOff     SecurityStatusMode = "off"
+	SecurityStatusModePrevent SecurityStatusMode = "prevent"
+)
+
+// Valid indicates whether the value is a known member of the SecurityStatusMode enum.
+func (e SecurityStatusMode) Valid() bool {
+	switch e {
+	case SecurityStatusModeObserve:
+		return true
+	case SecurityStatusModeOff:
+		return true
+	case SecurityStatusModePrevent:
 		return true
 	default:
 		return false
@@ -4808,6 +4961,87 @@ type ProxyCluster struct {
 // `shared` clusters are operated by NetBirdy and shared across accounts.
 type ProxyClusterType string
 
+// ProxyShieldConfig Management-controlled proxy shield configuration pushed over the sync stream.
+type ProxyShieldConfig struct {
+	// AiCrawlers Policy for known AI training crawlers.
+	AiCrawlers ProxyShieldConfigAiCrawlers `json:"ai_crawlers"`
+
+	// AllowCidrs Source ranges that always bypass the shield.
+	AllowCidrs []string `json:"allow_cidrs"`
+
+	// AllowLocal Whether loopback, RFC1918, ULA and link-local sources bypass the shield.
+	AllowLocal bool `json:"allow_local"`
+
+	// AllowSearchEngines Whether verified search-engine crawlers may pass.
+	AllowSearchEngines bool `json:"allow_search_engines"`
+
+	// Mode Shield mode.
+	Mode ProxyShieldConfigMode `json:"mode"`
+}
+
+// ProxyShieldConfigAiCrawlers Policy for known AI training crawlers.
+type ProxyShieldConfigAiCrawlers string
+
+// ProxyShieldConfigMode Shield mode.
+type ProxyShieldConfigMode string
+
+// ProxyShieldProxy One connected proxy and its last reported shield status.
+type ProxyShieldProxy struct {
+	// ProxyId Identifier the proxy registered with.
+	ProxyId string `json:"proxy_id"`
+
+	// Status Shield status last reported by one proxy.
+	Status *ProxyShieldStatus `json:"status,omitempty"`
+}
+
+// ProxyShieldState Shield configuration and per-proxy status.
+type ProxyShieldState struct {
+	// Config Management-controlled proxy shield configuration pushed over the sync stream.
+	Config *ProxyShieldConfig `json:"config,omitempty"`
+
+	// Managed Whether a shield configuration is managed by management and pushed to proxies. When false, proxies keep their local shield configuration and config is null.
+	Managed bool `json:"managed"`
+
+	// Proxies Connected proxies and their last reported shield status.
+	Proxies []ProxyShieldProxy `json:"proxies"`
+}
+
+// ProxyShieldStatus Shield status last reported by one proxy.
+type ProxyShieldStatus struct {
+	// ActiveTarpits In-flight tarpit responses.
+	ActiveTarpits int64 `json:"active_tarpits"`
+
+	// Banned Currently banned sources.
+	Banned int64 `json:"banned"`
+
+	// BannedIps Currently banned source IPs.
+	BannedIps []string `json:"banned_ips"`
+
+	// Mode Shield mode the proxy currently runs.
+	Mode string `json:"mode"`
+
+	// TrackedSources Sources in the score table.
+	TrackedSources int64 `json:"tracked_sources"`
+}
+
+// ProxyShieldUnbanResult Result of a shield unban command.
+type ProxyShieldUnbanResult struct {
+	// Ip Source IP the unban command targets.
+	Ip string `json:"ip"`
+
+	// Pushed Number of connected proxies the command was pushed to immediately. Remaining connected proxies receive it on their next sync-stream message.
+	Pushed int `json:"pushed"`
+}
+
+// ProxyShieldUpdateResult Result of a shield configuration update.
+type ProxyShieldUpdateResult struct {
+	// Config Management-controlled proxy shield configuration pushed over the sync stream.
+	Config ProxyShieldConfig `json:"config"`
+
+	// Pushed Number of connected proxies the new config was pushed to immediately.
+	Pushed int `json:"pushed"`
+}
+
 // ProxyToken defines model for ProxyToken.
 type ProxyToken struct {
 	CreatedAt time.Time  `json:"created_at"`
@@ -5026,6 +5260,114 @@ type ScimTokenResponse struct {
 	// AuthToken The newly generated SCIM API token
 	AuthToken string `json:"auth_token"`
 }
+
+// SecurityEvent One anomaly-detection finding from the security event log.
+type SecurityEvent struct {
+	// AccountId Account the finding belongs to.
+	AccountId *string `json:"account_id,omitempty"`
+
+	// Action Prevention action taken (alert when none ran).
+	Action string `json:"action"`
+
+	// PeerId Peer the finding refers to, when applicable.
+	PeerId *string `json:"peer_id,omitempty"`
+
+	// PeerName Peer hostname, when applicable.
+	PeerName *string `json:"peer_name,omitempty"`
+
+	// Reason Human-readable explanation of the score.
+	Reason *string `json:"reason,omitempty"`
+
+	// Rule Rule that produced the finding.
+	Rule string `json:"rule"`
+
+	// Severity Finding severity.
+	Severity SecurityEventSeverity `json:"severity"`
+
+	// SrcIp Source IP that triggered the finding.
+	SrcIp *string `json:"src_ip,omitempty"`
+
+	// Time RFC 3339 timestamp of the finding.
+	Time string `json:"time"`
+
+	// Type Event category (peer, auth, setup_key, user or pat).
+	Type string `json:"type"`
+
+	// UserId User or token the finding refers to, when applicable.
+	UserId *string `json:"user_id,omitempty"`
+
+	// WouldPrevent Whether the rule would have acted in prevent mode.
+	WouldPrevent bool `json:"would_prevent"`
+}
+
+// SecurityEventSeverity Finding severity.
+type SecurityEventSeverity string
+
+// SecurityEventList Security findings, newest first.
+type SecurityEventList struct {
+	// Events Security findings, newest first.
+	Events []SecurityEvent `json:"events"`
+}
+
+// SecurityModeRequest Security engine mode update.
+type SecurityModeRequest struct {
+	// Mode Requested mode.
+	Mode SecurityModeRequestMode `json:"mode"`
+}
+
+// SecurityModeRequestMode Requested mode.
+type SecurityModeRequestMode string
+
+// SecurityModeResponse Result of a security mode update.
+type SecurityModeResponse struct {
+	// Applied Whether the mode was applied to the running engine. False means the change was persisted and takes effect after restart.
+	Applied bool `json:"applied"`
+
+	// Mode Mode now in effect or persisted.
+	Mode SecurityModeResponseMode `json:"mode"`
+
+	// Note Operational note, for example when the change only takes effect after restart.
+	Note string `json:"note"`
+}
+
+// SecurityModeResponseMode Mode now in effect or persisted.
+type SecurityModeResponseMode string
+
+// SecurityRule Runtime state of one anomaly-detection rule.
+type SecurityRule struct {
+	// Action Prevention action the rule triggers in prevent mode.
+	Action SecurityRuleAction `json:"action"`
+
+	// Enabled Whether the rule is evaluated.
+	Enabled bool `json:"enabled"`
+
+	// Name Rule identifier, for example "peer_new_ip".
+	Name string `json:"name"`
+}
+
+// SecurityRuleAction Prevention action the rule triggers in prevent mode.
+type SecurityRuleAction string
+
+// SecurityStatus Anomaly-detection engine status. When the security section is absent or mode is off the engine does not run and mode reports "off".
+type SecurityStatus struct {
+	// FindingsByRule Findings emitted since the engine started, grouped by rule.
+	FindingsByRule map[string]int64 `json:"findings_by_rule"`
+
+	// FindingsTotal Total findings emitted since the engine started.
+	FindingsTotal int64 `json:"findings_total"`
+
+	// LearningPeriod Go duration of the baseline learning window, for example "168h0m0s".
+	LearningPeriod string `json:"learning_period"`
+
+	// Mode Engine mode.
+	Mode SecurityStatusMode `json:"mode"`
+
+	// Rules Per-rule runtime state.
+	Rules []SecurityRule `json:"rules"`
+}
+
+// SecurityStatusMode Engine mode.
+type SecurityStatusMode string
 
 // SentinelOneMatchAttributes Attribute conditions to match when approving agents
 type SentinelOneMatchAttributes struct {
@@ -6271,6 +6613,18 @@ type GetApiPeersParams struct {
 	Mac *string `form:"mac,omitempty" json:"mac,omitempty"`
 }
 
+// PostApiProxyShieldUnbanParams defines parameters for PostApiProxyShieldUnban.
+type PostApiProxyShieldUnbanParams struct {
+	// Ip Source IP to unban
+	Ip string `form:"ip" json:"ip"`
+}
+
+// GetApiSecurityEventsParams defines parameters for GetApiSecurityEvents.
+type GetApiSecurityEventsParams struct {
+	// Limit Maximum number of events to return
+	Limit *int `form:"limit,omitempty" json:"limit,omitempty"`
+}
+
 // GetApiUsersParams defines parameters for GetApiUsers.
 type GetApiUsersParams struct {
 	// ServiceUser Filters users and returns either regular users or service users
@@ -6478,6 +6832,9 @@ type PostApiPostureChecksJSONRequestBody = PostureCheckUpdate
 // PutApiPostureChecksPostureCheckIdJSONRequestBody defines body for PutApiPostureChecksPostureCheckId for application/json ContentType.
 type PutApiPostureChecksPostureCheckIdJSONRequestBody = PostureCheckUpdate
 
+// PutApiProxyShieldJSONRequestBody defines body for PutApiProxyShield for application/json ContentType.
+type PutApiProxyShieldJSONRequestBody = ProxyShieldConfig
+
 // PostApiReverseProxiesDomainsJSONRequestBody defines body for PostApiReverseProxiesDomains for application/json ContentType.
 type PostApiReverseProxiesDomainsJSONRequestBody = ReverseProxyDomainRequest
 
@@ -6495,6 +6852,9 @@ type PostApiRoutesJSONRequestBody = RouteRequest
 
 // PutApiRoutesRouteIdJSONRequestBody defines body for PutApiRoutesRouteId for application/json ContentType.
 type PutApiRoutesRouteIdJSONRequestBody = RouteRequest
+
+// PutApiSecurityModeJSONRequestBody defines body for PutApiSecurityMode for application/json ContentType.
+type PutApiSecurityModeJSONRequestBody = SecurityModeRequest
 
 // PutApiServerBackupJSONRequestBody defines body for PutApiServerBackup for application/json ContentType.
 type PutApiServerBackupJSONRequestBody = ServerBackupConfig

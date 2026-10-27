@@ -13,6 +13,7 @@ import {
   LockIcon,
   MonitorSmartphoneIcon,
   NetworkIcon,
+  ShieldCheckIcon,
   ShieldIcon,
 } from "lucide-react";
 import { useSearchParams } from "next/navigation";
@@ -30,6 +31,7 @@ import IdentityProvidersTab from "@/modules/settings/IdentityProvidersTab";
 import MetricsTab from "@/modules/settings/MetricsTab";
 import NetworkSettingsTab from "@/modules/settings/NetworkSettingsTab";
 import PermissionsTab from "@/modules/settings/PermissionsTab";
+import SecurityTab from "@/modules/settings/SecurityTab";
 import SetupKeysTab from "@/modules/settings/SetupKeysTab";
 import UpdatesTab from "@/modules/settings/UpdatesTab";
 
@@ -129,6 +131,13 @@ export default function NetBirdSettings() {
                     <ArrowUpCircleIcon size={14} />
                     Updates
                   </VerticalTabs.Trigger>
+                  <VerticalTabs.Trigger
+                    value="security"
+                    data-testid="settings-tab-security"
+                  >
+                    <ShieldCheckIcon size={14} />
+                    Security
+                  </VerticalTabs.Trigger>
                 </>
               )}
             </>
@@ -151,6 +160,7 @@ export default function NetBirdSettings() {
             {account && <MetricsTab account={account} />}
             {isOwnerOrAdmin && <BackupsTab />}
             {isOwnerOrAdmin && <UpdatesTab />}
+            {isOwnerOrAdmin && <SecurityTab />}
             {account && <DangerZoneTab account={account} />}
           </div>
         </RestrictedAccess>
@@ -162,7 +172,6 @@ export default function NetBirdSettings() {
 const DangerZoneTabTrigger = () => {
   const { isOwner } = useLoggedInUser();
 
-  
   if (false) return;
 
   return (

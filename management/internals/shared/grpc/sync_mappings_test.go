@@ -371,6 +371,8 @@ func (s *tokenValidatingSyncStream) RecvMsg(any) error            { return nil }
 
 func TestConnectionSendResponse_RoutesToSyncStream(t *testing.T) {
 	stream := &syncRecordingStream{}
+	s := NewProxyServiceServer(nil, nil, nil, ProxyOIDCConfig{}, nil, nil, nil, nil, nil)
+	t.Cleanup(s.Close)
 	conn := &proxyConnection{
 		syncStream: stream,
 	}
@@ -382,7 +384,7 @@ func TestConnectionSendResponse_RoutesToSyncStream(t *testing.T) {
 		InitialSyncComplete: true,
 	}
 
-	err := conn.sendResponse(resp)
+	err := s.sendResponse(conn, resp)
 	require.NoError(t, err)
 
 	require.Len(t, stream.sent, 1)
@@ -393,6 +395,8 @@ func TestConnectionSendResponse_RoutesToSyncStream(t *testing.T) {
 
 func TestConnectionSendResponse_RoutesToLegacyStream(t *testing.T) {
 	stream := &recordingStream{}
+	s := NewProxyServiceServer(nil, nil, nil, ProxyOIDCConfig{}, nil, nil, nil, nil, nil)
+	t.Cleanup(s.Close)
 	conn := &proxyConnection{
 		stream: stream,
 	}
@@ -403,7 +407,7 @@ func TestConnectionSendResponse_RoutesToLegacyStream(t *testing.T) {
 		},
 	}
 
-	err := conn.sendResponse(resp)
+	err := s.sendResponse(conn, resp)
 	require.NoError(t, err)
 
 	require.Len(t, stream.messages, 1)
@@ -433,8 +437,10 @@ func newBlockingSyncStream(t *testing.T) *blockingSyncStream {
 
 func TestWaitForAck_Ack(t *testing.T) {
 	stream := &syncRecordingStream{recvMsgs: []*proto.SyncMappingsRequest{ackMsg()}}
+	s := NewProxyServiceServer(nil, nil, nil, ProxyOIDCConfig{}, nil, nil, nil, nil, nil)
+	t.Cleanup(s.Close)
 
-	require.NoError(t, waitForAck(context.Background(), stream, time.Second))
+	require.NoError(t, s.waitForAck(context.Background(), &proxyConnection{}, stream, time.Second))
 }
 
 func TestWaitForAck_UnexpectedMessage(t *testing.T) {
@@ -442,14 +448,19 @@ func TestWaitForAck_UnexpectedMessage(t *testing.T) {
 		{Msg: &proto.SyncMappingsRequest_Init{Init: &proto.SyncMappingsInit{}}},
 	}}
 
-	assert.ErrorContains(t, waitForAck(context.Background(), stream, time.Second), "expected ack")
+	s := NewProxyServiceServer(nil, nil, nil, ProxyOIDCConfig{}, nil, nil, nil, nil, nil)
+	t.Cleanup(s.Close)
+
+	assert.ErrorContains(t, s.waitForAck(context.Background(), &proxyConnection{}, stream, time.Second), "expected ack")
 }
 
 func TestWaitForAck_TimesOutWhenProxyStopsAcking(t *testing.T) {
 	stream := newBlockingSyncStream(t)
+	s := NewProxyServiceServer(nil, nil, nil, ProxyOIDCConfig{}, nil, nil, nil, nil, nil)
+	t.Cleanup(s.Close)
 
 	start := time.Now()
-	err := waitForAck(context.Background(), stream, 50*time.Millisecond)
+	err := s.waitForAck(context.Background(), &proxyConnection{}, stream, 50*time.Millisecond)
 
 	assert.ErrorContains(t, err, "no ack within")
 	assert.Less(t, time.Since(start), time.Second)
@@ -457,10 +468,12 @@ func TestWaitForAck_TimesOutWhenProxyStopsAcking(t *testing.T) {
 
 func TestWaitForAck_ReturnsWhenConnectionCanceled(t *testing.T) {
 	stream := newBlockingSyncStream(t)
+	s := NewProxyServiceServer(nil, nil, nil, ProxyOIDCConfig{}, nil, nil, nil, nil, nil)
+	t.Cleanup(s.Close)
 	ctx, cancel := context.WithCancel(context.Background())
 	cancel()
 
-	assert.ErrorIs(t, waitForAck(ctx, stream, time.Minute), context.Canceled)
+	assert.ErrorIs(t, s.waitForAck(ctx, &proxyConnection{}, stream, time.Minute), context.Canceled)
 }
 
 func TestSendSnapshotSync_GivesUpWhenProxyStopsAcking(t *testing.T) {

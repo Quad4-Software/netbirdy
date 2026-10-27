@@ -68,6 +68,47 @@ shield writes its own decision log via `--shield-log-file` /
 `NB_PROXY_SHIELD_LOG_FILE` (non-pass decisions only: honeypot, ban,
 challenge, tarpit).
 
+## HTTP API
+
+The security endpoints are admin or owner only and live under the regular
+management API.
+
+### GET /api/security/status
+
+Returns the engine mode, learning period, per-rule state and the findings
+counters accumulated since the engine started. When the `security:` section
+is absent or `mode` is `off`, the engine is not running and `mode` reports
+`"off"` with empty counters.
+
+```json
+{
+  "mode": "observe",
+  "learning_period": "168h0m0s",
+  "rules": [{"name": "peer_new_ip", "enabled": true, "action": "alert"}],
+  "findings_total": 12,
+  "findings_by_rule": {"peer_new_ip": 12}
+}
+```
+
+### GET /api/security/events?limit=200
+
+Returns findings from the security event log, newest first. `limit`
+defaults to 200 and is capped at 1000. Each event carries `time`, `type`,
+`rule`, `severity`, `action`, the account/peer/user/src_ip it refers to,
+`reason` and `would_prevent`.
+
+### PUT /api/security/mode
+
+Body `{"mode": "off" | "observe" | "prevent"}`.
+
+When the engine is running, the mode switch applies immediately and the
+response reports `{"mode": ..., "applied": true}` with a note that the
+change is runtime only. When the engine is not running, the mode is written
+into the `security:` section of the management config file and the response
+reports `{"mode": ..., "applied": false, "note": "takes effect after
+restart"}`. To persist a live change, update `security.mode` in the config
+file as well.
+
 ## Reviewing and recovering
 
 - Events appear in the Activity audit feed and `security-events.jsonl`.

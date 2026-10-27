@@ -308,6 +308,24 @@ func (s *Shield) SetMode(mode string) error {
 	}
 }
 
+// ApplyConfig validates cfg and installs it live, swapping both the shield's
+// and the score store's config pointer like Reload does. The running config
+// is unchanged when validation fails.
+func (s *Shield) ApplyConfig(cfg Config) error {
+	if err := cfg.validate(); err != nil {
+		return err
+	}
+	s.cfgPtr.Store(&cfg)
+	s.store.cfgPtr.Store(&cfg)
+	s.log.Infof("shield: applied pushed config (mode %s)", cfg.Mode)
+	return nil
+}
+
+// Config returns a copy of the active configuration.
+func (s *Shield) Config() Config {
+	return *s.cfg()
+}
+
 // Reload re-reads the YAML config the shield was built from and applies it
 // live. Returns an error when no config file was supplied at startup or the
 // new file fails validation; in both cases the running config is unchanged.

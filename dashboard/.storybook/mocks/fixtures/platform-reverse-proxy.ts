@@ -559,4 +559,46 @@ export const reverseProxyFixtures: Record<string, Handler> = {
       total_records: events.length,
     };
   },
+
+  /* Proxy shield: config pushed to every connected proxy, plus the runtime
+     status each proxy reports back. */
+  "GET /proxy/shield": {
+    config: {
+      mode: "observe",
+      allow_cidrs: ["100.64.0.0/10"],
+      ai_crawlers: "deny",
+      allow_search_engines: false,
+      allow_local: true,
+    },
+    proxies: [
+      {
+        proxy_id: "proxy-eu-01",
+        status: {
+          mode: "observe",
+          banned: 2,
+          active_tarpits: 1,
+          tracked_sources: 432,
+          banned_ips: ["203.0.113.10", "198.51.100.77"],
+        },
+      },
+      {
+        proxy_id: "proxy-us-01",
+        status: {
+          mode: "observe",
+          banned: 0,
+          active_tarpits: 0,
+          tracked_sources: 187,
+          banned_ips: [],
+        },
+      },
+    ],
+  },
+  "PUT /proxy/shield": (ctx: HandlerContext) => ({
+    config: ctx.body ?? {},
+    pushed: 2,
+  }),
+  "POST /proxy/shield/unban": (ctx: HandlerContext) => ({
+    ip: ctx.query.get("ip") ?? "",
+    pushed: 2,
+  }),
 };

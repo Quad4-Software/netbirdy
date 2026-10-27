@@ -187,6 +187,13 @@ export default function Navigation({
                     exactPathMatch={true}
                     visible={permission?.services?.read}
                   />
+                  <SidebarItem
+                    label="Shield"
+                    isChild
+                    href={"/reverse-proxy/shield"}
+                    exactPathMatch={true}
+                    visible={permission?.services?.read}
+                  />
                 </SidebarItem>
 
                 <SidebarItem
@@ -359,7 +366,7 @@ export default function Navigation({
                 />
               </SidebarItemGroup>
             </div>
-            
+
             <NavigationVersionInfo />
           </div>
         </ScrollArea>

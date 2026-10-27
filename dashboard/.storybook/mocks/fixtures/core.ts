@@ -123,4 +123,74 @@ export const coreFixtures: Record<string, Handler> = {
       },
     ],
   },
+
+  /* Management security engine (anomaly detection): observe mode with a few
+     findings so the status card, rules table and feed all render. */
+  "GET /security/status": {
+    mode: "observe",
+    learning_period: "168h",
+    rules: [
+      { name: "peer_new_ip", enabled: true, action: "alert" },
+      { name: "peer_ip_flap", enabled: true, action: "alert" },
+      { name: "peer_impossible_travel", enabled: true, action: "alert" },
+      {
+        name: "concurrent_connections",
+        enabled: true,
+        action: "require_approval",
+      },
+      { name: "setup_key_misuse", enabled: true, action: "alert" },
+      { name: "auth_failure_burst", enabled: true, action: "alert" },
+      { name: "auth_success_after_failures", enabled: true, action: "alert" },
+      { name: "user_new_country", enabled: true, action: "alert" },
+      { name: "pat_new_ip", enabled: false, action: "alert" },
+    ],
+    findings_total: 5,
+    findings_by_rule: {
+      peer_new_ip: 2,
+      auth_failure_burst: 2,
+      user_new_country: 1,
+    },
+  },
+  "GET /security/events": {
+    events: [
+      {
+        time: "2026-10-08T09:41:00Z",
+        type: "peer_event",
+        severity: "medium",
+        rule: "peer_new_ip",
+        action: "alert",
+        peer_name: "office-laptop",
+        src_ip: "203.0.113.10",
+        would_prevent: true,
+        reason: "source IP not in peer baseline",
+      },
+      {
+        time: "2026-10-08T09:12:00Z",
+        type: "auth_event",
+        severity: "high",
+        rule: "auth_failure_burst",
+        action: "alert",
+        user_id: "user-ops-1",
+        src_ip: "198.51.100.77",
+        would_prevent: false,
+        reason: "23 failed logins in 5m",
+      },
+      {
+        time: "2026-10-08T08:03:00Z",
+        type: "user_event",
+        severity: "low",
+        rule: "user_new_country",
+        action: "alert",
+        user_id: "user-ops-2",
+        src_ip: "192.0.2.55",
+        would_prevent: false,
+        reason: "first login from DE",
+      },
+    ],
+  },
+  "PUT /security/mode": (ctx: HandlerContext) => ({
+    mode: (ctx.body as { mode?: string })?.mode ?? "observe",
+    applied: true,
+    note: "Mode applies to new findings only; existing blocks are unchanged.",
+  }),
 };

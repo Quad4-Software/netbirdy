@@ -129,3 +129,44 @@ func TestAllowLocalDisabled(t *testing.T) {
 		t.Fatalf("expected block with allow_local=false, got %d", rec.Code)
 	}
 }
+
+func TestApplyConfigSwapsRunningConfig(t *testing.T) {
+	cfg := DefaultConfig()
+	cfg.ChallengeAt = 1
+	cfg.TarpitAt = 5
+	cfg.BanAt = 10
+	cfg.WeightScannerUA = 80
+	sh := runtimeShield(t, cfg, WithKnownHost(func(string) bool { return true }))
+
+	next := cfg
+	next.Mode = ModeObserve
+	next.AllowCIDRs = []string{"203.0.113.0/24"}
+	if err := sh.ApplyConfig(next); err != nil {
+		t.Fatal(err)
+	}
+	if sh.Mode() != string(ModeObserve) {
+		t.Fatalf("mode %q", sh.Mode())
+	}
+	// observe mode scores but never alters responses, and the pushed cidr
+	// range bypasses the shield entirely.
+	rec, called := serve(sh)
+	if !called {
+		t.Fatal("allow_cidrs source still inspected")
+	}
+	if rec.Code != 200 {
+		t.Fatalf("observe mode blocked: %d", rec.Code)
+	}
+	active := sh.Config()
+	if !active.allowIP(netip.MustParseAddr("203.0.113.9")) {
+		t.Fatal("pushed cidr not installed")
+	}
+
+	bad := cfg
+	bad.Mode = "bogus"
+	if err := sh.ApplyConfig(bad); err == nil {
+		t.Fatal("invalid config applied")
+	}
+	if sh.Mode() != string(ModeObserve) {
+		t.Fatal("rejected config clobbered running config")
+	}
+}

@@ -204,6 +204,8 @@ func (s *BaseServer) APIHandler() http.Handler {
 		}
 		s.registerUpdatesAPI(apiRouter)
 		s.registerBackupAPI(apiRouter)
+		s.registerSecurityAPI(apiRouter)
+		s.registerShieldAPI(apiRouter)
 		return apiRouter
 	})
 

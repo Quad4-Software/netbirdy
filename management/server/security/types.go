@@ -189,6 +189,22 @@ func (c *Config) trusted(ip netip.Addr) bool {
 	return false
 }
 
+// RuleStatus reports one rule's runtime settings.
+type RuleStatus struct {
+	Name    string `json:"name"`
+	Enabled bool   `json:"enabled"`
+	Action  Action `json:"action"`
+}
+
+// Status snapshots the engine's runtime configuration and findings counts.
+type Status struct {
+	Mode           Mode             `json:"mode"`
+	LearningPeriod time.Duration    `json:"learning_period"`
+	Rules          []RuleStatus     `json:"rules"`
+	FindingsTotal  int64            `json:"findings_total"`
+	FindingsByRule map[string]int64 `json:"findings_by_rule"`
+}
+
 // PeerObservation describes a management-visible peer event.
 type PeerObservation struct {
 	AccountID string

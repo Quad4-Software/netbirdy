@@ -92,6 +92,47 @@ message GetMappingUpdateResponse {
   // initial_sync_complete is set on the last message of the initial snapshot.
   // The proxy uses this to signal that startup is complete.
   bool initial_sync_complete = 2;
+  // shield_config carries the management-pushed shield configuration.
+  // Older proxies ignore it; newer ones apply it at runtime.
+  ShieldConfig shield_config = 3;
+}
+
+// ShieldConfig is the management-controlled subset of the proxy shield
+// configuration. All fields are applied together; the proxy merges them on
+// top of its running config.
+message ShieldConfig {
+  // mode is "off", "observe" or "enforce".
+  string mode = 1;
+  // allow_cidrs lists source ranges that always bypass the shield.
+  repeated string allow_cidrs = 2;
+  // ai_crawlers is "deny", "allow" or "challenge".
+  string ai_crawlers = 3;
+  // allow_search_engines lets verified search-engine crawlers pass.
+  bool allow_search_engines = 4;
+  // allow_local lets loopback, RFC1918, ULA and link-local sources bypass.
+  bool allow_local = 5;
+}
+
+// ShieldStatus is a point-in-time shield report a proxy attaches to its
+// SyncMappings acks.
+message ShieldStatus {
+  // mode is the shield mode the proxy currently runs.
+  string mode = 1;
+  // banned is the number of currently banned sources.
+  int64 banned = 2;
+  // active_tarpits is the number of in-flight tarpit responses.
+  int64 active_tarpits = 3;
+  // tracked_sources is the number of sources in the score table.
+  int64 tracked_sources = 4;
+  // banned_ips lists the currently banned source IPs.
+  repeated string banned_ips = 5;
+}
+
+// ShieldCommand is an imperative control action management pushes to a
+// proxy over the sync stream.
+message ShieldCommand {
+  // unban_ip clears the ban for one source IP.
+  string unban_ip = 1;
 }
 
 enum ProxyMappingUpdateType {
@@ -452,7 +493,10 @@ message SyncMappingsInit {
 
 // SyncMappingsAck is sent by the proxy after it has fully processed a batch.
 // Management waits for this before sending the next batch.
-message SyncMappingsAck {}
+message SyncMappingsAck {
+  // shield_status reports the proxy's current shield state.
+  ShieldStatus shield_status = 2;
+}
 
 // SyncMappingsResponse is a batch of mappings sent by management.
 // Identical semantics to GetMappingUpdateResponse.
@@ -460,6 +504,10 @@ message SyncMappingsResponse {
   repeated ProxyMapping mapping = 1;
   // initial_sync_complete is set on the last message of the initial snapshot.
   bool initial_sync_complete = 2;
+  // shield_config carries the management-pushed shield configuration.
+  ShieldConfig shield_config = 3;
+  // shield_commands carries imperative shield actions (for example unban).
+  repeated ShieldCommand shield_commands = 4;
 }
 
 // CheckLLMPolicyLimitsRequest carries the resolved caller identity and the
