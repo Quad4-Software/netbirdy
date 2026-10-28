@@ -311,14 +311,13 @@ jobs:
             choco install nsis -y --no-progress
             if ($LASTEXITCODE -ne 0) { throw "NSIS install failed" }
           }
-          $envar = Join-Path $env:RUNNER_TEMP "envar.zip"
-          Invoke-WebRequest -Uri "https://nsis.sourceforge.io/mediawiki/images/7/7f/EnVar_plugin.zip" -OutFile $envar
+          # NSIS plugins ship in the repo: nsis.sourceforge.io serves 403s.
+          $envar = Resolve-Path ".github/nsis-plugins/EnVar_plugin.zip"
           if ((Get-FileHash -Path $envar -Algorithm SHA256).Hash.ToLower() -ne "e9aa92de351345ed82795251d838f1ae9041ba35af9d381a5780c7843b01f56a") { throw "EnVar plugin checksum mismatch" }
           $out = Join-Path $env:RUNNER_TEMP "envar"
           Expand-Archive -Path $envar -DestinationPath $out
           Copy-Item "$out\Plugins\x86-unicode\EnVar.dll" "$nsis\Plugins\x86-unicode\EnVar.dll" -Force
-          $shell = Join-Path $env:RUNNER_TEMP "shellexec.7z"
-          Invoke-WebRequest -Uri "https://nsis.sourceforge.io/mediawiki/images/6/68/ShellExecAsUser_amd64-Unicode.7z" -OutFile $shell
+          $shell = Resolve-Path ".github/nsis-plugins/ShellExecAsUser_amd64-Unicode.7z"
           if ((Get-FileHash -Path $shell -Algorithm SHA256).Hash.ToLower() -ne "0a55ea25c7330a92cec028eda8afcaf1b1a7092e0dfb77c21c8f654564b4ff9d") { throw "ShellExecAsUser plugin checksum mismatch" }
           $out2 = Join-Path $env:RUNNER_TEMP "shellexec"
           & "C:\Program Files\7-Zip\7z.exe" x "-o$out2" $shell -y | Out-Null
