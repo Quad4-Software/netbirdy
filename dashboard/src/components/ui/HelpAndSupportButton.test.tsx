@@ -14,7 +14,7 @@ describe("HelpAndSupportButton", () => {
     await userEvent.click(screen.getByRole("button"));
     const link = await screen.findByRole("menuitem", { name: /source code/i });
     expect(link.getAttribute("href")).toBe(
-      "https://github.com/Sudo-Ivan/netbirdy",
+      "https://github.com/Quad4-Software/netbirdy",
     );
   });
 });

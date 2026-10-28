@@ -6,8 +6,8 @@ import (
 )
 
 const (
-	urlMacIntel = "https://github.com/Sudo-Ivan/netbirdy/releases/latest"
-	urlMacM1M2  = "https://github.com/Sudo-Ivan/netbirdy/releases/latest"
+	urlMacIntel = "https://github.com/Quad4-Software/netbirdy/releases/latest"
+	urlMacM1M2  = "https://github.com/Quad4-Software/netbirdy/releases/latest"
 )
 
 // DownloadUrl return with the proper download link

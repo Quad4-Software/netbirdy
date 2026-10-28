@@ -110,7 +110,7 @@ chpasswd:
     content: |
       services:
         reverse-proxy:
-          image: ghcr.io/sudo-ivan/netbirdy-reverse-proxy:latest
+          image: ghcr.io/quad4-software/netbirdy-reverse-proxy:latest
           restart: unless-stopped
           logging:
             driver: json-file

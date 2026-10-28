@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://sudo-ivan.github.io/netbirdy/sitemap.xml
+Sitemap: https://quad4-software.github.io/netbirdy/sitemap.xml

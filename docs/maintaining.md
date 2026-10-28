@@ -27,7 +27,7 @@ upstream merge and keep --check green.
 
 Tagging vX.Y.Z or vX.Y.Z-nbyN (fork patch release) triggers
 release-fork.yml: goreleaser builds assets and publishes the GitHub release,
-and multi-arch images are pushed to ghcr.io/sudo-ivan/netbirdy-*. NetBirdy
+and multi-arch images are pushed to ghcr.io/quad4-software/netbirdy-*. NetBirdy
 versions mirror the upstream base and add -nbyN patch suffixes; docker tags
 use the same string.
 
@@ -40,7 +40,7 @@ dashboard on :8080, combined server on :8081.
 ## Published image flag
 
 `test-docker-compose` in test-infrastructure-files.yml pulls the published
-`ghcr.io/sudo-ivan/netbirdy-*` images. The job is gated behind the repository
+`ghcr.io/quad4-software/netbirdy-*` images. The job is gated behind the repository
 variable `NETBIRDY_PUBLISHED_IMAGES=true`; set it after the first image
 release so the job runs again.
 
@@ -75,7 +75,7 @@ Jobs:
 Images are pushed with zstd compressed layers and OCI media types, which GHCR
 supports. Pulling them needs Docker 23 or newer, or Podman 4 or newer.
 
-Image tags have no leading v (`ghcr.io/sudo-ivan/netbirdy-server:1.2.3`).
+Image tags have no leading v (`ghcr.io/quad4-software/netbirdy-server:1.2.3`).
 Prerelease tags (a hyphen in the version, for example `v1.0.0-rc.1`) stay
 GitHub prereleases and never move the `latest` image tag.
 

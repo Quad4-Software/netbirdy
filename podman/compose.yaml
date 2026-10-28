@@ -94,7 +94,7 @@ services:
       - UPDATER_TOKEN=${NETBIRDY_UPDATER_TOKEN:-}
       - UPDATER_PROJECT=netbirdy
       - UPDATER_SERVICES=server,dashboard
-      - UPDATER_IMAGE_PREFIX=${NETBIRDY_IMAGE_PREFIX:-ghcr.io/sudo-ivan/netbirdy-}
+      - UPDATER_IMAGE_PREFIX=${NETBIRDY_IMAGE_PREFIX:-ghcr.io/quad4-software/netbirdy-}
       - UPDATER_DATA_DIR=/data
       - UPDATER_BACKUP_DIR=/backups
     volumes:

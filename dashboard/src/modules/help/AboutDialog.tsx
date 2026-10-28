@@ -23,11 +23,11 @@ export function AboutDialog({ open, onOpenChange, dashboardVersion, managementVe
           {managementVersion && <div className="flex justify-between"><dt className="text-nb-gray-400">Management</dt><dd>{managementVersion}</dd></div>}
         </dl>
         <ul className="mt-4 space-y-1.5 text-sm">
-          <li><a className="text-netbirdy hover:underline" target="_blank" rel="noopener noreferrer" href="https://github.com/Sudo-Ivan/netbirdy">Source code (AGPLv3 offer)</a></li>
+          <li><a className="text-netbirdy hover:underline" target="_blank" rel="noopener noreferrer" href="https://github.com/Quad4-Software/netbirdy">Source code (AGPLv3 offer)</a></li>
           <li><Link className="text-netbirdy hover:underline" href="/docs">Documentation</Link></li>
           <li><Link className="text-netbirdy hover:underline" href="/docs/project/licenses-and-credits">Licenses and credits</Link></li>
-          <li><a className="text-netbirdy hover:underline" target="_blank" rel="noopener noreferrer" href="https://github.com/Sudo-Ivan/netbirdy/issues">Report an issue</a></li>
-          <li><a className="text-netbirdy hover:underline" target="_blank" rel="noopener noreferrer" href="https://github.com/Sudo-Ivan/netbirdy/security/advisories">Security advisories</a></li>
+          <li><a className="text-netbirdy hover:underline" target="_blank" rel="noopener noreferrer" href="https://github.com/Quad4-Software/netbirdy/issues">Report an issue</a></li>
+          <li><a className="text-netbirdy hover:underline" target="_blank" rel="noopener noreferrer" href="https://github.com/Quad4-Software/netbirdy/security/advisories">Security advisories</a></li>
         </ul>
         <p className="mt-4 text-xs text-nb-gray-500">
           Dashboard, management, signal, relay and the combined server are AGPL-3.0;

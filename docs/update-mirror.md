@@ -13,7 +13,7 @@ independently.
 the management config. Disabled by default; upgrades change nothing.
 
 - enabled: false by default.
-- repository: defaults to `Sudo-Ivan/netbirdy`.
+- repository: defaults to `Quad4-Software/netbirdy`.
 - api_base_url: testing only, defaults to `https://api.github.com`.
 - cache_dir: defaults to `<datadir>/updates`.
 - max_cache_bytes: 2 GiB default, LRU evicted, target version kept.

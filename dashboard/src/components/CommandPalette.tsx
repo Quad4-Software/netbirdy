@@ -39,7 +39,7 @@ export default function CommandPalette() {
     if (id === "docs") { router.push("/docs"); return; }
     if (id === "shortcuts") { window.dispatchEvent(new Event("nb:shortcuts")); return; }
     if (id === "about") { window.dispatchEvent(new Event("nb:about")); return; }
-    if (id === "source") return void window.open("https://github.com/Sudo-Ivan/netbirdy", "_blank");
+    if (id === "source") return void window.open("https://github.com/Quad4-Software/netbirdy", "_blank");
     if (id === "sign-out") return void logout();
     if (id.startsWith("/")) router.push(id);
   }, [setTheme, logout, router]);

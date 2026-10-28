@@ -10,7 +10,7 @@ export function welcome() {
     const message = `%c${ART}%c
 NetBirdy, a self-hosted NetBird fork.
 
-SOURCE: https://github.com/Sudo-Ivan/netbirdy
+SOURCE: https://github.com/Quad4-Software/netbirdy
 `;
 
     // Intentional NetBirdy ASCII banner in the devtools console.

@@ -17,7 +17,7 @@
 -->
 <policyconfig>
   <vendor>NetBirdy</vendor>
-  <vendor_url>https://github.com/Sudo-Ivan/netbirdy</vendor_url>
+  <vendor_url>https://github.com/Quad4-Software/netbirdy</vendor_url>
 
   <action id="io.netbirdy.settings.apply-privileged">
     <description>Change privileged NetBirdy settings</description>

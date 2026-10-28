@@ -42,9 +42,9 @@ if "$SIGNER" verify-artifact --artifact-public-key-file "$work/art.pub" --artifa
 fi
 
 d=$(printf '%064d' 7)
-sh "$here/images-list.sh" "$work/images.txt" ghcr.io/sudo-ivan/netbirdy- "sha256:$d" "sha256:$d" "sha256:$d"
+sh "$here/images-list.sh" "$work/images.txt" ghcr.io/quad4-software/netbirdy- "sha256:$d" "sha256:$d" "sha256:$d"
 [ "$(wc -l < "$work/images.txt")" -eq 3 ] || fail "images list line count"
-grep -q "^ghcr.io/sudo-ivan/netbirdy-updater@sha256:$d\$" "$work/images.txt" || fail "images list format"
+grep -q "^ghcr.io/quad4-software/netbirdy-updater@sha256:$d\$" "$work/images.txt" || fail "images list format"
 if sh "$here/images-list.sh" "$work/bad.txt" p- "sha256:abc" "sha256:$d" "sha256:$d" 2> /dev/null; then fail "short digest accepted"; fi
 if sh "$here/images-list.sh" "$work/bad.txt" p- "sha256:$(printf 'A%.0s' $(seq 64))" "sha256:$d" "sha256:$d" 2> /dev/null; then fail "uppercase digest accepted"; fi
 if sh "$here/images-list.sh" "$work/bad.txt" p- "$d" "sha256:$d" "sha256:$d" 2> /dev/null; then fail "missing sha256 prefix accepted"; fi

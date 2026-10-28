@@ -16,7 +16,7 @@ server:
   authSecret: "test"
   update_mirror:
     enabled: true
-    repository: "Sudo-Ivan/netbirdy"
+    repository: "Quad4-Software/netbirdy"
     prefetch: false
   updater:
     url: "http://netbirdy-updater:8089"

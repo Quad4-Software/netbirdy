@@ -32,9 +32,9 @@ the mirror and the GitHub release page are both untrusted transports.
 Verify manually:
 
 ```sh
-gh attestation verify <file> --repo Sudo-Ivan/netbirdy
+gh attestation verify <file> --repo Quad4-Software/netbirdy
 cosign verify-blob --signature checksums.sig \
-  --certificate-identity-regexp 'https://github.com/Sudo-Ivan/netbirdy/.github/workflows/release-fork.yml.*' \
+  --certificate-identity-regexp 'https://github.com/Quad4-Software/netbirdy/.github/workflows/release-fork.yml.*' \
   --certificate-oidc-issuer https://token.actions.githubusercontent.com \
   netbirdy_<ver>_checksums.txt
 ```

@@ -19,7 +19,7 @@ interface Props {
 }
 
 const GH_BASE =
-  "https://github.com/Sudo-Ivan/netbirdy/blob/master/dashboard/content/docs/";
+  "https://github.com/Quad4-Software/netbirdy/blob/master/dashboard/content/docs/";
 
 export function DocsArticle({ page, pages, prev, next }: Props) {
   const [query, setQuery] = useState("");

@@ -95,7 +95,7 @@ export default function HelpAndSupportButton() {
         )}
 
         <DropdownMenuItem
-          href="https://github.com/Sudo-Ivan/netbirdy"
+          href="https://github.com/Quad4-Software/netbirdy"
           target="_blank"
           rel="noopener noreferrer"
           asChild

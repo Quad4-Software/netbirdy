@@ -22,7 +22,7 @@ const (
 
 	defaultTempDir = "/var/lib/netbird/tmp-install"
 
-	pkgDownloadURL = "https://github.com/Sudo-Ivan/netbirdy/releases/download/v%version/netbirdy_%version_darwin_%arch.pkg"
+	pkgDownloadURL = "https://github.com/Quad4-Software/netbirdy/releases/download/v%version/netbirdy_%version_darwin_%arch.pkg"
 )
 
 var (

@@ -6,8 +6,8 @@ import (
 )
 
 const (
-	urlWinExe    = "https://github.com/Sudo-Ivan/netbirdy/releases/latest"
-	urlWinExeArm = "https://github.com/Sudo-Ivan/netbirdy/releases/latest"
+	urlWinExe    = "https://github.com/Quad4-Software/netbirdy/releases/latest"
+	urlWinExeArm = "https://github.com/Quad4-Software/netbirdy/releases/latest"
 )
 
 var regKeyAppPath = "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\App Paths\\NetBirdy"

@@ -155,14 +155,14 @@ func TestUpdatePathsAreNotAuthBypassed(t *testing.T) {
 func TestGetFullShape(t *testing.T) {
 	m := &fakeMirror{status: updatemirror.Status{Versions: []string{"0.9.0", "1.2.0", "1.10.0"}, Files: 4, Bytes: 1234, LastError: "boom"}}
 	up := &fakeUpdater{status: json.RawMessage(`{"state":"idle"}`)}
-	r, _, _ := newHarness(t, Options{Mirror: m, Updater: up, Repository: "Sudo-Ivan/netbirdy", MaxCacheBytes: 99})
+	r, _, _ := newHarness(t, Options{Mirror: m, Updater: up, Repository: "Quad4-Software/netbirdy", MaxCacheBytes: 99})
 	rec := do(r, "GET", "/api/updates", admin, "")
 	require.Equal(t, http.StatusOK, rec.Code)
 	var got Response
 	require.NoError(t, json.Unmarshal(rec.Body.Bytes(), &got))
 	assert.True(t, got.Mirror.Enabled)
 	assert.Equal(t, "1.10.0", got.LatestVersion)
-	assert.Equal(t, "https://github.com/Sudo-Ivan/netbirdy/releases/tag/v1.10.0", got.LatestReleaseURL)
+	assert.Equal(t, "https://github.com/Quad4-Software/netbirdy/releases/tag/v1.10.0", got.LatestReleaseURL)
 	assert.Equal(t, int64(99), got.Mirror.MaxBytes)
 	assert.Equal(t, "boom", got.Mirror.LastError)
 	assert.True(t, got.Updater.Available)

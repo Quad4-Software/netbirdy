@@ -141,11 +141,11 @@ export const ClustersModal = ({ open, onOpenChange, onFinish }: Props) => {
  -e NB_PROXY_PRIVATE=true \\
  -e NB_PROXY_ADDRESS=:443 \\
  -p 80:80 -p 443:443 \\
- ghcr.io/sudo-ivan/netbirdy-reverse-proxy:latest`;
+ ghcr.io/quad4-software/netbirdy-reverse-proxy:latest`;
 
   const composeCommand = `services:
   reverse-proxy:
-    image: ghcr.io/sudo-ivan/netbirdy-reverse-proxy:latest
+    image: ghcr.io/quad4-software/netbirdy-reverse-proxy:latest
     restart: unless-stopped
     ports:
       - "80:80"
@@ -183,7 +183,7 @@ spec:
     spec:
       containers:
         - name: reverse-proxy
-          image: ghcr.io/sudo-ivan/netbirdy-reverse-proxy:latest
+          image: ghcr.io/quad4-software/netbirdy-reverse-proxy:latest
           ports:
             - containerPort: 80
             - containerPort: 443

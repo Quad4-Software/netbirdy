@@ -4,7 +4,7 @@ NetBirdy is a modified fork of NetBird
 (https://github.com/netbirdio/netbird) and of the NetBird dashboard
 (https://github.com/netbirdio/dashboard).
 
-Modifications are copyright Sudo-Ivan 2026.
+Modifications are copyright Quad4-Software 2026.
 
 ## Summary of changes
 
@@ -38,7 +38,7 @@ modifications. Per AGPLv3 section 13, the complete corresponding
 source code for the versions of the covered works distributed through
 this project is offered at:
 
-    https://github.com/Sudo-Ivan/netbirdy
+    https://github.com/Quad4-Software/netbirdy
 
 ## Trademark
 

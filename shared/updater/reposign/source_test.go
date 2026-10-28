@@ -3,11 +3,11 @@ package reposign
 import "testing"
 
 func TestGitHubSourceURLs(t *testing.T) {
-	s := GitHubSource("Sudo-Ivan/netbirdy")
-	if s.KeysBaseURL != "https://raw.githubusercontent.com/Sudo-Ivan/netbirdy/main/publickeys/artifact-signatures/keys" {
+	s := GitHubSource("Quad4-Software/netbirdy")
+	if s.KeysBaseURL != "https://raw.githubusercontent.com/Quad4-Software/netbirdy/main/publickeys/artifact-signatures/keys" {
 		t.Fatalf("keys %s", s.KeysBaseURL)
 	}
-	if got := s.SigURLFor("v9.9.9", "netbirdy_x.msi"); got != "https://github.com/Sudo-Ivan/netbirdy/releases/download/v9.9.9/netbirdy_x.msi.sig" {
+	if got := s.SigURLFor("v9.9.9", "netbirdy_x.msi"); got != "https://github.com/Quad4-Software/netbirdy/releases/download/v9.9.9/netbirdy_x.msi.sig" {
 		t.Fatalf("sig %s", got)
 	}
 }

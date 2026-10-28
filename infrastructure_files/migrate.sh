@@ -18,8 +18,8 @@ set -euo pipefail
 ############################################
 
 readonly SCRIPT_VERSION="1.0.0"
-readonly DASHBOARD_IMAGE="ghcr.io/sudo-ivan/netbirdy-dashboard:latest"
-readonly NETBIRD_SERVER_IMAGE="ghcr.io/sudo-ivan/netbirdy-server:latest"
+readonly DASHBOARD_IMAGE="ghcr.io/quad4-software/netbirdy-dashboard:latest"
+readonly NETBIRD_SERVER_IMAGE="ghcr.io/quad4-software/netbirdy-server:latest"
 readonly SED_STRIP_PADDING='s/=//g'
 readonly MSG_SEPARATOR="=========================================="
 readonly PROXY_TYPE_CADDY="caddy_embedded"

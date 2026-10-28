@@ -45,7 +45,7 @@ import {
 } from "@/modules/settings/backups";
 
 const BACKUP_DOCS_URL =
-  "https://github.com/Sudo-Ivan/netbirdy/blob/main/docs/backups.md";
+  "https://github.com/Quad4-Software/netbirdy/blob/main/docs/backups.md";
 
 export default function BackupsTab() {
   const {

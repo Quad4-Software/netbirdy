@@ -24,7 +24,7 @@ import (
 
 const (
 	// Version endpoints
-	managementVersionURL = "https://api.github.com/repos/Sudo-Ivan/netbirdy/releases/latest"
+	managementVersionURL = "https://api.github.com/repos/Quad4-Software/netbirdy/releases/latest"
 	dashboardReleasesURL = "https://api.github.com/repos/netbirdio/dashboard/releases/latest"
 
 	// Cache TTL for version information

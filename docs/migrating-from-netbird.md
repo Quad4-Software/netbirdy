@@ -13,7 +13,7 @@ the upstream netbird package again; the same paths are used.
 
 ## Docker client
 
-Swap the image to ghcr.io/sudo-ivan/netbirdy and keep the same env vars
+Swap the image to ghcr.io/quad4-software/netbirdy and keep the same env vars
 (NB_*, NETBIRD_*) and volumes.
 
 ## Self-hosted server and dashboard
@@ -36,7 +36,7 @@ policies and tooling keep working.
   the management selfhosted metrics endpoint is disabled unless a downstream
   build provides one.
 - Version and self-update checks go to the fork GitHub releases
-  (github.com/Sudo-Ivan/netbirdy), never to pkgs.netbird.io.
+  (github.com/Quad4-Software/netbirdy), never to pkgs.netbird.io.
 - The GeoLite geolocation database download is opt-in: set
   NB_GEOLOCATION_CITY_TAR_URL, NB_GEOLOCATION_CITY_TAR_SHA256_URL (and the
   _ZIP_ variants for CSV) to a source you choose.

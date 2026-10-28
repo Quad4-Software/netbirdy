@@ -13,7 +13,7 @@ import {
 import { deployedBaseURL, isDeployedTarget } from "./target";
 
 const NETWORK = isDeployedTarget ? undefined : "environment_netbird";
-const IMAGE = process.env.NETBIRD_E2E_PEER_IMAGE || "ghcr.io/sudo-ivan/netbirdy:latest";
+const IMAGE = process.env.NETBIRD_E2E_PEER_IMAGE || "ghcr.io/quad4-software/netbirdy:latest";
 const MGMT_URL = deployedBaseURL ?? "http://management:80";
 
 type RegisteredPeer = {

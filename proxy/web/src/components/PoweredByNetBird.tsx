@@ -3,7 +3,7 @@ import { NetBirdLogo } from "./NetBirdLogo";
 export function PoweredByNetBird() {
   return (
     <a
-      href="https://github.com/Sudo-Ivan/netbirdy"
+      href="https://github.com/Quad4-Software/netbirdy"
       target="_blank"
       rel="noopener noreferrer"
       className="flex items-center justify-center mt-8 gap-2 group cursor-pointer"

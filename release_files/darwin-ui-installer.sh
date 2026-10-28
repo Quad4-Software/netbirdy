@@ -15,7 +15,7 @@ fi
 NB_BIN=$(which netbirdy)
 if [ -z "$NB_BIN" ]
 then
-  echo "NetBirdy daemon is not installed. Please run: brew install sudo-ivan/tap/netbirdy"
+  echo "NetBirdy daemon is not installed. Please run: brew install quad4-software/tap/netbirdy"
   exit 1
 fi
 NB_UI_VERSION=$1
@@ -25,7 +25,7 @@ then
   echo "NetBirdy's daemon is running with a different version than the NetBirdy's UI:"
   echo "NetBirdy UI Version: $NB_UI_VERSION"
   echo "NetBirdy Daemon Version: $NB_VERSION"
-  echo "Please run: brew install sudo-ivan/tap/netbirdy"
+  echo "Please run: brew install quad4-software/tap/netbirdy"
   echo "to update it"
 fi
 

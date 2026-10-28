@@ -94,7 +94,7 @@ echo "NetBirdy latest version: ${NETBIRD_LATEST_VERSION}"
 FIRST_PARTY_CSP="pkgs.netbird.io"
 FIRST_PARTY_CSP_CONNECT_SRC="wss://*.netbird.io"
 THIRD_PARTY_CSP=""
-THIRD_PARTY_CSP_CONNECT_SRC="https://api.github.com/repos/Sudo-Ivan/netbirdy/releases/latest https://raw.githubusercontent.com/Sudo-Ivan/netbirdy/"
+THIRD_PARTY_CSP_CONNECT_SRC="https://api.github.com/repos/Quad4-Software/netbirdy/releases/latest https://raw.githubusercontent.com/Quad4-Software/netbirdy/"
 THIRD_PARTY_CSP_SCRIPT_SRC="'sha256-7knV6EIjKUvCpYWE2rCYx8dYV2WCNb2bpTuitFXzBcA=' *.hs-scripts.com"
 
 CSP_DOMAINS=""

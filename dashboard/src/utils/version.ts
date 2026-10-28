@@ -18,7 +18,7 @@ export const getLatestNetbirdRelease = async (
 
   if (runFetch && typeof window !== "undefined" && localStorage.getItem("netbirdy-update-check") === "true") {
     const data = (await fetch(
-      `${GITHUB_API_ENDPOINT}/repos/Sudo-Ivan/netbirdy/releases/latest`,
+      `${GITHUB_API_ENDPOINT}/repos/Quad4-Software/netbirdy/releases/latest`,
     ).then((response) => response.json())) as any;
 
     try {

@@ -30,7 +30,7 @@ import (
 )
 
 const (
-	defaultRepository = "Sudo-Ivan/netbirdy"
+	defaultRepository = "Quad4-Software/netbirdy"
 	defaultAPIBaseURL = "https://api.github.com"
 	defaultCacheMax   = 2 << 30 // 2 GiB
 	defaultPoll       = time.Hour

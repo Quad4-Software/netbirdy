@@ -465,10 +465,10 @@ initialize_default_values() {
   NETBIRD_STUN_PORT=3478
 
   # Docker images
-  DASHBOARD_IMAGE=${DASHBOARD_IMAGE:-"ghcr.io/sudo-ivan/netbirdy-dashboard:latest"}
+  DASHBOARD_IMAGE=${DASHBOARD_IMAGE:-"ghcr.io/quad4-software/netbirdy-dashboard:latest"}
   # Combined server replaces separate signal, relay, and management containers
-  NETBIRD_SERVER_IMAGE=${NETBIRD_SERVER_IMAGE:-"ghcr.io/sudo-ivan/netbirdy-server:latest"}
-  NETBIRD_PROXY_IMAGE=${NETBIRD_PROXY_IMAGE:-"ghcr.io/sudo-ivan/netbirdy-reverse-proxy:latest"}
+  NETBIRD_SERVER_IMAGE=${NETBIRD_SERVER_IMAGE:-"ghcr.io/quad4-software/netbirdy-server:latest"}
+  NETBIRD_PROXY_IMAGE=${NETBIRD_PROXY_IMAGE:-"ghcr.io/quad4-software/netbirdy-reverse-proxy:latest"}
   TRAEFIK_IMAGE=${TRAEFIK_IMAGE:-"traefik:v3.7.14"}
   CROWDSEC_IMAGE=${CROWDSEC_IMAGE:-"crowdsecurity/crowdsec:v1.8.1"}
   # Reverse proxy configuration

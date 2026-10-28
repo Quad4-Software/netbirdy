@@ -29,8 +29,8 @@ const (
 
 	processExitWait = 10 * time.Second
 
-	msiDownloadURL = "https://github.com/Sudo-Ivan/netbirdy/releases/download/v%version/netbirdy_installer_%version_windows_%arch.msi"
-	exeDownloadURL = "https://github.com/Sudo-Ivan/netbirdy/releases/download/v%version/netbirdy_installer_%version_windows_%arch.exe"
+	msiDownloadURL = "https://github.com/Quad4-Software/netbirdy/releases/download/v%version/netbirdy_installer_%version_windows_%arch.msi"
+	exeDownloadURL = "https://github.com/Quad4-Software/netbirdy/releases/download/v%version/netbirdy_installer_%version_windows_%arch.exe"
 )
 
 var (

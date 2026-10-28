@@ -3,5 +3,5 @@
 package installer
 
 const (
-	DefaultSigningKeysBaseURL = "https://raw.githubusercontent.com/Sudo-Ivan/netbirdy/main/publickeys/artifact-signatures"
+	DefaultSigningKeysBaseURL = "https://raw.githubusercontent.com/Quad4-Software/netbirdy/main/publickeys/artifact-signatures"
 )

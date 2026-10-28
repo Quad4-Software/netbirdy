@@ -17,7 +17,7 @@ const (
 )
 
 var (
-	versionURL = "https://api.github.com/repos/Sudo-Ivan/netbirdy/releases/latest"
+	versionURL = "https://api.github.com/repos/Quad4-Software/netbirdy/releases/latest"
 )
 
 // Update fetch the version info periodically and notify the onUpdateListener in case the UI version or the

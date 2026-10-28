@@ -5,7 +5,7 @@ set -e
 CONFIG_FOLDER="/etc/netbird"
 CONFIG_FILE="$CONFIG_FOLDER/install.conf"
 
-OWNER="Sudo-Ivan"
+OWNER="Quad4-Software"
 REPO="netbirdy"
 CLI_APP="netbirdy"
 UI_APP="netbirdy-ui"
@@ -47,7 +47,7 @@ get_release() {
     local RELEASE=$1
     if [ "$RELEASE" = "latest" ]; then
         local TAG="latest"
-        local URL="https://api.github.com/repos/Sudo-Ivan/netbirdy/releases/latest"
+        local URL="https://api.github.com/repos/Quad4-Software/netbirdy/releases/latest"
     else
         local TAG="tags/${RELEASE}"
         local URL="https://api.github.com/repos/${OWNER}/${REPO}/releases/${TAG}"
@@ -123,12 +123,12 @@ add_apt_repo() {
         /usr/share/keyrings/netbirdy-archive-keyring.gpg \
         /usr/share/keyrings/wiretrustee-archive-keyring.gpg
 
-    echo "error: the NetBirdy apt repository is not published yet; install from https://github.com/Sudo-Ivan/netbirdy/releases" 1>&2
+    echo "error: the NetBirdy apt repository is not published yet; install from https://github.com/Quad4-Software/netbirdy/releases" 1>&2
     return 1
 }
 
 add_rpm_repo() {
-    echo "error: the NetBirdy yum repository is not published yet; install from https://github.com/Sudo-Ivan/netbirdy/releases" 1>&2
+    echo "error: the NetBirdy yum repository is not published yet; install from https://github.com/Quad4-Software/netbirdy/releases" 1>&2
     return 1
 }
 
@@ -181,7 +181,7 @@ install_pkg() {
     *) echo "Unsupported macOS arch: $(uname -m)" >&2; exit 1 ;;
   esac
 
-  PKG_URL=$(curl -sIL --proto "$PROTO_HTTPS" --proto-redir "$PROTO_HTTPS" -o /dev/null -w '%{url_effective}' "https://github.com/Sudo-Ivan/netbirdy/releases/latest")
+  PKG_URL=$(curl -sIL --proto "$PROTO_HTTPS" --proto-redir "$PROTO_HTTPS" -o /dev/null -w '%{url_effective}' "https://github.com/Quad4-Software/netbirdy/releases/latest")
   echo "Downloading NetBirdy macOS installer from the NetBirdy releases page"
   curl -fsSL --proto "$PROTO_HTTPS" --proto-redir "$PROTO_HTTPS" -o "${NB_TMPDIR}/netbirdy.pkg" "${PKG_URL}"
   ${SUDO} installer -pkg "${NB_TMPDIR}/netbirdy.pkg" -target /
@@ -274,9 +274,9 @@ install_netbird() {
             brew unlink netbirdy
         fi
 
-        brew install sudo-ivan/tap/netbirdy
+        brew install quad4-software/tap/netbirdy
         if ! $SKIP_UI_APP; then
-            brew install --cask sudo-ivan/tap/netbirdy-ui
+            brew install --cask quad4-software/tap/netbirdy-ui
         fi
     ;;
     *)

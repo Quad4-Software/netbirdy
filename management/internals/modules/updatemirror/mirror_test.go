@@ -24,7 +24,7 @@ func fakeGH(t *testing.T, files map[string][]byte, checksums string, keys map[st
 	t.Helper()
 	mux := http.NewServeMux()
 	srv := httptest.NewTLSServer(mux)
-	mux.HandleFunc("/repos/Sudo-Ivan/netbirdy/releases/latest", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/repos/Quad4-Software/netbirdy/releases/latest", func(w http.ResponseWriter, r *http.Request) {
 		if r.Header.Get("If-None-Match") == `"r1"` {
 			w.WriteHeader(http.StatusNotModified)
 			return

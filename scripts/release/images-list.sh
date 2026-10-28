@@ -2,7 +2,7 @@
 # Writes the signed image list consumed by the updater.
 # Usage: images-list.sh OUT PREFIX SERVER_DIGEST DASHBOARD_DIGEST UPDATER_DIGEST
 # PREFIX is the registry path before the service name, for example
-# ghcr.io/sudo-ivan/netbirdy-. Digests are sha256:<64 hex>.
+# ghcr.io/quad4-software/netbirdy-. Digests are sha256:<64 hex>.
 set -eu
 
 out=$1

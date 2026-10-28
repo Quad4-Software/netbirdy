@@ -13,9 +13,9 @@ NetBirdy is a self-hosted WireGuard mesh VPN. It is a fork of
 NetBird clients can connect to a NetBirdy server and an existing NetBird setup
 can be moved over without re-enrolling devices.
 
-[![CI](https://github.com/Sudo-Ivan/netbirdy/actions/workflows/golang-test-linux.yml/badge.svg)](https://github.com/Sudo-Ivan/netbirdy/actions/workflows/golang-test-linux.yml)
+[![CI](https://github.com/Quad4-Software/netbirdy/actions/workflows/golang-test-linux.yml/badge.svg)](https://github.com/Quad4-Software/netbirdy/actions/workflows/golang-test-linux.yml)
 
-Website: <https://sudo-ivan.github.io/netbirdy/>
+Website: <https://quad4-software.github.io/netbirdy/>
 
 > **Note:** LLMs were used to create and maintain this fork. It is a personal
 > fork for myself, friends and family only.
@@ -52,7 +52,7 @@ Website: <https://sudo-ivan.github.io/netbirdy/>
 The local stack needs Podman and make.
 
 ```sh
-git clone https://github.com/Sudo-Ivan/netbirdy.git
+git clone https://github.com/Quad4-Software/netbirdy.git
 cd netbirdy
 make podman-build
 make podman-up
@@ -73,7 +73,7 @@ See [podman/README.md](podman/README.md) for ports, resetting and tests.
 ## Install the client
 
 Packages and installers are published on the
-[releases page](https://github.com/Sudo-Ivan/netbirdy/releases). The binary is
+[releases page](https://github.com/Quad4-Software/netbirdy/releases). The binary is
 named `netbirdy`.
 
 Create a setup key in the dashboard, then on the device:

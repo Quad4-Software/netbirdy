@@ -30,7 +30,7 @@ const (
 	checkTimeout   = 5 * time.Minute
 	updaterTimeout = 10 * time.Second
 	maxBody        = 1 << 20
-	defaultRepo    = "Sudo-Ivan/netbirdy"
+	defaultRepo    = "Quad4-Software/netbirdy"
 )
 
 var versionRe = regexp.MustCompile(`^v?[0-9]+\.[0-9]+\.[0-9]+(-[A-Za-z0-9.]+)?$`)

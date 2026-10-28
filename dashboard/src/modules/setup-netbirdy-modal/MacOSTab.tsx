@@ -167,15 +167,15 @@ export default function MacOSTab({
                   <p>Install NetBirdy </p>
                   <Code
                     codeToCopy={[
-                      `brew install sudo-ivan/tap/netbirdy`,
-                      `brew install --cask sudo-ivan/tap/netbirdy-ui`,
+                      `brew install quad4-software/tap/netbirdy`,
+                      `brew install --cask quad4-software/tap/netbirdy-ui`,
                     ].join("\n")}
                   >
                     <Code.Comment># for CLI only</Code.Comment>
-                    <Code.Line>brew install sudo-ivan/tap/netbirdy</Code.Line>
+                    <Code.Line>brew install quad4-software/tap/netbirdy</Code.Line>
                     <Code.Comment># for GUI package</Code.Comment>
                     <Code.Line>
-                      brew install --cask sudo-ivan/tap/netbirdy-ui
+                      brew install --cask quad4-software/tap/netbirdy-ui
                     </Code.Line>
                   </Code>
                 </Steps.Step>

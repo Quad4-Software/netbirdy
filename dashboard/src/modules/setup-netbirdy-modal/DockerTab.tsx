@@ -87,7 +87,7 @@ export default function DockerTab({
                   <span className={"text-netbirdy"}>{GRPC_API_ORIGIN}</span> \
                 </Code.Line>
               )}
-              <Code.Line> ghcr.io/sudo-ivan/netbirdy:latest</Code.Line>
+              <Code.Line> ghcr.io/quad4-software/netbirdy:latest</Code.Line>
             </Code>
           </Steps.Step>
           <Steps.Step step={3 + offset} line={false}>
