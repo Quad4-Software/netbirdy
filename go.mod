@@ -95,7 +95,7 @@ require (
 	github.com/pion/turn/v3 v3.0.1
 	github.com/pires/go-proxyproto v0.11.0
 	github.com/pkg/sftp v1.13.12
-	github.com/prometheus/client_golang v1.23.2
+	github.com/prometheus/client_golang v1.24.1
 	github.com/prometheus/client_model v0.6.3
 	github.com/quic-go/quic-go v0.64.1
 	github.com/redis/go-redis/v9 v9.23.0
@@ -119,9 +119,9 @@ require (
 	github.com/wailsapp/wails/v3 v3.0.0-beta.34
 	github.com/yusufpapurcu/wmi v1.2.4
 	github.com/zcalusic/sysinfo v1.2.0
-	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.69.0
+	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.72.0
 	go.opentelemetry.io/otel v1.47.0
-	go.opentelemetry.io/otel/exporters/prometheus v0.64.0
+	go.opentelemetry.io/otel/exporters/prometheus v0.69.0
 	go.opentelemetry.io/otel/metric v1.47.0
 	go.opentelemetry.io/otel/sdk/metric v1.47.0
 	go.uber.org/mock v0.6.0
@@ -140,7 +140,7 @@ require (
 	golang.zx2c4.com/wireguard/wgctrl v0.0.0-20241231184526-a9ab2273dd10
 	golang.zx2c4.com/wireguard/windows v0.5.3
 	google.golang.org/api v0.276.0
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20260526163538-3dc84a4a5aaa
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20260928230214-8a89bd6388cc
 	google.golang.org/grpc v1.83.2
 	google.golang.org/protobuf v1.36.12
 	gopkg.in/yaml.v3 v3.0.1
@@ -328,9 +328,9 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/power-devops/perfstat v0.0.0-20260916203055-22a1a467d9f0 // indirect
 	github.com/pquerna/otp v1.5.0 // indirect
-	github.com/prometheus/common v0.69.0 // indirect
+	github.com/prometheus/common v0.72.0 // indirect
 	github.com/prometheus/otlptranslator v1.0.0 // indirect
-	github.com/prometheus/procfs v0.20.1 // indirect
+	github.com/prometheus/procfs v0.22.0 // indirect
 	github.com/quic-go/qpack v0.6.0 // indirect
 	github.com/russellhaering/goxmldsig v1.6.1 // indirect
 	github.com/ryanuber/go-glob v1.0.0 // indirect
