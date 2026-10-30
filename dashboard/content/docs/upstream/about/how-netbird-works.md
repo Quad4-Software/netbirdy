@@ -115,9 +115,11 @@ It runs in the cloud NetBird-managed and can be self-hosted.
 
 ## Relay Service
 
-The Relay service is a [TURN server](https://webrtc.org/getting-started/turn-server) in WebRTC terminology.
-In fact, we use an open-source implementation called [Coturn](https://github.com/coturn/coturn).
-The purpose of the Relay service is to gracefully implement a "Plan B" by relaying traffic between peers when a direct point-to-point connection is not possible. However, starting with v0.29.0, a new WebSocket-based relay has been introduced with the intent of replacing the previous TURN relay (Coturn). [More info](https://netbird.io/knowledge-hub/september-newsletter).
+The Relay service forwards encrypted peer traffic when a direct point-to-point connection cannot be established. It is separate from STUN/TURN services such as Coturn, which help with NAT traversal and TURN allocations.
+
+The standalone Relay service accepts WebSocket connections over TCP at `/relay` and can accept QUIC connections over UDP when TLS is configured. The combined server multiplexes its WebSocket Relay on the main HTTP(S) listener, so it does not need a separate Relay port. A standard HTTP reverse proxy can forward the WebSocket connection, but it cannot forward QUIC's UDP traffic. In the default automatic transport mode, clients can use WebSocket when QUIC is unreachable.
+
+You can use a managed Relay service or run the standalone Relay service with your own public endpoint.
 <p>
     <img src="/docs-img/docs-static-img-about-netbird-relay.png" alt="relay-dia" className="imagewrapper-big"/>
 </p>

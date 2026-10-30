@@ -55,7 +55,7 @@ Since version 0.29, NetBird uses a consolidated port architecture where Manageme
 | Port | Protocol | Description |
 |------|----------|-------------|
 | 80   | TCP      | HTTP (Let's Encrypt certificate validation, redirects to HTTPS) |
-| 443  | TCP      | HTTPS (Dashboard, Management API/gRPC, Signal gRPC, Relay WebSocket) |
+| 443  | TCP      | HTTPS (Dashboard, Management API/gRPC, Signal gRPC, Relay WebSocket at `/relay`) |
 | 3478 | UDP      | Coturn STUN/TURN server |
 
 **Without reverse proxy (direct exposure):**
@@ -65,10 +65,13 @@ Since version 0.29, NetBird uses a consolidated port architecture where Manageme
 | 443   | TCP      | HTTPS (Dashboard, Management HTTP API) |
 | 33073 | TCP      | Management gRPC API |
 | 10000 | TCP      | Signal gRPC API |
-| 33080 | TCP      | Relay (WebSocket/QUIC) |
+| 33080 | TCP      | Standalone Relay WebSocket listener (default port) |
+| 33080 | UDP      | Standalone Relay QUIC listener (optional; requires Relay TLS) |
 | 3478  | UDP      | Coturn STUN/TURN server |
 
 > **Note** The default setup script configures a Traefik reverse proxy that consolidates all services behind ports 80 and 443. If you're running NetBird behind your own reverse proxy, see the [advanced configuration](#advanced-running-net-bird-behind-an-existing-reverse-proxy) section.
+
+The standalone Relay uses TCP for WebSocket and UDP for QUIC on the configured listener port. Configure `--listen-address` (`NB_LISTEN_ADDRESS`) for its local bind and `--exposed-address` (`NB_EXPOSED_ADDRESS`) for the public address advertised to peers; these can differ behind a port-mapping proxy. An HTTP reverse proxy can route WebSocket traffic on `/relay`; QUIC must be forwarded over UDP separately. If QUIC is unavailable, clients can use the WebSocket transport. The combined server hosts its WebSocket Relay on the main HTTP(S) listener, so it does not need a separate Relay container or port.
 
 
 > **Note** **Legacy port requirements (pre-v0.29):** TCP `80, 443, 33073, 10000, 33080` plus UDP `3478` and UDP `49152-65535` (Coturn TURN relay port range). If you have any clients running versions below v0.29, you must keep these legacy ports open even if your server is upgraded - older clients cannot use the consolidated ports.
@@ -212,11 +215,7 @@ If you already have a reverse proxy (Nginx, Caddy, etc.), you can configure NetB
 
 **Existing deployments:** Use the configuration templates on the dedicated reverse proxy page.
 
-See the [External Reverse Proxy Configuration](/selfhosted/external-reverse-proxy) page for:
-- Complete configuration templates for [Traefik](/selfhosted/external-reverse-proxy#traefik), [Nginx](/selfhosted/external-reverse-proxy#nginx), [Caddy](/selfhosted/external-reverse-proxy#caddy-external), and [Nginx Proxy Manager](/selfhosted/external-reverse-proxy#nginx-proxy-manager)
-- Required routing endpoints and port mappings
-- Docker Compose examples for external proxies
-- Troubleshooting tips
+The repository includes an [Nginx example](https://github.com/Quad4-Software/netbirdy/blob/main/infrastructure_files/nginx.tmpl.conf) and a [Traefik Compose example](https://github.com/Quad4-Software/netbirdy/blob/main/infrastructure_files/docker-compose.yml.tmpl.traefik). Both route Relay WebSocket traffic on `/relay` and require WebSocket upgrade support. For example, advertise `rels://relay.example.com:443` while the proxy forwards to the Relay's internal TCP listener. A regular HTTP reverse proxy does not forward QUIC over UDP.
 
 ## Backup
 To backup your NetBird installation, you need to copy the configuration files, and the Management service databases.

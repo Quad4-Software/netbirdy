@@ -62,7 +62,7 @@ Enter choice [0-5] (default: 0):
 
 **For this quickstart guide, select option `[0]` (Traefik)** - just press Enter to use the default. This option includes a Traefik container in the Docker Compose that handles TLS certificates automatically via Let's Encrypt, requires no additional configuration, and makes it easy to enable the NetBird Proxy in the next step.
 
-> **Note** If you already have a reverse proxy (Traefik, Nginx, etc.) and want to use it instead, the script will guide you through the setup. See the [External Reverse Proxy Configuration](/selfhosted/external-reverse-proxy) guide for detailed instructions on each option.
+> **Note** If you already have a reverse proxy (Traefik, Nginx, etc.) and want to use it instead, the script will guide you through the setup. See the [reverse-proxy section in the advanced self-hosting guide](/selfhosted/selfhosted-guide#advanced-running-netbird-behind-an-existing-reverse-proxy) for Relay and other service routing details.
 
 
 
