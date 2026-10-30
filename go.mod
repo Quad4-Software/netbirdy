@@ -92,7 +92,7 @@ require (
 	github.com/pion/transport/v3 v3.1.1
 	github.com/pion/transport/v4 v4.0.2
 	github.com/pion/turn/v4 v4.1.1
-	github.com/pires/go-proxyproto v0.11.0
+	github.com/pires/go-proxyproto v0.16.0
 	github.com/pkg/sftp v1.13.12
 	github.com/prometheus/client_golang v1.23.2
 	github.com/prometheus/client_model v0.6.3
