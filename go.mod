@@ -94,7 +94,7 @@ require (
 	github.com/pion/turn/v4 v4.1.1
 	github.com/pires/go-proxyproto v0.11.0
 	github.com/pkg/sftp v1.13.12
-	github.com/prometheus/client_golang v1.23.2
+	github.com/prometheus/client_golang v1.25.0
 	github.com/prometheus/client_model v0.6.3
 	github.com/quic-go/quic-go v0.64.1
 	github.com/redis/go-redis/v9 v9.23.0
@@ -324,9 +324,9 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/power-devops/perfstat v0.0.0-20260916203055-22a1a467d9f0 // indirect
 	github.com/pquerna/otp v1.5.0 // indirect
-	github.com/prometheus/common v0.69.0 // indirect
+	github.com/prometheus/common v0.72.0 // indirect
 	github.com/prometheus/otlptranslator v1.0.0 // indirect
-	github.com/prometheus/procfs v0.20.1 // indirect
+	github.com/prometheus/procfs v0.22.0 // indirect
 	github.com/quic-go/qpack v0.6.0 // indirect
 	github.com/russellhaering/goxmldsig v1.6.1 // indirect
 	github.com/ryanuber/go-glob v1.0.0 // indirect
