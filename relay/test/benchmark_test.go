@@ -11,7 +11,7 @@ import (
 	"time"
 
 	"github.com/pion/logging"
-	"github.com/pion/turn/v3"
+	"github.com/pion/turn/v4"
 
 	"github.com/netbirdio/netbird/client/iface"
 	"github.com/netbirdio/netbird/relay/server"
