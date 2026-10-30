@@ -2,9 +2,9 @@ module github.com/netbirdio/netbird
 
 go 1.27.0
 
-// Pin the toolchain to a patch release >= go1.27.2
+// Pin the toolchain to a patch release >= go1.27.3
 // See https://go.dev/issue/77875.
-toolchain go1.27.2
+toolchain go1.27.3
 
 require (
 	cunicu.li/go-rosenpass v0.5.42
