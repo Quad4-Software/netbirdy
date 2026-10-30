@@ -102,7 +102,7 @@ func jsonIncomingHeaderMatcher(key string) (string, bool) {
 func (p *program) startJSONGateway(jsonListener *socketListener, daemonEndpoint string) error {
 	if jsonListener.network == "tcp" {
 		log.Warnf("daemon JSON socket is listening on TCP (%s): callers carry no verifiable identity over TCP, "+
-			"so privileged operations will be denied for JSON clients", jsonListener.address)
+			"so privileged operations and RPCs requiring caller identity will be denied for JSON clients", jsonListener.address)
 	}
 
 	mux := runtime.NewServeMux(runtime.WithIncomingHeaderMatcher(jsonIncomingHeaderMatcher))

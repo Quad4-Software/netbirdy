@@ -28,6 +28,22 @@ func TestRegisterUILogRefusesUnidentifiedCaller(t *testing.T) {
 	}
 }
 
+func TestDebugBundleRefusesUnidentifiedCaller(t *testing.T) {
+	s := &Server{}
+
+	resp, err := s.DebugBundle(noIdentityCtx(), &proto.DebugBundleRequest{})
+	if resp != nil && resp.GetPath() != "" {
+		t.Cleanup(func() {
+			if err := os.Remove(resp.GetPath()); err != nil && !os.IsNotExist(err) {
+				t.Errorf("remove generated debug bundle: %v", err)
+			}
+		})
+	}
+	if gstatus.Code(err) != codes.PermissionDenied {
+		t.Fatalf("code = %v, want PermissionDenied", gstatus.Code(err))
+	}
+}
+
 func TestRegisterUILogRefusesForeignPath(t *testing.T) {
 	secret := "/etc/shadow"
 	if runtime.GOOS == "windows" {

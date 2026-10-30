@@ -122,14 +122,23 @@ func (d *FilteredDevice) Write(bufs [][]byte, offset int) (int, error) {
 		return d.deviceWrite(bufs, offset)
 	}
 
-	filteredBufs := make([][]byte, 0, len(bufs))
+	var filteredBufs [][]byte
 	dropped := 0
-	for _, buf := range bufs {
+	for i, buf := range bufs {
 		if filter.FilterInbound(buf[offset:], len(buf)) {
 			dropped++
-		} else {
+			if filteredBufs == nil {
+				filteredBufs = make([][]byte, 0, len(bufs))
+				filteredBufs = append(filteredBufs, bufs[:i]...)
+			}
+			continue
+		}
+		if filteredBufs != nil {
 			filteredBufs = append(filteredBufs, buf)
 		}
+	}
+	if filteredBufs == nil {
+		return d.deviceWrite(bufs, offset)
 	}
 
 	n, err := d.deviceWrite(filteredBufs, offset)

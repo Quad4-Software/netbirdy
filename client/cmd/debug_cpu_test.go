@@ -11,8 +11,11 @@ import (
 	"github.com/spf13/pflag"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/peer"
 
 	"github.com/netbirdio/netbird/client/internal"
+	"github.com/netbirdio/netbird/client/internal/ipcauth"
 	"github.com/netbirdio/netbird/client/internal/profilemanager"
 )
 
@@ -48,7 +51,16 @@ func startDebugTestDaemon(t *testing.T) string {
 	}))
 
 	ctx, cancel := context.WithCancel(internal.CtxInitState(context.Background()))
-	srv, lis := startClientDaemon(t, ctx, "", tempDir+"/config.json")
+	caller := ipcauth.AuthInfo{Identity: ipcauth.Identity{UID: 1000}}
+	identityInterceptor := grpc.UnaryInterceptor(func(
+		ctx context.Context,
+		req any,
+		_ *grpc.UnaryServerInfo,
+		handler grpc.UnaryHandler,
+	) (any, error) {
+		return handler(peer.NewContext(ctx, &peer.Peer{AuthInfo: caller}), req)
+	})
+	srv, lis := startClientDaemon(t, ctx, "", tempDir+"/config.json", identityInterceptor)
 	t.Cleanup(func() {
 		cancel()
 		srv.Stop()

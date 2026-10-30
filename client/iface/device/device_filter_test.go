@@ -2,14 +2,99 @@ package device
 
 import (
 	"net"
+	"net/netip"
 	"testing"
 
-	"go.uber.org/mock/gomock"
 	"github.com/google/gopacket"
 	"github.com/google/gopacket/layers"
+	"go.uber.org/mock/gomock"
 
 	mocks "github.com/netbirdio/netbird/client/iface/mocks"
+	"github.com/netbirdio/netbird/client/iface/wgbackend"
 )
+
+type writeTestTUN struct {
+	wgbackend.TUN
+	written [][]byte
+}
+
+func (d *writeTestTUN) Write(bufs [][]byte, _ int) (int, error) {
+	d.written = bufs
+	return len(bufs), nil
+}
+
+type noOpPacketFilter struct{}
+
+func (noOpPacketFilter) FilterOutbound([]byte, int) bool                        { return false }
+func (noOpPacketFilter) FilterInbound([]byte, int) bool                         { return false }
+func (noOpPacketFilter) SetUDPPacketHook(netip.Addr, uint16, func([]byte) bool) {}
+func (noOpPacketFilter) SetTCPPacketHook(netip.Addr, uint16, func([]byte) bool) {}
+
+type byteDropFilter struct{ drop byte }
+
+func (f byteDropFilter) FilterOutbound([]byte, int) bool { return false }
+func (f byteDropFilter) FilterInbound(packet []byte, _ int) bool {
+	return len(packet) > 0 && packet[0] == f.drop
+}
+func (byteDropFilter) SetUDPPacketHook(netip.Addr, uint16, func([]byte) bool) {}
+func (byteDropFilter) SetTCPPacketHook(netip.Addr, uint16, func([]byte) bool) {}
+
+func TestFilteredDeviceWriteNoOpFilterAvoidsAllocation(t *testing.T) {
+	tun := &writeTestTUN{}
+	device := newDeviceFilter(tun)
+	device.SetFilter(noOpPacketFilter{})
+	bufs := [][]byte{{1}, {2}, {3}}
+
+	var written int
+	var writeErr error
+	allocs := testing.AllocsPerRun(100, func() {
+		written, writeErr = device.Write(bufs, 0)
+	})
+	if writeErr != nil {
+		t.Fatalf("write: %v", writeErr)
+	}
+	if written != len(bufs) {
+		t.Fatalf("written = %d, want %d", written, len(bufs))
+	}
+	if allocs != 0 {
+		t.Fatalf("allocations per no-op filtered write = %v, want 0", allocs)
+	}
+	if &tun.written[0] != &bufs[0] {
+		t.Fatal("no-op filter did not pass the original packet slice through")
+	}
+}
+
+func TestFilteredDeviceWriteDropsOnlyMatchingPackets(t *testing.T) {
+	tun := &writeTestTUN{}
+	device := newDeviceFilter(tun)
+	device.SetFilter(byteDropFilter{drop: 2})
+	bufs := [][]byte{{1}, {2}, {3}}
+
+	written, err := device.Write(bufs, 0)
+	if err != nil {
+		t.Fatalf("write: %v", err)
+	}
+	if written != len(bufs) {
+		t.Fatalf("written = %d, want %d", written, len(bufs))
+	}
+	if len(tun.written) != 2 || tun.written[0][0] != 1 || tun.written[1][0] != 3 {
+		t.Fatalf("underlying device received %v, want packets 1 and 3", tun.written)
+	}
+}
+
+func BenchmarkFilteredDeviceWriteNoOpFilter(b *testing.B) {
+	device := newDeviceFilter(&writeTestTUN{})
+	device.SetFilter(noOpPacketFilter{})
+	bufs := [][]byte{{1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}}
+
+	b.ReportAllocs()
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		if _, err := device.Write(bufs, 0); err != nil {
+			b.Fatal(err)
+		}
+	}
+}
 
 func TestDeviceWrapperRead(t *testing.T) {
 	ctrl := gomock.NewController(t)

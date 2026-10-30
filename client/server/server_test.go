@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"errors"
 	"net/url"
 	"os/user"
 	"path/filepath"
@@ -113,7 +114,8 @@ func TestServer_SubcribeEvents(t *testing.T) {
 
 	ctx := internal.CtxInitState(context.Background())
 	ic := profilemanager.ConfigInput{
-		ConfigPath: tempDir + "/default.json",
+		ConfigPath:    tempDir + "/default.json",
+		ManagementURL: "http://non-existent-url-for-testing.invalid:12345",
 	}
 
 	_, err := profilemanager.UpdateOrCreateConfig(ic)
@@ -137,12 +139,11 @@ func TestServer_SubcribeEvents(t *testing.T) {
 
 	err = s.Start()
 	require.NoError(t, err)
-
-	u, err := url.Parse("http://non-existent-url-for-testing.invalid:12345")
-	require.NoError(t, err)
-	s.config = &profilemanager.Config{
-		ManagementURL: u,
-	}
+	t.Cleanup(func() {
+		if _, err := s.Down(userCtx(), &daemonProto.DownRequest{}); err != nil && !errors.Is(err, ErrServiceNotUp) {
+			t.Errorf("stop test client: %v", err)
+		}
+	})
 
 	ctx, cancel := context.WithTimeout(ctx, 1*time.Second)
 	defer cancel()

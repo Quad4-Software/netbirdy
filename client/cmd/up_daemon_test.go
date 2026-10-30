@@ -133,11 +133,4 @@ func TestUpDaemon(t *testing.T) {
 	}
 	time.Sleep(time.Second * 3)
 
-	rootCmd.SetErr(nil)
-	rootCmd.SetArgs([]string{"down", "--daemon-addr", "tcp://" + cliAddr})
-	if err := rootCmd.Execute(); err != nil {
-		t.Errorf("expected no error while running up command, got %v", err)
-		return
-	}
-	// we can't check status here, because context already canceled
 }

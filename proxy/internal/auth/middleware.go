@@ -135,12 +135,17 @@ func (mw *Middleware) Protect(next http.Handler) http.Handler {
 
 		config, exists := mw.getDomainConfig(host)
 		mw.logger.Debugf("checking authentication for host: %s, exists: %t", host, exists)
-
 		if !exists {
 			next.ServeHTTP(w, r)
 			return
 		}
 
+		// enforce account id for requests routed through the embedded client
+		capturedData := proxy.CapturedDataFromContext(r.Context())
+		if capturedData != nil && capturedData.GetAccountID() != "" && capturedData.GetAccountID() != config.AccountID {
+			denyForbidden(w, r, config)
+			return
+		}
 		// Set account and service IDs in captured data for access logging.
 		setCapturedIDs(r, config)
 
@@ -740,10 +745,7 @@ func setSessionCookie(w http.ResponseWriter, r *http.Request, token string, expi
 	if expiration == 0 {
 		expiration = auth.DefaultSessionExpiry
 	}
-	secure := true
-	if types.IsOverlayOrigin(r.Context()) && r.TLS == nil {
-		secure = false
-	}
+	secure := !types.IsOverlayOrigin(r.Context()) || r.TLS != nil
 	http.SetCookie(w, &http.Cookie{
 		Name:     auth.SessionCookieName,
 		Value:    token,

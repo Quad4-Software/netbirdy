@@ -16,6 +16,7 @@ import (
 	"github.com/netbirdio/netbird/client/internal/ipcauth"
 	"github.com/netbirdio/netbird/client/internal/localmetrics"
 	"github.com/netbirdio/netbird/client/internal/profilemanager"
+	"github.com/netbirdio/netbird/client/mdm"
 	"github.com/netbirdio/netbird/client/proto"
 	"github.com/netbirdio/netbird/util"
 )
@@ -34,9 +35,8 @@ import (
 //   - Binding the local metrics endpoint to a non-loopback address publishes
 //     peer names and connectivity state to the network without authentication.
 //
-// Everything else stays unauthenticated, so this is not an authorization model:
-// it only refuses the changes that would let a local user become root. A caller
-// whose identity cannot be established is refused as well.
+// These checks refuse the privileged changes listed here for unprivileged
+// callers. Other sensitive RPCs enforce their own caller checks.
 
 // privilegedConfigChange is the subset of a config request that crosses the
 // user-to-root boundary. Fields are nil or empty when the request leaves them
@@ -83,6 +83,15 @@ func privilegedChangeFromLogin(msg *proto.LoginRequest) privilegedConfigChange {
 // value it does not change is never refused: a UI that submits the whole
 // settings form must not start failing once an administrator has enabled SSH.
 func requirePrivilegeForConfigChange(ctx context.Context, stored *profilemanager.Config, change privilegedConfigChange) error {
+	return requirePrivilegeForConfigChangeWithPolicy(ctx, stored, change, nil)
+}
+
+func requirePrivilegeForConfigChangeWithPolicy(
+	ctx context.Context,
+	stored *profilemanager.Config,
+	change privilegedConfigChange,
+	policy *mdm.Policy,
+) error {
 	if enables(storedFlag(stored, func(c *profilemanager.Config) *bool { return c.EnableSSHRoot }), change.enableSSHRoot) {
 		return denyPrivileged(ctx, "enabling SSH root login", ipcauth.UpCommand("--enable-ssh-root"))
 	}
@@ -112,7 +121,7 @@ func requirePrivilegeForConfigChange(ctx context.Context, stored *profilemanager
 
 	// Only guard the management binding while the SSH server is enabled: that is
 	// when the management identity decides who may open a shell here.
-	if !sshServerEnabled(stored) {
+	if !sshServerEnabledWithPolicy(stored, policy) {
 		return nil
 	}
 
@@ -123,6 +132,27 @@ func requirePrivilegeForConfigChange(ctx context.Context, stored *profilemanager
 	}
 
 	return nil
+}
+
+// sshServerEnabledWithPolicy includes runtime MDM overrides, which are not
+// written to the profile file used by the privilege gate.
+func sshServerEnabledWithPolicy(cfg *profilemanager.Config, policy *mdm.Policy) bool {
+	if policy != nil {
+		if enabled, ok := policy.GetBool(mdm.KeyAllowServerSSH); ok {
+			return enabled
+		}
+	}
+	return sshServerEnabled(cfg)
+}
+
+func requireIdentifiedCaller(ctx context.Context, action string) error {
+	if _, ok := ipcauth.CallerIdentity(ctx); ok {
+		return nil
+	}
+
+	log.Warnf("denying %s: the caller's identity cannot be verified on this control channel", action)
+	return gstatus.Errorf(codes.PermissionDenied,
+		"%s requires a control channel that carries the caller's identity", action)
 }
 
 // requirePrivilegeForDeregistration refuses to deregister the peer from the

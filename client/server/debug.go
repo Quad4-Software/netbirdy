@@ -26,16 +26,19 @@ import (
 
 // DebugBundle creates a debug bundle and returns the location.
 func (s *Server) DebugBundle(callerCtx context.Context, req *proto.DebugBundleRequest) (resp *proto.DebugBundleResponse, err error) {
+	if err := requireIdentifiedCaller(callerCtx, "generating a debug bundle"); err != nil {
+		return nil, err
+	}
+
 	if err := requirePrivilegeForUploadURL(callerCtx, req.GetUploadURL(), req.GetUploadInsecure()); err != nil {
 		return nil, err
 	}
 
-	// The UI log is opened as whoever asked for this bundle, so a caller only
-	// collects a log it owns (privileged callers excepted). ok is false on a
-	// socket that carries no identity, which skips the UI log.
-	callerID, callerIdentified := ipcauth.CallerIdentity(callerCtx)
+	// The UI log is opened as the caller, so they can only collect a log they
+	// own unless they are privileged.
+	callerID, _ := ipcauth.CallerIdentity(callerCtx)
 
-	path, managementURL, err := s.generateDebugBundle(req, uiLogOpener(callerID, callerIdentified))
+	path, managementURL, err := s.generateDebugBundle(req, uiLogOpener(callerID, true))
 	if err != nil {
 		return nil, err
 	}

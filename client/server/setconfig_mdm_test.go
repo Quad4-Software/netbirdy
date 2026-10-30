@@ -11,6 +11,7 @@ import (
 	"google.golang.org/grpc/codes"
 	gstatus "google.golang.org/grpc/status"
 
+	"github.com/netbirdio/netbird/client/internal"
 	"github.com/netbirdio/netbird/client/internal/profilemanager"
 	"github.com/netbirdio/netbird/client/mdm"
 	"github.com/netbirdio/netbird/client/proto"
@@ -363,4 +364,37 @@ func TestSetConfig_MDMEmpty_NoEnforcement(t *testing.T) {
 
 	require.NoError(t, err)
 	require.NotNil(t, resp)
+}
+
+func TestSetConfig_MDMEnabledSSHProtectsManagementURL(t *testing.T) {
+	s, _, profName, username, _ := setupServerWithProfile(t)
+	withMDMPolicy(t, s, mdm.NewPolicy(map[string]any{
+		mdm.KeyAllowServerSSH: true,
+	}))
+
+	_, err := s.SetConfig(userCtx(), &proto.SetConfigRequest{
+		ProfileName:   profName,
+		Username:      username,
+		ManagementUrl: "https://attacker.example.com:443",
+	})
+
+	require.Equal(t, codes.PermissionDenied, gstatus.Code(err),
+		"an MDM-enabled SSH server must protect the management binding")
+}
+
+func TestLogin_MDMEnabledSSHProtectsManagementURL(t *testing.T) {
+	s, _, _, username, _ := setupServerWithProfile(t)
+	withMDMPolicy(t, s, mdm.NewPolicy(map[string]any{
+		mdm.KeyAllowServerSSH: true,
+	}))
+	s.rootCtx = internal.CtxInitState(context.Background())
+	internal.CtxGetState(s.rootCtx).Set(internal.StatusConnected)
+
+	_, err := s.Login(userCtx(), &proto.LoginRequest{
+		Username:      &username,
+		ManagementUrl: "https://attacker.example.com:443",
+	})
+
+	require.Equal(t, codes.PermissionDenied, gstatus.Code(err),
+		"Login must apply the same MDM-aware management binding gate as SetConfig")
 }

@@ -268,7 +268,7 @@ func (s *Server) Start() error {
 
 	if s.updateManager == nil {
 		stateMgr := statemanager.New(s.profileManager.GetStatePath())
-		s.updateManager = updater.NewManager(s.statusRecorder, stateMgr)
+		s.updateManager = updater.NewManager(s.rootCtx, s.statusRecorder, stateMgr)
 		s.updateManager.CheckUpdateSuccess(s.rootCtx)
 	}
 
@@ -547,7 +547,9 @@ func (s *Server) SetConfig(callerCtx context.Context, msg *proto.SetConfigReques
 		return nil, err
 	}
 
-	if err := requirePrivilegeForConfigChange(callerCtx, stored, privilegedChangeFromSetConfig(msg)); err != nil {
+	if err := requirePrivilegeForConfigChangeWithPolicy(
+		callerCtx, stored, privilegedChangeFromSetConfig(msg), policy,
+	); err != nil {
 		return nil, err
 	}
 
@@ -702,7 +704,9 @@ func (s *Server) Login(callerCtx context.Context, msg *proto.LoginRequest) (*pro
 
 	// Privilege gate: same restrictions as SetConfig, since LoginRequest can carry
 	// the same fields.
-	if err := requirePrivilegeForConfigChange(callerCtx, stored, privilegedChangeFromLogin(msg)); err != nil {
+	if err := requirePrivilegeForConfigChangeWithPolicy(
+		callerCtx, stored, privilegedChangeFromLogin(msg), policy,
+	); err != nil {
 		return nil, err
 	}
 
@@ -1439,6 +1443,10 @@ func (s *Server) SwitchProfile(callerCtx context.Context, msg *proto.SwitchProfi
 
 // Down engine work in the daemon.
 func (s *Server) Down(ctx context.Context, _ *proto.DownRequest) (*proto.DownResponse, error) {
+	if err := requireIdentifiedCaller(ctx, "bringing the agent down"); err != nil {
+		return nil, err
+	}
+
 	s.mutex.Lock()
 
 	giveUpChan := s.clientGiveUpChan
@@ -2903,7 +2911,9 @@ func (s *Server) authorizeAndPrepareLogin(callerCtx context.Context, msg *proto.
 	if err != nil {
 		return nil, nil, false, err
 	}
-	if err := requirePrivilegeForConfigChange(callerCtx, stored, privilegedChangeFromLogin(msg)); err != nil {
+	if err := requirePrivilegeForConfigChangeWithPolicy(
+		callerCtx, stored, privilegedChangeFromLogin(msg), s.mdmLoader.Load(),
+	); err != nil {
 		return nil, nil, false, err
 	}
 

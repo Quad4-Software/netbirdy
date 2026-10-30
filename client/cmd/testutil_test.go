@@ -149,14 +149,14 @@ func startManagement(t *testing.T, config *config.Config, testFile string) (*grp
 }
 
 func startClientDaemon(
-	t *testing.T, ctx context.Context, _, _ string,
+	t *testing.T, ctx context.Context, _, _ string, serverOptions ...grpc.ServerOption,
 ) (*grpc.Server, net.Listener) {
 	t.Helper()
 	lis, err := net.Listen("tcp", "127.0.0.1:0")
 	if err != nil {
 		t.Fatal(err)
 	}
-	s := grpc.NewServer()
+	s := grpc.NewServer(serverOptions...)
 
 	server := client.New(ctx,
 		"", "", false, false, false, false)

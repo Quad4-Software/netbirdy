@@ -43,8 +43,9 @@ func validateJSONSocketFlags() error {
 func daemonServerOptions(network string) []grpc.ServerOption {
 	if network == "tcp" {
 		log.Warnf("daemon is listening on TCP (%s): callers carry no verifiable identity over TCP, "+
-			"so privileged operations (SSH root login, SSH auth, enabling the SSH server, management URL changes, "+
-			"deregistration) will be denied, and the SSH JWT cache is neither filled nor served. "+
+			"so operations requiring caller identity (SSH root login, SSH auth, enabling the SSH server, "+
+			"management URL changes, deregistration, disconnecting the agent, and generating debug bundles) "+
+			"will be denied, and the SSH JWT cache is neither filled nor served. "+
 			"Use a unix socket, or npipe:// on Windows", daemonAddr)
 		return nil
 	}
