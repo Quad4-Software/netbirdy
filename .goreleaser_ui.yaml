@@ -55,9 +55,9 @@ archives:
       - netbirdy-ui-windows-amd64
 
 nfpms:
-  - maintainer: NetBirdy <https://github.com/Sudo-Ivan/netbirdy>
+  - maintainer: NetBirdy <https://github.com/Quad4-Software/netbirdy>
     description: NetBirdy client UI.
-    homepage: https://github.com/Sudo-Ivan/netbirdy
+    homepage: https://github.com/Quad4-Software/netbirdy
     license: BSD-3-Clause
     vendor: NetBirdy
     id: netbird_ui_deb
@@ -84,9 +84,9 @@ nfpms:
       - libwebkitgtk-6.0-4
       - xdg-utils
 
-  - maintainer: NetBirdy <https://github.com/Sudo-Ivan/netbirdy>
+  - maintainer: NetBirdy <https://github.com/Quad4-Software/netbirdy>
     description: NetBirdy client UI.
-    homepage: https://github.com/Sudo-Ivan/netbirdy
+    homepage: https://github.com/Quad4-Software/netbirdy
     license: BSD-3-Clause
     vendor: NetBirdy
     id: netbird_ui_rpm
@@ -119,8 +119,6 @@ nfpms:
 
 release:
   # Uploads into the release created by the main .goreleaser.yaml run.
-  # make_latest stays false everywhere: the signing pipeline
-  # (ghcr.io/sudo-ivan/netbirdy-sign-pipelines) marks the release latest after the Windows
-  # and macOS artifacts are signed.
+  # The main release workflow marks a stable release latest after signing its assets.
   make_latest: false
   prerelease: auto

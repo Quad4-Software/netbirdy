@@ -18,7 +18,7 @@ concurrency:
 
 jobs:
   test-docker-compose:
-    # Needs published ghcr.io/sudo-ivan/netbirdy-* images; enable via the
+    # Needs published ghcr.io/quad4-software/netbirdy-* images; enable via the
     # NETBIRDY_PUBLISHED_IMAGES repository variable once images exist.
     if: github.repository == 'netbirdio/netbird' || vars.NETBIRDY_PUBLISHED_IMAGES == 'true'
     runs-on: ubuntu-latest

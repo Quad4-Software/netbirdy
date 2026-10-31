@@ -46,9 +46,9 @@ nfpms:
   # Mutually-exclusive alternative to the GTK4 netbirdy-ui package -- both
   # ship the same /usr/bin/netbirdy-ui from the shared stable/yum repos, so
   # this one carries its own name and conflicts with the GTK4 package.
-  - maintainer: NetBirdy <https://github.com/Sudo-Ivan/netbirdy>
+  - maintainer: NetBirdy <https://github.com/Quad4-Software/netbirdy>
     description: NetBirdy client UI.
-    homepage: https://github.com/Sudo-Ivan/netbirdy
+    homepage: https://github.com/Quad4-Software/netbirdy
     license: BSD-3-Clause
     vendor: NetBirdy
     id: netbird_ui_deb_gtk3
@@ -75,9 +75,9 @@ nfpms:
       - libwebkit2gtk-4.1-0
       - xdg-utils
 
-  - maintainer: NetBirdy <https://github.com/Sudo-Ivan/netbirdy>
+  - maintainer: NetBirdy <https://github.com/Quad4-Software/netbirdy>
     description: NetBirdy client UI.
-    homepage: https://github.com/Sudo-Ivan/netbirdy
+    homepage: https://github.com/Quad4-Software/netbirdy
     license: BSD-3-Clause
     vendor: NetBirdy
     id: netbird_ui_rpm_gtk3
@@ -137,8 +137,6 @@ uploads:
 
 release:
   # Uploads into the release created by the main .goreleaser.yaml run.
-  # make_latest stays false everywhere: the signing pipeline
-  # (ghcr.io/sudo-ivan/netbirdy-sign-pipelines) marks the release latest after the Windows
-  # and macOS artifacts are signed.
+  # The main release workflow marks a stable release latest after signing its assets.
   make_latest: false
   prerelease: auto

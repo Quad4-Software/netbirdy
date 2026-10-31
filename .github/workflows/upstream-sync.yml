@@ -8,7 +8,7 @@ permissions:
   pull-requests: write
 jobs:
   sync:
-    if: github.repository == 'Sudo-Ivan/netbirdy'
+    if: github.repository == 'Quad4-Software/netbirdy'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
@@ -21,7 +21,9 @@ jobs:
           git fetch https://github.com/netbirdio/netbird.git 'refs/tags/*:refs/tags/upstream/*'
           LATEST=$(git tag -l 'upstream/v*' --sort=-v:refname | head -1 | sed 's|upstream/||')
           echo "tag=$LATEST" >> "$GITHUB_OUTPUT"
-          if git branch -r --list "origin/sync/$LATEST" | grep -q . || gh pr list --state open --head "sync/$LATEST" --json number --jq 'length' | grep -qv '^0$'; then
+          branch=$(git branch -r --list "origin/sync/$LATEST")
+          pr_count=$(gh pr list --state open --head "sync/$LATEST" --json number --jq length)
+          if [ -n "$branch" ] || [ "$pr_count" -gt 0 ]; then
             echo "exists=true" >> "$GITHUB_OUTPUT"
           else
             echo "exists=false" >> "$GITHUB_OUTPUT"
@@ -39,11 +41,12 @@ jobs:
           note=""
           if [ -z "$UPSTREAM_SYNC_PAT" ]; then
             dropped=$(git status --porcelain -- .github/workflows | sed -e 's/^...//' -e 's/.* -> //' | sort -u)
-            if [ -n "$dropped" ]; then
-              git reset -q HEAD -- .github/workflows
-              git checkout -- .github/workflows || true
-              git clean -fdq -- .github/workflows
-              note=$(printf '\n\nWorkflow file changes were left out because the token used to push cannot update files under `.github/workflows`. Apply them by hand:\n\n```\ngit fetch https://github.com/netbirdio/netbird.git tag %s\ngit checkout FETCH_HEAD -- .github/workflows\n```\n\nFiles affected:\n\n```\n%s\n```' "${{ steps.tag.outputs.tag }}" "$dropped")
+          if [ -n "$dropped" ]; then
+            git reset -q HEAD -- .github/workflows
+            git checkout -- .github/workflows || true
+            git clean -fdq -- .github/workflows
+            # shellcheck disable=SC2016 # Keep Markdown backticks literal in the generated note.
+            note=$(printf '\n\nWorkflow file changes were left out because the token used to push cannot update files under `.github/workflows`. Apply them by hand:\n\n```\ngit fetch https://github.com/netbirdio/netbird.git tag %s\ngit checkout FETCH_HEAD -- .github/workflows\n```\n\nFiles affected:\n\n```\n%s\n```' "${{ steps.tag.outputs.tag }}" "$dropped")
             fi
           fi
           git add -A

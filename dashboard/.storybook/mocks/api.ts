@@ -47,9 +47,9 @@ const json = (body: unknown, status = 200) =>
 /* Third-party calls the dashboard makes on its own; answered offline so
    screenshots never depend on what GitHub serves today. */
 const external: Record<string, unknown> = {
-  "https://raw.githubusercontent.com/Sudo-Ivan/netbirdy/main/dashboard/announcements.json":
+  "https://raw.githubusercontent.com/Quad4-Software/netbirdy/main/dashboard/announcements.json":
     [],
-  "https://api.github.com/repos/Sudo-Ivan/netbirdy/releases/latest": {
+  "https://api.github.com/repos/Quad4-Software/netbirdy/releases/latest": {
     tag_name: "v0.60.0",
     name: "v0.60.0",
   },

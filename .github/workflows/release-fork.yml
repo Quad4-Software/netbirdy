@@ -13,11 +13,11 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  IMAGE_PREFIX: ghcr.io/sudo-ivan/netbirdy-
+  IMAGE_PREFIX: ghcr.io/quad4-software/netbirdy-
 
 jobs:
   meta:
-    if: github.repository == 'Sudo-Ivan/netbirdy'
+    if: github.repository == 'Quad4-Software/netbirdy'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -85,6 +85,7 @@ jobs:
         uses: actions/setup-go@44694675825211faa026b3c33043df3e48a5fa00 # v6.0.0
         with:
           go-version-file: "go.mod"
+          cache: false
 
       - name: Install cross compilers
         run: sudo apt-get update && sudo apt-get install -y -q gcc-arm-linux-gnueabihf gcc-aarch64-linux-gnu
@@ -100,11 +101,17 @@ jobs:
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: "24"
+          package-manager-cache: false
+
+      - name: Set up pnpm
+        if: needs.meta.outputs.publish == 'true'
+        uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+        with:
+          version: 12.14.0
 
       - name: Install proxy web dependencies for license collection
         if: needs.meta.outputs.publish == 'true'
         run: |
-          npm install -g pnpm@12.14.0
           pnpm install --frozen-lockfile --filter web --ignore-scripts
 
       - name: Set up QEMU
@@ -181,11 +188,13 @@ jobs:
         uses: actions/setup-go@44694675825211faa026b3c33043df3e48a5fa00 # v6.0.0
         with:
           go-version-file: "go.mod"
+          cache: false
 
       - name: Set up Node.js
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: "24"
+          package-manager-cache: false
 
       - name: Set up pnpm
         uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
@@ -274,6 +283,7 @@ jobs:
         uses: actions/setup-go@44694675825211faa026b3c33043df3e48a5fa00 # v6.0.0
         with:
           go-version-file: "go.mod"
+          cache: false
 
       - name: Download the desktop binary
         uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
@@ -370,16 +380,18 @@ jobs:
         uses: actions/setup-go@44694675825211faa026b3c33043df3e48a5fa00 # v6.0.0
         with:
           go-version-file: "go.mod"
+          cache: false
 
       - name: Set up Node.js
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: "24"
+          package-manager-cache: false
 
       - name: Set up pnpm
         uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
         with:
-          version_file_path: "package.json"
+          version: 12.14.0
 
       - name: Build the desktop frontend
         run: |
@@ -421,6 +433,8 @@ jobs:
   images:
     needs: [meta, goreleaser]
     runs-on: ubuntu-latest
+    outputs:
+      image_matrix: ${{ steps.image-matrix.outputs.value }}
     permissions:
       contents: read
       packages: write
@@ -458,37 +472,125 @@ jobs:
               [ "$STABLE" = "true" ] && tags="$tags -t ${IMAGE_PREFIX}${svc}:latest"
               # shellcheck disable=SC2086
               docker buildx build --platform linux/amd64,linux/arm64 --push \
+                --sbom=true --provenance=mode=max \
                 --output type=image,compression=zstd,compression-level=3,force-compression=true,oci-mediatypes=true \
                 --metadata-file "meta-${svc}.json" -f "podman/Containerfile.${svc}" $tags .
               digest=$(jq -r '."containerimage.digest"' "meta-${svc}.json")
               echo "${svc}_digest=${digest}" >> "$GITHUB_ENV"
             done
-            server_digest=$(docker buildx imagetools inspect "${IMAGE_PREFIX}server:${VERSION}" --format '{{json .Manifest}}' | jq -r '.digest')
-            echo "server_digest=${server_digest}" >> "$GITHUB_ENV"
+            digest=$(docker buildx imagetools inspect "${IMAGE_PREFIX}server:${VERSION}" --format '{{json .Manifest}}' | jq -r '.digest')
+            echo "server_digest=${digest}" >> "$GITHUB_ENV"
           else
             for svc in dashboard updater; do
               docker buildx build --platform linux/amd64 --load -t "dryrun-${svc}:test" -f "podman/Containerfile.${svc}" .
             done
             {
+              echo "server_digest=${zero}"
               echo "dashboard_digest=${zero}"
               echo "updater_digest=${zero}"
-              echo "server_digest=${zero}"
             } >> "$GITHUB_ENV"
           fi
 
-      - name: Write the image list
+      - name: Write the legacy image list
         run: |
           mkdir -p out
           sh scripts/release/images-list.sh "out/netbirdy_${VERSION}_images.txt" "$IMAGE_PREFIX" \
             "$server_digest" "$dashboard_digest" "$updater_digest"
           cat "out/netbirdy_${VERSION}_images.txt"
 
+      - name: Write the provenance image list
+        run: |
+          mkdir -p out
+          client_repo=${IMAGE_PREFIX%-}
+          refs=(
+            "$client_repo:$VERSION"
+            "$client_repo:$VERSION-rootless"
+            "$client_repo:$VERSION-rootless-ubi"
+            "${IMAGE_PREFIX}relay:$VERSION"
+            "${IMAGE_PREFIX}relay:$VERSION-ubi"
+            "${IMAGE_PREFIX}signal:$VERSION"
+            "${IMAGE_PREFIX}signal:$VERSION-ubi"
+            "${IMAGE_PREFIX}management:$VERSION"
+            "${IMAGE_PREFIX}management:$VERSION-ubi"
+            "${IMAGE_PREFIX}upload:$VERSION"
+            "${IMAGE_PREFIX}server:$VERSION"
+            "${IMAGE_PREFIX}server:$VERSION-ubi"
+            "${IMAGE_PREFIX}reverse-proxy:$VERSION"
+            "${IMAGE_PREFIX}reverse-proxy:$VERSION-ubi"
+            "${IMAGE_PREFIX}nblink:$VERSION"
+            "${IMAGE_PREFIX}dashboard:$VERSION"
+            "${IMAGE_PREFIX}updater:$VERSION"
+          )
+          refs_file="out/netbirdy_${VERSION}_image_refs.txt"
+          if [ "$PUBLISH" = "true" ]; then
+            : > "$refs_file"
+            for ref in "${refs[@]}"; do
+              digest=$(docker buildx imagetools inspect "$ref" --format '{{json .Manifest}}' | jq -r '.digest')
+              printf '%s %s\n' "${ref%:*}" "$digest" >> "$refs_file"
+            done
+          else
+            zero="sha256:$(printf '0%.0s' $(seq 64))"
+            : > "$refs_file"
+            for ref in "${refs[@]}"; do
+              printf '%s %s\n' "${ref%:*}" "$zero" >> "$refs_file"
+            done
+          fi
+          set --
+          while IFS=' ' read -r image digest; do
+            set -- "$@" "$image" "$digest"
+          done < "$refs_file"
+          sh scripts/release/image-provenance-list.sh \
+            "out/netbirdy_${VERSION}_images_provenance.txt" "$IMAGE_PREFIX" "$@"
+
+      - name: Set image attestation matrix
+        id: image-matrix
+        run: |
+          matrix=$(jq -cn --rawfile list "out/netbirdy_${VERSION}_images_provenance.txt" '
+            {include: ($list | split("\n") | map(select(length > 0)) |
+              map(split("@") as $parts | {name: $parts[0], digest: $parts[1]}))}')
+          echo "value=$matrix" >> "$GITHUB_OUTPUT"
+
       - name: Upload image list
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
           name: images-list
-          path: out/*_images.txt
+          path: out/*_images*.txt
           if-no-files-found: error
+
+  attest-images:
+    needs: [meta, images]
+    if: needs.meta.outputs.publish == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+      attestations: write
+      packages: write
+    strategy:
+      fail-fast: true
+      matrix: ${{ fromJSON(needs.images.outputs.image_matrix) }}
+    steps:
+      - name: Install cosign
+        uses: sigstore/cosign-installer@ba7bc0a3fef59531c69a25acd34668d6d3fe6f22 # v4.1.0
+
+      - name: Login to GHCR
+        uses: docker/login-action@650006c6eb7dba73a995cc03b0b2d7f5ca915bee # v4.2.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Sign image digest
+        env:
+          IMAGE_REF: ${{ matrix.name }}@${{ matrix.digest }}
+        run: cosign sign --yes "$IMAGE_REF"
+
+      - name: Attest image provenance
+        uses: actions/attest-build-provenance@977bb373ede98d70efdf65b84cb5f73e068dcc2a # v3.0.0
+        with:
+          subject-name: ${{ matrix.name }}
+          subject-digest: ${{ matrix.digest }}
+          push-to-registry: true
 
   sign:
     needs: [meta, goreleaser, desktop-linux, windows-installer, macos-pkg, images]
@@ -497,6 +599,7 @@ jobs:
       contents: read
     env:
       VERSION: ${{ needs.meta.outputs.version }}
+      PUBLISH: ${{ needs.meta.outputs.publish }}
     steps:
       - name: Checkout
         uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
@@ -507,6 +610,21 @@ jobs:
         uses: actions/setup-go@44694675825211faa026b3c33043df3e48a5fa00 # v6.0.0
         with:
           go-version-file: "go.mod"
+          cache: false
+
+      - name: Prepare SBOM output directory
+        run: mkdir -p inputs
+
+      - name: Generate source SBOM
+        uses: anchore/sbom-action@66cbf4bc1f1c0d2edc94016e65bc221b6bb0ad6c # v0.24.3
+        with:
+          path: .
+          format: spdx-json
+          output-file: inputs/netbirdy_${{ needs.meta.outputs.version }}_source.spdx.json
+          syft-version: v1.55.0
+          dependency-snapshot: false
+          upload-artifact: false
+          upload-release-assets: false
 
       - name: Download release files
         uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
@@ -514,15 +632,48 @@ jobs:
           path: inputs
           merge-multiple: true
 
-      - name: Sign and verify
+      - name: Build signer
+        run: go build -o "$RUNNER_TEMP/signer" ./client/cmd/signer
+
+      - name: Create ephemeral signing key
+        id: ephemeral-key
+        if: needs.meta.outputs.publish != 'true'
+        run: |
+          "$RUNNER_TEMP/signer" create-root-key \
+            --priv-key-file "$RUNNER_TEMP/root.key" \
+            --pub-key-file "$RUNNER_TEMP/root.pub" --expiration 24h >/dev/null
+          "$RUNNER_TEMP/signer" create-artifact-key \
+            --root-private-key-file "$RUNNER_TEMP/root.key" \
+            --artifact-priv-key-file "$RUNNER_TEMP/artifact.key" \
+            --artifact-pub-key-file "$RUNNER_TEMP/artifact.pub" \
+            --expiration 24h >/dev/null
+          {
+            echo "key_file=$RUNNER_TEMP/artifact.key"
+            echo "pub_file=$RUNNER_TEMP/artifact.pub"
+            echo "root_key_file=$RUNNER_TEMP/root.key"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Prepare release signing key
+        id: release-key
+        if: needs.meta.outputs.publish == 'true'
         env:
           ARTIFACT_KEY: ${{ secrets.NETBIRDY_ARTIFACT_KEY }}
         run: |
           umask 077
+          : "${ARTIFACT_KEY:?NETBIRDY_ARTIFACT_KEY is required for release signing}"
           key_file="$RUNNER_TEMP/artifact.key"
-          trap 'shred -f "$key_file" 2>/dev/null || true; rm -f "$key_file"' EXIT
           printf '%s' "$ARTIFACT_KEY" > "$key_file"
-          go build -o "$RUNNER_TEMP/signer" ./client/cmd/signer
+          echo "key_file=$key_file" >> "$GITHUB_OUTPUT"
+          echo "pub_file=$GITHUB_WORKSPACE/publickeys/artifact-signatures/keys/artifact-key-pub.pem" >> "$GITHUB_OUTPUT"
+
+      - name: Sign and verify
+        env:
+          KEY_FILE: ${{ steps.release-key.outputs.key_file || steps.ephemeral-key.outputs.key_file }}
+          PUB_FILE: ${{ steps.release-key.outputs.pub_file || steps.ephemeral-key.outputs.pub_file }}
+          ROOT_KEY_FILE: ${{ steps.ephemeral-key.outputs.root_key_file }}
+        run: |
+          set -eu
+          trap 'for f in "$KEY_FILE" "$ROOT_KEY_FILE"; do if [ -n "$f" ]; then shred -f "$f" 2>/dev/null || rm -f "$f"; fi; done' EXIT
           export SIGNER="$RUNNER_TEMP/signer"
           sh scripts/release/test.sh
           rm -f inputs/netbirdy-ui.exe
@@ -532,7 +683,7 @@ jobs:
             merge="$RUNNER_TEMP/goreleaser_checksums.txt"
             mv "$f" "$merge"
           done
-          sh scripts/release/sign.sh inputs "$VERSION" "$key_file" publickeys/artifact-signatures/keys/artifact-key-pub.pem "$merge"
+          sh scripts/release/sign.sh inputs "$VERSION" "$KEY_FILE" "$PUB_FILE" "$merge"
           ls -l inputs
 
       - name: Upload signed release files
@@ -544,13 +695,12 @@ jobs:
 
   publish:
     if: needs.meta.outputs.publish == 'true'
-    needs: [meta, sign]
+    needs: [meta, sign, images, attest-images]
     runs-on: ubuntu-latest
     permissions:
       contents: write
       id-token: write
       attestations: write
-      packages: write
     env:
       TAG: ${{ needs.meta.outputs.tag }}
       VERSION: ${{ needs.meta.outputs.version }}
@@ -567,30 +717,10 @@ jobs:
       - name: Install cosign
         uses: sigstore/cosign-installer@ba7bc0a3fef59531c69a25acd34668d6d3fe6f22 # v4.1.0
 
-      - name: Login to GHCR
-        uses: docker/login-action@650006c6eb7dba73a995cc03b0b2d7f5ca915bee # v4.2.0
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Sign with cosign
         run: |
-          for f in "assets/netbirdy_${VERSION}_checksums.txt" "assets/netbirdy_${VERSION}_images.txt"; do
+          for f in "assets/netbirdy_${VERSION}_checksums.txt" "assets/netbirdy_${VERSION}_images.txt" "assets/netbirdy_${VERSION}_images_provenance.txt"; do
             cosign sign-blob --yes --bundle "${f}.cosign.bundle" "$f"
-          done
-          while IFS= read -r image; do
-            cosign sign --yes "$image"
-          done < "assets/netbirdy_${VERSION}_images.txt"
-
-      - name: Read image digests
-        id: digests
-        run: |
-          list="assets/netbirdy_${VERSION}_images.txt"
-          for svc in server dashboard updater; do
-            line=$(grep "netbirdy-${svc}@" "$list")
-            echo "${svc}_name=${line%@*}" >> "$GITHUB_OUTPUT"
-            echo "${svc}_digest=${line#*@}" >> "$GITHUB_OUTPUT"
           done
 
       - name: Attest release files
@@ -598,30 +728,9 @@ jobs:
         with:
           subject-checksums: assets/netbirdy_${{ needs.meta.outputs.version }}_checksums.txt
 
-      - name: Attest server image
-        uses: actions/attest-build-provenance@977bb373ede98d70efdf65b84cb5f73e068dcc2a # v3.0.0
-        with:
-          subject-name: ${{ steps.digests.outputs.server_name }}
-          subject-digest: ${{ steps.digests.outputs.server_digest }}
-          push-to-registry: true
-
-      - name: Attest dashboard image
-        uses: actions/attest-build-provenance@977bb373ede98d70efdf65b84cb5f73e068dcc2a # v3.0.0
-        with:
-          subject-name: ${{ steps.digests.outputs.dashboard_name }}
-          subject-digest: ${{ steps.digests.outputs.dashboard_digest }}
-          push-to-registry: true
-
-      - name: Attest updater image
-        uses: actions/attest-build-provenance@977bb373ede98d70efdf65b84cb5f73e068dcc2a # v3.0.0
-        with:
-          subject-name: ${{ steps.digests.outputs.updater_name }}
-          subject-digest: ${{ steps.digests.outputs.updater_digest }}
-          push-to-registry: true
-
       - name: Upload signed assets to the release
         run: |
-          find assets -maxdepth 1 -type f \( -name '*.sig' -o -name '*.exe' -o -name '*.pkg' -o -name '*_images.txt' -o -name '*_checksums.txt' -o -name '*.cosign.bundle' -o -name 'netbirdy-ui_*' -o -name 'netbirdy-ui-linux_*' \) ! -name 'netbirdy-ui.exe*' -print0 \
+          find assets -maxdepth 1 -type f \( -name '*.sig' -o -name '*.exe' -o -name '*.msi' -o -name '*.pkg' -o -name '*.tar.gz' -o -name '*.zip' -o -name '*.deb' -o -name '*.rpm' -o -name '*_images*.txt' -o -name '*_checksums.txt' -o -name '*.cosign.bundle' -o -name '*.spdx.json' -o -name 'netbirdy-ui_*' -o -name 'netbirdy-ui-linux_*' \) ! -name 'netbirdy-ui.exe*' -print0 \
             | xargs -0 gh release upload "$TAG" --clobber
 
       - name: Mark the release latest

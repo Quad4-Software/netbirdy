@@ -49,4 +49,35 @@ if sh "$here/images-list.sh" "$work/bad.txt" p- "sha256:abc" "sha256:$d" "sha256
 if sh "$here/images-list.sh" "$work/bad.txt" p- "sha256:$(printf 'A%.0s' $(seq 64))" "sha256:$d" "sha256:$d" 2> /dev/null; then fail "uppercase digest accepted"; fi
 if sh "$here/images-list.sh" "$work/bad.txt" p- "$d" "sha256:$d" "sha256:$d" 2> /dev/null; then fail "missing sha256 prefix accepted"; fi
 
+refs="$work/image-refs.txt"
+: > "$refs"
+n=1
+for image in \
+    ghcr.io/quad4-software/netbirdy \
+    ghcr.io/quad4-software/netbirdy \
+    ghcr.io/quad4-software/netbirdy \
+    ghcr.io/quad4-software/netbirdy-relay \
+    ghcr.io/quad4-software/netbirdy-relay \
+    ghcr.io/quad4-software/netbirdy-signal \
+    ghcr.io/quad4-software/netbirdy-signal \
+    ghcr.io/quad4-software/netbirdy-management \
+    ghcr.io/quad4-software/netbirdy-management \
+    ghcr.io/quad4-software/netbirdy-upload \
+    ghcr.io/quad4-software/netbirdy-server \
+    ghcr.io/quad4-software/netbirdy-server \
+    ghcr.io/quad4-software/netbirdy-reverse-proxy \
+    ghcr.io/quad4-software/netbirdy-reverse-proxy \
+    ghcr.io/quad4-software/netbirdy-nblink \
+    ghcr.io/quad4-software/netbirdy-dashboard \
+    ghcr.io/quad4-software/netbirdy-updater; do
+    printf '%s sha256:%064d\n' "$image" "$n" >> "$refs"
+    n=$((n + 1))
+done
+set --
+while IFS=' ' read -r image digest; do
+    set -- "$@" "$image" "$digest"
+done < "$refs"
+sh "$here/image-provenance-list.sh" "$work/image-provenance.txt" ghcr.io/quad4-software/netbirdy- "$@"
+[ "$(wc -l < "$work/image-provenance.txt")" -eq 17 ] || fail "published image variants were omitted"
+
 echo "release scripts ok"

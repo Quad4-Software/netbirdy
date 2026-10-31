@@ -25,28 +25,44 @@ binary itself is a per-distribution package-manager concern.
 
 ## Release verification
 
-Every release asset ships with a reposign signature (`<file>.sig`) that
-NetBirdy clients verify against the root key embedded in the binary, so
-the mirror and the GitHub release page are both untrusted transports.
+Release files ship with reposign signatures (`<file>.sig`) verified against the
+root key embedded in NetBirdy clients. The checksum manifest has a GitHub
+artifact attestation and a Cosign bundle. The source dependency inventory is
+published as SPDX JSON. Container images include BuildKit SBOM and provenance
+attestations, and each image digest is signed and attested by the release
+workflow.
 
 Verify manually:
 
 ```sh
 gh attestation verify <file> --repo Quad4-Software/netbirdy
-cosign verify-blob --signature checksums.sig \
+cosign verify-blob --bundle netbirdy_<ver>_checksums.txt.cosign.bundle \
   --certificate-identity-regexp 'https://github.com/Quad4-Software/netbirdy/.github/workflows/release-fork.yml.*' \
   --certificate-oidc-issuer https://token.actions.githubusercontent.com \
   netbirdy_<ver>_checksums.txt
 ```
 
-For container images, verify the digest in `netbirdy_<ver>_images.txt`
-the same way, then pull by `image@sha256:<digest>`.
+`netbirdy_<ver>_images.txt` lists the legacy updater images.
+`netbirdy_<ver>_images_provenance.txt` records every published image variant.
+Verify an image signature before pulling its listed digest:
+
+```sh
+cosign verify \
+  --certificate-identity-regexp 'https://github.com/Quad4-Software/netbirdy/.github/workflows/release-fork.yml.*' \
+  --certificate-oidc-issuer https://token.actions.githubusercontent.com \
+  ghcr.io/quad4-software/netbirdy-server@sha256:<digest>
+```
+
+The image SBOM is SPDX attached to the OCI index. Inspect it with
+`docker buildx imagetools inspect <image>@sha256:<digest>`.
+OpenVEX statements are published only after a product-specific vulnerability
+assessment supports the status claim.
 
 ### Key rotation and revocation
 
 Private keys live outside the repository in `~/.config/netbirdy-signing/`
 (root.key and artifact.key, mode 600). The root key must stay offline
-and backed up; the artifact key is also stored as the
+and backed up. The artifact key is also stored as the
 `NETBIRDY_ARTIFACT_KEY` repository secret for CI signing.
 
 Rotate the artifact key yearly:

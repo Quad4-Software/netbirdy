@@ -1,4 +1,4 @@
-Contact: https://github.com/Sudo-Ivan/netbirdy/security/advisories/new
-Policy: https://github.com/Sudo-Ivan/netbirdy/blob/main/SECURITY.md
+Contact: https://github.com/Quad4-Software/netbirdy/security/advisories/new
+Policy: https://github.com/Quad4-Software/netbirdy/blob/main/SECURITY.md
 Expires: 2027-10-24T00:00:00Z
 Preferred-Languages: en

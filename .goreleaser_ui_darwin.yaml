@@ -46,8 +46,6 @@ changelog:
 
 release:
   # Uploads into the release created by the main .goreleaser.yaml run.
-  # make_latest stays false everywhere: the signing pipeline
-  # (ghcr.io/sudo-ivan/netbirdy-sign-pipelines) marks the release latest after the Windows
-  # and macOS artifacts are signed.
+  # The main release workflow marks a stable release latest after signing its assets.
   make_latest: false
   prerelease: auto

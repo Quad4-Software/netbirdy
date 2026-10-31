@@ -307,9 +307,9 @@ archives:
         format: zip
 
 nfpms:
-  - maintainer: NetBirdy <https://github.com/Sudo-Ivan/netbirdy>
+  - maintainer: NetBirdy <https://github.com/Quad4-Software/netbirdy>
     description: NetBirdy client.
-    homepage: https://github.com/Sudo-Ivan/netbirdy
+    homepage: https://github.com/Quad4-Software/netbirdy
     license: BSD-3-Clause
     vendor: NetBirdy
     id: netbird_deb
@@ -336,9 +336,9 @@ nfpms:
       preremove: "release_files/pre_remove.sh"
 
   - &netbird_rpm
-    maintainer: NetBirdy <https://github.com/Sudo-Ivan/netbirdy>
+    maintainer: NetBirdy <https://github.com/Quad4-Software/netbirdy>
     description: NetBirdy client.
-    homepage: https://github.com/Sudo-Ivan/netbirdy
+    homepage: https://github.com/Quad4-Software/netbirdy
     license: BSD-3-Clause
     vendor: NetBirdy
     id: netbird_rpm_amd64
@@ -388,7 +388,7 @@ nfpms:
     rpm:
       summary: NetBirdy client
       group: Applications/Internet
-      packager: NetBirdy <https://github.com/Sudo-Ivan/netbirdy>
+      packager: NetBirdy <https://github.com/Quad4-Software/netbirdy>
       signature:
         key_file: '{{ if index .Env "GPG_RPM_KEY_FILE" }}{{ .Env.GPG_RPM_KEY_FILE }}{{ end }}'
 
@@ -418,13 +418,15 @@ dockers_v2:
      ids:
        - netbirdy
      images:
-       - ghcr.io/sudo-ivan/netbirdy
+       - ghcr.io/quad4-software/netbirdy
      tags:
        - "{{ .Version }}"
        - "{{ if eq .Env.SKIP_PUBLISH \"false\" }}latest{{ end }}"
      dockerfile: client/Dockerfile
      flags:
        - --output=type=image,compression=zstd,compression-level=3,force-compression=true,oci-mediatypes=true
+       - --sbom=true
+       - --provenance=mode=max
      extra_files:
        - client/netbirdy-entrypoint.sh
      platforms:
@@ -437,19 +439,21 @@ dockers_v2:
        "org.opencontainers.image.version": "{{.Version}}"
        "org.opencontainers.image.revision": "{{.FullCommit}}"
        "org.opencontainers.image.source": "{{.GitURL}}"
-       "maintainer": "https://github.com/Sudo-Ivan/netbirdy"
+       "maintainer": "https://github.com/Quad4-Software/netbirdy"
    - id: netbirdy-rootless
      disable: "{{ .Env.SKIP_DOCKER_PUSH }}"
      ids:
        - netbirdy
      images:
-       - ghcr.io/sudo-ivan/netbirdy
+       - ghcr.io/quad4-software/netbirdy
      tags:
        - "{{ .Version }}-rootless"
        - "{{ if eq .Env.SKIP_PUBLISH \"false\" }}rootless-latest{{ end }}"
      dockerfile: client/Dockerfile-rootless
      flags:
        - --output=type=image,compression=zstd,compression-level=3,force-compression=true,oci-mediatypes=true
+       - --sbom=true
+       - --provenance=mode=max
      extra_files:
        - client/netbirdy-entrypoint.sh
      platforms:
@@ -462,19 +466,21 @@ dockers_v2:
        "org.opencontainers.image.version": "{{.Version}}"
        "org.opencontainers.image.revision": "{{.FullCommit}}"
        "org.opencontainers.image.source": "{{.GitURL}}"
-       "maintainer": "https://github.com/Sudo-Ivan/netbirdy"
+       "maintainer": "https://github.com/Quad4-Software/netbirdy"
    - id: netbirdy-rootless-ubi
      disable: "{{ .Env.SKIP_DOCKER_PUSH }}"
      ids:
        - netbirdy
      images:
-       - ghcr.io/sudo-ivan/netbirdy
+       - ghcr.io/quad4-software/netbirdy
      tags:
        - "{{ .Version }}-rootless-ubi"
        - "{{ if eq .Env.SKIP_PUBLISH \"false\" }}rootless-ubi-latest{{ end }}"
      dockerfile: client/Dockerfile-rootless.ubi
      flags:
        - --output=type=image,compression=zstd,compression-level=3,force-compression=true,oci-mediatypes=true
+       - --sbom=true
+       - --provenance=mode=max
      extra_files:
        - client/netbirdy-entrypoint.sh
      platforms:
@@ -500,19 +506,21 @@ dockers_v2:
        "org.opencontainers.image.version": "{{.Version}}"
        "org.opencontainers.image.revision": "{{.FullCommit}}"
        "org.opencontainers.image.source": "{{.GitURL}}"
-       "maintainer": "https://github.com/Sudo-Ivan/netbirdy"
+       "maintainer": "https://github.com/Quad4-Software/netbirdy"
    - id: relay
      disable: "{{ .Env.SKIP_DOCKER_PUSH }}"
      ids:
        - netbirdy-relay
      images:
-       - ghcr.io/sudo-ivan/netbirdy-relay
+       - ghcr.io/quad4-software/netbirdy-relay
      tags:
        - "{{ .Version }}"
        - "{{ if eq .Env.SKIP_PUBLISH \"false\" }}latest{{ end }}"
      dockerfile: relay/Dockerfile
      flags:
        - --output=type=image,compression=zstd,compression-level=3,force-compression=true,oci-mediatypes=true
+       - --sbom=true
+       - --provenance=mode=max
      platforms:
        - linux/amd64
        - linux/arm64
@@ -523,19 +531,21 @@ dockers_v2:
        "org.opencontainers.image.version": "{{.Version}}"
        "org.opencontainers.image.revision": "{{.FullCommit}}"
        "org.opencontainers.image.source": "{{.GitURL}}"
-       "maintainer": "https://github.com/Sudo-Ivan/netbirdy"
+       "maintainer": "https://github.com/Quad4-Software/netbirdy"
    - id: relay-ubi
      disable: "{{ .Env.SKIP_DOCKER_PUSH }}"
      ids:
        - netbirdy-relay
      images:
-       - ghcr.io/sudo-ivan/netbirdy-relay
+       - ghcr.io/quad4-software/netbirdy-relay
      tags:
        - "{{ .Version }}-ubi"
        - "{{ if eq .Env.SKIP_PUBLISH \"false\" }}ubi-latest{{ end }}"
      dockerfile: relay/Dockerfile.ubi
      flags:
        - --output=type=image,compression=zstd,compression-level=3,force-compression=true,oci-mediatypes=true
+       - --sbom=true
+       - --provenance=mode=max
      platforms:
        - linux/amd64
        - linux/arm64
@@ -559,19 +569,21 @@ dockers_v2:
        "org.opencontainers.image.version": "{{.Version}}"
        "org.opencontainers.image.revision": "{{.FullCommit}}"
        "org.opencontainers.image.source": "{{.GitURL}}"
-       "maintainer": "https://github.com/Sudo-Ivan/netbirdy"
+       "maintainer": "https://github.com/Quad4-Software/netbirdy"
    - id: signal
      disable: "{{ .Env.SKIP_DOCKER_PUSH }}"
      ids:
        - netbirdy-signal
      images:
-       - ghcr.io/sudo-ivan/netbirdy-signal
+       - ghcr.io/quad4-software/netbirdy-signal
      tags:
        - "{{ .Version }}"
        - "{{ if eq .Env.SKIP_PUBLISH \"false\" }}latest{{ end }}"
      dockerfile: signal/Dockerfile
      flags:
        - --output=type=image,compression=zstd,compression-level=3,force-compression=true,oci-mediatypes=true
+       - --sbom=true
+       - --provenance=mode=max
      platforms:
        - linux/amd64
        - linux/arm64
@@ -582,19 +594,21 @@ dockers_v2:
        "org.opencontainers.image.version": "{{.Version}}"
        "org.opencontainers.image.revision": "{{.FullCommit}}"
        "org.opencontainers.image.source": "{{.GitURL}}"
-       "maintainer": "https://github.com/Sudo-Ivan/netbirdy"
+       "maintainer": "https://github.com/Quad4-Software/netbirdy"
    - id: signal-ubi
      disable: "{{ .Env.SKIP_DOCKER_PUSH }}"
      ids:
        - netbirdy-signal
      images:
-       - ghcr.io/sudo-ivan/netbirdy-signal
+       - ghcr.io/quad4-software/netbirdy-signal
      tags:
        - "{{ .Version }}-ubi"
        - "{{ if eq .Env.SKIP_PUBLISH \"false\" }}ubi-latest{{ end }}"
      dockerfile: signal/Dockerfile.ubi
      flags:
        - --output=type=image,compression=zstd,compression-level=3,force-compression=true,oci-mediatypes=true
+       - --sbom=true
+       - --provenance=mode=max
      platforms:
        - linux/amd64
        - linux/arm64
@@ -618,19 +632,21 @@ dockers_v2:
        "org.opencontainers.image.version": "{{.Version}}"
        "org.opencontainers.image.revision": "{{.FullCommit}}"
        "org.opencontainers.image.source": "{{.GitURL}}"
-       "maintainer": "https://github.com/Sudo-Ivan/netbirdy"
+       "maintainer": "https://github.com/Quad4-Software/netbirdy"
    - id: management
      disable: "{{ .Env.SKIP_DOCKER_PUSH }}"
      ids:
        - netbirdy-mgmt
      images:
-       - ghcr.io/sudo-ivan/netbirdy-management
+       - ghcr.io/quad4-software/netbirdy-management
      tags:
        - "{{ .Version }}"
        - "{{ if eq .Env.SKIP_PUBLISH \"false\" }}latest{{ end }}"
      dockerfile: management/Dockerfile
      flags:
        - --output=type=image,compression=zstd,compression-level=3,force-compression=true,oci-mediatypes=true
+       - --sbom=true
+       - --provenance=mode=max
      platforms:
        - linux/amd64
        - linux/arm64
@@ -641,19 +657,21 @@ dockers_v2:
        "org.opencontainers.image.version": "{{.Version}}"
        "org.opencontainers.image.revision": "{{.FullCommit}}"
        "org.opencontainers.image.source": "{{.GitURL}}"
-       "maintainer": "https://github.com/Sudo-Ivan/netbirdy"
+       "maintainer": "https://github.com/Quad4-Software/netbirdy"
    - id: management-ubi
      disable: "{{ .Env.SKIP_DOCKER_PUSH }}"
      ids:
        - netbirdy-mgmt
      images:
-       - ghcr.io/sudo-ivan/netbirdy-management
+       - ghcr.io/quad4-software/netbirdy-management
      tags:
        - "{{ .Version }}-ubi"
        - "{{ if eq .Env.SKIP_PUBLISH \"false\" }}ubi-latest{{ end }}"
      dockerfile: management/Dockerfile.ubi
      flags:
        - --output=type=image,compression=zstd,compression-level=3,force-compression=true,oci-mediatypes=true
+       - --sbom=true
+       - --provenance=mode=max
      platforms:
        - linux/amd64
        - linux/arm64
@@ -677,19 +695,21 @@ dockers_v2:
        "org.opencontainers.image.version": "{{.Version}}"
        "org.opencontainers.image.revision": "{{.FullCommit}}"
        "org.opencontainers.image.source": "{{.GitURL}}"
-       "maintainer": "https://github.com/Sudo-Ivan/netbirdy"
+       "maintainer": "https://github.com/Quad4-Software/netbirdy"
    - id: upload
      disable: "{{ .Env.SKIP_DOCKER_PUSH }}"
      ids:
        - netbirdy-upload
      images:
-       - ghcr.io/sudo-ivan/netbirdy-upload
+       - ghcr.io/quad4-software/netbirdy-upload
      tags:
        - "{{ .Version }}"
        - "{{ if eq .Env.SKIP_PUBLISH \"false\" }}latest{{ end }}"
      dockerfile: upload-server/Dockerfile.release
      flags:
        - --output=type=image,compression=zstd,compression-level=3,force-compression=true,oci-mediatypes=true
+       - --sbom=true
+       - --provenance=mode=max
      platforms:
        - linux/amd64
        - linux/arm64
@@ -700,19 +720,21 @@ dockers_v2:
        "org.opencontainers.image.version": "{{.Version}}"
        "org.opencontainers.image.revision": "{{.FullCommit}}"
        "org.opencontainers.image.source": "{{.GitURL}}"
-       "maintainer": "https://github.com/Sudo-Ivan/netbirdy"
+       "maintainer": "https://github.com/Quad4-Software/netbirdy"
    - id: netbirdy-server
      disable: "{{ .Env.SKIP_DOCKER_PUSH }}"
      ids:
        - netbirdy-server
      images:
-       - ghcr.io/sudo-ivan/netbirdy-server
+       - ghcr.io/quad4-software/netbirdy-server
      tags:
        - "{{ .Version }}"
        - "{{ if eq .Env.SKIP_PUBLISH \"false\" }}latest{{ end }}"
      dockerfile: combined/Dockerfile
      flags:
        - --output=type=image,compression=zstd,compression-level=3,force-compression=true,oci-mediatypes=true
+       - --sbom=true
+       - --provenance=mode=max
      platforms:
        - linux/amd64
        - linux/arm64
@@ -723,19 +745,21 @@ dockers_v2:
        "org.opencontainers.image.version": "{{.Version}}"
        "org.opencontainers.image.revision": "{{.FullCommit}}"
        "org.opencontainers.image.source": "{{.GitURL}}"
-       "maintainer": "https://github.com/Sudo-Ivan/netbirdy"
+       "maintainer": "https://github.com/Quad4-Software/netbirdy"
    - id: netbirdy-server-ubi
      disable: "{{ .Env.SKIP_DOCKER_PUSH }}"
      ids:
        - netbirdy-server
      images:
-       - ghcr.io/sudo-ivan/netbirdy-server
+       - ghcr.io/quad4-software/netbirdy-server
      tags:
        - "{{ .Version }}-ubi"
        - "{{ if eq .Env.SKIP_PUBLISH \"false\" }}ubi-latest{{ end }}"
      dockerfile: combined/Dockerfile.ubi
      flags:
        - --output=type=image,compression=zstd,compression-level=3,force-compression=true,oci-mediatypes=true
+       - --sbom=true
+       - --provenance=mode=max
      platforms:
        - linux/amd64
        - linux/arm64
@@ -759,19 +783,21 @@ dockers_v2:
        "org.opencontainers.image.version": "{{.Version}}"
        "org.opencontainers.image.revision": "{{.FullCommit}}"
        "org.opencontainers.image.source": "{{.GitURL}}"
-       "maintainer": "https://github.com/Sudo-Ivan/netbirdy"
+       "maintainer": "https://github.com/Quad4-Software/netbirdy"
    - id: netbirdy-proxy
      disable: "{{ .Env.SKIP_DOCKER_PUSH }}"
      ids:
        - netbirdy-proxy
      images:
-       - ghcr.io/sudo-ivan/netbirdy-reverse-proxy
+       - ghcr.io/quad4-software/netbirdy-reverse-proxy
      tags:
        - "{{ .Version }}"
        - "{{ if eq .Env.SKIP_PUBLISH \"false\" }}latest{{ end }}"
      dockerfile: proxy/Dockerfile
      flags:
        - --output=type=image,compression=zstd,compression-level=3,force-compression=true,oci-mediatypes=true
+       - --sbom=true
+       - --provenance=mode=max
      platforms:
        - linux/amd64
        - linux/arm64
@@ -782,19 +808,21 @@ dockers_v2:
        "org.opencontainers.image.version": "{{.Version}}"
        "org.opencontainers.image.revision": "{{.FullCommit}}"
        "org.opencontainers.image.source": "{{.GitURL}}"
-       "maintainer": "https://github.com/Sudo-Ivan/netbirdy"
+       "maintainer": "https://github.com/Quad4-Software/netbirdy"
    - id: nblink
      disable: "{{ .Env.SKIP_DOCKER_PUSH }}"
      ids:
        - nblink
      images:
-       - ghcr.io/sudo-ivan/netbirdy-nblink
+       - ghcr.io/quad4-software/netbirdy-nblink
      tags:
        - "{{ .Version }}"
        - "{{ if eq .Env.SKIP_PUBLISH \"false\" }}latest{{ end }}"
      dockerfile: client/Dockerfile-nblink
      flags:
        - --output=type=image,compression=zstd,compression-level=3,force-compression=true,oci-mediatypes=true
+       - --sbom=true
+       - --provenance=mode=max
      platforms:
        - linux/amd64
        - linux/arm64
@@ -805,19 +833,21 @@ dockers_v2:
        "org.opencontainers.image.version": "{{.Version}}"
        "org.opencontainers.image.revision": "{{.FullCommit}}"
        "org.opencontainers.image.source": "{{.GitURL}}"
-       "maintainer": "https://github.com/Sudo-Ivan/netbirdy"
+       "maintainer": "https://github.com/Quad4-Software/netbirdy"
    - id: proxy-ubi
      disable: "{{ .Env.SKIP_DOCKER_PUSH }}"
      ids:
        - netbirdy-proxy
      images:
-       - ghcr.io/sudo-ivan/netbirdy-reverse-proxy
+       - ghcr.io/quad4-software/netbirdy-reverse-proxy
      tags:
        - "{{ .Version }}-ubi"
        - "{{ if eq .Env.SKIP_PUBLISH \"false\" }}ubi-latest{{ end }}"
      dockerfile: proxy/Dockerfile.ubi
      flags:
        - --output=type=image,compression=zstd,compression-level=3,force-compression=true,oci-mediatypes=true
+       - --sbom=true
+       - --provenance=mode=max
      platforms:
        - linux/amd64
        - linux/arm64
@@ -841,7 +871,7 @@ dockers_v2:
        "org.opencontainers.image.version": "{{.Version}}"
        "org.opencontainers.image.revision": "{{.FullCommit}}"
        "org.opencontainers.image.source": "{{.GitURL}}"
-       "maintainer": "https://github.com/Sudo-Ivan/netbirdy"
+       "maintainer": "https://github.com/Quad4-Software/netbirdy"
 
 checksum:
   extra_files:
@@ -855,15 +885,13 @@ changelog:
   disable: true
 
 release:
-  # The signing pipeline (ghcr.io/sudo-ivan/netbirdy-sign-pipelines, dispatched by
-  # trigger_signer) marks the release latest once the Windows and macOS
-  # artifacts are signed. Without this override goreleaser marks it latest
-  # at publish time, while those artifacts are still unsigned.
+  # The release workflow marks a stable release latest after its assets are signed.
+  draft: true
   make_latest: false
   header: |
     NetBirdy {{ .Tag }}
 
-    Client packages, installers and container images. Every file has a signature and is listed in the checksums file. See https://github.com/Sudo-Ivan/netbirdy/blob/main/docs/updating.md for how to verify them.
+    Client packages, installers and container images. Release files are signed and listed in the checksums file. See https://github.com/Quad4-Software/netbirdy/blob/main/docs/updating.md for verification steps.
   # Mark x.y.z-rc.* and other prerelease tags as prereleases on GitHub.
   prerelease: auto
   extra_files:

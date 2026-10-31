@@ -17,7 +17,7 @@ concurrency:
 
 jobs:
   build:
-    if: github.repository == 'Sudo-Ivan/netbirdy'
+    if: github.repository == 'Quad4-Software/netbirdy'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout

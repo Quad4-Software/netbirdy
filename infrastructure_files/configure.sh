@@ -230,8 +230,6 @@ if test -f 'management.json'; then
     fi
 fi
 
-env | grep NETBIRD
-
 bkp_postfix="$(date +%s)"
 if test -f "${artifacts_path}/docker-compose.yml"; then
     cp $artifacts_path/docker-compose.yml "${artifacts_path}/docker-compose.yml.bkp.${bkp_postfix}"
