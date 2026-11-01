@@ -76,7 +76,7 @@ require (
 	github.com/netbirdio/management-integrations/integrations v0.0.0-20261021190039-6c1585eb11de
 	github.com/netbirdio/signal-dispatcher/dispatcher v0.0.0-20250805121659-6b4ac470ca45
 	github.com/netbirdio/wireguard-go v0.0.0-20261021152105-0de46b309cdb
-	github.com/oapi-codegen/runtime v1.1.2
+	github.com/oapi-codegen/runtime v1.8.0
 	github.com/okta/okta-sdk-golang/v2 v2.20.0
 	github.com/onsi/ginkgo v1.16.5
 	github.com/onsi/gomega v1.34.1
