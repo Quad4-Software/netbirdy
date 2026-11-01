@@ -300,12 +300,12 @@ func TestFilterSessionRequests_RefusedRequestsStayInOrder(t *testing.T) {
 
 	validWinch := cryptossh.Marshal(struct{ Columns, Rows, Width, Height uint32 }{100, 40, 0, 0})
 	reqs := []*cryptossh.Request{
-		{Type: "pty-req", Payload: ptyReqPayload(0xFFFFFFFF, "xterm")},
-		{Type: "pty-req", Payload: ptyReqPayload(5, "xterm")},
-		{Type: "window-change", Payload: validWinch},
-		{Type: "shell"},
-		{Type: "window-change", Payload: validWinch},
-		{Type: "window-change", Payload: validWinch},
+		{Type: "pty-req", WantReply: true, Payload: ptyReqPayload(0xFFFFFFFF, "xterm")},
+		{Type: "pty-req", WantReply: true, Payload: ptyReqPayload(5, "xterm")},
+		{Type: "window-change", WantReply: true, Payload: validWinch},
+		{Type: "shell", WantReply: true},
+		{Type: "window-change", WantReply: true, Payload: validWinch},
+		{Type: "window-change", WantReply: true, Payload: validWinch},
 	}
 	want := []string{
 		refusedRequestType, // malformed pty-req

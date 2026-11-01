@@ -745,6 +745,7 @@ func (s *SqlStore) getAccount(ctx context.Context, accountID string) (*types.Acc
 			settings_jwt_groups_enabled, settings_jwt_groups_claim_name, settings_jwt_allow_groups,
 			settings_routing_peer_dns_resolution_enabled, settings_dns_domain, settings_network_range,
 			settings_network_range_v6, settings_ipv6_enabled_groups, settings_lazy_connection_enabled,
+			settings_error_reporting_enabled, settings_error_reporting_dsn,
 			settings_local_mfa_enabled, settings_metrics_push_enabled, settings_agent_network_only,
 			settings_peer_hostname_collision_rejected,
 			settings_dashboard_features, settings_auto_update_version, settings_auto_update_always,
@@ -770,6 +771,8 @@ func (s *SqlStore) getAccount(ctx context.Context, accountID string) (*types.Acc
 		sNetworkRangeV6                  sql.NullString
 		sIPv6EnabledGroups               sql.NullString
 		sLazyConnectionEnabled           sql.NullBool
+		sErrorReportingEnabled           sql.NullBool
+		sErrorReportingDSN               sql.NullString
 		sLocalMFAEnabled                 sql.NullBool
 		sMetricsPushEnabled              sql.NullBool
 		sPeerHostnameCollisionRejected   sql.NullBool
@@ -801,6 +804,7 @@ func (s *SqlStore) getAccount(ctx context.Context, accountID string) (*types.Acc
 		&sJWTGroupsEnabled, &sJWTGroupsClaimName, &sJWTAllowGroups,
 		&sRoutingPeerDNSResolutionEnabled, &sDNSDomain, &sNetworkRange,
 		&sNetworkRangeV6, &sIPv6EnabledGroups, &sLazyConnectionEnabled,
+		&sErrorReportingEnabled, &sErrorReportingDSN,
 		&sLocalMFAEnabled, &sMetricsPushEnabled, &sAgentNetworkOnly,
 		&sPeerHostnameCollisionRejected,
 		&sDashboardFeatures, &autoUpdateVersion, &autoUpdateAlways,
@@ -866,6 +870,12 @@ func (s *SqlStore) getAccount(ctx context.Context, accountID string) (*types.Acc
 	}
 	if sLazyConnectionEnabled.Valid {
 		account.Settings.LazyConnectionEnabled = sLazyConnectionEnabled.Bool
+	}
+	if sErrorReportingEnabled.Valid {
+		account.Settings.ErrorReportingEnabled = sErrorReportingEnabled.Bool
+	}
+	if sErrorReportingDSN.Valid {
+		account.Settings.ErrorReportingDSN = sErrorReportingDSN.String
 	}
 	if sLocalMFAEnabled.Valid {
 		account.Settings.LocalMfaEnabled = sLocalMFAEnabled.Bool

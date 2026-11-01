@@ -109,6 +109,29 @@ func TestRequestFilter_UnhandledTypesDropPayload(t *testing.T) {
 	assert.Zero(t, f.queuedBytes, "refused request must not count its payload")
 }
 
+func TestRequestFilter_DropsRefusedRequestsWithoutReplies(t *testing.T) {
+	f := &requestFilter{}
+	winch := cryptossh.Marshal(struct{ Columns, Rows, Width, Height uint32 }{100, 40, 0, 0})
+
+	for i := 0; i <= maxQueuedRequests; i++ {
+		req := &cryptossh.Request{Type: "window-change", WantReply: false, Payload: winch}
+		require.True(t, f.enqueue(req), "refused no-reply request %d should not fill the queue", i)
+		assert.Equal(t, refusedRequestType, req.Type)
+	}
+
+	assert.Empty(t, f.queue, "refused requests without replies should not be queued")
+	assert.Zero(t, f.queuedBytes, "refused requests should not consume the queue byte budget")
+
+	next := &cryptossh.Request{
+		Type:      "env",
+		WantReply: true,
+		Payload:   cryptossh.Marshal(struct{ Key, Value string }{"A", "b"}),
+	}
+	require.True(t, f.enqueue(next), "the following request should remain available to the session loop")
+	require.Len(t, f.queue, 1)
+	assert.Same(t, next, f.queue[0].req, "the following request should keep its place in the queue")
+}
+
 // Nothing drains window changes for a subsystem session, so a resize after one must be
 // refused for the rest of the session, even if a shell request follows.
 func TestRequestFilter_SubsystemSessionRefusesResize(t *testing.T) {
@@ -166,10 +189,26 @@ func TestRequestFilter_CoalescedResizeReleasesQueuedBytes(t *testing.T) {
 	winch := cryptossh.Marshal(struct{ Columns, Rows, Width, Height uint32 }{100, 40, 0, 0})
 
 	for i := 0; i < 50; i++ {
-		require.True(t, f.enqueue(&cryptossh.Request{Type: "window-change", Payload: winch}))
+		require.True(t, f.enqueue(&cryptossh.Request{Type: "window-change", WantReply: true, Payload: winch}))
 	}
 
 	assert.Equal(t, len(winch), f.queuedBytes, "only the newest resize should be charged")
+}
+
+func TestRequestFilter_CoalescesNoReplyWindowChanges(t *testing.T) {
+	f := &requestFilter{}
+	require.True(t, f.enqueue(&cryptossh.Request{Type: "shell"}))
+	winch := cryptossh.Marshal(struct{ Columns, Rows, Width, Height uint32 }{100, 40, 0, 0})
+
+	var latest *cryptossh.Request
+	for i := 0; i <= maxQueuedRequests; i++ {
+		latest = &cryptossh.Request{Type: "window-change", WantReply: false, Payload: winch}
+		require.True(t, f.enqueue(latest), "no-reply resize %d should be coalesced", i)
+	}
+
+	require.Len(t, f.queue, 2, "only the shell request and latest resize should remain")
+	assert.Same(t, latest, f.lastWinch.req, "latest resize should be retained")
+	assert.Equal(t, len(winch), f.queuedBytes, "superseded no-reply resizes should not count against the queue")
 }
 
 // A large request the loop ignores is refused and its payload dropped, so it cannot close

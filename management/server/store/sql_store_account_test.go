@@ -288,7 +288,7 @@ func Test_AccountSettings_SaveAndRetrieve(t *testing.T) {
 		settings := types.Settings{}
 		numOfExportedFields, err := populateFields.PopulateAll(reflect.ValueOf(&settings).Elem())
 		assert.NoError(t, err)
-		assert.Equal(t, 28, numOfExportedFields)
+		assert.Equal(t, 30, numOfExportedFields)
 		account.Settings = &settings
 
 		err = store.SaveAccount(context.Background(), account)
@@ -299,7 +299,7 @@ func Test_AccountSettings_SaveAndRetrieve(t *testing.T) {
 		assert.NotNil(t, accountFromDb)
 		assert.NotNil(t, accountFromDb.Settings)
 
-		assert.True(t, reflect.DeepEqual(&settings, accountFromDb.Settings), "created settings and settings retrieved from the db should match")
+		assert.Equal(t, &settings, accountFromDb.Settings, "created settings and settings retrieved from the db should match")
 	})
 }
 

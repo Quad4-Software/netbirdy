@@ -207,6 +207,11 @@ func (f *requestFilter) dropHead() {
 func (f *requestFilter) enqueue(req *cryptossh.Request) bool {
 	q := &queuedRequest{req: req}
 	f.classify(q)
+	// A refused request with no requested reply needs no session-loop work. Dropping it
+	// prevents floods of invalid requests from filling the bounded queue.
+	if q.req.Type == refusedRequestType && !q.req.WantReply {
+		return true
+	}
 	q.size = len(req.Payload)
 
 	if len(f.queue) >= maxQueuedRequests || f.queuedBytes+q.size > maxQueuedBytes {
@@ -247,9 +252,30 @@ func (f *requestFilter) classify(q *queuedRequest) {
 
 // refuse drops the payload of q and releases the size it was charged against the queue.
 func (f *requestFilter) refuse(q *queuedRequest) {
+	refuseRequest(q.req)
+	if !q.req.WantReply {
+		f.removeQueuedRequest(q)
+		return
+	}
 	f.queuedBytes -= q.size
 	q.size = 0
-	refuseRequest(q.req)
+}
+
+func (f *requestFilter) removeQueuedRequest(q *queuedRequest) {
+	for i, queued := range f.queue {
+		if queued != q {
+			continue
+		}
+		f.queuedBytes -= q.size
+		q.size = 0
+		copy(f.queue[i:], f.queue[i+1:])
+		f.queue[len(f.queue)-1] = nil
+		f.queue = f.queue[:len(f.queue)-1]
+		break
+	}
+	if f.lastWinch == q {
+		f.lastWinch = nil
+	}
 }
 
 func (f *requestFilter) noteCommand(reqType string) {
