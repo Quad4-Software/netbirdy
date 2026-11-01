@@ -40,8 +40,8 @@ RUN --mount=type=cache,target=/go/pkg/mod \
       -o /out/netbirdy-upload ./upload-server \
     && mkdir -p /out/var/lib/netbird
 
-FROM cgr.dev/chainguard/static@sha256:17367e4d3ae2b46c3290858e483fac09be085c92b372360fe3bf6a6150848fde AS base-release
-FROM cgr.dev/chainguard/busybox@sha256:98e9e7306c899a8af252ef1ff50c54def91c2fe04677298eafdf0b902f2980ed AS base-debug
+FROM cgr.dev/chainguard/static@sha256:fc42af33e643f20d08baf03cddcc1c02ba57052dfb02edb0d79f3fc47bcea8d9 AS base-release
+FROM cgr.dev/chainguard/busybox@sha256:9cf938251dfb3cc081ef9847e79c203b5de90ecc20855e40bef8a7cc191bb218 AS base-debug
 
 # hadolint ignore=DL3006
 FROM base-${VARIANT}
