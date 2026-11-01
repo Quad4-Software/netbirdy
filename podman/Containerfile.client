@@ -5,7 +5,7 @@ RUN go mod download
 COPY . .
 RUN CGO_ENABLED=0 GOOS=linux go build -ldflags "-s -w" -o /out/netbirdy ./client
 
-FROM docker.io/library/alpine:3.21
+FROM docker.io/library/alpine:3.24
 RUN apk add --no-cache ca-certificates iptables ip6tables iproute2 bash
 COPY --from=builder /out/netbirdy /usr/local/bin/netbirdy
 RUN chmod 755 /usr/local/bin/netbirdy
