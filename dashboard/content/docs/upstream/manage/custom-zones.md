@@ -1,15 +1,15 @@
 ---
 title: "Custom Zones"
-description: "Configure DNS Custom Zones for your NetBird network"
+description: "Configure DNS Custom Zones for your NetBirdy network"
 order: 121
 upstream: "manage/dns/custom-zones.mdx@2382247"
 ---
 
-> **Note** This page is adapted from the upstream NetBird documentation (BSD-3-Clause) and may describe features that NetBirdy does not include.
+> **Note** This page is adapted from the upstream NetBirdy documentation (BSD-3-Clause) and may describe features that NetBirdy does not include.
 
 # Custom Zones
 
-NetBird's Custom Zones define private DNS records that are distributed directly to peers. Unlike nameservers that forward queries to external DNS servers, Custom Zones are hosted within NetBird and resolved locally on peers.
+NetBirdy's Custom Zones define private DNS records that are distributed directly to peers. Unlike nameservers that forward queries to external DNS servers, Custom Zones are hosted within NetBirdy and resolved locally on peers.
 
 This provides complete control over internal DNS without running separate infrastructure, enabling group-based access control where different teams see different records. Custom Zones are ideal for internal service discovery, environment isolation, split-horizon DNS, and providing friendly names to resources across infrastructure.
 
@@ -17,7 +17,7 @@ This provides complete control over internal DNS without running separate infras
 
 ### Creating a Custom Zone
 
-To create a new Custom DNS Zone, navigate to **DNS** > **Zones** in the NetBird Dashboard and click **Add Zone**. Configure the zone settings as described below:
+To create a new Custom DNS Zone, navigate to **DNS** > **Zones** in the NetBirdy Dashboard and click **Add Zone**. Configure the zone settings as described below:
 
 <img src="" alt="Add Custom Zone" className="imagewrapper-big"/>
 
@@ -27,7 +27,7 @@ The fully qualified domain name for this zone (e.g., `services.company.internal`
 
 - Must be a valid FQDN format
 - Cannot be changed after creation
-- Must not conflict with the NetBird peer DNS domain
+- Must not conflict with the NetBirdy peer DNS domain
 
 **Distribution Groups**
 
@@ -110,7 +110,7 @@ Custom DNS Zones take precedence over nameservers when there is a conflict. If a
 Custom DNS Zones have the following limitations:
 
 - **Domain cannot be changed**: Once a zone is created, its domain cannot be modified. The zone must be deleted and recreated with a new domain
-- **Cannot use peer DNS domain**: Zone domain must not conflict with your NetBird peer DNS domain (e.g., `netbird.cloud`, `netbird.selfhosted`, or a custom domain configured via the `--dns-domain` flag or in **Settings** > **Network** > **DNS Domain**)
+- **Cannot use peer DNS domain**: Zone domain must not conflict with your NetBirdy peer DNS domain (e.g., `netbird.cloud`, `netbird.selfhosted`, or a custom domain configured via the `--dns-domain` flag or in **Settings** > **Network** > **DNS Domain**)
 - **CNAME exclusivity**: CNAME records cannot coexist with A or AAAA records for the same hostname
 - **Empty zones not distributed**: Zones without any DNS records are not distributed to peers
 - **Requires managed DNS**: Peers in groups listed under **DNS** > **DNS Settings** (Disable DNS Management), or started with `netbird up --disable-dns`, run in [unmanaged mode](/manage/dns/dns-settings#unmanaged-mode) and will not resolve zone records, even when the zone's distribution groups include them

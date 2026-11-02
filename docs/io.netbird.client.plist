@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <!--
-    NetBird MDM preferences (macOS) — bare plist for MDM platforms that
+    NetBirdy MDM preferences (macOS) — bare plist for MDM platforms that
     accept a managed-preferences plist tied to a bundle identifier
     (e.g. JumpCloud "Mac Application Custom Settings", Mosyle "Custom
     Settings", Jamf "Application & Custom Settings" → External
@@ -14,7 +14,7 @@
     target devices via the Apple MDM protocol. The OS materializes the
     final file at:
         /Library/Managed Preferences/io.netbird.client.plist
-    which is what the NetBird daemon's client/mdm/policy_darwin.go
+    which is what the NetBirdy daemon's client/mdm/policy_darwin.go
     loader reads on every 1-minute MDM reload tick.
 
     For MDM platforms that expect a full Configuration Profile instead

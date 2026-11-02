@@ -1,16 +1,16 @@
 ---
-title: "NetBird Agent command line interface (CLI)"
+title: "NetBirdy Agent command line interface (CLI)"
 description: ""
 order: 104
 upstream: "get-started/cli.mdx@2382247"
 ---
 
-> **Note** This page is adapted from the upstream NetBird documentation (BSD-3-Clause) and may describe features that NetBirdy does not include.
+> **Note** This page is adapted from the upstream NetBirdy documentation (BSD-3-Clause) and may describe features that NetBirdy does not include.
 
-# NetBird Agent command line interface (CLI)
+# NetBirdy Agent command line interface (CLI)
 
-The NetBird client installation adds a binary called `netbird` to your system. This binary runs as a daemon service to connect
-your computer or server to the NetBird network as a peer. But it can also be used as a client to control the daemon service.
+The NetBirdy client installation adds a binary called `netbird` to your system. This binary runs as a daemon service to connect
+your computer or server to the NetBirdy network as a peer. But it can also be used as a client to control the daemon service.
 
 This section will explore the commands available in `netbird`.
 ## Syntax
@@ -51,11 +51,11 @@ Below is the list of global flags:
   -c, --config string           Overrides the default profile file location. Deprecated on `up` and `login`; use `--service-env NB_CONFIG=<path>` instead.
       --daemon-addr string      Daemon service address to serve CLI requests [unix|tcp|npipe]://[path|host:port|name] (default "unix:///var/run/netbird.sock", "npipe://netbird" on Windows)
   -n, --hostname string         Sets a custom hostname for the device
-      --log-file console        Sets NetBird log paths written to simultaneously. If "console" is specified the log will be output to stdout. If "syslog" is specified the log will be sent to the syslog daemon. You can pass the flag multiple times or separate entries by comma (default [/var/log/netbird/client.log])
-  -l, --log-level string        Sets NetBird log level (default "info")
+      --log-file console        Sets NetBirdy log paths written to simultaneously. If "console" is specified the log will be output to stdout. If "syslog" is specified the log will be sent to the syslog daemon. You can pass the flag multiple times or separate entries by comma (default [/var/log/netbird/client.log])
+  -l, --log-level string        Sets NetBirdy log level (default "info")
   -m, --management-url string   Management Service URL [http|https]://[host]:[port] (default "https://api.netbird.io:443")
       --preshared-key string    Sets WireGuard PreSharedKey property. If set, then only peers that have the same key can communicate.
-  -s, --service string          NetBird system service name (default "netbird")
+  -s, --service string          NetBirdy system service name (default "netbird")
   -k, --setup-key string        Setup key obtained from the Management Service Dashboard (used to register peer)
       --setup-key-file string   Path to a file containing a setup key (used to register peer). Ignored if --setup-key is provided.
 ```
@@ -92,7 +92,7 @@ Beyond flag-derived variables, the client also supports a number of advanced env
 
 ## Commands
 ### up
-Single command to log in and start the NetBird client. It can send a signal to the daemon service or run in the foreground with the flag `--foreground-mode`.
+Single command to log in and start the NetBirdy client. It can send a signal to the daemon service or run in the foreground with the flag `--foreground-mode`.
 
 The command will check if the peer is logged in and connect to the management service. If the peer is not logged in, by default, it will attempt to initiate an SSO login flow.
 #### Flags
@@ -107,7 +107,7 @@ The command will check if the peer is logged in and connect to the management se
       --disable-ipv6                        Disables IPv6 overlay addressing. The client will not receive an IPv6 address or accept IPv6 traffic from peers. (v0.68.0+)
       --disable-server-routes               Disable server routes. If enabled, the client won't act as a router for server routes received from the management service.
       --disable-ssh-auth                    Disable SSH JWT authentication. If enabled, any peer with network access can connect without user authentication.
-      --dns-resolver-address string         Sets a custom address for NetBird's local DNS resolver. If set, the agent won't attempt to discover the best IP and port to listen on. An empty string "" clears the previous configuration. E.g. --dns-resolver-address 127.0.0.1:5053 or --dns-resolver-address ""
+      --dns-resolver-address string         Sets a custom address for NetBirdy's local DNS resolver. If set, the agent won't attempt to discover the best IP and port to listen on. An empty string "" clears the previous configuration. E.g. --dns-resolver-address 127.0.0.1:5053 or --dns-resolver-address ""
       --dns-router-interval duration        DNS route update interval (default 1m0s)
       --enable-lazy-connection              Deprecated and no longer used. Lazy connections are controlled by Management and the NB_LAZY_CONN environment variable.
       --enable-rosenpass                    [Experimental] Enable Rosenpass feature. If enabled, the connection will be post-quantum secured via Rosenpass.
@@ -155,7 +155,7 @@ netbird up --setup-key AAAA-BBB-CCC-DDDDDD --extra-dns-labels vpc1,mgmt1
 
 
 ### login
-Command to authenticate the NetBird client to a management service. If the peer is not logged in, by default, it will attempt to initiate an SSO login flow.
+Command to authenticate the NetBirdy client to a management service. If the peer is not logged in, by default, it will attempt to initiate an SSO login flow.
 #### Flags
 ```shell
       --no-browser       Do not open the browser for SSO login
@@ -180,7 +180,7 @@ netbird login --setup-key AAAA-BBB-CCC-DDDDDD --management-url https://api.self-
 ```
 
 ### down
-Command to stop a connection with the management service and other peers in a NetBird network. After running this command, the daemon service will enter an `Idle` state.
+Command to stop a connection with the management service and other peers in a NetBirdy network. After running this command, the daemon service will enter an `Idle` state.
 #### Usage
 The minimal form of running the command is:
 ```shell
@@ -197,8 +197,8 @@ Retrieves the peer status from the daemon service.
   -i, --filter-by-ips strings              Filter the detailed output by a list of one or more IPs (v4 or v6), e.g., --filter-by-ips 100.64.0.100,fd00::1
   -N, --filter-by-names strings            Filter the detailed output by a list of one or more peer FQDN or hostnames, e.g., --filter-by-names peer-a,peer-b.netbird.cloud
   -S, --filter-by-status string            Filter the detailed output by connection status (idle|connecting|connected), e.g., --filter-by-status connected
-  -4, --ipv4                               Display only NetBird IPv4 of this peer, e.g., --ipv4 will output 100.64.0.33
-  -6, --ipv6                               Display only NetBird IPv6 of this peer
+  -4, --ipv4                               Display only NetBirdy IPv4 of this peer, e.g., --ipv4 will output 100.64.0.33
+  -6, --ipv6                               Display only NetBirdy IPv6 of this peer
   -j, --json                               Display detailed status information in JSON format
   -y, --yaml                               Display detailed status information in YAML format
 ```
@@ -216,7 +216,7 @@ Management: Connected
 Signal: Connected
 Relays: 2/2 Available
 Nameservers: 1/1 Available
-NetBird IP: 100.119.62.6/16
+NetBirdy IP: 100.119.62.6/16
 Interface type: Kernel
 Quantum resistance: false
 Routes: -
@@ -231,7 +231,7 @@ This will output:
 ```shell
 Peers detail:
  Peer:
-  NetBird IP: 100.119.85.4
+  NetBirdy IP: 100.119.85.4
   Public key: 2lI3F+fDUWh58g5oRN+y7lPHpNcEVWhiDv/wr1/jiF8=
   Status: Disconnected
   -- detail --
@@ -247,7 +247,7 @@ Peers detail:
   Latency: 10.74ms
 
  Peer:
-  NetBird IP: 100.119.201.225
+  NetBirdy IP: 100.119.201.225
   Public key: +jkH8cs/Fo83qdB6dWG16+kAQmGTKYoBYSAdLtSOV10=
   Status: Connected
   -- detail --
@@ -263,7 +263,7 @@ Peers detail:
   Latency: 20.14ms
 
  Peer:
-  NetBird IP: 100.119.230.104
+  NetBirdy IP: 100.119.230.104
   Public key: R7olj0S8jiYMLfOWK+wDto+j3pE4vR54tLGrEQKgBSw=
   Status: Connected
   -- detail --
@@ -288,7 +288,7 @@ Relays:
   [turns:turn.netbird.io:443?transport=tcp] is Available
 Nameservers:
   [8.8.8.8:53, 8.8.4.4:53] for [.] is Available
-NetBird IP: 100.119.62.6/16
+NetBirdy IP: 100.119.62.6/16
 Interface type: Kernel
 Quantum resistance: false
 Routes: -
@@ -302,7 +302,7 @@ This will output:
 ```shell
 Peers detail:
  Peer:
-  NetBird IP: 100.119.201.225
+  NetBirdy IP: 100.119.201.225
   Public key: +jkH8cs/Fo83qdB6dWG16+kAQmGTKYoBYSAdLtSOV10=
   Status: Connected
   -- detail --
@@ -318,7 +318,7 @@ Peers detail:
   Latency: 20.14ms
 
  Peer:
-  NetBird IP: 100.119.230.104
+  NetBirdy IP: 100.119.230.104
   Public key: R7olj0S8jiYMLfOWK+wDto+j3pE4vR54tLGrEQKgBSw=
   Status: Connected
   -- detail --
@@ -343,7 +343,7 @@ Relays:
   [turns:turn.netbird.io:443?transport=tcp] is Available
 Nameservers:
   [8.8.8.8:53, 8.8.4.4:53] for [.] is Available
-NetBird IP: 100.119.62.6/16
+NetBirdy IP: 100.119.62.6/16
 Interface type: Kernel
 Quantum resistance: false
 Routes: -
@@ -357,7 +357,7 @@ This will output:
 ```shell
 Peers detail:
  Peer:
-  NetBird IP: 100.119.201.225
+  NetBirdy IP: 100.119.201.225
   Public key: +jkH8cs/Fo83qdB6dWG16+kAQmGTKYoBYSAdLtSOV10=
   Status: Connected
   -- detail --
@@ -382,7 +382,7 @@ Relays:
   [turns:turn.netbird.io:443?transport=tcp] is Available
 Nameservers:
   [8.8.8.8:53, 8.8.4.4:53] for [.] is Available
-NetBird IP: 100.119.62.6/16
+NetBirdy IP: 100.119.62.6/16
 Interface type: Kernel
 Quantum resistance: false
 Routes: -
@@ -397,7 +397,7 @@ This will output:
 Peers detail:
 
  Peer:
-  NetBird IP: 100.119.230.104
+  NetBirdy IP: 100.119.230.104
   Public key: R7olj0S8jiYMLfOWK+wDto+j3pE4vR54tLGrEQKgBSw=
   Status: Connected
   -- detail --
@@ -422,7 +422,7 @@ Relays:
   [turns:turn.netbird.io:443?transport=tcp] is Available
 Nameservers:
   [8.8.8.8:53, 8.8.4.4:53] for [.] is Available
-NetBird IP: 100.119.62.6/16
+NetBirdy IP: 100.119.62.6/16
 Interface type: Kernel
 Quantum resistance: false
 Routes: -
@@ -437,7 +437,7 @@ Use `netbird status --check` to run a health probe from a script or container or
 
 - `live`: succeeds when the daemon responds to the status request.
 - `ready`: succeeds when the daemon status is `Idle`, `Connecting`, or `Connected`. Authentication-required states (`NeedsLogin`, `LoginFailed`, and `SessionExpired`) and unexpected states fail the check.
-- `startup`: succeeds when management and signal are connected and, if any NetBird relays are configured, at least one relay is available.
+- `startup`: succeeds when management and signal are connected and, if any NetBirdy relays are configured, at least one relay is available.
 
 For example, the following loop makes each probe result visible:
 
@@ -452,9 +452,9 @@ done
 ```
 
 ### ssh
-Command to connect via SSH to a remote peer in your NetBird network. The `ssh` command has several subcommands for different operations.
+Command to connect via SSH to a remote peer in your NetBirdy network. The `ssh` command has several subcommands for different operations.
 
-> **Note** Before using this command, make sure that SSH Access is enabled both on the target peer and in the NetBird Dashboard. Learn more about [enabling SSH access](/manage/peers/ssh).
+> **Note** Before using this command, make sure that SSH Access is enabled both on the target peer and in the NetBirdy Dashboard. Learn more about [enabling SSH access](/manage/peers/ssh).
 
 
 #### ssh (connect)
@@ -475,7 +475,7 @@ Connect to a remote peer via SSH with an interactive shell or execute a command.
 ```
 
 **Arguments:**
-* `[user@]host`: The remote user and NetBird peer hostname or IP address
+* `[user@]host`: The remote user and NetBirdy peer hostname or IP address
 * `[command]`: Optional command to execute on the remote peer
 
 **Usage:**
@@ -503,7 +503,7 @@ netbird ssh -R 8080:localhost:3000 user@100.119.230.104
 > **Note** Port forwarding must be enabled on the SSH server using `--enable-ssh-local-port-forwarding` and/or `--enable-ssh-remote-port-forwarding` flags.
 
 
-> **Note** For SFTP and SCP, use native clients (`sftp` and `scp` commands) which work with NetBird SSH automatically.
+> **Note** For SFTP and SCP, use native clients (`sftp` and `scp` commands) which work with NetBirdy SSH automatically.
 
 
 #### Troubleshooting
@@ -543,9 +543,9 @@ netbird ssh -R 8080:localhost:3000 user@100.119.230.104
 
 
 ### expose
-Command to expose a local port to the public internet via the NetBird reverse proxy. The service remains active as long as the command is running and is automatically removed when you stop it.
+Command to expose a local port to the public internet via the NetBirdy reverse proxy. The service remains active as long as the command is running and is automatically removed when you stop it.
 
-> **Note** Before using this command, make sure the NetBird client is connected (`netbird up`), and that the **Peer Expose** feature is enabled by your account administrator in **Settings** > **Clients**. See [Expose from CLI](/manage/reverse-proxy/expose-from-cli) for the complete guide.
+> **Note** Before using this command, make sure the NetBirdy client is connected (`netbird up`), and that the **Peer Expose** feature is enabled by your account administrator in **Settings** > **Clients**. See [Expose from CLI](/manage/reverse-proxy/expose-from-cli) for the complete guide.
 
 
 #### Flags
@@ -705,7 +705,7 @@ These flags are intended for managed or shared machines where non-admin users sh
 - `--disable-profiles` prevents users from adding, removing, or switching profiles. The client stays locked to the profile that was active at install time. Any attempt to switch profiles via CLI or UI is rejected.
 - `--disable-update-settings` prevents users from changing daemon settings (management URL, log level, DNS resolver address, etc.) via CLI or UI. The configuration can only be changed by an administrator who reinstalls the service or uses `service reconfigure`.
 
-Typical use: an IT admin deploys NetBird with a setup key and locks the configuration so end users cannot disconnect from the corporate account or point the client at a different management server.
+Typical use: an IT admin deploys NetBirdy with a setup key and locks the configuration so end users cannot disconnect from the corporate account or point the client at a different management server.
 
 ```shell
 sudo netbird service install \
@@ -782,7 +782,7 @@ sudo netbird service reset-params
 ```
 
 ### debug
-The `debug` command provides tools for diagnosing and understanding the internal operations of the NetBird daemon.
+The `debug` command provides tools for diagnosing and understanding the internal operations of the NetBirdy daemon.
 
 #### Usage
 To access debugging options:
@@ -792,7 +792,7 @@ netbird debug [command]
 #### Subcommands
 - `bundle`: Create a debug bundle that includes logs and system information for troubleshooting.
 - `for`: Run the daemon with trace logging for a specified duration and create a debug bundle.
-- `log`: Manage logging levels for the NetBird daemon.
+- `log`: Manage logging levels for the NetBirdy daemon.
 - `trace`: Trace a packet through the firewall.
 
 #### Flags
@@ -808,7 +808,7 @@ standard service installation, the location is `/tmp/netbird.debug.<number>.zip`
 path.
 
 The local ZIP is created whether or not `--upload-bundle` is used. With `--upload-bundle`, the command also prints an
-upload key that you can share with the NetBird team.
+upload key that you can share with the NetBirdy team.
 The file belongs to the daemon service account (`root` on standard Linux and macOS installations and `LocalSystem` on
 Windows), so elevated permissions may be required to access it directly.
 
@@ -857,14 +857,14 @@ netbird debug for 5m
 
 This will output something similar to:
 ```
-Netbird up
+NetBirdy up
 Log level set to trace.
-Netbird down
-Netbird up
+NetBirdy down
+NetBirdy up
 Remaining time: 00:00:01
 Duration completed
 Creating debug bundle...
-Netbird down
+NetBirdy down
 Log level restored to INFO
 /tmp/netbird.debug.3162242909.zip
 ```
@@ -880,11 +880,11 @@ Log level restored to INFO
 ```
 
 ### debug log
-This subcommand manages the logging level for the NetBird daemon during the current session.
+This subcommand manages the logging level for the NetBirdy daemon during the current session.
 The change in logging level is temporary and will revert back to the configured default upon daemon restart.
 
 #### Usage
-Adjust the logging level of the NetBird daemon:
+Adjust the logging level of the NetBirdy daemon:
 ```shell
 netbird debug log level <level>
 ```
@@ -958,7 +958,7 @@ Final disposition: ALLOWED
 The stages in order:
 
 1. **Received**: The raw packet as it enters the filter.
-2. **Inbound Port DNAT**: Port-level destination NAT (e.g. SSH port 22 is rewritten to 22022 where the NetBird SSH server listens).
+2. **Inbound Port DNAT**: Port-level destination NAT (e.g. SSH port 22 is rewritten to 22022 where the NetBirdy SSH server listens).
 3. **Inbound 1:1 NAT**: Full address rewrite if 1:1 NAT is configured for this peer.
 4. **Connection Tracking**: Checks if this packet belongs to an already-established connection. If it does, it is allowed immediately and later stages are skipped.
 5. **Routing**: Determines whether the packet is destined for local delivery or needs to be forwarded to another network.

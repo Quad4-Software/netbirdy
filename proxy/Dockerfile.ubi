@@ -6,7 +6,7 @@ ARG RELEASE=1
 
 LABEL name="netbirdy-reverse-proxy" \
       maintainer="NetBirdy <dev@netbird.io>" \
-      vendor="NetBird GmbH" \
+      vendor="NetBirdy GmbH" \
       version="${VERSION}" \
       release="${RELEASE}" \
       summary="NetBirdy Reverse Proxy" \

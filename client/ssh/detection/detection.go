@@ -14,11 +14,11 @@ import (
 
 const (
 	// ServerIdentifier is the base response for NetBirdy SSH servers
-	ServerIdentifier = "NetBird-SSH-Server"
+	ServerIdentifier = "NetBirdy-SSH-Server"
 	// ProxyIdentifier is the base response for NetBirdy SSH proxy
-	ProxyIdentifier = "NetBird-SSH-Proxy"
+	ProxyIdentifier = "NetBirdy-SSH-Proxy"
 	// JWTRequiredMarker is appended to responses when JWT is required
-	JWTRequiredMarker = "NetBird-JWT-Required"
+	JWTRequiredMarker = "NetBirdy-JWT-Required"
 
 	// DefaultTimeout is the default timeout for SSH server detection
 	DefaultTimeout = 5 * time.Second

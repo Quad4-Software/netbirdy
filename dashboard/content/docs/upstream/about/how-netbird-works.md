@@ -1,21 +1,21 @@
 ---
-title: "How NetBird Works"
+title: "How NetBirdy Works"
 description: ""
 order: 100
 upstream: "about-netbird/how-netbird-works.mdx@2382247"
 ---
 
-> **Note** This page is adapted from the upstream NetBird documentation (BSD-3-Clause) and may describe features that NetBirdy does not include.
+> **Note** This page is adapted from the upstream NetBirdy documentation (BSD-3-Clause) and may describe features that NetBirdy does not include.
 
-# How NetBird Works
+# How NetBirdy Works
 
-NetBird is an open source platform consisting of a collection of components, responsible for handling peer-to-peer
+NetBirdy is an open source platform consisting of a collection of components, responsible for handling peer-to-peer
 connections, tunneling, authentication, and network management (IPs, keys, ACLs, etc).
 
 It uses open-source technologies like [WireGuard®](https://www.wireguard.com/), [Pion ICE (WebRTC)](https://github.com/pion/ice), [Coturn](https://github.com/coturn/coturn),
-and [software](https://github.com/netbirdio/netbird) developed by NetBird to make secure private networks deployment and management simple.
+and [software](https://github.com/netbirdio/netbird) developed by NetBirdy to make secure private networks deployment and management simple.
 
-NetBird relies on four components - **Client** application, **Management**, **Signal** and **Relay** services.
+NetBirdy relies on four components - **Client** application, **Management**, **Signal** and **Relay** services.
 
 The combination of these elements ensures that direct point-to-point connections are established and only authenticated
 users (or machines) have access to the resources for which they are authorized.
@@ -27,7 +27,7 @@ It can be a Linux server running in the cloud or on-premises, a personal laptop,
     <img src="/docs-img/docs-static-img-about-netbird-high-level-dia.png" alt="high-level-dia" className="imagewrapper-big"/>
 </p>
 
-With NetBird clients installed and authorized on the Management service, machines form a mesh network connecting
+With NetBirdy clients installed and authorized on the Management service, machines form a mesh network connecting
 to each other directly via an encrypted point-to-point WireGuard tunnel.
 
 <p>
@@ -37,17 +37,17 @@ to each other directly via an encrypted point-to-point WireGuard tunnel.
 While it is possible to create a full mesh network, it might be not a desirable outcome.
 In this case, [groups and access controls](/manage/access-control/manage-network-access) can be utilized to limit the access to certain machines.
 
-Let's now take a closer look at each of NetBird's components.
+Let's now take a closer look at each of NetBirdy's components.
 
 ## Management Service
 
-The Management service is the central coordination component for NetBird with a UI dashboard.
+The Management service is the central coordination component for NetBirdy with a UI dashboard.
 It keeps the network state, public WireGuard keys of the peers, authenticates and distributes network changes to peers.
 
 The Management Service's responsibilities include:
 
 * **Registering and authenticating new peers.**  Every new machine has to register itself in the network in order to connect to other machines.
-After installation, NetBird client requires login that can be done through Identity Provider (IDP) like Okta or with a [setup key](/manage/peers/register-machines-using-setup-keys).
+After installation, NetBirdy client requires login that can be done through Identity Provider (IDP) like Okta or with a [setup key](/manage/peers/register-machines-using-setup-keys).
 * **Keeping the network map.** The Management service stores information about all the registered peers including WireGuard public key that was sent during the registration process.
 * **Managing private IP addresses.** Each peer receives a unique private IP with which it can be identified in the network.
 We use [Carrier Grade NAT](https://en.wikipedia.org/wiki/Carrier-grade_NAT) address space with an allocated address block <em>100.64.0.0/10</em>.
@@ -61,7 +61,7 @@ After that, they are able to establish a connection to the new peer.
 * **Logging network activity.**
 * **Managing users.**
 
-The Management service runs in the cloud NetBird-managed. It can also be self-hosted.
+The Management service runs in the cloud NetBirdy-managed. It can also be self-hosted.
 
 <p>
     <img src="/docs-img/docs-static-img-about-netbird-management.png" alt="management-dia" className="imagewrapper-big"/>
@@ -69,7 +69,7 @@ The Management service runs in the cloud NetBird-managed. It can also be self-ho
 
 ## Client Application
 
-The NetBird client is software installed on the machines within a NetBird network.
+The NetBirdy client is software installed on the machines within a NetBirdy network.
 It is an entry point to your private network that makes it possible for machines to communicate with each other.
 Once installed and registered, a machine becomes a peer within the network.
 
@@ -90,7 +90,7 @@ The client uses a system's available firewall manager like `nftables` to apply t
 * **Applying DNS settings.** The client application runs an [embedded DNS resolver](https://netbird.io/knowledge-hub/using-xdp-ebpf-to-share-default-dns-port-between-resolvers) and ensures that the machine can resolve other peers' FQDNs in the `netbird.cloud` namespaces.
 The client also applies other DNS settings that are received from the Management service.
 
-> **Note** The **private key**, generated by the NetBird client, **never leaves the machine**, ensuring that only the machine that owns the key can decrypt traffic addressed to it.
+> **Note** The **private key**, generated by the NetBirdy client, **never leaves the machine**, ensuring that only the machine that owns the key can decrypt traffic addressed to it.
 
 
 ## Signal Service
@@ -110,8 +110,8 @@ This is done through Signal. After a connection has been established, Signal ste
 > **Note** Messages that are sent over Signal are **point-to-point encrypted**, so Signal can't see the contents.
 
 
-NetBird Signal is very similar to the signaling servers used in [WebRTC](https://developer.mozilla.org/en-US/Web/API/WebRTC_API/Signaling_and_video_calling#the_signaling_server).
-It runs in the cloud NetBird-managed and can be self-hosted.
+NetBirdy Signal is very similar to the signaling servers used in [WebRTC](https://developer.mozilla.org/en-US/Web/API/WebRTC_API/Signaling_and_video_calling#the_signaling_server).
+It runs in the cloud NetBirdy-managed and can be self-hosted.
 
 ## Relay Service
 

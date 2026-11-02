@@ -5,7 +5,7 @@
                    schemaVersion="1.0"
                    xmlns="http://schemas.microsoft.com/GroupPolicy/2006/07/PolicyDefinitions">
   <policyNamespaces>
-    <target prefix="netbird" namespace="NetBird.Policies.Client" />
+    <target prefix="netbird" namespace="NetBirdy.Policies.Client" />
   </policyNamespaces>
   <resources minRequiredRevision="1.0" />
   <supportedOn>
@@ -14,7 +14,7 @@
     </definitions>
   </supportedOn>
   <categories>
-    <category name="NetBird" displayName="$(string.NetBird_Category)" />
+    <category name="NetBirdy" displayName="$(string.NetBird_Category)" />
   </categories>
   <policies>
 
@@ -26,9 +26,9 @@
             class="Machine"
             displayName="$(string.ManagementURL_Name)"
             explainText="$(string.ManagementURL_Help)"
-            key="Software\Policies\NetBird"
+            key="Software\Policies\NetBirdy"
             presentation="$(presentation.ManagementURL_Pres)">
-      <parentCategory ref="NetBird" />
+      <parentCategory ref="NetBirdy" />
       <supportedOn ref="SUPPORTED_NetBird_All" />
       <elements>
         <text id="ManagementURL_Text" valueName="ManagementURL" required="true" />
@@ -39,9 +39,9 @@
             class="Machine"
             displayName="$(string.PreSharedKey_Name)"
             explainText="$(string.PreSharedKey_Help)"
-            key="Software\Policies\NetBird"
+            key="Software\Policies\NetBirdy"
             presentation="$(presentation.PreSharedKey_Pres)">
-      <parentCategory ref="NetBird" />
+      <parentCategory ref="NetBirdy" />
       <supportedOn ref="SUPPORTED_NetBird_All" />
       <elements>
         <text id="PreSharedKey_Text" valueName="PreSharedKey" />
@@ -56,9 +56,9 @@
             class="Machine"
             displayName="$(string.DisableAutoConnect_Name)"
             explainText="$(string.DisableAutoConnect_Help)"
-            key="Software\Policies\NetBird"
+            key="Software\Policies\NetBirdy"
             valueName="DisableAutoConnect">
-      <parentCategory ref="NetBird" />
+      <parentCategory ref="NetBirdy" />
       <supportedOn ref="SUPPORTED_NetBird_All" />
       <enabledValue><decimal value="1" /></enabledValue>
       <disabledValue><decimal value="0" /></disabledValue>
@@ -68,9 +68,9 @@
             class="Machine"
             displayName="$(string.DisableAutostart_Name)"
             explainText="$(string.DisableAutostart_Help)"
-            key="Software\Policies\NetBird"
+            key="Software\Policies\NetBirdy"
             valueName="DisableAutostart">
-      <parentCategory ref="NetBird" />
+      <parentCategory ref="NetBirdy" />
       <supportedOn ref="SUPPORTED_NetBird_All" />
       <enabledValue><decimal value="1" /></enabledValue>
       <disabledValue><decimal value="0" /></disabledValue>
@@ -80,9 +80,9 @@
             class="Machine"
             displayName="$(string.DisableClientRoutes_Name)"
             explainText="$(string.DisableClientRoutes_Help)"
-            key="Software\Policies\NetBird"
+            key="Software\Policies\NetBirdy"
             valueName="DisableClientRoutes">
-      <parentCategory ref="NetBird" />
+      <parentCategory ref="NetBirdy" />
       <supportedOn ref="SUPPORTED_NetBird_All" />
       <enabledValue><decimal value="1" /></enabledValue>
       <disabledValue><decimal value="0" /></disabledValue>
@@ -92,9 +92,9 @@
             class="Machine"
             displayName="$(string.DisableServerRoutes_Name)"
             explainText="$(string.DisableServerRoutes_Help)"
-            key="Software\Policies\NetBird"
+            key="Software\Policies\NetBirdy"
             valueName="DisableServerRoutes">
-      <parentCategory ref="NetBird" />
+      <parentCategory ref="NetBirdy" />
       <supportedOn ref="SUPPORTED_NetBird_All" />
       <enabledValue><decimal value="1" /></enabledValue>
       <disabledValue><decimal value="0" /></disabledValue>
@@ -104,9 +104,9 @@
             class="Machine"
             displayName="$(string.BlockInbound_Name)"
             explainText="$(string.BlockInbound_Help)"
-            key="Software\Policies\NetBird"
+            key="Software\Policies\NetBirdy"
             valueName="BlockInbound">
-      <parentCategory ref="NetBird" />
+      <parentCategory ref="NetBirdy" />
       <supportedOn ref="SUPPORTED_NetBird_All" />
       <enabledValue><decimal value="1" /></enabledValue>
       <disabledValue><decimal value="0" /></disabledValue>
@@ -116,9 +116,9 @@
             class="Machine"
             displayName="$(string.AllowServerSSH_Name)"
             explainText="$(string.AllowServerSSH_Help)"
-            key="Software\Policies\NetBird"
+            key="Software\Policies\NetBirdy"
             valueName="AllowServerSSH">
-      <parentCategory ref="NetBird" />
+      <parentCategory ref="NetBirdy" />
       <supportedOn ref="SUPPORTED_NetBird_All" />
       <enabledValue><decimal value="1" /></enabledValue>
       <disabledValue><decimal value="0" /></disabledValue>
@@ -128,9 +128,9 @@
             class="Machine"
             displayName="$(string.AllowRemoteJobs_Name)"
             explainText="$(string.AllowRemoteJobs_Help)"
-            key="Software\Policies\NetBird"
+            key="Software\Policies\NetBirdy"
             valueName="AllowRemoteJobs">
-      <parentCategory ref="NetBird" />
+      <parentCategory ref="NetBirdy" />
       <supportedOn ref="SUPPORTED_NetBird_All" />
       <enabledValue><decimal value="1" /></enabledValue>
       <disabledValue><decimal value="0" /></disabledValue>
@@ -140,9 +140,9 @@
             class="Machine"
             displayName="$(string.DebugBundleUploadURL_Name)"
             explainText="$(string.DebugBundleUploadURL_Help)"
-            key="Software\Policies\NetBird"
+            key="Software\Policies\NetBirdy"
             presentation="$(presentation.DebugBundleUploadURL_Pres)">
-      <parentCategory ref="NetBird" />
+      <parentCategory ref="NetBirdy" />
       <supportedOn ref="SUPPORTED_NetBird_All" />
       <elements>
         <text id="DebugBundleUploadURL_Text" valueName="DebugBundleUploadURL" required="false" />
@@ -153,9 +153,9 @@
             class="Machine"
             displayName="$(string.RosenpassEnabled_Name)"
             explainText="$(string.RosenpassEnabled_Help)"
-            key="Software\Policies\NetBird"
+            key="Software\Policies\NetBirdy"
             valueName="RosenpassEnabled">
-      <parentCategory ref="NetBird" />
+      <parentCategory ref="NetBirdy" />
       <supportedOn ref="SUPPORTED_NetBird_All" />
       <enabledValue><decimal value="1" /></enabledValue>
       <disabledValue><decimal value="0" /></disabledValue>
@@ -165,9 +165,9 @@
             class="Machine"
             displayName="$(string.RosenpassPermissive_Name)"
             explainText="$(string.RosenpassPermissive_Help)"
-            key="Software\Policies\NetBird"
+            key="Software\Policies\NetBirdy"
             valueName="RosenpassPermissive">
-      <parentCategory ref="NetBird" />
+      <parentCategory ref="NetBirdy" />
       <supportedOn ref="SUPPORTED_NetBird_All" />
       <enabledValue><decimal value="1" /></enabledValue>
       <disabledValue><decimal value="0" /></disabledValue>
@@ -177,9 +177,9 @@
             class="Machine"
             displayName="$(string.WireguardPort_Name)"
             explainText="$(string.WireguardPort_Help)"
-            key="Software\Policies\NetBird"
+            key="Software\Policies\NetBirdy"
             presentation="$(presentation.WireguardPort_Pres)">
-      <parentCategory ref="NetBird" />
+      <parentCategory ref="NetBirdy" />
       <supportedOn ref="SUPPORTED_NetBird_All" />
       <elements>
         <decimal id="WireguardPort_Decimal" valueName="WireguardPort"
@@ -191,9 +191,9 @@
             class="Machine"
             displayName="$(string.SplitTunnel_Name)"
             explainText="$(string.SplitTunnel_Help)"
-            key="Software\Policies\NetBird"
+            key="Software\Policies\NetBirdy"
             presentation="$(presentation.SplitTunnel_Pres)">
-      <parentCategory ref="NetBird" />
+      <parentCategory ref="NetBirdy" />
       <supportedOn ref="SUPPORTED_NetBird_All" />
       <elements>
         <enum id="SplitTunnel_Mode" valueName="SplitTunnelMode" required="true">
@@ -212,9 +212,9 @@
             class="Machine"
             displayName="$(string.DisableUpdateSettings_Name)"
             explainText="$(string.DisableUpdateSettings_Help)"
-            key="Software\Policies\NetBird"
+            key="Software\Policies\NetBirdy"
             valueName="DisableUpdateSettings">
-      <parentCategory ref="NetBird" />
+      <parentCategory ref="NetBirdy" />
       <supportedOn ref="SUPPORTED_NetBird_All" />
       <enabledValue><decimal value="1" /></enabledValue>
       <disabledValue><decimal value="0" /></disabledValue>
@@ -224,9 +224,9 @@
             class="Machine"
             displayName="$(string.DisableProfiles_Name)"
             explainText="$(string.DisableProfiles_Help)"
-            key="Software\Policies\NetBird"
+            key="Software\Policies\NetBirdy"
             valueName="DisableProfiles">
-      <parentCategory ref="NetBird" />
+      <parentCategory ref="NetBirdy" />
       <supportedOn ref="SUPPORTED_NetBird_All" />
       <enabledValue><decimal value="1" /></enabledValue>
       <disabledValue><decimal value="0" /></disabledValue>
@@ -236,9 +236,9 @@
             class="Machine"
             displayName="$(string.DisableNetworks_Name)"
             explainText="$(string.DisableNetworks_Help)"
-            key="Software\Policies\NetBird"
+            key="Software\Policies\NetBirdy"
             valueName="DisableNetworks">
-      <parentCategory ref="NetBird" />
+      <parentCategory ref="NetBirdy" />
       <supportedOn ref="SUPPORTED_NetBird_All" />
       <enabledValue><decimal value="1" /></enabledValue>
       <disabledValue><decimal value="0" /></disabledValue>
@@ -248,9 +248,9 @@
             class="Machine"
             displayName="$(string.DisableAdvancedView_Name)"
             explainText="$(string.DisableAdvancedView_Help)"
-            key="Software\Policies\NetBird"
+            key="Software\Policies\NetBirdy"
             valueName="DisableAdvancedView">
-      <parentCategory ref="NetBird" />
+      <parentCategory ref="NetBirdy" />
       <supportedOn ref="SUPPORTED_NetBird_All" />
       <enabledValue><decimal value="1" /></enabledValue>
       <disabledValue><decimal value="0" /></disabledValue>
@@ -260,9 +260,9 @@
             class="Machine"
             displayName="$(string.DisableMetricsCollection_Name)"
             explainText="$(string.DisableMetricsCollection_Help)"
-            key="Software\Policies\NetBird"
+            key="Software\Policies\NetBirdy"
             valueName="DisableMetricsCollection">
-      <parentCategory ref="NetBird" />
+      <parentCategory ref="NetBirdy" />
       <supportedOn ref="SUPPORTED_NetBird_All" />
       <enabledValue><decimal value="1" /></enabledValue>
       <disabledValue><decimal value="0" /></disabledValue>

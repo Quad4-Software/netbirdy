@@ -31,7 +31,7 @@ export function AboutDialog({ open, onOpenChange, dashboardVersion, managementVe
         </ul>
         <p className="mt-4 text-xs text-nb-gray-500">
           Dashboard, management, signal, relay and the combined server are AGPL-3.0;
-          other components are BSD-3-Clause. NetBirdy is not affiliated with NetBird GmbH.
+          other components are BSD-3-Clause. NetBirdy is not affiliated with NetBirdy GmbH.
         </p>
       </DialogContent>
     </Dialog>

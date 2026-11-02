@@ -1,14 +1,14 @@
 # Notice
 
-NetBirdy is a modified fork of NetBird
-(https://github.com/netbirdio/netbird) and of the NetBird dashboard
+NetBirdy is a modified fork of NetBirdy
+(https://github.com/netbirdio/netbird) and of the NetBirdy dashboard
 (https://github.com/netbirdio/dashboard).
 
 Modifications are copyright Quad4-Software 2026.
 
 ## Summary of changes
 
-- Rebrand of the product name from NetBird to NetBirdy across
+- Rebrand of the product name from NetBirdy to NetBirdy across
   user-facing strings, documentation, and packaging metadata.
 - Binary rename: netbird -> netbirdy, netbird-mgmt -> netbirdy-mgmt,
   netbird-signal -> netbirdy-signal, netbird-relay -> netbirdy-relay,
@@ -42,8 +42,8 @@ this project is offered at:
 
 ## Trademark
 
-NetBird is a trademark of NetBird GmbH. NetBirdy is not affiliated
-with, endorsed by, or sponsored by NetBird GmbH.
+NetBirdy is a trademark of NetBirdy GmbH. NetBirdy is not affiliated
+with, endorsed by, or sponsored by NetBirdy GmbH.
 
 Nothing in this file is legal advice.
 
@@ -54,6 +54,6 @@ Instrument Sans and JetBrains Mono are vendored under the SIL Open Font License 
 - JetBrains Mono: Copyright 2020 The JetBrains Project Authors (https://github.com/JetBrains/JetBrainsMono)
 
 Embedded documentation under dashboard/content/docs/upstream/ and
-dashboard/public/docs-img/ is adapted from the NetBird documentation
+dashboard/public/docs-img/ is adapted from the NetBirdy documentation
 (github.com/netbirdio/docs), BSD-3-Clause, copyright Wiretrustee UG
 and AUTHORS, pinned to commit 2382247.

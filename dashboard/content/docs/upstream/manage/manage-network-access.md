@@ -1,15 +1,15 @@
 ---
-title: "Managing Access with NetBird: Groups and Access Policies"
+title: "Managing Access with NetBirdy: Groups and Access Policies"
 description: ""
 order: 115
 upstream: "manage/access-control/manage-network-access.mdx@2382247"
 ---
 
-> **Note** This page is adapted from the upstream NetBird documentation (BSD-3-Clause) and may describe features that NetBirdy does not include.
+> **Note** This page is adapted from the upstream NetBirdy documentation (BSD-3-Clause) and may describe features that NetBirdy does not include.
 
-NetBird empowers administrators to effectively manage and control access between resources (referred to as peers) using groups and access policies.
+NetBirdy empowers administrators to effectively manage and control access between resources (referred to as peers) using groups and access policies.
 These access policies define which peers or peer groups are allowed to connect, specify the protocols and ports available
-for these connections, and optionally incorporate posture checks. By integrating posture checks, NetBird enforces
+for these connections, and optionally incorporate posture checks. By integrating posture checks, NetBirdy enforces
 zero trust principles, enabling dynamic and context-aware access control that adapts to the specific security needs of
 your environment.
 
@@ -23,14 +23,14 @@ Watch our Access Control video on YouTube:
 
 
 ## Introduction
-Initially, a NetBird account is configured with a `Default` policy which allows peers to connect via any protocol, resulting in the formation of a full mesh network. This setup often suits small networks or those requiring minimal security. In scenarios where higher security is needed or access to specific resources must be restricted for certain users or services, policies can be set up to determine access permissions.
+Initially, a NetBirdy account is configured with a `Default` policy which allows peers to connect via any protocol, resulting in the formation of a full mesh network. This setup often suits small networks or those requiring minimal security. In scenarios where higher security is needed or access to specific resources must be restricted for certain users or services, policies can be set up to determine access permissions.
 
 
-Access control policies make use of groups to control connections between peers. These groups, which are sets of peers (meaning different machines with the NetBird client installed), can be added as Source or Destination of a policy. They are evaluated when the Management service distributes the list of peers across your network.
+Access control policies make use of groups to control connections between peers. These groups, which are sets of peers (meaning different machines with the NetBirdy client installed), can be added as Source or Destination of a policy. They are evaluated when the Management service distributes the list of peers across your network.
 
 ## Concepts
 ### Groups
-A NetBird group works and follows a similar concept to tags in other platforms; they are easily created and can be associated with peers and used in policies to control traffic within your network.
+A NetBirdy group works and follows a similar concept to tags in other platforms; they are easily created and can be associated with peers and used in policies to control traffic within your network.
 
 Here are some key attributes of groups:
 - Each group is unique.
@@ -81,7 +81,7 @@ In the popup, specify connection `Source` and `Destination` groups. You can sele
 
 
 You can limit access to specific protocol and ports by selecting the `Protocol` and providing the port numbers in the `Ports` field.
-Starting version `0.48` NetBird supports port ranges in policies, allowing you to specify a range of ports in the format `start-end` (e.g., `8000-9000`).
+Starting version `0.48` NetBirdy supports port ranges in policies, allowing you to specify a range of ports in the format `start-end` (e.g., `8000-9000`).
 Set the `Direction` field, then provide a name and description for your policy.
 
 <p>

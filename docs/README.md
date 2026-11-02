@@ -1,6 +1,6 @@
 # Documentation index
 
-- migrating-from-netbird.md - migrating an existing NetBird install
+- migrating-from-netbird.md - migrating an existing NetBirdy install
 - offline-mode.md - client offline mode: cached map and management IPs
 - security-monitoring.md - anomaly detection, audit JSONL, syslog
 - wazuh.md - Wazuh 4.x SIEM integration

@@ -5,20 +5,20 @@ order: 114
 upstream: "manage/access-control/index.mdx@2382247"
 ---
 
-> **Note** This page is adapted from the upstream NetBird documentation (BSD-3-Clause) and may describe features that NetBirdy does not include.
+> **Note** This page is adapted from the upstream NetBirdy documentation (BSD-3-Clause) and may describe features that NetBirdy does not include.
 
-NetBird's access control system is built on Zero Trust security principles, ensuring that no device or user has access to network resources by default. Instead, access must be explicitly granted through carefully designed policies. This guide will help you understand how NetBird's policy system works, clarify the important distinction between user groups and peer groups, and provide step-by-step instructions for implementing secure access control in your network.
+NetBirdy's access control system is built on Zero Trust security principles, ensuring that no device or user has access to network resources by default. Instead, access must be explicitly granted through carefully designed policies. This guide will help you understand how NetBirdy's policy system works, clarify the important distinction between user groups and peer groups, and provide step-by-step instructions for implementing secure access control in your network.
 
 <p>
-    <img src="" alt="NetBird Policy Update" />
+    <img src="" alt="NetBirdy Policy Update" />
 </p>
 
-> **Note** **NEW:** For a visual overview of your access policies and how peers, groups, and their relationships connect, check out the [**Control Center**](https://docs.netbird.io/manage/control-center) feature in NetBird. The Control Center provides an interactive graph view that makes it easy to understand your network's access structure at a glance.
+> **Note** **NEW:** For a visual overview of your access policies and how peers, groups, and their relationships connect, check out the [**Control Center**](https://docs.netbird.io/manage/control-center) feature in NetBirdy. The Control Center provides an interactive graph view that makes it easy to understand your network's access structure at a glance.
 
 
-## Zero Trust Principles and NetBird
+## Zero Trust Principles and NetBirdy
 
-Zero trust networking operates on the principle of "never trust, always verify." Unlike traditional perimeter-based security models, zero trust assumes that threats can exist both inside and outside the network. NetBird implements this through:
+Zero trust networking operates on the principle of "never trust, always verify." Unlike traditional perimeter-based security models, zero trust assumes that threats can exist both inside and outside the network. NetBirdy implements this through:
 
 - **Deny-by-default behavior:** Without policies, no peer can communicate with another peer
 - **Explicit access grants:** Every connection must be explicitly allowed through a policy
@@ -28,45 +28,45 @@ Zero trust networking operates on the principle of "never trust, always verify."
 
 ## Default ALL to ALL Policy (Not Recommended)
 
-> **Note** **TLDR:**  NetBird automatically creates a Default policy that allows all devices to communicate with each other. While this helps with onboarding, the Default policy completely undermines zero trust principles and should be removed once you create proper access control policies. Make sure to have replacement policies ready before deleting it, or all peer communication will stop.
+> **Note** **TLDR:**  NetBirdy automatically creates a Default policy that allows all devices to communicate with each other. While this helps with onboarding, the Default policy completely undermines zero trust principles and should be removed once you create proper access control policies. Make sure to have replacement policies ready before deleting it, or all peer communication will stop.
 
 
-When you first create a NetBird account, a **Default policy** is automatically created that allows all peers to communicate with each other using any protocol. This policy exists because early NetBird users were confused and frustrated when their devices couldn't communicate—NetBird's deny-by-default security model meant nothing worked without policies defined, and users thought the platform was broken. 
+When you first create a NetBirdy account, a **Default policy** is automatically created that allows all peers to communicate with each other using any protocol. This policy exists because early NetBirdy users were confused and frustrated when their devices couldn't communicate—NetBirdy's deny-by-default security model meant nothing worked without policies defined, and users thought the platform was broken. 
 
 <p>
-    <img src="/docs-img/docs-static-img-manage-access-control-all-all-policy.png" alt="NetBird ALL to ALL" />
+    <img src="/docs-img/docs-static-img-manage-access-control-all-all-policy.png" alt="NetBirdy ALL to ALL" />
 </p>
 
-The Default policy, which uses the special `All` group as both source and destination, solves this onboarding friction by letting new users immediately see NetBird working while they learn the platform.
+The Default policy, which uses the special `All` group as both source and destination, solves this onboarding friction by letting new users immediately see NetBirdy working while they learn the platform.
 
 However, **the Default policy completely undermines zero trust security principles** and should be removed as soon as you're ready to implement proper access control. It violates the principle of least privilege, provides no network segmentation (a compromised device has direct access to everything), and allows all-to-all communication even after you create restrictive policies. Think of it as training wheels: helpful for getting started, but you should remove it when moving to production. 
 
 ## Understanding Groups
 
-### What Are Groups in NetBird?
+### What Are Groups in NetBirdy?
 
-Groups in NetBird function similarly to tags or labels in other platforms. They're collections of peers (devices running the NetBird client) and resources (internal network resources that don’t run the NetBird client) that can be used in policies to control network traffic. Every peer in your network can belong to one or more groups, and these group memberships determine what resources that peer can access.
+Groups in NetBirdy function similarly to tags or labels in other platforms. They're collections of peers (devices running the NetBirdy client) and resources (internal network resources that don’t run the NetBirdy client) that can be used in policies to control network traffic. Every peer in your network can belong to one or more groups, and these group memberships determine what resources that peer can access.
 
 ### User Groups vs. Peer Groups: A Critical Distinction
 
-This is one of the most important concepts to understand when configuring NetBird access control. **It's important to note that NetBird doesn't technically differentiate between "user groups" and "peer groups" in the interface—all groups appear together in the Groups page.** However, understanding this conceptual distinction is crucial for implementing secure, well-organized access control.
+This is one of the most important concepts to understand when configuring NetBirdy access control. **It's important to note that NetBirdy doesn't technically differentiate between "user groups" and "peer groups" in the interface—all groups appear together in the Groups page.** However, understanding this conceptual distinction is crucial for implementing secure, well-organized access control.
 
-The distinction is based on **how groups are used and assigned**, not on any technical difference in NetBird:
+The distinction is based on **how groups are used and assigned**, not on any technical difference in NetBirdy:
 
 ### User Groups
 
 **User groups** are groups that are assigned to user accounts and automatically inherited by any device that user logs into. These are designed for client-side devices used by human users—laptops, workstations, mobile devices, and tablets.
 
 <p>
-    <img src="/docs-img/docs-static-img-manage-access-control-user-groups.png" alt="NetBird User Groups" />
+    <img src="/docs-img/docs-static-img-manage-access-control-user-groups.png" alt="NetBirdy User Groups" />
 </p>
 
 **How user groups work:**
 
-When a user signs into NetBird on a device (such as a Windows computer using the desktop client or a smartphone using the mobile app), that device automatically receives all group memberships assigned to that user account. This typically happens manually on invite or through your Identity Provider (IdP) integration.
+When a user signs into NetBirdy on a device (such as a Windows computer using the desktop client or a smartphone using the mobile app), that device automatically receives all group memberships assigned to that user account. This typically happens manually on invite or through your Identity Provider (IdP) integration.
 
 1. **IdP Integration:** User groups are defined in your identity provider (such as Okta, Azure AD, Google Workspace, etc.)
-2. **Automatic Assignment:** When a user signs into NetBird with SSO on their device, that device (peer) automatically inherits the user's group memberships
+2. **Automatic Assignment:** When a user signs into NetBirdy with SSO on their device, that device (peer) automatically inherits the user's group memberships
 3. **Dynamic Updates:** If a user's group membership changes in the IdP, their device's access permissions update accordingly
 
 > **Note** This automatic inheritance is controlled by the account-level `Enable user group propagation` setting, which is on by default. See [Groups Settings](/manage/settings/groups) for details.
@@ -75,7 +75,7 @@ When a user signs into NetBird on a device (such as a Windows computer using the
 **Methods for assigning user groups to peers:**
 
 - **Automatic via SSO:** The recommended method. When users authenticate through your IdP, their device automatically receives the appropriate group assignments
-- **Manual assignment to users:** Add groups to a user's account in NetBird, then any device that user signs into will inherit those groups
+- **Manual assignment to users:** Add groups to a user's account in NetBirdy, then any device that user signs into will inherit those groups
 - **Direct peer assignment:** You can manually assign user groups directly to specific peers in the Peers section
 
 **Examples of user groups:**
@@ -91,18 +91,18 @@ When a user signs into NetBird on a device (such as a Windows computer using the
 **Peer groups** are groups that are assigned directly to infrastructure resources—servers, databases, network appliances, backup systems, and other non-user devices. These resources don't have users logging into them, so groups are assigned either through setup keys or manual assignment.
 
 <p>
-    <img src="/docs-img/docs-static-img-manage-access-control-peer-groups.png" alt="NetBird Peer Groups" />
+    <img src="/docs-img/docs-static-img-manage-access-control-peer-groups.png" alt="NetBirdy Peer Groups" />
 </p>
 
 **How peer groups work:**
 
-1. **Manual Creation:** Groups are created explicitly in the NetBird interface
+1. **Manual Creation:** Groups are created explicitly in the NetBirdy interface
 2. **Setup Key Assignment:** The most common method - when creating a setup key, you specify which groups should be [auto-assigned](https://docs.netbird.io/manage/peers/register-machines-using-setup-keys#peer-auto-grouping) to any peer that registers with that key
 3. **Manual Assignment:** Administrators can also manually assign groups to specific infrastructure peers after they're connected
 
 **What are Setup Keys?**
 
-Setup keys are pre-authentication keys that allow servers and headless devices to register with your NetBird network automatically, without requiring interactive SSO login. When you create a setup key, you can specify which groups should be automatically assigned to any peer that connects using that key.
+Setup keys are pre-authentication keys that allow servers and headless devices to register with your NetBirdy network automatically, without requiring interactive SSO login. When you create a setup key, you can specify which groups should be automatically assigned to any peer that connects using that key.
 
 **Examples of peer groups:**
 
@@ -115,7 +115,7 @@ Setup keys are pre-authentication keys that allow servers and headless devices t
 
 ### Why Think of User Groups and Peer Groups Separately?
 
-Even though NetBird treats all groups the same way technically, maintaining this conceptual separation in your mind and in your naming conventions is crucial for several reasons:
+Even though NetBirdy treats all groups the same way technically, maintaining this conceptual separation in your mind and in your naming conventions is crucial for several reasons:
 
 1. **Security clarity:** Clearly distinguishes between "who" (users) and "what" (resources)
 2. **Principle of least privilege:** Makes it easier to grant users access only to the specific resources they need
@@ -138,7 +138,7 @@ Even though NetBird treats all groups the same way technically, maintaining this
 
 ### The Source-Destination Model
 
-NetBird policies control network traffic by defining:
+NetBirdy policies control network traffic by defining:
 
 - **Source:** The group of peers that initiate connections
 - **Destination:** The group of peers that receive connections
@@ -204,7 +204,7 @@ Destination: engineering-users
 
 ```
 
-While NetBird’s peer-to-peer technology allows servers to connect to laptops and even mobile phones, this is not recommended.
+While NetBirdy’s peer-to-peer technology allows servers to connect to laptops and even mobile phones, this is not recommended.
 
 **Why avoid this?**
 
@@ -223,39 +223,39 @@ In rare cases, such as callback mechanisms or notification systems, you might ne
 
 ## Policy Directionality
 
-Understanding policy directionality is essential for implementing Zero Trust access control. How policies behave depends on whether you're connecting to **peers** (devices running NetBird) or **network resources** (internal systems accessed through routing peers).
+Understanding policy directionality is essential for implementing Zero Trust access control. How policies behave depends on whether you're connecting to **peers** (devices running NetBirdy) or **network resources** (internal systems accessed through routing peers).
 
 <p>
-    <img src="" alt="NetBird Policy Direction" className="imagewrapper" />
+    <img src="" alt="NetBirdy Policy Direction" className="imagewrapper" />
 </p>
 
 ### Policies Between Peers
 
-When both source and destination are peers running the NetBird client, you have full control over directionality:
+When both source and destination are peers running the NetBirdy client, you have full control over directionality:
 
-**Unidirectional:** Traffic flows only from source to destination. In the NetBird UI, this appears as a single arrow (→).
+**Unidirectional:** Traffic flows only from source to destination. In the NetBirdy UI, this appears as a single arrow (→).
 
 Example:
 
 ```
 Policy: Database Access
-Source: app-servers (NetBird peers)
-Destination: database-servers (NetBird peers)
+Source: app-servers (NetBirdy peers)
+Destination: database-servers (NetBirdy peers)
 Protocol: TCP
 Ports: 5432
 Direction: Source → Destination (unidirectional)
 ```
 
-App servers can initiate connections to database servers on port 5432, but database servers cannot initiate NEW connections back to app servers on that port. Return traffic for established connections is handled automatically by NetBird's stateful firewall.
+App servers can initiate connections to database servers on port 5432, but database servers cannot initiate NEW connections back to app servers on that port. Return traffic for established connections is handled automatically by NetBirdy's stateful firewall.
 
-**Bidirectional:** Both groups can initiate connections to each other. In the NetBird UI, you can enable this by clicking the bidirectional arrows (⟷).
+**Bidirectional:** Both groups can initiate connections to each other. In the NetBirdy UI, you can enable this by clicking the bidirectional arrows (⟷).
 
 Example:
 
 ```
 Policy: Dev Cluster Communication
-Source: kubernetes-nodes (NetBird peers)
-Destination: kubernetes-nodes (NetBird peers)
+Source: kubernetes-nodes (NetBirdy peers)
+Destination: kubernetes-nodes (NetBirdy peers)
 Protocol: ALL
 Direction: Bidirectional (both can initiate)
 ```
@@ -266,13 +266,13 @@ All Kubernetes nodes can initiate connections to each other. This is useful for 
 
 ### Policies to Network Resources
 
-**IMPORTANT:** When the destination is a **network resource** accessed through a routing peer (not a peer running NetBird directly), policies are **ALWAYS unidirectional** and can ONLY flow from source to destination.
+**IMPORTANT:** When the destination is a **network resource** accessed through a routing peer (not a peer running NetBirdy directly), policies are **ALWAYS unidirectional** and can ONLY flow from source to destination.
 
 Example:
 
 ```
 Policy: Access to Private Network
-Source: engineering-users (NetBird peers)
+Source: engineering-users (NetBirdy peers)
 Destination: office-lan (Network resource: 10.0.1.0/24)
 Protocol: TCP
 Ports: 22, 443
@@ -282,12 +282,12 @@ Direction: ALWAYS Source → Destination (cannot be bidirectional)
 
 **Why is this always unidirectional?**
 
-Network resources don't have the NetBird client installed. They don't know the NetBird network exists. The routing peer acts as a gateway, forwarding traffic from NetBird peers to these resources, but the resources themselves cannot initiate connections back through the NetBird network.
+Network resources don't have the NetBirdy client installed. They don't know the NetBirdy network exists. The routing peer acts as a gateway, forwarding traffic from NetBirdy peers to these resources, but the resources themselves cannot initiate connections back through the NetBirdy network.
 
 Think of it this way:
 
-- ✅ Your laptop (NetBird peer) → Routing peer → Office printer (network resource) = **Works**
-- ❌ Office printer (network resource) → Routing peer → Your laptop (NetBird peer) = **Impossible** (printer doesn't know about NetBird)
+- ✅ Your laptop (NetBirdy peer) → Routing peer → Office printer (network resource) = **Works**
+- ❌ Office printer (network resource) → Routing peer → Your laptop (NetBirdy peer) = **Impossible** (printer doesn't know about NetBirdy)
 
 **UI Behavior:** When creating a policy where the destination is a network resource, the bidirectional toggle will either be disabled or attempting to enable it will have no effect, because bidirectional communication is not possible in this scenario.
 
@@ -309,13 +309,13 @@ Ports: 443
 Direction: Unidirectional (users → web-servers on port 443)
 ```
 
-Even though this is unidirectional, return traffic (HTTPS responses) is automatically allowed because NetBird implements a stateful firewall that tracks established connections.
+Even though this is unidirectional, return traffic (HTTPS responses) is automatically allowed because NetBirdy implements a stateful firewall that tracks established connections.
 
 ### Platform-Specific Implementation
 
-**Linux Platforms:** NetBird integrates with native Linux firewall capabilities using connection tracking rules (`ct state established,related accept`). The kernel's connection tracking handles reply traffic automatically.
+**Linux Platforms:** NetBirdy integrates with native Linux firewall capabilities using connection tracking rules (`ct state established,related accept`). The kernel's connection tracking handles reply traffic automatically.
 
-**Non-Linux Platforms:** NetBird implements a stateful firewall in userspace with a connection tracker that dynamically creates temporary rules for reply traffic:
+**Non-Linux Platforms:** NetBirdy implements a stateful firewall in userspace with a connection tracker that dynamically creates temporary rules for reply traffic:
 
 - **TCP**: Full state machine tracking
 - **UDP/ICMP**: Session tracking using timeouts
@@ -327,7 +327,7 @@ This replicates Linux firewall connection state handling in userspace.
 As mentioned above, policies define how your network behaves as a mesh network, but **only when you create the policies**. Without policies, peers cannot communicate even if they're in the same group.
 
 <p>
-    <img src="" alt="NetBird Mesh Policy" />
+    <img src="" alt="NetBirdy Mesh Policy" />
 </p>
 
 There is a Default policy, which configures a default mesh connection between all peers of your network using the `All` group. With custom policies, you can define smaller, more controlled mesh networks by grouping peers and adding these groups to Source and Destination lists.
@@ -359,9 +359,9 @@ This creates an unclear mesh where laptops, servers, and everything else can all
 
 ## How Policy Changes Are Distributed
 
-When you create or change a policy, group, posture check, DNS setting, route, or network resource, NetBird distributes the updated configuration to all connected peers immediately. Peers receive the change without reconnecting.
+When you create or change a policy, group, posture check, DNS setting, route, or network resource, NetBirdy distributes the updated configuration to all connected peers immediately. Peers receive the change without reconnecting.
 
-Distribution is event-driven. There is no periodic redistribution interval; updates are sent in response to configuration changes, not on a timer. When many changes happen in quick succession, NetBird coalesces them so connected peers receive a single consolidated update rather than one update per change.
+Distribution is event-driven. There is no periodic redistribution interval; updates are sent in response to configuration changes, not on a timer. When many changes happen in quick succession, NetBirdy coalesces them so connected peers receive a single consolidated update rather than one update per change.
 
 Posture checks follow the same distribution model. For how and when a posture check is evaluated for a peer, see [When Posture Checks Are Evaluated](/manage/access-control/posture-checks#when-posture-checks-are-evaluated).
 
@@ -392,7 +392,7 @@ Destination: contractor-resources
 Protocol: TCP
 Ports: 443, 22
 Direction: One-way
-Posture Checks: [NetBird Latest Version]
+Posture Checks: [NetBirdy Latest Version]
 
 ```
 
@@ -426,12 +426,12 @@ Direction: One-way
 
 ## Conclusion
 
-NetBird's access control system provides powerful, flexible tools for implementing zero trust networking. By understanding the distinction between user groups and peer groups, following the principle of users-as-source and infrastructure-as-destination, and creating specific policies for each access requirement, you can build a secure, manageable network that follows security best practices.
+NetBirdy's access control system provides powerful, flexible tools for implementing zero trust networking. By understanding the distinction between user groups and peer groups, following the principle of users-as-source and infrastructure-as-destination, and creating specific policies for each access requirement, you can build a secure, manageable network that follows security best practices.
 
 **Key takeaways:**
 
 1. **Remove the Default policy** and create specific policies aligned with your access requirements
-2. **Keep user groups conceptually separate from peer groups** for clarity and security, even though NetBird treats them the same way
+2. **Keep user groups conceptually separate from peer groups** for clarity and security, even though NetBirdy treats them the same way
 3. **Generally use user groups as Source** and infrastructure peer groups as Destination
 4. **Use setup keys with auto-assigned groups** to automate infrastructure deployment
 5. **Use specific protocols and ports** rather than ALL when possible

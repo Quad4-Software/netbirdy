@@ -5,14 +5,14 @@ order: 125
 upstream: "manage/network-routes/index.mdx@2382247"
 ---
 
-> **Note** This page is adapted from the upstream NetBird documentation (BSD-3-Clause) and may describe features that NetBirdy does not include.
+> **Note** This page is adapted from the upstream NetBirdy documentation (BSD-3-Clause) and may describe features that NetBirdy does not include.
 
 # Routes
 
 > **Warning** Routes are deprecated. Every use case except [exit nodes](/use-cases/remote-access/exit-nodes) has moved to [Networks](/manage/networks). Use Networks for all new configurations. For a side-by-side comparison of the two models, see [How Routing Peers Work](/manage/networks/how-routing-peers-work).
 
 
-Routes let you route traffic from NetBird peers to private networks without installing the NetBird client on every device. A routing peer forwards packets between your NetBird mesh network and your internal networks (LANs, VPCs, data centers).
+Routes let you route traffic from NetBirdy peers to private networks without installing the NetBirdy client on every device. A routing peer forwards packets between your NetBirdy mesh network and your internal networks (LANs, VPCs, data centers).
 
 Routes also power [exit nodes](/use-cases/remote-access/exit-nodes): a default route (`0.0.0.0/0`) that sends all internet traffic from peers in its distribution groups through a routing peer. That route grants access to any network the routing peer can reach; see the [exit nodes guide](/use-cases/remote-access/exit-nodes#routing-peer) for how to limit this with **Block LAN access**.
 
@@ -20,7 +20,7 @@ Routes also power [exit nodes](/use-cases/remote-access/exit-nodes): a default r
     <img src="" alt="Routes diagram" className="imagewrapper-big"/>
 </p>
 
-> **Note** Routes require NetBird [v0.9.0](https://github.com/netbirdio/netbird/releases) or later.
+> **Note** Routes require NetBirdy [v0.9.0](https://github.com/netbirdio/netbird/releases) or later.
 
 
 > **Warning** By default, Routes bypass Access Control rules. Traffic flows freely to routed networks unless you [configure access control explicitly](/manage/network-routes/access-control). See [Routes caveats](#network-routes-caveats) for details.
@@ -34,7 +34,7 @@ A **network identifier** is a name for the network you want to route. A **range*
 
 ### Routing Peer
 
-A routing peer is a NetBird device that forwards traffic between the NetBird network and a private network. It must have network access to the resources you want to reach.
+A routing peer is a NetBirdy device that forwards traffic between the NetBirdy network and a private network. It must have network access to the resources you want to reach.
 
 > **Note** A network route grants access to the network behind the routing peer, not to the routing peer machine itself. If you need to reach services running on the routing peer, create a separate peer-to-peer [access control policy](/manage/access-control) that targets the routing peer's group as the destination.
 
@@ -44,13 +44,13 @@ A routing peer is a NetBird device that forwards traffic between the NetBird net
 
 ### Routing Group
 
-A routing group is a set of routing peers. Each peer in the group routes packets between your routed network and other NetBird peers. Using a routing group provides automatic high availability.
+A routing group is a set of routing peers. Each peer in the group routes packets between your routed network and other NetBirdy peers. Using a routing group provides automatic high availability.
 
 ### Masquerade
 
 When enabled (the default), the routing peer performs NAT on forwarded traffic, hiding the original source IP. This simplifies setup by eliminating the need for return routes on the remote network.
 
-Disable masquerade when you need source IP visibility for auditing or compliance. In this case, you must configure a return route to your NetBird network in your external network infrastructure.
+Disable masquerade when you need source IP visibility for auditing or compliance. In this case, you must configure a return route to your NetBirdy network in your external network infrastructure.
 
 ### Distribution Groups
 
@@ -95,15 +95,15 @@ The **Keep routes** option is enabled by default. When enabled, if a domain stop
 
 This preserves connections during IP changes, such as DNS-based load balancing where long-running connections to a previous IP remain valid.
 
-> **Note** DNS Routes require NetBird [v0.28.0](https://github.com/netbirdio/netbird/releases) or later. Wildcard domains are not supported.
+> **Note** DNS Routes require NetBirdy [v0.28.0](https://github.com/netbirdio/netbird/releases) or later. Wildcard domains are not supported.
 
 
-> **Note** Starting with NetBird v0.59.0, the local DNS forwarder port changed from `5353` to `22054` to avoid collisions. The Management Service applies the new port only when all peers in the account run v0.59.0 or newer.
+> **Note** Starting with NetBirdy v0.59.0, the local DNS forwarder port changed from `5353` to `22054` to avoid collisions. The Management Service applies the new port only when all peers in the account run v0.59.0 or newer.
 
 
 ## Managing Network Routes
 
-A network route describes a network you want to connect with your NetBird peers. It includes an identifier, network range, routing peer or peer groups, and parameters for priority and masquerading.
+A network route describes a network you want to connect with your NetBirdy peers. It includes an identifier, network range, routing peer or peer groups, and parameters for priority and masquerading.
 
 ### Creating a Network Route
 
@@ -151,7 +151,7 @@ Click **Add Route** to save.
 
 ### Creating Highly Available Routes
 
-To avoid single points of failure, we recommend installing NetBird on every resource. When that is not feasible, use high availability mode to ensure reliable connections. Multiple NetBird peers can serve as routing peers for the same private network.
+To avoid single points of failure, we recommend installing NetBirdy on every resource. When that is not feasible, use high availability mode to ensure reliable connections. Multiple NetBirdy peers can serve as routing peers for the same private network.
 
 Enable high availability in two ways:
 
@@ -191,9 +191,9 @@ In this example, peers in `berlin-office` use `aws-nb-europe-router-az-a` to acc
 
 ### Routes Without Masquerading
 
-Disable masquerade when you need source IP transparency or want to manage routing on your external network. The routing peer forwards packets with the original NetBird peer IP intact.
+Disable masquerade when you need source IP transparency or want to manage routing on your external network. The routing peer forwards packets with the original NetBirdy peer IP intact.
 
-This requires configuring your external network router with a return route to your NetBird network through the routing peer. Devices without the client can then communicate with your NetBird peers.
+This requires configuring your external network router with a return route to your NetBirdy network through the routing peer. Devices without the client can then communicate with your NetBirdy peers.
 
 <p>
     <img src="" alt="Routes without masquerading" className="imagewrapper-big"/>
@@ -315,10 +315,10 @@ The Network Route grants unrestricted access to the network range, bypassing the
 
 ## Get started
 <div>
-     window.open("https://netbird.io/pricing")}>Use NetBird
+     window.open("https://netbird.io/pricing")}>Use NetBirdy
 </div>
 
 - Make sure to [star us on GitHub](https://github.com/netbirdio/netbird)
 - Follow us [on X](https://x.com/netbird)
 - Join our [Slack Channel](/slack-url)
-- NetBird [latest release](https://github.com/netbirdio/netbird/releases) on GitHub
+- NetBirdy [latest release](https://github.com/netbirdio/netbird/releases) on GitHub

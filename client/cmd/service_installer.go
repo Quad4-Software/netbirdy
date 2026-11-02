@@ -131,7 +131,7 @@ func createServiceConfigForInstall() (*service.Config, error) {
 	return svcConfig, nil
 }
 
-// legacyServiceUnitPaths are the unit file locations a NetBird install leaves
+// legacyServiceUnitPaths are the unit file locations a NetBirdy install leaves
 // behind. A leftover unit means a second daemon would compete for the same
 // wt0 interface and /var/run/netbird.sock.
 var legacyServiceUnitPaths = []string{

@@ -1,26 +1,26 @@
 ---
 title: "Automated setup with a Personal Access Token"
-description: "Create the first self-hosted NetBird owner user and return a Personal Access Token from the setup API for automation."
+description: "Create the first self-hosted NetBirdy owner user and return a Personal Access Token from the setup API for automation."
 order: 128
 upstream: "selfhosted/automated-setup.mdx@2382247"
 ---
 
-> **Note** This page is adapted from the upstream NetBird documentation (BSD-3-Clause) and may describe features that NetBirdy does not include.
+> **Note** This page is adapted from the upstream NetBirdy documentation (BSD-3-Clause) and may describe features that NetBirdy does not include.
 
 # Automated setup with a Personal Access Token
 
-Self-hosted NetBird normally creates the first owner user through the Dashboard setup page. For automation and infrastructure-as-code workflows, you can enable setup-time Personal Access Token (PAT) creation and call the setup API directly.
+Self-hosted NetBirdy normally creates the first owner user through the Dashboard setup page. For automation and infrastructure-as-code workflows, you can enable setup-time Personal Access Token (PAT) creation and call the setup API directly.
 
-When `NB_SETUP_PAT_ENABLED=true`, `POST /api/setup` can create the first owner user and return a one-time plain text PAT in the response. Use this token to bootstrap the instance through the [NetBird API](/api/introduction), then rotate it or replace it with a service user token.
+When `NB_SETUP_PAT_ENABLED=true`, `POST /api/setup` can create the first owner user and return a one-time plain text PAT in the response. Use this token to bootstrap the instance through the [NetBirdy API](/api/introduction), then rotate it or replace it with a service user token.
 
-> **Warning** Setup-time PAT creation is disabled by default. The setup endpoint is unauthenticated while setup is required, so enable this only for controlled bootstrap workflows. Store the returned token securely; NetBird only shows the plain text token once.
+> **Warning** Setup-time PAT creation is disabled by default. The setup endpoint is unauthenticated while setup is required, so enable this only for controlled bootstrap workflows. Store the returned token securely; NetBirdy only shows the plain text token once.
 
 
 ## Requirements
 
-- A self-hosted NetBird deployment using the embedded IdP/local user setup flow.
-- No existing NetBird account or owner user. The setup endpoint only works while setup is required.
-- Access to the Management HTTP API through your NetBird URL, for example `https://netbird.example.com/api/setup`.
+- A self-hosted NetBirdy deployment using the embedded IdP/local user setup flow.
+- No existing NetBirdy account or owner user. The setup endpoint only works while setup is required.
+- Access to the Management HTTP API through your NetBirdy URL, for example `https://netbird.example.com/api/setup`.
 
 ## Enable setup-time PAT creation
 
@@ -86,20 +86,20 @@ The response includes `Cache-Control: no-store` because it may contain a plain t
 | `create_pat` | No | Set to `true` to request a setup PAT. Ignored unless `NB_SETUP_PAT_ENABLED=true`. |
 | `pat_expire_in` | No | PAT lifetime in days. Applies only when `create_pat` is true. Defaults to `1`; allowed range is `1` to `365`. |
 
-If `create_pat` is omitted or false, setup creates only the owner user. If `NB_SETUP_PAT_ENABLED` is not set to `true`, NetBird ignores the PAT request and returns a setup response without `personal_access_token`.
+If `create_pat` is omitted or false, setup creates only the owner user. If `NB_SETUP_PAT_ENABLED` is not set to `true`, NetBirdy ignores the PAT request and returns a setup response without `personal_access_token`.
 
 ## Use the token
 
 Use the returned PAT with the `Authorization: Token` header:
 
-```bash {{ title: 'Use setup PAT with NetBird API' }}
+```bash {{ title: 'Use setup PAT with NetBirdy API' }}
 NETBIRD_PAT="nbp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 
 curl -fsS "${NETBIRD_URL}/api/users" \
   -H "Authorization: Token ${NETBIRD_PAT}"
 ```
 
-Common bootstrap tasks include creating users, service users, setup keys, groups, policies, and routes through the NetBird API. To run these declaratively from a playbook, see [Configure NetBird with Ansible](/selfhosted/iac/ansible).
+Common bootstrap tasks include creating users, service users, setup keys, groups, policies, and routes through the NetBirdy API. To run these declaratively from a playbook, see [Configure NetBirdy with Ansible](/selfhosted/iac/ansible).
 
 > **Note** For long-running automation, create a dedicated service user and PAT after bootstrap. Then delete or let the setup PAT expire.
 
@@ -124,4 +124,4 @@ Check that:
 
 ### Setup fails after creating the owner user
 
-If account or PAT provisioning fails, NetBird rolls back setup-created resources so that setup can be retried. Fix the reported error and call `/api/setup` again.
+If account or PAT provisioning fails, NetBirdy rolls back setup-created resources so that setup can be retried. Fix the reported error and call `/api/setup` again.

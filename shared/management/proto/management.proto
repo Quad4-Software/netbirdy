@@ -76,7 +76,7 @@ message EncryptedMessage {
 
   // encrypted message Body
   bytes body = 2;
-  // Version of the Netbird Management Service protocol
+  // Version of the NetBirdy Management Service protocol
   int32 version = 3;
 }
 
@@ -128,7 +128,7 @@ message SyncRequest {
   PeerSystemMeta meta = 1;
 }
 
-// SyncResponse represents a state that should be applied to the local peer (e.g. Netbird servers config as well as local peer and remote peers configs)
+// SyncResponse represents a state that should be applied to the local peer (e.g. NetBirdy servers config as well as local peer and remote peers configs)
 message SyncResponse {
 
   // Global config
@@ -317,13 +317,13 @@ message ServerKeyResponse {
   string key = 1;
   // Key expiration timestamp after which the key should be fetched again by the client
   google.protobuf.Timestamp expiresAt = 2;
-  // Version of the Netbird Management Service protocol
+  // Version of the NetBirdy Management Service protocol
   int32 version = 3;
 }
 
 message Empty {}
 
-// NetbirdConfig is a common configuration of any Netbird peer. It contains STUN, TURN, Signal and Management servers configurations
+// NetbirdConfig is a common configuration of any NetBirdy peer. It contains STUN, TURN, Signal and Management servers configurations
 message NetbirdConfig {
   // a list of STUN servers
   repeated HostConfig stuns = 1;
@@ -403,9 +403,9 @@ message ProtectedHostConfig {
 // PeerConfig represents a configuration of a "our" peer.
 // The properties are used to configure local Wireguard
 message PeerConfig {
-  // Peer's virtual IP address within the Netbird VPN (a Wireguard address config)
+  // Peer's virtual IP address within the NetBirdy VPN (a Wireguard address config)
   string  address = 1;
-  // Netbird DNS server (a Wireguard DNS config)
+  // NetBirdy DNS server (a Wireguard DNS config)
   string dns = 2;
 
   // SSHConfig of the peer.

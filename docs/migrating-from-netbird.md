@@ -1,4 +1,4 @@
-# Migrating from NetBird
+# Migrating from NetBirdy
 
 NetBirdy is a drop-in replacement: existing config, state and clients keep
 working.
@@ -27,7 +27,7 @@ netbird-dashboard and the embedded IdP config carry over unchanged.
 
 Paths /etc/netbird and /var/lib/netbird, env vars NB_* and NETBIRD_*, the wt0
 interface, the netbird-dashboard OIDC client id, io.netbird.* ids, and the Go
-module path github.com/netbirdio/netbird stay as NetBird so persisted data,
+module path github.com/netbirdio/netbird stay as NetBirdy so persisted data,
 policies and tooling keep working.
 
 ## Differences to expect
@@ -40,7 +40,7 @@ policies and tooling keep working.
 - The GeoLite geolocation database download is opt-in: set
   NB_GEOLOCATION_CITY_TAR_URL, NB_GEOLOCATION_CITY_TAR_SHA256_URL (and the
   _ZIP_ variants for CSV) to a source you choose.
-- NetBird Cloud api.netbird.io/app.netbird.io remain the compiled defaults for
+- NetBirdy Cloud api.netbird.io/app.netbird.io remain the compiled defaults for
   cloud users; self-hosted installs configure them as before.
 
 See also: [offline mode](offline-mode.md).

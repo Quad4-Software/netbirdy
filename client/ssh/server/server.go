@@ -917,7 +917,7 @@ func (s *Server) findSessionKeyByContext(ctx ssh.Context) sessionKey {
 }
 
 // connectionValidator returns a tracked connection, or nil to reject it.
-// With a valid configured IPv4 address and network, only TCP peers in the NetBird
+// With a valid configured IPv4 address and network, only TCP peers in the NetBirdy
 // IPv4 or IPv6 subnet are allowed, excluding the server's own IPs. Otherwise,
 // network filtering is skipped. Stopped or replaced SSH servers are always rejected.
 func (s *Server) connectionValidator(ctx ssh.Context, conn net.Conn) net.Conn {

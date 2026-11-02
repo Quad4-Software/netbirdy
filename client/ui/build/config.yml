@@ -5,11 +5,11 @@ version: '3'
 
 # This information is used to generate the build assets.
 info:
-  companyName: "NetBird GmbH" # The name of the company
+  companyName: "NetBirdy GmbH" # The name of the company
   productName: "NetBirdy" # The name of the application
   productIdentifier: "io.netbird.client" # The unique product identifier
   description: "NetBirdy desktop client" # The application description
-  copyright: "NetBird GmbH" # Copyright text
+  copyright: "NetBirdy GmbH" # Copyright text
   comments: "Some Product Comments" # Comments
   version: "0.0.1" # The application version
   # cfBundleIconName: "appicon" # The macOS icon name in Assets.car icon bundles (optional)

@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <!--
-    NetBird MDM configuration profile (macOS).
+    NetBirdy MDM configuration profile (macOS).
 
     Wraps a `com.apple.ManagedClient.preferences` payload that pushes the
-    NetBird MDM policy into:
+    NetBirdy MDM policy into:
         /Library/Managed Preferences/io.netbird.client.plist
 
     Read at runtime by the netbird daemon's macOS loader
@@ -50,11 +50,11 @@
     <key>PayloadUUID</key>
     <string>11111111-1111-1111-1111-111111111111</string>
     <key>PayloadDisplayName</key>
-    <string>NetBird MDM Policy</string>
+    <string>NetBirdy MDM Policy</string>
     <key>PayloadDescription</key>
-    <string>Enforces NetBird client configuration. Values written here override any local user / CLI / on-disk setting and are re-applied at every daemon boot and on every 1-minute MDM reload tick.</string>
+    <string>Enforces NetBirdy client configuration. Values written here override any local user / CLI / on-disk setting and are re-applied at every daemon boot and on every 1-minute MDM reload tick.</string>
     <key>PayloadOrganization</key>
-    <string>NetBird</string>
+    <string>NetBirdy</string>
     <key>PayloadScope</key>
     <string>System</string>
     <key>PayloadRemovalDisallowed</key>
@@ -73,7 +73,7 @@
             <key>PayloadUUID</key>
             <string>22222222-2222-2222-2222-222222222222</string>
             <key>PayloadDisplayName</key>
-            <string>NetBird Managed Preferences</string>
+            <string>NetBirdy Managed Preferences</string>
             <key>PayloadEnabled</key>
             <true/>
 

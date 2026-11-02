@@ -5,13 +5,13 @@ order: 106
 upstream: "client/environment-variables.mdx@2382247"
 ---
 
-> **Note** This page is adapted from the upstream NetBird documentation (BSD-3-Clause) and may describe features that NetBirdy does not include.
+> **Note** This page is adapted from the upstream NetBirdy documentation (BSD-3-Clause) and may describe features that NetBirdy does not include.
 
-The NetBird client supports environment variables for advanced configuration. These are separate from the CLI flag environment variables (like `NB_LOG_LEVEL`) which are described in the [CLI reference](/get-started/cli#environment-variables).
+The NetBirdy client supports environment variables for advanced configuration. These are separate from the CLI flag environment variables (like `NB_LOG_LEVEL`) which are described in the [CLI reference](/get-started/cli#environment-variables).
 
 ## Setting environment variables
 
-Environment variables must be set on the **daemon process**, not the CLI. When running NetBird as a system service, use `--service-env` to persist them:
+Environment variables must be set on the **daemon process**, not the CLI. When running NetBirdy as a system service, use `--service-env` to persist them:
 
 ```shell
 # Set during install
@@ -41,11 +41,11 @@ NB_WG_KERNEL_DISABLED=true netbird up --foreground-mode
 | `NB_DISABLE_CUSTOM_ROUTING` | All | Revert to the routing behavior from before exit node support was added. No exclusion routes or fwmark-based socket routing will be used; all dialers and listeners fall back to plain `net.Dial`/`net.Listen`. Routes with a prefix of /7 or larger (e.g. default routes, 0.0.0.0/0) will be rejected. |
 | `NB_ROUTE_PROTO_FLAG` | macOS, BSD | Set a custom route flag on routes the client adds to the routing table. Accepted values: `2` (RTF_PROTO2) or `3` (RTF_PROTO3); defaults to RTF_PROTO1. Not used on Linux (Linux uses netlink with its own protocol field). |
 | `NB_DISABLE_ROUTE_CACHE` | Windows | Disable the 2-second cache on Windows routing table lookups. The client reads the OS routing table (via Win32 API) when adding or removing routes; without the cache, each operation triggers a fresh read. Only needed for debugging route conflicts. |
-| `NB_FWMARK_BASE` | Linux | Move the netfilter mark range the client uses (default base `0x1BD00`, covering `0x1BD00`-`0x1BD0FF`). Set this when other software on the host claims bits the NetBird marks use, so its rules act on NetBird traffic. The value is the base of the range, decimal or `0x`-prefixed, and the low byte identifies the individual mark, so it has to be left free: `NB_FWMARK_BASE=0x11000` puts the marks at `0x11000`-`0x110FF`. A value that is zero, larger than 32 bits, or has a bit set in its low byte is rejected with a warning in the log and the default range is used. |
+| `NB_FWMARK_BASE` | Linux | Move the netfilter mark range the client uses (default base `0x1BD00`, covering `0x1BD00`-`0x1BD0FF`). Set this when other software on the host claims bits the NetBirdy marks use, so its rules act on NetBirdy traffic. The value is the base of the range, decimal or `0x`-prefixed, and the low byte identifies the individual mark, so it has to be left free: `NB_FWMARK_BASE=0x11000` puts the marks at `0x11000`-`0x110FF`. A value that is zero, larger than 32 bits, or has a bit set in its low byte is rejected with a warning in the log and the default range is used. |
 
-Container network plugins, CNIs and other VPNs claim bits of the mark space for themselves. When one of them has a rule matching a bit that a NetBird mark also sets, that rule acts on NetBird traffic, which shows up as traffic being dropped, masqueraded, or routed elsewhere. `NB_FWMARK_BASE` moves the whole NetBird range out of the way.
+Container network plugins, CNIs and other VPNs claim bits of the mark space for themselves. When one of them has a rule matching a bit that a NetBirdy mark also sets, that rule acts on NetBirdy traffic, which shows up as traffic being dropped, masqueraded, or routed elsewhere. `NB_FWMARK_BASE` moves the whole NetBirdy range out of the way.
 
-> **Warning** The client removes the routing rule for its mark range on shutdown. If you change `NB_FWMARK_BASE` while the client was not shut down gracefully (killed, crashed, host reset), the rule for the previous range stays behind and has to be removed by hand, otherwise traffic keeps being sent to the NetBird routing table:
+> **Warning** The client removes the routing rule for its mark range on shutdown. If you change `NB_FWMARK_BASE` while the client was not shut down gracefully (killed, crashed, host reset), the rule for the previous range stays behind and has to be removed by hand, otherwise traffic keeps being sent to the NetBirdy routing table:
 >
 > ```shell
 > # Find the leftover rule, it names the mark of the previous range
@@ -104,7 +104,7 @@ Container network plugins, CNIs and other VPNs claim bits of the mark space for 
 |---|---|---|
 | `NB_DNS_FORWARDER_PORT` | All | Override the port the internal DNS forwarder binds to for handling DNS routes received from clients (default: `22054`). The forwarder is separate from the local resolver. |
 | `NB_DNS_LAZY_WARMUP_TIMEOUT` | All | Per-query budget for waking an idle peer when the local resolver returns one of its A or AAAA records (Go duration, default: `2s`). The value must be positive; invalid, zero, or negative values use the default. |
-| `NB_USE_LEGACY_DNS_RESOLUTION` | Windows | Available from client v0.78.0. Go back to only setting the NetBird address as the tunnel adapter's nameserver, leaving Windows free to query the other adapters' resolvers in parallel. By default, a peer with a primary nameserver also gets a Name Resolution Policy Table rule that sends every query to the NetBird resolver and nowhere else. Set this if a zone that only the local network resolves has to stay reachable while connected and cannot be declared as a match domain — it also brings back the query leak and the non-deterministic resolution the rule prevents. |
+| `NB_USE_LEGACY_DNS_RESOLUTION` | Windows | Available from client v0.78.0. Go back to only setting the NetBirdy address as the tunnel adapter's nameserver, leaving Windows free to query the other adapters' resolvers in parallel. By default, a peer with a primary nameserver also gets a Name Resolution Policy Table rule that sends every query to the NetBirdy resolver and nowhere else. Set this if a zone that only the local network resolves has to stay reachable while connected and cannot be declared as a match domain — it also brings back the query leak and the non-deterministic resolution the rule prevents. |
 | `NB_UNCLEAN_SHUTDOWN_RESOLV_FILE` | Linux, FreeBSD | Custom file path to store a backup of `/etc/resolv.conf` before the client modifies it. Used to restore the original on next startup if the client crashed without cleaning up (default: `<state-dir>/resolv.conf`, i.e. `/var/lib/netbird/resolv.conf` on Linux, `/var/db/netbird/resolv.conf` on FreeBSD). |
 
 ## Connection retry
@@ -122,7 +122,7 @@ These control the exponential backoff when the client loses its connection to th
 
 | Variable | Platform | Description |
 |---|---|---|
-| `NB_DISABLE_SSH_CONFIG` | All | Prevent the client from writing NetBird peer entries into the system SSH config directory (`/etc/ssh/ssh_config.d/99-netbird.conf` on Unix, `%PROGRAMDATA%\ssh\ssh_config.d\99-netbird.conf` on Windows). By default, the client adds `Host` blocks so you can `ssh peer-name` without specifying the IP. |
+| `NB_DISABLE_SSH_CONFIG` | All | Prevent the client from writing NetBirdy peer entries into the system SSH config directory (`/etc/ssh/ssh_config.d/99-netbird.conf` on Unix, `%PROGRAMDATA%\ssh\ssh_config.d\99-netbird.conf` on Windows). By default, the client adds `Host` blocks so you can `ssh peer-name` without specifying the IP. |
 | `NB_FORCE_SSH_CONFIG` | All | Write the SSH config entries even when the peer count exceeds the default limit of 200. Without this, the client skips SSH config generation for large networks to avoid slow file writes. |
 
 ## Relay
@@ -142,14 +142,14 @@ These control the exponential backoff when the client loses its connection to th
 | Variable | Platform | Description |
 |---|---|---|
 | `NB_LOG_FORMAT` | All | Override the log output format. Accepted values: `json` (one JSON object per line) or `syslog` (compact format used when logging to syslog). Anything else falls back to the default human-readable text formatter. The `syslog` value is also selected automatically when the log destination is set to `syslog`. |
-| `NB_LOG_MAX_SIZE_MB` | All | Maximum size in megabytes of a single log file before NetBird's built-in rotation triggers (default: `15`). Only effective when the built-in rotation is active, see `NB_LOG_DISABLE_ROTATION` and [Log rotation](/help/troubleshooting-client#log-rotation). |
-| `NB_LOG_DISABLE_ROTATION` | All | Set to `true` to disable NetBird's built-in log rotation. NetBird will write to the configured log file directly and leave rotation to an external tool (e.g. system `logrotate` on Linux). On Linux, NetBird also auto-disables its own rotation when it detects a `logrotate` config that mentions `netbird`, this variable lets you force the same behavior on other platforms or when the auto-detection misses your config. Also see [Log rotation troubleshooting](/help/troubleshooting-client#log-rotation). |
+| `NB_LOG_MAX_SIZE_MB` | All | Maximum size in megabytes of a single log file before NetBirdy's built-in rotation triggers (default: `15`). Only effective when the built-in rotation is active, see `NB_LOG_DISABLE_ROTATION` and [Log rotation](/help/troubleshooting-client#log-rotation). |
+| `NB_LOG_DISABLE_ROTATION` | All | Set to `true` to disable NetBirdy's built-in log rotation. NetBirdy will write to the configured log file directly and leave rotation to an external tool (e.g. system `logrotate` on Linux). On Linux, NetBirdy also auto-disables its own rotation when it detects a `logrotate` config that mentions `netbird`, this variable lets you force the same behavior on other platforms or when the auto-detection misses your config. Also see [Log rotation troubleshooting](/help/troubleshooting-client#log-rotation). |
 
 ## Other
 
 | Variable | Platform | Description |
 |---|---|---|
-| `NB_STATE_DIR` | All | Override the directory where the client stores persistent state files (config, state.json, WireGuard keys). Defaults to `/var/lib/netbird` on Linux/macOS, `/var/db/netbird` on FreeBSD, `%PROGRAMDATA%\Netbird` on Windows. |
+| `NB_STATE_DIR` | All | Override the directory where the client stores persistent state files (config, state.json, WireGuard keys). Defaults to `/var/lib/netbird` on Linux/macOS, `/var/db/netbird` on FreeBSD, `%PROGRAMDATA%\NetBirdy` on Windows. |
 | `NB_DNS_STATE_FILE` | All | Override the path to the client state file (`state.json`). Despite the name, this is not DNS-specific: it stores all shutdown/recovery state including DNS settings, SSH config, routes, and auto-update progress. The default path is per-profile (e.g. `/var/lib/netbird/state.json` for the default profile). Setting this bypasses per-profile state isolation. Primarily used by the embedded client API (`embed.Options.StatePath`). |
 | `NB_ROSENPASS_LOG_LEVEL` | All | Log level for the Rosenpass post-quantum key exchange subprocess. Accepted values: `debug`, `info`, `warn`, `error` (default: `info`). Separate from the main client log level. |
 | `NB_AUTO_UPDATE_DRY_RUN` | All | Set to `true` to run the auto-update check and download steps without actually replacing the binary. Useful for testing update infrastructure. |
