@@ -21,7 +21,7 @@ RUN --mount=type=cache,target=/go/pkg/mod \
     -X main.builtBy=podman" \
     -o netbirdy-server ./combined
 
-FROM docker.io/library/ubuntu:24.04
+FROM docker.io/library/ubuntu:25.10
 RUN apt-get update && apt-get install -y ca-certificates curl && rm -rf /var/lib/apt/lists/*
 ENTRYPOINT [ "/go/bin/netbirdy-server" ]
 CMD ["--config", "/etc/netbird/config.yaml"]
