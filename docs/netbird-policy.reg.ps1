@@ -1,12 +1,12 @@
 #requires -Version 5.1
 <#
 .SYNOPSIS
-  Push the NetBird MDM policy to a Windows device via JumpCloud Commands
+  Push the NetBirdy MDM policy to a Windows device via JumpCloud Commands
   by importing a sidecar netbird-policy.reg file.
 
 .DESCRIPTION
   Windows counterpart of docs/netbird-macos.sh. Outcome:
-  HKLM\Software\Policies\NetBird populated from the attached
+  HKLM\Software\Policies\NetBirdy populated from the attached
   netbird-policy.reg file, daemon picks up the change via the
   1-minute MDM reload ticker.
 
@@ -24,12 +24,12 @@
     On a reference machine, after configuring the policy values either
     via gpedit (GPO) or manual `reg add`, export with:
 
-        reg export "HKLM\Software\Policies\NetBird" netbird-policy.reg /y
+        reg export "HKLM\Software\Policies\NetBirdy" netbird-policy.reg /y
 
     Then attach the resulting file to the JumpCloud command.
 
   Semantics:
-    - The script nukes the existing HKLM\Software\Policies\NetBird key
+    - The script nukes the existing HKLM\Software\Policies\NetBirdy key
       before importing the .reg, so the .reg is the SINGLE SOURCE OF
       TRUTH. Any value present in the registry but absent from the .reg
       is removed. This is what an MDM admin almost always wants.
@@ -46,7 +46,7 @@
 $ErrorActionPreference = "Stop"
 
 $RegFileName = "netbird-policy.reg"
-$RegKey      = "HKLM\Software\Policies\NetBird"
+$RegKey      = "HKLM\Software\Policies\NetBirdy"
 
 # Resolve the attached .reg file: JumpCloud copies command attachments
 # into C:\Windows\Temp\ before invoking the script. Cwd / $PSScriptRoot
@@ -66,7 +66,7 @@ $regFile = $candidates[0]
 Write-Host "[netbird-mdm] using $regFile"
 
 # Wipe the existing policy key so the .reg is authoritative.
-$existed = Test-Path "Registry::HKEY_LOCAL_MACHINE\Software\Policies\NetBird"
+$existed = Test-Path "Registry::HKEY_LOCAL_MACHINE\Software\Policies\NetBirdy"
 if ($existed) {
     & reg.exe delete $RegKey /f | Out-Null
     if ($LASTEXITCODE -ne 0) {

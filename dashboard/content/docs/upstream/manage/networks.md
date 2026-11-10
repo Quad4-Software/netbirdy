@@ -1,15 +1,15 @@
 ---
 title: "Networks"
-description: "Learn how NetBird Networks work: the four building blocks (Network, Routing Peer, Resource, Policy), how a packet reaches a resource, and a complete worked example for reaching internal apps with Zero Trust access by default."
+description: "Learn how NetBirdy Networks work: the four building blocks (Network, Routing Peer, Resource, Policy), how a packet reaches a resource, and a complete worked example for reaching internal apps with Zero Trust access by default."
 order: 123
 upstream: "manage/networks/index.mdx@2382247"
 ---
 
-> **Note** This page is adapted from the upstream NetBird documentation (BSD-3-Clause) and may describe features that NetBirdy does not include.
+> **Note** This page is adapted from the upstream NetBirdy documentation (BSD-3-Clause) and may describe features that NetBirdy does not include.
 
 # Networks
 
-Every device that runs the NetBird client joins a single private **overlay network**, encrypted end to end with [WireGuard](/about-netbird/netbird-vs-traditional-vpn#why-wire-guard-with-net-bird). Nothing is exposed to the public internet, and you never open an inbound port. Peers connect outbound and negotiate connectivity using ICE/STUN for NAT traversal. See [Ports & Firewalls](/about-netbird/ports-and-firewalls) for details.
+Every device that runs the NetBirdy client joins a single private **overlay network**, encrypted end to end with [WireGuard](/about-netbird/netbird-vs-traditional-vpn#why-wire-guard-with-net-bird). Nothing is exposed to the public internet, and you never open an inbound port. Peers connect outbound and negotiate connectivity using ICE/STUN for NAT traversal. See [Ports & Firewalls](/about-netbird/ports-and-firewalls) for details.
 
 But you can't run the client everywhere. Some devices can't run it at all, like printers, IoT sensors, and appliances you can't install software on. And installing it on every database and server is more overhead than most teams want. A **Network** fills that gap: a few clients become routing peers that open whole subnets, single hosts, and internal domains to your overlay network, with nothing reachable until a policy allows it.
 
@@ -20,10 +20,10 @@ The common case is **VPN-to-Site**: your laptop reaches into a remote network an
 
 ## The mental model
 
-If you remember one thing, remember this: **a NetBird Network is a map of part of your infrastructure, drawn onto your overlay network.** The **resources** are the destinations, the **access policies** are the gatekeepers that decide who may pass, and the **routing peers** are the roads that carry traffic to each destination.
+If you remember one thing, remember this: **a NetBirdy Network is a map of part of your infrastructure, drawn onto your overlay network.** The **resources** are the destinations, the **access policies** are the gatekeepers that decide who may pass, and the **routing peers** are the roads that carry traffic to each destination.
 
 <p>
-    <img src="" alt="Three NetBird peers on the overlay network connect through a WireGuard tunnel to a routing peer in a private network. Access policies on the routing peer allow a database on TCP 5432, a web app on TCP 443, and an RDP workstation on TCP/UDP 3389; a printer with no policy is unreachable." className="imagewrapper-big"/>
+    <img src="" alt="Three NetBirdy peers on the overlay network connect through a WireGuard tunnel to a routing peer in a private network. Access policies on the routing peer allow a database on TCP 5432, a web app on TCP 443, and an RDP workstation on TCP/UDP 3389; a printer with no policy is unreachable." className="imagewrapper-big"/>
 </p>
 
 *Left to right: peers reach the routing peer through a WireGuard tunnel, and access policies on the routing peer decide which resources behind it each peer can reach. The printer has no policy, so nothing reaches it.*
@@ -57,25 +57,25 @@ Resources can be collected into a **resource group**. When an access policy's de
 
 #### Domain resources
 
-Instead of an IP, a resource can be a domain or a wildcard domain. The NetBird client resolves the name through the routing peer and routes traffic to whatever address it returns. This is useful when a service's IP changes or you'd rather reference it by name. For the resolution mechanics and DNS troubleshooting, see [How Routing Peers Work](/manage/networks/how-routing-peers-work#dns-and-domain-routing) and [Internal DNS Servers](/manage/dns/internal-dns-servers#domain-resources-and-routing-peer-dns).
+Instead of an IP, a resource can be a domain or a wildcard domain. The NetBirdy client resolves the name through the routing peer and routes traffic to whatever address it returns. This is useful when a service's IP changes or you'd rather reference it by name. For the resolution mechanics and DNS troubleshooting, see [How Routing Peers Work](/manage/networks/how-routing-peers-work#dns-and-domain-routing) and [Internal DNS Servers](/manage/dns/internal-dns-servers#domain-resources-and-routing-peer-dns).
 
 > **Note** A wildcard resource like `*.berlin.internal` matches subdomains only, not the base domain. To allow `berlin.internal` too, add it as a separate resource. Assigning it to the same resource group reuses the existing routing peers and policies.
 
 
 ### Access policy
 
-An access policy is the rule that makes a resource reachable. It grants access from a **source** to a **destination**, for the chosen protocols and ports. The destination can be one or more groups or resources, a single resource, or a NetBird peer itself for direct peer-to-peer access. A peer can reach a resource only when a policy allows one of its groups to reach that resource or its group.
+An access policy is the rule that makes a resource reachable. It grants access from a **source** to a **destination**, for the chosen protocols and ports. The destination can be one or more groups or resources, a single resource, or a NetBirdy peer itself for direct peer-to-peer access. A peer can reach a resource only when a policy allows one of its groups to reach that resource or its group.
 
 This is Zero Trust by default: nothing is reachable until a policy says so. The ideal source is a group of users [synced from your identity provider](/manage/team/idp-sync), so access follows your existing org structure and updates automatically as people join, move, or leave. See [Groups & Policies](/manage/access-control) for how groups and policies work.
 
-> **Warning** Unlike NetBird peers, resources are **not** automatically members of the built-in `All` group. A resource with no policy is reachable by no one. You must explicitly grant access.
+> **Warning** Unlike NetBirdy peers, resources are **not** automatically members of the built-in `All` group. A resource with no policy is reachable by no one. You must explicitly grant access.
 
 
 <div id="routing-peers" />
 
 ### Routing peer
 
-A routing peer is a NetBird client installed inside the private network that forwards traffic from the overlay network to devices that don't run the client. Any NetBird client can be one (Linux, Windows, macOS, and others), so the role is about where the machine sits, not which OS it runs. For the full picture, see [How Routing Peers Work](/manage/networks/how-routing-peers-work).
+A routing peer is a NetBirdy client installed inside the private network that forwards traffic from the overlay network to devices that don't run the client. Any NetBirdy client can be one (Linux, Windows, macOS, and others), so the role is about where the machine sits, not which OS it runs. For the full picture, see [How Routing Peers Work](/manage/networks/how-routing-peers-work).
 
 A simple routing peer needs little: 2 vCPUs and 4 GB of RAM is a good baseline, and a small VM or even a Raspberry Pi will do for light use. Scale up as network throughput, link saturation, and the number of users grow; [Sizing Routing Peers](/manage/networks/sizing-routing-peers) gives a method for high-throughput deployments.
 
@@ -90,7 +90,7 @@ Here is the whole path, end to end:
 
 1. Your client encrypts the packet and sends it through the tunnel to the routing peer.
 2. The routing peer decrypts the packet and forwards it onto the local network toward the resource.
-3. By default the routing peer **masquerades** the traffic, rewriting the source to its own LAN IP, so the destination network needs no awareness of NetBird.
+3. By default the routing peer **masquerades** the traffic, rewriting the source to its own LAN IP, so the destination network needs no awareness of NetBirdy.
 4. Replies follow the reverse path. The connection is stateful, so return traffic needs no extra policy.
 
 ### Through the peer, or to the peer?
@@ -100,20 +100,20 @@ One subtlety causes most policy mistakes. A network resource policy permits traf
 If a resource stays unreachable even though the policy looks right, [Troubleshooting resource connectivity](/help/troubleshooting-resource-connectivity) helps you find which layer is dropping the traffic.
 
 <p>
-    <img src="" alt="Two paths compared. Through the routing peer: a network resource policy, evaluated in the forward chain, lets a client reach a web app behind the routing peer on TCP 443. To the routing peer: a peer-to-peer policy, evaluated in the input chain, lets a client reach SSH on the routing peer's NetBird IP on TCP 22." className="imagewrapper-big"/>
+    <img src="" alt="Two paths compared. Through the routing peer: a network resource policy, evaluated in the forward chain, lets a client reach a web app behind the routing peer on TCP 443. To the routing peer: a peer-to-peer policy, evaluated in the input chain, lets a client reach SSH on the routing peer's NetBirdy IP on TCP 22." className="imagewrapper-big"/>
 </p>
 
 > **Note** For the full kernel-level traffic walkthrough, host requirements (IP forwarding, container capabilities), masquerade internals, and the forward-vs-input-chain rule in depth, see [How Routing Peers Work](/manage/networks/how-routing-peers-work).
 
 
-> **Note** "To the peer" has a further subtlety: a peer-to-peer policy reaches the routing peer at its **NetBird IP** (its `100.x` overlay address). To reach it at its **LAN IP** — e.g. clients resolve its name to that address — you also need a resource that covers that IP (the route), and on userspace peers `NB_ENABLE_LOCAL_FORWARDING`. See [Reaching the routing peer itself](/manage/networks/how-routing-peers-work#reaching-the-routing-peer-itself) and the [Reach Services on the Routing Peer](/use-cases/remote-access/reach-services-on-the-routing-peer) use case.
+> **Note** "To the peer" has a further subtlety: a peer-to-peer policy reaches the routing peer at its **NetBirdy IP** (its `100.x` overlay address). To reach it at its **LAN IP** — e.g. clients resolve its name to that address — you also need a resource that covers that IP (the route), and on userspace peers `NB_ENABLE_LOCAL_FORWARDING`. See [Reaching the routing peer itself](/manage/networks/how-routing-peers-work#reaching-the-routing-peer-itself) and the [Reach Services on the Routing Peer](/use-cases/remote-access/reach-services-on-the-routing-peer) use case.
 
 
 ## Walkthrough: access two internal apps
 
-A remote engineer in the `Development` group needs to reach two apps in the Berlin office: an internal **wiki** running on the host `10.10.0.5`, and an internal **dashboard** at `grafana.berlin.internal`. The two apps live on distinct hosts, so they're independent resources. One machine inside the office runs the NetBird client and serves as the routing peer.
+A remote engineer in the `Development` group needs to reach two apps in the Berlin office: an internal **wiki** running on the host `10.10.0.5`, and an internal **dashboard** at `grafana.berlin.internal`. The two apps live on distinct hosts, so they're independent resources. One machine inside the office runs the NetBirdy client and serves as the routing peer.
 
-1. **Install the routing peer.** On a host inside the office network, install the NetBird client and register it with a [setup key](/manage/peers/register-machines-using-setup-keys).
+1. **Install the routing peer.** On a host inside the office network, install the NetBirdy client and register it with a [setup key](/manage/peers/register-machines-using-setup-keys).
 2. **Create the Network.** Go to **Networks**, add a Network named `Berlin Office`.
 
 <p>
@@ -177,9 +177,9 @@ In one breath, for the office example above:
 - **Access policy** — the rule letting `Development` reach them, and nothing else.
 - **Routing peer** — the office host that forwards the traffic.
 
-Access is denied until a policy allows it. That default is what makes a NetBird Network Zero Trust. For a full rollout across your organization, see [Implementing Zero Trust](/use-cases/security/implement-zero-trust).
+Access is denied until a policy allows it. That default is what makes a NetBirdy Network Zero Trust. For a full rollout across your organization, see [Implementing Zero Trust](/use-cases/security/implement-zero-trust).
 
-Networks keep resources private to your overlay network. If you instead need to make a service available on the public internet, NetBird's built-in [Reverse Proxy](/manage/reverse-proxy) handles that, with automatic TLS and authentication and no open ports on your machines.
+Networks keep resources private to your overlay network. If you instead need to make a service available on the public internet, NetBirdy's built-in [Reverse Proxy](/manage/reverse-proxy) handles that, with automatic TLS and authentication and no open ports on your machines.
 
 
 
@@ -188,10 +188,10 @@ Networks keep resources private to your overlay network. If you instead need to 
 ## Get Started
 
 <div className="text-center">
-    Use NetBird
+    Use NetBirdy
 </div>
 
 - Make sure to [star us on GitHub](https://github.com/netbirdio/netbird)
 - Follow us [on X](https://x.com/netbird)
 - Join our [Slack Channel](/slack-url)
-- NetBird [latest release](https://github.com/netbirdio/netbird/releases) on GitHub
+- NetBirdy [latest release](https://github.com/netbirdio/netbird/releases) on GitHub

@@ -57,7 +57,7 @@ export default function AndroidTab() {
           </Steps.Step>
         </Steps>
       </TabsContentPadding>
-    The official NetBird mobile apps work with a NetBirdy server.
+    The official NetBirdy mobile apps work with a NetBirdy server.
 </TabsContent>
   );
 }

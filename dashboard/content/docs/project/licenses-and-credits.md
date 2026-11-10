@@ -15,5 +15,5 @@ SIL Open Font License. See `NOTICE.md` for the full credits.
 
 ## Trademarks
 
-NetBird is a trademark of NetBird Project. The fork uses the NetBirdy name
-and its own artwork; do not present a NetBirdy build as upstream NetBird.
+NetBirdy is a trademark of NetBirdy Project. The fork uses the NetBirdy name
+and its own artwork; do not present a NetBirdy build as upstream NetBirdy.

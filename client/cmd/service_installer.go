@@ -75,6 +75,13 @@ func buildServiceArguments() []string {
 		args = append(args, "--sentry-dsn", sentryDSN)
 	}
 
+	// The resolved principals rather than the names the administrator typed, so
+	// the daemon needs no directory lookup on the boot path and a group renamed
+	// or recreated after the install cannot silently change who may connect.
+	for _, principal := range resolvedAllowGroups {
+		args = append(args, "--allow-group", principal)
+	}
+
 	return args
 }
 
@@ -118,6 +125,15 @@ func createServiceConfigForInstall() (*service.Config, error) {
 		return nil, err
 	}
 
+	// Resolved here, where a name that does not exist fails the install in front
+	// of the administrator, rather than at boot where it would leave the daemon
+	// unable to serve anybody.
+	resolved, err := resolveAllowGroups(allowGroups)
+	if err != nil {
+		return nil, err
+	}
+	resolvedAllowGroups = resolved
+
 	svcConfig, err := newSVCConfig()
 	if err != nil {
 		return nil, fmt.Errorf("create service config: %w", err)
@@ -131,7 +147,7 @@ func createServiceConfigForInstall() (*service.Config, error) {
 	return svcConfig, nil
 }
 
-// legacyServiceUnitPaths are the unit file locations a NetBird install leaves
+// legacyServiceUnitPaths are the unit file locations a NetBirdy install leaves
 // behind. A leftover unit means a second daemon would compete for the same
 // wt0 interface and /var/run/netbird.sock.
 var legacyServiceUnitPaths = []string{

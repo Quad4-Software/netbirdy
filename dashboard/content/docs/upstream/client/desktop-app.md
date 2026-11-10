@@ -1,28 +1,28 @@
 ---
-title: "NetBird Desktop App"
-description: "Overview of the redesigned NetBird desktop app: Default and Advanced views, peer details, a reorganized Settings page, MDM-driven UI, non-disruptive session renewal, and localization."
+title: "NetBirdy Desktop App"
+description: "Overview of the redesigned NetBirdy desktop app: Default and Advanced views, peer details, a reorganized Settings page, MDM-driven UI, non-disruptive session renewal, and localization."
 order: 107
 upstream: "client/desktop-app.mdx@2382247"
 ---
 
-> **Note** This page is adapted from the upstream NetBird documentation (BSD-3-Clause) and may describe features that NetBirdy does not include.
+> **Note** This page is adapted from the upstream NetBirdy documentation (BSD-3-Clause) and may describe features that NetBirdy does not include.
 
-# NetBird Desktop App
+# NetBirdy Desktop App
 
-Starting with NetBird v0.75.0, the desktop app uses a [Wails](https://wails.io/) webview with a React frontend. The management server and wire protocol are unchanged, but the UI and the daemon need to be updated together. If their versions do not match, the app displays an update notification.
+Starting with NetBirdy v0.75.0, the desktop app uses a [Wails](https://wails.io/) webview with a React frontend. The management server and wire protocol are unchanged, but the UI and the daemon need to be updated together. If their versions do not match, the app displays an update notification.
 
 ## First Launch
 
-On first launch, the welcome dialog points you to the NetBird icon in the Windows or Linux system tray, or the macOS menu bar. Choose whether to connect to **NetBird Cloud** or a **Self-hosted** deployment. For a self-hosted deployment, enter its management URL before connecting.
+On first launch, the welcome dialog points you to the NetBirdy icon in the Windows or Linux system tray, or the macOS menu bar. Choose whether to connect to **NetBirdy Cloud** or a **Self-hosted** deployment. For a self-hosted deployment, enter its management URL before connecting.
 
-Click **Connect** in the main window or tray menu. NetBird opens your browser to authenticate the device. Once authorization completes, the desktop app connects and displays the device's NetBird IP address.
+Click **Connect** in the main window or tray menu. NetBirdy opens your browser to authenticate the device. Once authorization completes, the desktop app connects and displays the device's NetBirdy IP address.
 
 ## Default and Advanced Views
 
 The main window opens in a compact **Default** view that shows the essentials: the active profile, connection status, hostname, overlay IP, and current exit node.
 
 <p>
-    <img src="/docs-img/docs-static-img-client-desktop-app-default-view.png" alt="NetBird desktop app default view" className="imagewrapper"/>
+    <img src="/docs-img/docs-static-img-client-desktop-app-default-view.png" alt="NetBirdy desktop app default view" className="imagewrapper"/>
 </p>
 
 Switch to the **Advanced** view and the window expands with a peers and resources browser on the right. The **Peers** tab lists the peers in your network.
@@ -43,7 +43,7 @@ Clicking a peer opens a detail panel with the information you would otherwise lo
 
 ## A Reactive UI
 
-Changes made by the NetBird daemon or the CLI are reflected in the app immediately. Connect or disconnect from the CLI and the toggle flips on its own. Switch profiles and the window catches up. There is no need to refresh or relaunch the app.
+Changes made by the NetBirdy daemon or the CLI are reflected in the app immediately. Connect or disconnect from the CLI and the toggle flips on its own. Switch profiles and the window catches up. There is no need to refresh or relaunch the app.
 
 ## System Tray
 
@@ -54,10 +54,10 @@ A colored status dot sits next to the tray icon so you can read the state of you
 * **Grey** when disconnected.
 
 <p>
-    <img src="" alt="NetBird system tray status indicator" className="imagewrapper"/>
+    <img src="" alt="NetBirdy system tray status indicator" className="imagewrapper"/>
 </p>
 
-The tray menu also provides profile switching, session-renewal access, exit-node selection, Settings, Help & Support, and **Quit NetBird**. Closing the main window only hides it while the daemon and network connection continue running. Choosing **Quit NetBird** disconnects the daemon before the desktop app exits, unless **Stay Connected After Quitting** is enabled in **Settings → General** (requires client v0.76.2 or later). That setting is off by default; with it enabled, the connection keeps running after quitting and only stops when you disconnect it yourself.
+The tray menu also provides profile switching, session-renewal access, exit-node selection, Settings, Help & Support, and **Quit NetBirdy**. Closing the main window only hides it while the daemon and network connection continue running. Choosing **Quit NetBirdy** disconnects the daemon before the desktop app exits, unless **Stay Connected After Quitting** is enabled in **Settings → General** (requires client v0.76.2 or later). That setting is off by default; with it enabled, the connection keeps running after quitting and only stops when you disconnect it yourself.
 
 ## Exit Nodes
 
@@ -67,7 +67,7 @@ The compact view shows the active exit node. Open the exit-node selector in the 
 
 The settings page uses a tabbed layout that groups options by what they control. The tabs you see depend on your role and on any [MDM policy](#mdm-driven-ui) in effect. The full set is:
 
-* **General** for everyday toggles: Connect on Startup, Launch NetBird UI at Login, Stay Connected After Quitting, notifications, and display language.
+* **General** for everyday toggles: Connect on Startup, Launch NetBirdy UI at Login, Stay Connected After Quitting, notifications, and display language.
 * **Network** for connectivity, DNS, routes, and IPv6 settings.
 * **Security** for inbound traffic, LAN access, and quantum-resistant encryption settings.
 * **Profiles** for managing the accounts the app knows about. See [Profiles](/client/profiles).
@@ -94,11 +94,11 @@ The settings page uses a tabbed layout that groups options by what they control.
 >   re-enabling SSH authentication never require privileges.
 
 
-**Connect on Startup** controls whether the background service reconnects when it starts. **Launch NetBird UI at Login** controls only whether the graphical interface opens when you sign in to the operating system. On a fresh desktop installation, launch at login is enabled once by default. Upgrades preserve the user's existing preference. Administrators can manage this behavior with [`disableAutostart`](/client/mdm-integration#disableAutostart).
+**Connect on Startup** controls whether the background service reconnects when it starts. **Launch NetBirdy UI at Login** controls only whether the graphical interface opens when you sign in to the operating system. On a fresh desktop installation, launch at login is enabled once by default. Upgrades preserve the user's existing preference. Administrators can manage this behavior with [`disableAutostart`](/client/mdm-integration#disableAutostart).
 
 ## MDM-Driven UI
 
-If you roll out NetBird through MDM, the app reads the policy in effect on the device and adjusts itself to match, so users only see the options they are allowed to use. For deploying NetBird through an MDM provider, see the [MDM deployment guides](/manage/peers/mdm-deployment/intune-netbird-integration).
+If you roll out NetBirdy through MDM, the app reads the policy in effect on the device and adjusts itself to match, so users only see the options they are allowed to use. For deploying NetBirdy through an MDM provider, see the [MDM deployment guides](/manage/peers/mdm-deployment/intune-netbird-integration).
 
 * **Hide whole views.** `disableAdvancedView` hides the Advanced view of the main window, so managed users only see the compact one.
 * **Gate specific capabilities.** Keys such as `allowServerSSH` control whether the corresponding toggle is available in the app.
@@ -121,12 +121,12 @@ The renewal flow follows one rule: re-authenticating never closes an active conn
 
 You can switch languages from the **Display Language** picker in **Settings → General**, and the change applies instantly. The desktop app is available in English, French, Galician, German, Hebrew, Hungarian, Italian, Japanese, Portuguese, Russian, Simplified Chinese, Spanish, and Ukrainian.
 
-Translations are a community effort on [Crowdin](https://crowdin.com/project/netbird). If your language is missing or a phrase reads incorrectly, join the project and translate there. Crowdin syncs finished translations into the NetBird repository, so please don't open pull requests that edit the translation files directly.
+Translations are a community effort on [Crowdin](https://crowdin.com/project/netbird). If your language is missing or a phrase reads incorrectly, join the project and translate there. Crowdin syncs finished translations into the NetBirdy repository, so please don't open pull requests that edit the translation files directly.
 
 ## Capturing a Debug Bundle
 
-The **Troubleshoot** tab can capture a debug bundle that collects daemon and UI logs in one step. You can collect new trace logs for 1–30 minutes, cycle the connection, include a packet capture and system information, anonymize sensitive data, and either upload the result to NetBird or keep it locally. See [Troubleshooting the client](/help/troubleshooting-client#debug-bundle-uploads-with-gui) for the complete flow.
+The **Troubleshoot** tab can capture a debug bundle that collects daemon and UI logs in one step. You can collect new trace logs for 1–30 minutes, cycle the connection, include a packet capture and system information, anonymize sensitive data, and either upload the result to NetBirdy or keep it locally. See [Troubleshooting the client](/help/troubleshooting-client#debug-bundle-uploads-with-gui) for the complete flow.
 
 <p>
-    <img src="/docs-img/docs-static-img-help-troubleshooting-client-ui-bundle-local-success.png" alt="Completed debug bundle saved locally in the NetBird desktop app" className="imagewrapper"/>
+    <img src="/docs-img/docs-static-img-help-troubleshooting-client-ui-bundle-local-success.png" alt="Completed debug bundle saved locally in the NetBirdy desktop app" className="imagewrapper"/>
 </p>

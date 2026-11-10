@@ -1,7 +1,7 @@
 #!/bin/sh
 # Re-apply the NetBirdy rebrand after an upstream merge.
 # Usage: tools/rebrand/rebrand.sh [--check]
-#   default: rewrite user-visible NetBird strings to NetBirdy
+#   default: rewrite user-visible NetBirdy strings to NetBirdy
 #   --check: exit non-zero when new upstream brand strings slipped in
 #
 # KEEP list (never rewritten): the Go module path github.com/netbirdio/netbird,
@@ -10,7 +10,7 @@
 # OIDC client id netbird-dashboard, io.netbird.* bundle and policy ids,
 # firewall and nftables chain names, upstream URLs under *.netbird.io that
 # document upstream behaviour or identify persisted state, LICENSE, AUTHORS
-# and NetBird GmbH attribution strings, generated *.pb.go files.
+# and NetBirdy GmbH attribution strings, generated *.pb.go files.
 set -eu
 
 cd "$(dirname "$0")/../.."
@@ -22,18 +22,18 @@ EXCLUDE='--exclude-dir=.git --exclude-dir=node_modules --exclude-dir=vendor --ex
 # Word-boundary display name rewrite in user-visible text. Identifiers such as
 # isNetBirdCloud stay untouched because of the word boundaries.
 if [ "$CHECK" -eq 0 ]; then
-    grep -rln $EXCLUDE 'NetBird\|Netbird' . \
+    grep -rln $EXCLUDE 'NetBirdy\|NetBirdy' . \
         | xargs -r sed -i 's/\bNetBird\b/NetBirdy/g; s/\bNetbird\b/NetBirdy/g'
     exit 0
 fi
 
-# --check: report any remaining bare NetBird display strings outside the keep
+# --check: report any remaining bare NetBirdy display strings outside the keep
 # zones below. Each pattern is a known-allowed context.
 hits=$(grep -rn $EXCLUDE '\bNetBird\b\|\bNetbird\b' . \
     | grep -v 'netbirdio/netbird' \
     | grep -v 'github\.com/netbirdio' \
     | grep -v 'netbird\.io' \
-    | grep -v 'NetBird GmbH' \
+    | grep -v 'NetBirdy GmbH' \
     | grep -v 'LICENSE' \
     | grep -v 'AUTHORS' \
     | grep -v 'NOTICE' \
@@ -41,8 +41,8 @@ hits=$(grep -rn $EXCLUDE '\bNetBird\b\|\bNetbird\b' . \
     | grep -v '_test\.go' \
     | grep -v '\.proto' \
     | grep -v 'tools/rebrand/' \
-    | grep -v 'fork of NetBird' \
-    | grep -v 'NetBird service' \
+    | grep -v 'fork of NetBirdy' \
+    | grep -v 'NetBirdy service' \
     | grep -v 'netbird service' \
     | grep -v 'docs/netbird' \
     | grep -v 'content/docs/upstream' \
@@ -56,14 +56,14 @@ hits=$(grep -rn $EXCLUDE '\bNetBird\b\|\bNetbird\b' . \
     | grep -v 'io.netbird' \
     | grep -v 'migrating-from-netbird' \
     | grep -v 'sync-upstream' \
-    | grep -v 'upstream NetBird' \
+    | grep -v 'upstream NetBirdy' \
     | grep -v 'funding' \
     | grep -v 'netbird install' \
-    | grep -v 'NetBird install' \
+    | grep -v 'NetBirdy install' \
     | grep -v '^./README\.md:' \
     | grep -v '^./site/' \
-    | grep -v 'official NetBird mobile apps' \
-    | grep -v 'NetBird-SSH-\|NetBird-JWT-' \
+    | grep -v 'official NetBirdy mobile apps' \
+    | grep -v 'NetBirdy-SSH-\|NetBirdy-JWT-' \
     || true)
 
 if [ -n "$hits" ]; then

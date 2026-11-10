@@ -1,7 +1,7 @@
 {
   "name": "NetBirdy",
   "short_name": "NetBirdy",
-  "description": "A self-hosted WireGuard mesh network, compatible with NetBird.",
+  "description": "A self-hosted WireGuard mesh network, compatible with NetBirdy.",
   "start_url": "./",
   "scope": "./",
   "display": "browser",

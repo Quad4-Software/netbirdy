@@ -50,7 +50,7 @@ func TestFindKubernetesClustersSkipsFailedLookup(t *testing.T) {
 		},
 	}}
 
-	// The first peer has no DNS record in NetBird, so its reverse lookup fails.
+	// The first peer has no DNS record in NetBirdy, so its reverse lookup fails.
 	lookupAddr := func(_ context.Context, addr string) ([]string, error) {
 		switch addr {
 		case "100.64.0.1":

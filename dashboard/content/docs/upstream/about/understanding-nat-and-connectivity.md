@@ -1,11 +1,11 @@
 ---
 title: "Understanding NAT and Connectivity"
-description: "How NAT types, hole punching, and NetBird\"
+description: "How NAT types, hole punching, and NetBirdy\"
 order: 103
 upstream: "about-netbird/understanding-nat-and-connectivity.mdx@2382247"
 ---
 
-> **Note** This page is adapted from the upstream NetBird documentation (BSD-3-Clause) and may describe features that NetBirdy does not include.
+> **Note** This page is adapted from the upstream NetBirdy documentation (BSD-3-Clause) and may describe features that NetBirdy does not include.
 
 # Understanding NAT and Connectivity
 
@@ -17,7 +17,7 @@ NAT was originally designed to conserve IPv4 addresses, but it creates a challen
 
 ## NAT in Different Environments
 
-Not all NAT is created equal. The type of NAT you're behind can impact whether NetBird can establish a direct peer-to-peer connection or needs to fall back to relay servers.
+Not all NAT is created equal. The type of NAT you're behind can impact whether NetBirdy can establish a direct peer-to-peer connection or needs to fall back to relay servers.
 
 ### Easy NAT
 
@@ -93,7 +93,7 @@ Mobile carriers typically use **Carrier-Grade NAT (CGNAT)**, which adds an extra
 - Mappings may have short timeouts (30-60 seconds)
 - Network conditions change frequently as you move between towers
 
-> **Note** The `100.64.0.0/10` range you see in mobile networks is reserved for Carrier-Grade NAT. NetBird also uses this range for its internal addressing, which is intentional to avoid conflicts with typical private network ranges.
+> **Note** The `100.64.0.0/10` range you see in mobile networks is reserved for Carrier-Grade NAT. NetBirdy also uses this range for its internal addressing, which is intentional to avoid conflicts with typical private network ranges.
 
 
 ### 1:1 NAT
@@ -111,13 +111,13 @@ Cloud VMs and data center servers present a different scenario:
 - Or may be behind enterprise-grade firewalls with restrictive NAT
 - Often have strict egress policies
 
-## NetBird Relay
+## NetBirdy Relay
 
-When direct peer-to-peer connections aren't possible (usually due to NAT difficulties), NetBird uses relay servers to ensure connectivity. NetBird includes a custom-built relay system optimized specifically for its use case.
+When direct peer-to-peer connections aren't possible (usually due to NAT difficulties), NetBirdy uses relay servers to ensure connectivity. NetBirdy includes a custom-built relay system optimized specifically for its use case.
 
 ### How the Relay Works
 
-The NetBird relay is a lightweight server that forwards encrypted WireGuard traffic between peers when they cannot connect directly. Unlike traditional TURN servers, NetBird's relay uses a custom protocol designed for efficiency.
+The NetBirdy relay is a lightweight server that forwards encrypted WireGuard traffic between peers when they cannot connect directly. Unlike traditional TURN servers, NetBirdy's relay uses a custom protocol designed for efficiency.
 
 **Transport protocols:**
 - **QUIC**: A modern UDP-based protocol with built-in encryption. This is the primary transport and offers lower latency.
@@ -129,12 +129,12 @@ When a client connects to a relay server, it races both protocols simultaneously
 
 When two peers need to communicate through a relay:
 
-1. Both peers receive relay server information from the NetBird Management service
+1. Both peers receive relay server information from the NetBirdy Management service
 2. The Signal service helps peers negotiate which relay server to use
 3. Both peers connect to the agreed-upon relay server
 4. Traffic flows through the relay while remaining end-to-end encrypted
 
-NetBird supports multiple relay server instances for high availability. If a relay server becomes unavailable, peers can switch to an alternative.
+NetBirdy supports multiple relay server instances for high availability. If a relay server becomes unavailable, peers can switch to an alternative.
 
 > **Note** Self-hosted deployments can run their own relay servers. For best performance, deploy relay servers geographically close to your users.
 
@@ -143,7 +143,7 @@ NetBird supports multiple relay server instances for high availability. If a rel
 
 ### P2P (Peer-to-Peer) Connections
 
-When NetBird establishes a P2P connection, traffic flows directly between peers with no intermediate servers:
+When NetBirdy establishes a P2P connection, traffic flows directly between peers with no intermediate servers:
 
 ```
 ┌──────────────┐                                    ┌──────────────┐
@@ -165,12 +165,12 @@ When NetBird establishes a P2P connection, traffic flows directly between peers 
 
 ### Relayed Connections
 
-When P2P fails, NetBird falls back to relay servers. Traffic is encrypted before leaving your device and remains encrypted through the relay:
+When P2P fails, NetBirdy falls back to relay servers. Traffic is encrypted before leaving your device and remains encrypted through the relay:
 
 ```
 ┌──────────────┐         ┌───────────────┐         ┌──────────────┐
 │    Peer A    │◀───────▶│ Relay Server  │◀───────▶│    Peer B    │
-│  (Your PC)   │         │  (NetBird)    │         │  (Server)    │
+│  (Your PC)   │         │  (NetBirdy)    │         │  (Server)    │
 └──────────────┘         └───────────────┘         └──────────────┘
                                 │
                  Traffic is still WireGuard
@@ -193,13 +193,13 @@ When P2P fails, NetBird falls back to relay servers. Traffic is encrypted before
 
 To check which type a specific connection is using on your own machines — and to troubleshoot a relayed one step by step — see [Troubleshooting relayed connections](/help/troubleshooting-relayed-connections).
 
-## How NetBird Establishes Connections
+## How NetBirdy Establishes Connections
 
-NetBird uses the ICE (Interactive Connectivity Establishment) protocol to find the best possible connection path between two peers. ICE is the same technology that powers WebRTC video calls.
+NetBirdy uses the ICE (Interactive Connectivity Establishment) protocol to find the best possible connection path between two peers. ICE is the same technology that powers WebRTC video calls.
 
 ### The Connection Process
 
-When two NetBird peers need to connect:
+When two NetBirdy peers need to connect:
 
 **1. Candidate Gathering**
 
@@ -211,7 +211,7 @@ Each peer discovers all possible ways it can be reached:
 
 **2. Candidate Exchange**
 
-Peers exchange their discovered candidates through the NetBird Signal service. This exchange is encrypted end-to-end, so the Signal service cannot see the actual candidate information.
+Peers exchange their discovered candidates through the NetBirdy Signal service. This exchange is encrypted end-to-end, so the Signal service cannot see the actual candidate information.
 
 **3. Connectivity Checks**
 
@@ -226,11 +226,11 @@ Priority 4: Relay ↔ Any         (fallback via relay server)
 
 **4. Connection Establishment**
 
-The first candidate pair that successfully exchanges packets becomes the active connection. NetBird then configures WireGuard to use this path for encrypted tunnel traffic.
+The first candidate pair that successfully exchanges packets becomes the active connection. NetBirdy then configures WireGuard to use this path for encrypted tunnel traffic.
 
 ### NAT Hole Punching
 
-When both peers are behind NAT, NetBird uses a technique called **UDP hole punching**:
+When both peers are behind NAT, NetBirdy uses a technique called **UDP hole punching**:
 
 1. Peer A sends a UDP packet to Peer B's public address (this packet may be dropped, but it opens a hole in A's NAT)
 2. Peer B simultaneously sends a UDP packet to Peer A's public address (opening a hole in B's NAT)
@@ -256,16 +256,16 @@ When both peers are behind NAT, NetBird uses a technique called **UDP hole punch
 
 When hole punching fails on your network, the practical fixes — and the cases where relay is the expected outcome — are covered in [Troubleshooting relayed connections](/help/troubleshooting-relayed-connections).
 
-## NetBird's Relay Infrastructure
+## NetBirdy's Relay Infrastructure
 
-NetBird provides globally distributed relay servers to ensure minimal performance impact and connectivity even in the most restrictive networks. The relay system supports two transport protocols:
+NetBirdy provides globally distributed relay servers to ensure minimal performance impact and connectivity even in the most restrictive networks. The relay system supports two transport protocols:
 
 - **QUIC**: High-performance UDP-based transport (primary)
 - **WebSocket**: TCP-based transport that works over port 443 (fallback when UDP is blocked)
 
 The WebSocket transport is particularly important for corporate networks that only allow HTTPS traffic, as it appears as standard web traffic to firewalls.
 
-For legacy compatibility, NetBird also supports TURN (Coturn) servers, though the native relay is recommended for new deployments.
+For legacy compatibility, NetBirdy also supports TURN (Coturn) servers, though the native relay is recommended for new deployments.
 
 ## Summary
 
@@ -276,4 +276,4 @@ For legacy compatibility, NetBird also supports TURN (Coturn) servers, though th
 | Carrier Grade (Double) | Mobile networks | Low-Medium | Varies by carrier; Wi-Fi often better |
 | 1:1 NAT | Cloud VM | High | Check security group UDP rules |
 
-NetBird is designed to work in all these environments. When P2P isn't possible, the relay fallback ensures you stay connected. The connection type affects latency and throughput, but security remains the same - your traffic is always encrypted end-to-end with WireGuard.
+NetBirdy is designed to work in all these environments. When P2P isn't possible, the relay fallback ensures you stay connected. The connection type affects latency and throughput, but security remains the same - your traffic is always encrypted end-to-end with WireGuard.

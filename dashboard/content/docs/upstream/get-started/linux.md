@@ -5,15 +5,15 @@ order: 105
 upstream: "get-started/install/linux.mdx@2382247"
 ---
 
-> **Note** This page is adapted from the upstream NetBird documentation (BSD-3-Clause) and may describe features that NetBirdy does not include.
+> **Note** This page is adapted from the upstream NetBirdy documentation (BSD-3-Clause) and may describe features that NetBirdy does not include.
 
 # Linux Installation
 
-The NetBird client allows a peer to join a pre-existing NetBird deployment. If a NetBird deployment is not yet available, there are both managed and [self-hosted](https://docs.netbird.io/selfhosted/selfhosted-quickstart) options available.
+The NetBirdy client allows a peer to join a pre-existing NetBirdy deployment. If a NetBirdy deployment is not yet available, there are both managed and [self-hosted](https://docs.netbird.io/selfhosted/selfhosted-quickstart) options available.
 
 ## Desktop App Dependencies
 
-The desktop app introduced in NetBird v0.75.0 renders its interface in a GTK 4 WebKit webview. The `netbird-ui` package does not declare these libraries as dependencies, so install them alongside it.
+The desktop app introduced in NetBirdy v0.75.0 renders its interface in a GTK 4 WebKit webview. The `netbird-ui` package does not declare these libraries as dependencies, so install them alongside it.
 
 > **Warning** The desktop app requires **GTK 4.10 or newer** and **WebKitGTK 6.0**. On older GTK 4 releases the app starts but crashes as soon as it opens a file dialog, so install the `netbird` CLI only on those systems.
 
@@ -78,17 +78,17 @@ curl -fsSL https://pkgs.netbird.io/install.sh | sh
 
 ### RHEL 9 / Amazon Linux 2 (YUM)
 
-> **Note** These releases do not provide GTK 4.10 or WebKitGTK 6.0, so the desktop app is not available. Install the CLI and manage NetBird with `netbird` commands.
+> **Note** These releases do not provide GTK 4.10 or WebKitGTK 6.0, so the desktop app is not available. Install the CLI and manage NetBirdy with `netbird` commands.
 
 
 1. Add the repository:
 ```bash
 sudo tee /etc/yum.repos.d/netbird.repo < **Note** Requires installation of [Homebrew](https://docs.brew.sh/Homebrew-on-Linux), Universal Blue images should have Homebrew preinstalled.
 >
->     This method does not install the NetBird GUI. It installs the CLI only.
+>     This method does not install the NetBirdy GUI. It installs the CLI only.
 
 
-1. If NetBird was previously installed with Homebrew, you will need to run:
+1. If NetBirdy was previously installed with Homebrew, you will need to run:
 ```bash
 # Stop and uninstall daemon service:
 sudo netbird service stop
@@ -97,9 +97,9 @@ sudo netbird service uninstall
 brew unlink netbird
 ```
 
-NetBird will copy any existing configuration from the NetBird's default configuration paths to the new default location.
+NetBirdy will copy any existing configuration from the NetBirdy's default configuration paths to the new default location.
 
-2. Install Netbird
+2. Install NetBirdy
 ```bash
 brew install netbirdio/tap/netbird
 ```
@@ -116,7 +116,7 @@ brew install netbirdio/tap/netbird
 ```
 You may need to adjust this command if you are not using the default `/home/linuxbrew/.linuxbrew` prefix for your Homebrew install.
 
-> **Note** On Fedora-based systems including Universal Blue, SELinux may block NetBird from running due to homebrew installing it in ~/linuxbrew.
+> **Note** On Fedora-based systems including Universal Blue, SELinux may block NetBirdy from running due to homebrew installing it in ~/linuxbrew.
 >
 > You can fix this by running
 > ```bash
@@ -128,7 +128,7 @@ You may need to adjust this command if you are not using the default `/home/linu
 >
 > If your Homebrew prefix is set to something other than /home/linuxbrew/.linuxbrew, you may need to adjust those commands to match.
 >
-> You can verify that the NetBird service is running properly before and after making these changes by running:
+> You can verify that the NetBirdy service is running properly before and after making these changes by running:
 > ```bash
 > sudo systemctl status netbird
 > ```
@@ -149,7 +149,7 @@ distrobox create netbird --init --image debian:13 -a "--cap-add=NET_ADMIN" --add
 distrobox enter --root netbird
 curl -fsSL https://pkgs.netbird.io/install.sh | sh
 ```
-3. Export the Netbird binary to the host
+3. Export the NetBirdy binary to the host
 ```bash
 #from inside the container
 distrobox-export -b /usr/bin/netbird
@@ -181,7 +181,7 @@ zypper in netbird
 ### Binary Install
 **Installation from binary (CLI only)**
 
-1. Checkout NetBird [releases](https://github.com/netbirdio/netbird/releases/latest)
+1. Checkout NetBirdy [releases](https://github.com/netbirdio/netbird/releases/latest)
 2. Download the latest release:
 ```bash
   curl -L -o ./netbird_.tar.gz https://github.com/netbirdio/netbird/releases/download/v/netbird___.tar.gz
@@ -213,10 +213,10 @@ After that you may need to add /usr/bin in your PATH environment variable:
 
 ## Community packages
 
-> **Warning** The packages in this section are maintained by Linux distributions and other community package repositories. NetBird does not build or publish them. Available versions, architectures, service integration, and desktop app support may differ from the officially supported NetBird packages above.
+> **Warning** The packages in this section are maintained by Linux distributions and other community package repositories. NetBirdy does not build or publish them. Available versions, architectures, service integration, and desktop app support may differ from the officially supported NetBirdy packages above.
 
 
-Your distribution's normal update process will update NetBird when a newer package becomes available.
+Your distribution's normal update process will update NetBirdy when a newer package becomes available.
 
 ### Alpine Linux (APK)
 
@@ -242,7 +242,7 @@ rc-service netbird start
 
 ### ALT Linux Sisyphus (APT-RPM)
 
-NetBird is available in the [ALT Linux Sisyphus repository](https://packages.altlinux.org/en/sisyphus/srpms/netbird/):
+NetBirdy is available in the [ALT Linux Sisyphus repository](https://packages.altlinux.org/en/sisyphus/srpms/netbird/):
 
 ```bash
 sudo apt-get update
@@ -282,7 +282,7 @@ Chaotic-AUR provides prebuilt packages from the AUR. If you already have [Chaoti
 sudo pacman -Syu netbird
 ```
 
-After installing either AUR package or the Chaotic-AUR package, enable and start the default NetBird client instance:
+After installing either AUR package or the Chaotic-AUR package, enable and start the default NetBirdy client instance:
 
 ```bash
 sudo systemctl enable --now netbird@main.service
@@ -295,7 +295,7 @@ sudo systemctl enable --now netbird@main.service
 ```nix
 { config, pkgs, ... }:
 {
-  services.netbird.enable = true; # NetBird service and CLI
+  services.netbird.enable = true; # NetBirdy service and CLI
   environment.systemPackages = [ pkgs.netbird-ui ]; # Desktop app
 }
 ```
@@ -316,7 +316,7 @@ sudo zypper install netbird
 sudo systemctl enable --now netbird
 ```
 
-This package is separate from the NetBird-hosted RPM repository described earlier on this page.
+This package is separate from the NetBirdy-hosted RPM repository described earlier on this page.
 
 ### Solus Polaris (eopkg)
 
@@ -349,7 +349,7 @@ Before you log in, the command should return daemon status rather than a socket 
 
 ## Updating
 
-If your NetBird client was installed through a package manager, use that to update.
+If your NetBirdy client was installed through a package manager, use that to update.
 If you used the one-command script to install, you can follow this to update:
 
 ```bash
@@ -361,9 +361,9 @@ netbird up
 ```
 
 
-## Running NetBird with SSO Login
+## Running NetBirdy with SSO Login
 ### Desktop UI Application
-Launch the desktop app and click **Connect** in the main window or system-tray menu. On first launch, choose NetBird Cloud or enter the URL of your self-hosted deployment. NetBird opens your browser to authenticate the device. See the [desktop app guide](/client/desktop-app) for the complete interface.
+Launch the desktop app and click **Connect** in the main window or system-tray menu. On first launch, choose NetBirdy Cloud or enter the URL of your self-hosted deployment. NetBirdy opens your browser to authenticate the device. See the [desktop app guide](/client/desktop-app) for the complete interface.
 
 ### CLI
 Alternatively, you could use command line. Simply run
@@ -383,7 +383,7 @@ Check connection status:
   netbird status
 ```
 
-## Running NetBird with a Setup Key
+## Running NetBirdy with a Setup Key
 In case you are activating a server peer, you can use a [setup key](/manage/peers/register-machines-using-setup-keys) as described in the steps below.
 
 > This is especially helpful when you are running multiple server instances with infrastructure-as-code tools like ansible and terraform.

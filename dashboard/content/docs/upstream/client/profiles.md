@@ -1,30 +1,30 @@
 ---
-title: "Switching Between NetBird Accounts with Profiles"
+title: "Switching Between NetBirdy Accounts with Profiles"
 description: ""
 order: 108
 upstream: "client/profiles.mdx@2382247"
 ---
 
-> **Note** This page is adapted from the upstream NetBird documentation (BSD-3-Clause) and may describe features that NetBirdy does not include.
+> **Note** This page is adapted from the upstream NetBirdy documentation (BSD-3-Clause) and may describe features that NetBirdy does not include.
 
-NetBird supports multiple profiles on a single device, making it easy to switch between work, home, or other networks.
+NetBirdy supports multiple profiles on a single device, making it easy to switch between work, home, or other networks.
 Only one profile is active at a time, and switching takes just a click.
 
-This feature also allows you to switch between self-hosted and cloud-hosted NetBird accounts seamlessly without needing
+This feature also allows you to switch between self-hosted and cloud-hosted NetBirdy accounts seamlessly without needing
 to juggle multiple config files.
 
 <p>
-    <img src="/docs-img/docs-static-img-client-profiles-profiles.png" alt="Profile selector in the NetBird desktop app" className="imagewrapper"/>
+    <img src="/docs-img/docs-static-img-client-profiles-profiles.png" alt="Profile selector in the NetBirdy desktop app" className="imagewrapper"/>
 </p>
 
-## NetBird Profiles GUI Quickstart
+## NetBirdy Profiles GUI Quickstart
 
-1. Open the desktop app. NetBird creates a `default` profile automatically.
+1. Open the desktop app. NetBirdy creates a `default` profile automatically.
 2. Open **Settings → Profiles** and select **Add profile**.
-3. Give the profile a recognizable name and configure whether it connects to NetBird Cloud or a self-hosted management URL.
+3. Give the profile a recognizable name and configure whether it connects to NetBirdy Cloud or a self-hosted management URL.
 4. Select the profile from the selector in the main window or tray menu.
 
-Selecting a profile makes it active and connects automatically. The first time you use a profile, NetBird opens the browser authentication flow if needed. Later switches reuse that profile's saved login state. While the Profiles settings page is open for management, selecting a profile does not interrupt the profile you are editing.
+Selecting a profile makes it active and connects automatically. The first time you use a profile, NetBirdy opens the browser authentication flow if needed. Later switches reuse that profile's saved login state. While the Profiles settings page is open for management, selecting a profile does not interrupt the profile you are editing.
 
 ## Manage Profiles in the GUI
 
@@ -36,13 +36,13 @@ Open **Settings → Profiles** to:
 * Recognize profiles by their assigned Work, Home, Default, or other type icon.
 
 <p>
-    <img src="" alt="Profiles settings in the NetBird desktop app" className="imagewrapper"/>
+    <img src="" alt="Profiles settings in the NetBirdy desktop app" className="imagewrapper"/>
 </p>
 
 ## What Is a Profile?
 
-A **profile** is your NetBird configuration bundle: WireGuard keys, login state, and network settings all in one file.
-Think of it as a separate "NetBird account" on your machine:
+A **profile** is your NetBirdy configuration bundle: WireGuard keys, login state, and network settings all in one file.
+Think of it as a separate "NetBirdy account" on your machine:
 
 - **Default profile**  
   Created automatically on first run or after upgrade.  
@@ -63,13 +63,13 @@ Each profile has two parts:
 The `default` profile is special: its ID is always `default`. You can rename its display label,
 but it keeps that reserved ID and cannot be removed.
 
-The default profile is stored as `default.json` in NetBird's state directory. Additional service profiles are stored under a per-user subdirectory as `<id>.json`:
+The default profile is stored as `default.json` in NetBirdy's state directory. Additional service profiles are stored under a per-user subdirectory as `<id>.json`:
 
 | OS | Default state directory | Additional profile example |
 | --- | --- | --- |
 | Linux and macOS | `/var/lib/netbird/` | `/var/lib/netbird/<username>/<id>.json` |
 | FreeBSD | `/var/db/netbird/` | `/var/db/netbird/<username>/<id>.json` |
-| Windows | `%ProgramData%\Netbird\` | `%ProgramData%\Netbird\<username>\<id>.json` |
+| Windows | `%ProgramData%\NetBirdy\` | `%ProgramData%\NetBirdy\<username>\<id>.json` |
 
 `NB_STATE_DIR` overrides the default state directory. Treat profile files as credentials: stop the service before manual maintenance, restrict access, and prefer the GUI or CLI for normal profile management.
 
@@ -77,7 +77,7 @@ The default profile is stored as `default.json` in NetBird's state directory. Ad
 
 ## Why Use Profiles?
 
-- **Seamless switching** between multiple NetBird networks/accounts  
+- **Seamless switching** between multiple NetBirdy networks/accounts  
 - **No manual config files updates**: all configs are managed through the CLI or GUI
 - **Persistent state**: your last active profile reconnects on startup
 - **Safe defaults**: you cannot remove the active/default profile by accident
@@ -86,7 +86,7 @@ The default profile is stored as `default.json` in NetBird's state directory. Ad
 
 ## Upgrading From an Older Version
 
-If you're upgrading from NetBird below version `0.52.0` that did not support profiles, here's what happens:
+If you're upgrading from NetBirdy below version `0.52.0` that did not support profiles, here's what happens:
 
 * During the first launch after the upgrade, your existing config `/etc/netbird/config.json` (or Windows equivalent) is automatically
 copied to a new profile named  `default`.
@@ -96,7 +96,7 @@ copied to a new profile named  `default`.
 
 In some environments, you may want to disable the profiles feature entirely. This can be useful for:
 
-* **Managed environments** where users should not be able to switch between different NetBird accounts
+* **Managed environments** where users should not be able to switch between different NetBirdy accounts
 * **Security policies** that require a single, fixed configuration
 * **Automated deployments** where profile switching could interfere with operations
 
@@ -323,7 +323,7 @@ The command does the following in the background:
 
 ### Using `--profile` Flags
 
-You can use the `--profile` flag with any NetBird CLI command to specify which profile to use for that command.
+You can use the `--profile` flag with any NetBirdy CLI command to specify which profile to use for that command.
 This is useful for running commands in a specific context without switching profiles manually.
 
 ```bash
@@ -332,5 +332,5 @@ netbird login --profile home
 ```
 
 The value is resolved as a handle (an exact ID, a unique name, or a unique ID prefix), the same way as
-`profile select`. NetBird switches to the resolved profile then runs the command under the
+`profile select`. NetBirdy switches to the resolved profile then runs the command under the
 hood. If the profile is new and hasn't been used yet, you'll be prompted to authenticate.

@@ -5,11 +5,11 @@ order: 127
 upstream: "selfhosted/selfhosted-guide.mdx@2382247"
 ---
 
-> **Note** This page is adapted from the upstream NetBird documentation (BSD-3-Clause) and may describe features that NetBirdy does not include.
+> **Note** This page is adapted from the upstream NetBirdy documentation (BSD-3-Clause) and may describe features that NetBirdy does not include.
 
-NetBird is open-source and can be self-hosted on your servers.
+NetBirdy is open-source and can be self-hosted on your servers.
 
-It relies on components developed by NetBird Authors [Management Service](https://github.com/netbirdio/netbird/tree/main/management), [Management UI Dashboard](https://github.com/netbirdio/dashboard), [Signal Service](https://github.com/netbirdio/netbird/tree/main/signal),
+It relies on components developed by NetBirdy Authors [Management Service](https://github.com/netbirdio/netbird/tree/main/management), [Management UI Dashboard](https://github.com/netbirdio/dashboard), [Signal Service](https://github.com/netbirdio/netbird/tree/main/signal),
 a 3rd party open-source STUN/TURN service [Coturn](https://github.com/coturn/coturn), and an identity provider (IDP).
 
 If you would like to learn more about the architecture please refer to the [architecture section](/about-netbird/how-netbird-works).
@@ -20,8 +20,8 @@ If you would like to learn more about the architecture please refer to the [arch
 > **Note** **New to self-hosting?** The [Quickstart guide](/selfhosted/selfhosted-quickstart) uses the built-in identity provider and is the fastest way to get started. This advanced guide is for users who need to integrate with an existing IdP or have specific enterprise requirements.
 
 
-> **Note** It might be a good idea to try NetBird before self-hosting on your servers.
-> We run NetBird in the cloud, and it will take a few clicks to get started with our managed version. [Check it out!](https://netbird.io/pricing)
+> **Note** It might be a good idea to try NetBirdy before self-hosting on your servers.
+> We run NetBirdy in the cloud, and it will take a few clicks to get started with our managed version. [Check it out!](https://netbird.io/pricing)
 
 
 ## When to use this guide
@@ -49,7 +49,7 @@ For simpler deployments, the [Quickstart with embedded IdP](/selfhosted/selfhost
 
 #### Port requirements
 
-Since version 0.29, NetBird uses a consolidated port architecture where Management and Signal services share ports via HTTP/2 protocol negotiation. This significantly reduces the number of ports you need to open.
+Since version 0.29, NetBirdy uses a consolidated port architecture where Management and Signal services share ports via HTTP/2 protocol negotiation. This significantly reduces the number of ports you need to open.
 
 **With reverse proxy (recommended):**
 | Port | Protocol | Description |
@@ -69,7 +69,7 @@ Since version 0.29, NetBird uses a consolidated port architecture where Manageme
 | 33080 | UDP      | Standalone Relay QUIC listener (optional; requires Relay TLS) |
 | 3478  | UDP      | Coturn STUN/TURN server |
 
-> **Note** The default setup script configures a Traefik reverse proxy that consolidates all services behind ports 80 and 443. If you're running NetBird behind your own reverse proxy, see the [advanced configuration](#advanced-running-net-bird-behind-an-existing-reverse-proxy) section.
+> **Note** The default setup script configures a Traefik reverse proxy that consolidates all services behind ports 80 and 443. If you're running NetBirdy behind your own reverse proxy, see the [advanced configuration](#advanced-running-net-bird-behind-an-existing-reverse-proxy) section.
 
 The standalone Relay uses TCP for WebSocket and UDP for QUIC on the configured listener port. Configure `--listen-address` (`NB_LISTEN_ADDRESS`) for its local bind and `--exposed-address` (`NB_EXPOSED_ADDRESS`) for the public address advertised to peers; these can differ behind a port-mapping proxy. An HTTP reverse proxy can route WebSocket traffic on `/relay`; QUIC must be forwarded over UDP separately. If QUIC is unavailable, clients can use the WebSocket transport. The combined server hosts its WebSocket Relay on the main HTTP(S) listener, so it does not need a separate Relay container or port.
 
@@ -79,7 +79,7 @@ The standalone Relay uses TCP for WebSocket and UDP for QUIC on the configured l
 
 For this tutorial we will be using domain ```demo.netbird.io``` which points to our Ubuntu 22.04 machine hosted at Hetzner.
 
-### Step 1: Get the latest stable NetBird code
+### Step 1: Get the latest stable NetBirdy code
 
 ```bash
 #!/bin/bash
@@ -129,17 +129,17 @@ NETBIRD_LETSENCRYPT_EMAIL=""
 - Configure ```NETBIRD_LETSENCRYPT_EMAIL``` property.
 This can be any email address. [Let's Encrypt](https://letsencrypt.org/) will create an account while generating a new certificate.
 
-> **Note** NetBird supports automatic renewal by default when using Let's Encrypt.
+> **Note** NetBirdy supports automatic renewal by default when using Let's Encrypt.
 
 
-> **Note** If you want to setup NetBird with your own reverse-Proxy and without using the integrated letsencrypt, follow [this step here instead](#advanced-running-net-bird-behind-an-existing-reverse-proxy).
+> **Note** If you want to setup NetBirdy with your own reverse-Proxy and without using the integrated letsencrypt, follow [this step here instead](#advanced-running-net-bird-behind-an-existing-reverse-proxy).
 
 
 ### Step 3: Configure Identity Provider (IDP)
 
-NetBird supports generic OpenID (OIDC) protocol allowing integration with any IDP following the specification.
+NetBirdy supports generic OpenID (OIDC) protocol allowing integration with any IDP following the specification.
 
-NetBird's management service integrates with some of the most popular IDP APIs, allowing the service to cache and display user names and email addresses without storing sensitive data.
+NetBirdy's management service integrates with some of the most popular IDP APIs, allowing the service to cache and display user names and email addresses without storing sensitive data.
 
 Pick the one that suits your needs, follow the **Standalone Setup (Advanced)** section in each guide (except Google, see the note below), and continue with this guide:
 
@@ -163,7 +163,7 @@ Pick the one that suits your needs, follow the **Standalone Setup (Advanced)** s
 
 ### Step 4: Disable single account mode (optional)
 
-NetBird Management service runs in a single account mode by default since version v0.10.1.
+NetBirdy Management service runs in a single account mode by default since version v0.10.1.
 Management service was creating a separate account for each registered user before v0.10.1.
 Single account mode ensures that all the users signing up for your self-hosted installation will join the same account/network.
 In most cases, this is the desired behavior.
@@ -204,21 +204,21 @@ docker compose logs relay
 docker compose logs dashboard
 ```
 
-## Advanced: Running NetBird behind an existing reverse-proxy
+## Advanced: Running NetBirdy behind an existing reverse-proxy
 
-If you already have a reverse proxy (Nginx, Caddy, etc.), you can configure NetBird to work with it instead of using the built-in Traefik.
+If you already have a reverse proxy (Nginx, Caddy, etc.), you can configure NetBirdy to work with it instead of using the built-in Traefik.
 
-> **Note** Not all reverse proxies are supported as NetBird uses *gRPC* for various components. Your reverse proxy must support HTTP/2 and gRPC proxying.
+> **Note** Not all reverse proxies are supported as NetBirdy uses *gRPC* for various components. Your reverse proxy must support HTTP/2 and gRPC proxying.
 
 
-**New deployments:** The `getting-started.sh` script can simplify the integration of NetBird into your existing reverse proxy setup by generating a drop-in config or bespoke instructions.
+**New deployments:** The `getting-started.sh` script can simplify the integration of NetBirdy into your existing reverse proxy setup by generating a drop-in config or bespoke instructions.
 
 **Existing deployments:** Use the configuration templates on the dedicated reverse proxy page.
 
 The repository includes an [Nginx example](https://github.com/Quad4-Software/netbirdy/blob/main/infrastructure_files/nginx.tmpl.conf) and a [Traefik Compose example](https://github.com/Quad4-Software/netbirdy/blob/main/infrastructure_files/docker-compose.yml.tmpl.traefik). Both route Relay WebSocket traffic on `/relay` and require WebSocket upgrade support. For example, advertise `rels://relay.example.com:443` while the proxy forwards to the Relay's internal TCP listener. A regular HTTP reverse proxy does not forward QUIC over UDP.
 
 ## Backup
-To backup your NetBird installation, you need to copy the configuration files, and the Management service databases.
+To backup your NetBirdy installation, you need to copy the configuration files, and the Management service databases.
 
 The configuration files are located in the folder where you ran the installation script. To backup, copy the files to a backup location:
 ```bash
@@ -240,23 +240,23 @@ docker compose start management
 > run management to properly migrate rules to policies, and then upgrade to **0.26.0+**.
 
 
-To upgrade NetBird to the latest version, you need to review the [release notes](https://github.com/netbirdio/netbird/releases) for any breaking changes and follow the upgrade steps below:
+To upgrade NetBirdy to the latest version, you need to review the [release notes](https://github.com/netbirdio/netbird/releases) for any breaking changes and follow the upgrade steps below:
 1. Run the backup steps described in the [backup](#backup-net-bird) section.
-2. Pull the latest NetBird docker images:
+2. Pull the latest NetBirdy docker images:
    ```bash
    cd netbird/infrastructure_files/artifacts/
    docker compose pull
     ```
-3. Restart the NetBird containers with the new images:
+3. Restart the NetBirdy containers with the new images:
    ```bash
    docker compose up -d --force-recreate
     ```
 
 ## Migrating to Embedded IdP
 
-If you've deployed NetBird using this advanced guide and want to simplify your setup by migrating to the embedded IdP:
+If you've deployed NetBirdy using this advanced guide and want to simplify your setup by migrating to the embedded IdP:
 
-1. Your existing IdP can be added as an embedded IdP directly in the NetBird Management Dashboard
+1. Your existing IdP can be added as an embedded IdP directly in the NetBirdy Management Dashboard
 2. Users can continue logging in with their existing credentials
 3. You can gradually transition to local user management
 
@@ -266,6 +266,6 @@ See the [Migration Guide](/selfhosted/identity-providers#migration-guide) for de
 
 Feel free to ping us on [Slack](/slack-url) if you have any questions
 
-- NetBird managed version: [https://app.netbird.io](https://app.netbird.io)
+- NetBirdy managed version: [https://app.netbird.io](https://app.netbird.io)
 - Make sure to [star us on GitHub](https://github.com/netbirdio/netbird)
 - Follow us [on X](https://x.com/netbird)

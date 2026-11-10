@@ -5,27 +5,27 @@ order: 122
 upstream: "manage/dns/dns-settings.mdx@2382247"
 ---
 
-> **Note** This page is adapted from the upstream NetBird documentation (BSD-3-Clause) and may describe features that NetBirdy does not include.
+> **Note** This page is adapted from the upstream NetBirdy documentation (BSD-3-Clause) and may describe features that NetBirdy does not include.
 
 # DNS Settings
 
-DNS Settings control whether NetBird manages DNS configuration for specific peer groups. This is useful when certain peers need to maintain their existing DNS setup.
+DNS Settings control whether NetBirdy manages DNS configuration for specific peer groups. This is useful when certain peers need to maintain their existing DNS setup.
 
 ## DNS Management Modes
 
-NetBird supports two DNS management modes per peer:
+NetBirdy supports two DNS management modes per peer:
 
 ### Managed Mode (Default)
 
-NetBird configures the system's DNS settings. All DNS queries route through NetBird's local resolver, and configured nameservers apply to this peer.
+NetBirdy configures the system's DNS settings. All DNS queries route through NetBirdy's local resolver, and configured nameservers apply to this peer.
 
 ### Unmanaged Mode
 
-NetBird does not modify system DNS settings. The peer uses its pre-existing DNS configuration, and all configured nameservers and [Custom Zone](/manage/dns/custom-zones) records are ignored, including zones distributed to a group this peer belongs to.
+NetBirdy does not modify system DNS settings. The peer uses its pre-existing DNS configuration, and all configured nameservers and [Custom Zone](/manage/dns/custom-zones) records are ignored, including zones distributed to a group this peer belongs to.
 
 Use unmanaged mode when a peer has conflicting VPN or DNS requirements, corporate policy requires specific DNS settings, or you're troubleshooting DNS issues.
 
-> **Note** Even in unmanaged mode, peers can still communicate over the NetBird network. DNS management only affects name resolution, not connectivity.
+> **Note** Even in unmanaged mode, peers can still communicate over the NetBirdy network. DNS management only affects name resolution, not connectivity.
 
 
 ### Client-Side DNS Control
@@ -64,7 +64,7 @@ netbird up --disable-dns=false
 
 ### Domain Controllers
 
-For guidance on running NetBird alongside Domain Controllers, including disabling DNS management for DC groups, see [Internal DNS Servers](/manage/dns/internal-dns-servers#active-directory--domain-controllers).
+For guidance on running NetBirdy alongside Domain Controllers, including disabling DNS management for DC groups, see [Internal DNS Servers](/manage/dns/internal-dns-servers#active-directory--domain-controllers).
 
 ---
 

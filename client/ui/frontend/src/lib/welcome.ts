@@ -8,7 +8,7 @@ const ART = `
 
 export function welcome() {
     const message = `%c${ART}%c
-NetBirdy, a self-hosted NetBird fork.
+NetBirdy, a self-hosted NetBirdy fork.
 
 SOURCE: https://github.com/Quad4-Software/netbirdy
 `;

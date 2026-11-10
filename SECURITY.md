@@ -21,9 +21,9 @@ dashboard, and the Podman preview stack.
 Out of scope: third-party integrations deployed separately (Pocket ID, Quad4
 ID,
 Wazuh), social engineering, denial of service against upstream
-upstream NetBird infrastructure.
+upstream NetBirdy infrastructure.
 Bugs that are upstream issues should also be reported
-to the upstream NetBird project.
+to the upstream NetBirdy project.
 
 ## Expectations
 

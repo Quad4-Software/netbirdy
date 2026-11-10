@@ -303,6 +303,16 @@ const (
 	UpdateCheckRequested     Activity = 154
 	ServerUpdateRequested    Activity = 155
 
+	// The MCP session events' client_name meta is chosen by the client, and their access meta is
+	// what the user approved at consent, still limited by the user's role.
+
+	// MCPClientSignedIn indicates that a user signed an MCP client in through the MCP OAuth broker
+	MCPClientSignedIn Activity = 156
+	// MCPClientSignedOut indicates that an MCP client ended its session at the revocation endpoint
+	MCPClientSignedOut Activity = 157
+	// MCPSessionRevokedOnTokenReuse indicates that an MCP session was revoked because a refresh token or an authorization code was used twice
+	MCPSessionRevokedOnTokenReuse Activity = 158
+
 	AccountDeleted Activity = 99999
 )
 
@@ -497,6 +507,10 @@ var activityMap = map[Activity]Code{
 	PATAnomaly:               {"Access token used from a new address", "pat.anomaly"},
 	UpdateCheckRequested:     {"Update check requested", "update.check.request"},
 	ServerUpdateRequested:    {"Server update requested", "update.server.request"},
+
+	MCPClientSignedIn:             {"MCP client signed in", "mcp.session.start"},
+	MCPClientSignedOut:            {"MCP client signed out", "mcp.session.revoke"},
+	MCPSessionRevokedOnTokenReuse: {"MCP session revoked after token reuse", "mcp.session.replay"},
 }
 
 // StringCode returns a string code of the activity

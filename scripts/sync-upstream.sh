@@ -1,5 +1,5 @@
 #!/bin/sh
-# Sync an upstream NetBird release into this fork.
+# Sync an upstream NetBirdy release into this fork.
 # Usage: scripts/sync-upstream.sh <upstream-tag>
 set -eu
 TAG="${1:?usage: sync-upstream.sh vX.Y.Z}"

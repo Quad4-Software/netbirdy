@@ -16,6 +16,7 @@ import (
 	"google.golang.org/grpc"
 
 	"github.com/netbirdio/netbird/client/internal"
+	"github.com/netbirdio/netbird/client/internal/ipcauth"
 	"github.com/netbirdio/netbird/client/server"
 )
 
@@ -56,6 +57,14 @@ var (
 	jsonSocket       string
 	enableJSONSocket bool
 	sentryDSN        string
+	// allowGroups holds the --allow-group values as given: group or account
+	// names, or principals already in kind:value form. resolveAllowGroups turns
+	// them into the principals the daemon enforces.
+	allowGroups []string
+	// resolvedAllowGroups holds those principals after the install-time
+	// resolution, for persisting and for the arguments the installed service
+	// runs with.
+	resolvedAllowGroups []string
 )
 
 type program struct {
@@ -74,6 +83,7 @@ type program struct {
 	// sentryFlush drains buffered error reports on shutdown. Always non-nil
 	// after Start, also when no DSN is configured (the call is a no-op then).
 	sentryFlush func()
+	authzGate   *ipcauth.AuthzGate
 }
 
 func init() {
@@ -88,8 +98,17 @@ func init() {
 	serviceCmd.PersistentFlags().BoolVar(&captureEnabled, "enable-capture", false, "Enables packet capture via 'netbirdy debug capture'. To persist, use: netbirdy service install --enable-capture")
 	serviceCmd.PersistentFlags().BoolVar(&networksDisabled, "disable-networks", false, "Disables network selection. If enabled, the client will not allow listing, selecting, or deselecting networks. To persist, use: netbirdy service install --disable-networks")
 	serviceCmd.PersistentFlags().BoolVar(&enableJSONSocket, "enable-json-socket", false, "Enables the HTTP/JSON API socket served by grpc-gateway. To persist, use: netbirdy service install --enable-json-socket")
-	serviceCmd.PersistentFlags().StringVar(&jsonSocket, "json-socket", defaultJSONSocket, "HTTP/JSON API socket address [unix|tcp]://[path|host:port]. Requires --enable-json-socket to serve. To persist, use: netbirdy service install --enable-json-socket --json-socket")
+	serviceCmd.PersistentFlags().StringVar(&jsonSocket, "json-socket", defaultJSONSocket, "HTTP/JSON API socket address unix://path. tcp://host:port is deprecated: it carries no caller identity, so the daemon refuses every request on it. Requires --enable-json-socket to serve. To persist, use: netbirdy service install --enable-json-socket --json-socket")
 	serviceCmd.PersistentFlags().StringVar(&sentryDSN, "sentry-dsn", "", "Sentry-compatible DSN (Sentry.io, GlitchTip, Bugsink) for daemon panic and error reporting. Falls back to the built-in project DSN; set to off to disable. Can also be set with NB_SENTRY_DSN. To persist, use: netbirdy service install --sentry-dsn")
+
+	allowGroupDesc := `Restricts the daemon control socket and the JSON socket to the given group. ` +
+		`Accounts outside it cannot connect at all, so nothing the daemon exposes is reachable from them. ` +
+		`On Windows the daemon's own account, LocalSystem and elevated administrators keep access regardless. ` +
+		`Takes a group name, or a numeric GID on Unix and a SID on Windows; ` +
+		`Unix accepts a single group, Windows a comma-separated list of groups or accounts. ` +
+		`Names are resolved when the service is installed, LDAP, SSSD and Active Directory groups included. ` +
+		`To persist, use: netbirdy service install --allow-group <group>`
+	serviceCmd.PersistentFlags().StringSliceVar(&allowGroups, "allow-group", nil, allowGroupDesc)
 
 	rootCmd.PersistentFlags().StringVarP(&serviceName, "service", "s", defaultServiceName, "NetBirdy system service name")
 	serviceEnvDesc := `Sets extra environment variables for the service. ` +

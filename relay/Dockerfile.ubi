@@ -6,7 +6,7 @@ ARG RELEASE=1
 
 LABEL name="netbirdy-relay" \
       maintainer="NetBirdy <dev@netbird.io>" \
-      vendor="NetBird GmbH" \
+      vendor="NetBirdy GmbH" \
       version="${VERSION}" \
       release="${RELEASE}" \
       summary="NetBirdy Relay" \

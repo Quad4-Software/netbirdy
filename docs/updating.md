@@ -13,7 +13,7 @@ make podman-up      # config and data persist in the volume
 
 Upgrade with the system package manager (`apt`, `dnf`, `zypper`). The
 `netbirdy` packages declare `Replaces`/`Conflicts`/`Provides` on
-`netbird`, so upgrading in place over a NetBird install keeps the same
+`netbird`, so upgrading in place over a NetBirdy install keeps the same
 config at `/etc/netbird`, the same `netbird` system user and the same
 service file. See docs/migrating-from-netbird.md for the full matrix.
 

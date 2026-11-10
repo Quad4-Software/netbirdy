@@ -5,7 +5,7 @@ order: 25
 ---
 
 Most of the guides under the upstream sections are adapted from the
-[NetBird documentation](https://github.com/netbirdio/docs)
+[NetBirdy documentation](https://github.com/netbirdio/docs)
 (BSD-3-Clause, copyright Wiretrustee UG and AUTHORS), pinned to commit
 `238224712cf7639036ed39fa8873d777b8822273`.
 

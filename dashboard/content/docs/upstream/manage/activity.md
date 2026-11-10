@@ -5,15 +5,15 @@ order: 117
 upstream: "manage/activity/index.mdx@2382247"
 ---
 
-> **Note** This page is adapted from the upstream NetBird documentation (BSD-3-Clause) and may describe features that NetBirdy does not include.
+> **Note** This page is adapted from the upstream NetBirdy documentation (BSD-3-Clause) and may describe features that NetBirdy does not include.
 
-The Audit events logging functionality in NetBird allows you to observe and track changes to your network infrastructure.
+The Audit events logging functionality in NetBirdy allows you to observe and track changes to your network infrastructure.
 This includes events such as when a new machine or user has joined your network, when access control policies have been modified,
 and many other key network events.
 
 ## Related Video Content
 
-To get started with event logging in NetBird, watch this introductory video:
+To get started with event logging in NetBirdy, watch this introductory video:
 
 
 [Watch video](https://youtube.com/watch?v=UlnMo1KYXPU)
@@ -21,13 +21,13 @@ To get started with event logging in NetBird, watch this introductory video:
 
 
 ## Access the Audit Events Logging View
-The audit events logging feature is enabled by default for every NetBird network. You can access the activity log in the web UI under the [Audit Events tab](https://app.netbird.io/events/audit). This view provides a centralized log of network events. You can use the search bar to search by activity name, and apply filters for timeframes, event types, and users.
+The audit events logging feature is enabled by default for every NetBirdy network. You can access the activity log in the web UI under the [Audit Events tab](https://app.netbird.io/events/audit). This view provides a centralized log of network events. You can use the search bar to search by activity name, and apply filters for timeframes, event types, and users.
 
 <p>
     <img src="" alt="activity-monitoring" className="imagewrapper-big"/>
 </p>
 
-The current version of NetBird tracks a wide range of network changes that occur in the Management server, such as modifications to peers, groups, system settings, setup keys, and access control policies.
+The current version of NetBirdy tracks a wide range of network changes that occur in the Management server, such as modifications to peers, groups, system settings, setup keys, and access control policies.
 
 <details>
   <summary>Click here to view the full list of tracked events</summary>
@@ -132,7 +132,7 @@ The current version of NetBird tracks a wide range of network changes that occur
 
 </details>
 
-Future versions will also support connection events that occur in NetBird clients (e.g., peer A connected to peer B).
+Future versions will also support connection events that occur in NetBirdy clients (e.g., peer A connected to peer B).
 
 > **Note** The `unknown` name or `unknown@unknown.com` email address may be displayed in the activity event store if the encryption key has been corrupted or lost. This issue is most relevant for self-hosted setups. In this case, the events returned by the API could show `unknown@unknown.com` for the email address field and `unknown` for the name field.
 >
@@ -141,15 +141,15 @@ Future versions will also support connection events that occur in NetBird client
 
 ## Enable Audit Events Streaming to SIEM Systems
 
-NetBird can stream audit events to your Security Information and Event Management (SIEM) system in real-time. With this feature enabled, you can monitor and analyze NetBird network changes within your SIEM infrastructure. Check the [integrations guide](/manage/activity/event-streaming) for more information about the supported integrations and how to enable them.
+NetBirdy can stream audit events to your Security Information and Event Management (SIEM) system in real-time. With this feature enabled, you can monitor and analyze NetBirdy network changes within your SIEM infrastructure. Check the [integrations guide](/manage/activity/event-streaming) for more information about the supported integrations and how to enable them.
 
 ## Get Started
 
 <div>
-     window.open("https://netbird.io/pricing")}>Use NetBird
+     window.open("https://netbird.io/pricing")}>Use NetBirdy
 </div>
 
 - Make sure to [star us on GitHub](https://github.com/netbirdio/netbird)
 - Follow us [on X](https://x.com/netbird)
 - Join our [Slack Channel](/slack-url)
-- NetBird [latest release](https://github.com/netbirdio/netbird/releases) on GitHub
+- NetBirdy [latest release](https://github.com/netbirdio/netbird/releases) on GitHub

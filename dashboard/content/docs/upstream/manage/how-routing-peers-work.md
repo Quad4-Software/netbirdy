@@ -5,15 +5,15 @@ order: 124
 upstream: "manage/networks/how-routing-peers-work.mdx@2382247"
 ---
 
-> **Note** This page is adapted from the upstream NetBird documentation (BSD-3-Clause) and may describe features that NetBirdy does not include.
+> **Note** This page is adapted from the upstream NetBirdy documentation (BSD-3-Clause) and may describe features that NetBirdy does not include.
 
 # How Routing Peers Work
 
-A routing peer is a NetBird peer whose client bridges your overlay network to private networks and resources that do not run the client. This page covers what routing peers are, how traffic flows through them, the requirements they impose on the host, how high availability and access control behave, and how to harden them.
+A routing peer is a NetBirdy peer whose client bridges your overlay network to private networks and resources that do not run the client. This page covers what routing peers are, how traffic flows through them, the requirements they impose on the host, how high availability and access control behave, and how to harden them.
 
 ## What is a routing peer
 
-A routing peer is a NetBird peer installed inside a private network that forwards traffic between the NetBird overlay and resources that cannot or should not run the client themselves. It is the bridge between your Zero Trust mesh and the LANs, VPCs, datacenter networks, or individual hosts you need to reach.
+A routing peer is a NetBirdy peer installed inside a private network that forwards traffic between the NetBirdy overlay and resources that cannot or should not run the client themselves. It is the bridge between your Zero Trust mesh and the LANs, VPCs, datacenter networks, or individual hosts you need to reach.
 
 A single peer can serve multiple roles at once. The same machine can be a client peer, a routing peer for one or more networks, and an exit node simultaneously.
 
@@ -21,14 +21,14 @@ Because routing peers are typically headless servers, register them with [setup 
 
 ## When to use a routing peer
 
-- **Site or LAN access.** NetBird peers need to reach resources on a remote subnet, office network, datacenter, or cloud VPC without installing the client on every host.
+- **Site or LAN access.** NetBirdy peers need to reach resources on a remote subnet, office network, datacenter, or cloud VPC without installing the client on every host.
 - **Domain-based access.** Traffic must be routed by FQDN or wildcard domain to services whose IPs change.
 - **Exit node.** All internet-bound traffic from a group of peers must egress through a controlled location.
-- **Kubernetes.** Pods or services need to be reachable from NetBird peers without putting the client on every node.
+- **Kubernetes.** Pods or services need to be reachable from NetBirdy peers without putting the client on every node.
 
 ## Networks vs Network Routes
 
-NetBird offers two ways to configure routing peers. Both are actively maintained.
+NetBirdy offers two ways to configure routing peers. Both are actively maintained.
 
 **[Networks](/manage/networks) (newer, recommended where possible)**
 - Mandatory groups for both routing peers and resources. Traffic is denied by default until a policy permits it.
@@ -43,15 +43,15 @@ NetBird offers two ways to configure routing peers. Both are actively maintained
 ## Mental model: how traffic flows
 
 <p>
-    <img src="" alt="Three NetBird peers on the overlay network connect through a WireGuard tunnel to a routing peer in a private network. Access policies on the routing peer allow a database on TCP 5432, a web app on TCP 443, and an RDP workstation on TCP/UDP 3389; a printer with no policy is unreachable." className="imagewrapper-big"/>
+    <img src="" alt="Three NetBirdy peers on the overlay network connect through a WireGuard tunnel to a routing peer in a private network. Access policies on the routing peer allow a database on TCP 5432, a web app on TCP 443, and an RDP workstation on TCP/UDP 3389; a printer with no policy is unreachable." className="imagewrapper-big"/>
 </p>
 
-The walkthrough below describes the **Linux kernel-mode** path, where forwarding and firewalling happen in the kernel via `nftables` / `iptables`. On other platforms, NetBird performs the same logical steps in a userspace filter, but the implementation differs.
+The walkthrough below describes the **Linux kernel-mode** path, where forwarding and firewalling happen in the kernel via `nftables` / `iptables`. On other platforms, NetBirdy performs the same logical steps in a userspace filter, but the implementation differs.
 
-1. The originating peer encrypts the packet to the routing peer's WireGuard public key. The packet enters the tunnel at the source and exits on the routing peer's NetBird interface.
+1. The originating peer encrypts the packet to the routing peer's WireGuard public key. The packet enters the tunnel at the source and exits on the routing peer's NetBirdy interface.
 2. The routing peer's kernel forwards the packet according to the host routing table. If the destination is on a directly attached network or reachable via the host's gateway, the packet is forwarded.
-3. Forwarded packets traverse the host firewall's **forward chain**. NetBird applies the policies attached to the route or network resource here. Policies that target the routing peer itself live in the **input chain** and are evaluated separately.
-4. If masquerade is enabled (the default), the routing peer SNATs the source IP to its own LAN-side address before the packet leaves. With masquerade disabled, the original NetBird IP is preserved and the destination network must route return traffic back through the routing peer.
+3. Forwarded packets traverse the host firewall's **forward chain**. NetBirdy applies the policies attached to the route or network resource here. Policies that target the routing peer itself live in the **input chain** and are evaluated separately.
+4. If masquerade is enabled (the default), the routing peer SNATs the source IP to its own LAN-side address before the packet leaves. With masquerade disabled, the original NetBirdy IP is preserved and the destination network must route return traffic back through the routing peer.
 5. Replies follow the reverse path. The stateful firewall on the routing peer tracks established connections so return traffic does not need an explicit policy.
 
 ## Requirements
@@ -90,7 +90,7 @@ The flag is off by default on every platform (see [Client Environment Variables]
 netbird service reconfigure --service-env NB_ENABLE_LOCAL_FORWARDING=true
 ```
 
-This flag is only one of three things self-access needs — the peer also needs a route and a peer-to-peer policy. See [Reaching the routing peer itself](#reaching-the-routing-peer-itself) for the full picture. This is the common shape when the service host *is* the routing peer: a file server that runs the NetBird client, whose clients resolve its name to its LAN IP.
+This flag is only one of three things self-access needs — the peer also needs a route and a peer-to-peer policy. See [Reaching the routing peer itself](#reaching-the-routing-peer-itself) for the full picture. This is the common shape when the service host *is* the routing peer: a file server that runs the NetBirdy client, whose clients resolve its name to its LAN IP.
 
 Leave it off otherwise. With it on, any permitted peer can reach services bound to the routing peer's LAN addresses, not just the networks behind it — so don't enable it on a peer running local-only services you don't want exposed.
 
@@ -153,14 +153,14 @@ Place highly available peers in different failure domains within the same networ
 
 ## Masquerade
 
-Masquerade is on by default. The routing peer SNATs forwarded traffic to its own LAN-side IP. This is the simplest configuration because the destination network does not need any awareness of NetBird.
+Masquerade is on by default. The routing peer SNATs forwarded traffic to its own LAN-side IP. This is the simplest configuration because the destination network does not need any awareness of NetBirdy.
 
 Turn masquerade off when:
 
 - You need source IP visibility for auditing, compliance, or application logic.
-- You want the destination network's existing firewalls to filter peers by their NetBird IP.
+- You want the destination network's existing firewalls to filter peers by their NetBirdy IP.
 
-With masquerade off, you must add a return route on the destination network pointing the NetBird CIDR (default `100.64.0.0/10`) at the routing peer.
+With masquerade off, you must add a return route on the destination network pointing the NetBirdy CIDR (default `100.64.0.0/10`) at the routing peer.
 
 High availability then needs one more thing from you. Clients still move to the standby peer on their own, but that return route keeps pointing at the peer that just failed, so replies are dropped even though the outbound direction has recovered. The destination network has to be able to follow the failover too. See [High availability with masquerade off](/manage/networks/masquerade#high-availability-with-masquerade-off).
 
@@ -177,7 +177,7 @@ This is the subtlest part of the model and the source of most policy mistakes.
 - **Input chain.** Packets destined to the routing peer's own IP. [Peer-to-peer policies](/manage/access-control/manage-network-access) apply here.
 
 <p>
-    <img src="" alt="Two paths compared. Through the routing peer: a network resource policy, evaluated in the forward chain, lets a client reach a web app behind the routing peer on TCP 443. To the routing peer: a peer-to-peer policy, evaluated in the input chain, lets a client reach SSH on the routing peer's NetBird IP on TCP 22." className="imagewrapper-big"/>
+    <img src="" alt="Two paths compared. Through the routing peer: a network resource policy, evaluated in the forward chain, lets a client reach a web app behind the routing peer on TCP 443. To the routing peer: a peer-to-peer policy, evaluated in the input chain, lets a client reach SSH on the routing peer's NetBirdy IP on TCP 22." className="imagewrapper-big"/>
 </p>
 
 If users need to reach both the resources behind a routing peer **and** services running on the routing peer itself (Pi-hole, monitoring, jump-host SSH), you need one policy of each kind.
@@ -189,9 +189,9 @@ If users need to reach both the resources behind a routing peer **and** services
 
 ### Reaching the routing peer itself
 
-Every peer has two addresses — its **NetBird IP** (its `100.x` overlay address, the one in `netbird status`) and its **LAN IP** (its address on the local network). Reaching the routing peer at each needs different things:
+Every peer has two addresses — its **NetBirdy IP** (its `100.x` overlay address, the one in `netbird status`) and its **LAN IP** (its address on the local network). Reaching the routing peer at each needs different things:
 
-- **At its NetBird IP** — a single peer-to-peer policy (input chain) is enough. Every client already has an overlay route to every peer.
+- **At its NetBirdy IP** — a single peer-to-peer policy (input chain) is enough. Every client already has an overlay route to every peer.
 - **At its LAN IP** — when DNS (or a DFS path) resolves the service to its LAN address, the client has **no route** to that IP yet. Reaching it needs three things together:
   - a **resource** that covers the LAN IP (the route),
   - a **peer-to-peer policy** (the input-chain accept), and
@@ -261,7 +261,7 @@ When a peer is `Connected` but a resource behind it is still unreachable, [Troub
 - On the routing peer host:
   - `sysctl net.ipv4.ip_forward` to confirm forwarding.
   - `ip route` to confirm reachability to the destination CIDR.
-  - `nft list ruleset` (or `iptables-save`) to inspect the rules NetBird installed.
+  - `nft list ruleset` (or `iptables-save`) to inspect the rules NetBirdy installed.
 
 ## Common pitfalls
 
@@ -271,5 +271,5 @@ When a peer is `Connected` but a resource behind it is still unreachable, [Troub
 - Mixing domain and IP-range resources in the same network.
 - Exit node missing the ICMP policy, so clients can't connect to the routing peer in the first place.
 - DNS port mismatch when an account has a mix of pre-0.59 and post-0.59 peers.
-- Reaching a service on the routing peer's **own LAN IP** (not its NetBird IP) with only an input policy — it also needs a resource for the route, and on userspace peers `NB_ENABLE_LOCAL_FORWARDING`. See [Reaching the routing peer itself](#reaching-the-routing-peer-itself).
+- Reaching a service on the routing peer's **own LAN IP** (not its NetBirdy IP) with only an input policy — it also needs a resource for the route, and on userspace peers `NB_ENABLE_LOCAL_FORWARDING`. See [Reaching the routing peer itself](#reaching-the-routing-peer-itself).
 - Health-checking that path with `ping` — ICMP needs its own peer-to-peer policy; a service up while ping is down is a missing ICMP policy, not a routing failure.

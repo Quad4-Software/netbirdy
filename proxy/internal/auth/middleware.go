@@ -66,6 +66,11 @@ type DomainConfig struct {
 	AllowedGroups map[string]struct{}
 	// TargetResolver pins the target and access action used by this auth snapshot.
 	TargetResolver *proxy.TargetResolver
+	// AgentNetwork and SuppressAccessLog classify the domain's requests for
+	// access logging before they are matched to a target, so a rejection that
+	// happens earlier is still logged as an agent-network request.
+	AgentNetwork      bool
+	SuppressAccessLog bool
 }
 
 // DomainOption configures a domain authentication snapshot.
@@ -78,6 +83,16 @@ func WithTargetResolver(resolver *proxy.TargetResolver) DomainOption {
 			return errors.New("target resolver is nil")
 		}
 		config.TargetResolver = resolver
+		return nil
+	}
+}
+
+// WithAgentNetwork marks the domain as serving agent-network targets, with
+// their access-log suppression, for requests rejected before target matching.
+func WithAgentNetwork(agentNetwork, suppressAccessLog bool) DomainOption {
+	return func(config *DomainConfig) error {
+		config.AgentNetwork = agentNetwork
+		config.SuppressAccessLog = suppressAccessLog
 		return nil
 	}
 }
@@ -311,6 +326,10 @@ func setCapturedIDs(r *http.Request, config DomainConfig) {
 	if cd := proxy.CapturedDataFromContext(r.Context()); cd != nil {
 		cd.SetAccountID(config.AccountID)
 		cd.SetServiceID(config.ServiceID)
+		if config.AgentNetwork {
+			cd.SetAgentNetwork(true)
+			cd.SetSuppressAccessLog(config.SuppressAccessLog)
+		}
 	}
 }
 
@@ -364,13 +383,15 @@ func (mw *Middleware) checkIPRestrictions(w http.ResponseWriter, r *http.Request
 	return false
 }
 
-// denyForbidden renders the block page, dropping the client connection
+// denyForbidden renders the block page and marks the request as an auth
+// rejection for the access log, dropping the client connection
 // when the domain is private so a later retry cannot reuse it.
 func denyForbidden(w http.ResponseWriter, r *http.Request, config DomainConfig) {
 	if config.Private {
 		denyPrivate(w, r)
 		return
 	}
+	markAuthRejected(r)
 	var requestID string
 	if cd := proxy.CapturedDataFromContext(r.Context()); cd != nil {
 		requestID = cd.GetRequestID()
@@ -382,6 +403,7 @@ func denyForbidden(w http.ResponseWriter, r *http.Request, config DomainConfig) 
 // before joining the overlay cannot keep retrying on the same warm socket.
 // Go's HTTP/2 server turns the exact lowercase "close" token into a GOAWAY.
 func denyPrivate(w http.ResponseWriter, r *http.Request) {
+	markAuthRejected(r)
 	h := w.Header()
 	h.Set("Connection", "close")
 	h.Set("Cache-Control", "no-store")
@@ -390,6 +412,14 @@ func denyPrivate(w http.ResponseWriter, r *http.Request) {
 		requestID = cd.GetRequestID()
 	}
 	web.ServeAccessDeniedPage(w, r, http.StatusForbidden, "Access Denied", "This service is only reachable through the private network.", requestID)
+}
+
+// markAuthRejected attributes the response to the proxy's access checks, so
+// the access log does not report the rejection as the backend's.
+func markAuthRejected(r *http.Request) {
+	if cd := proxy.CapturedDataFromContext(r.Context()); cd != nil {
+		cd.SetOrigin(proxy.OriginAuth)
+	}
 }
 
 // resolveClientIP extracts the real client IP from CapturedData, falling back to r.RemoteAddr.

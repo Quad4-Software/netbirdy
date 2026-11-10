@@ -5,7 +5,7 @@ order: 113
 upstream: "manage/peers/register-machines-using-setup-keys.mdx@2382247"
 ---
 
-> **Note** This page is adapted from the upstream NetBird documentation (BSD-3-Clause) and may describe features that NetBirdy does not include.
+> **Note** This page is adapted from the upstream NetBirdy documentation (BSD-3-Clause) and may describe features that NetBirdy does not include.
 
 A setup key is a pre-authentication token used to register new machines in your network.
 On a machine's first run, it associates that machine with your account.
@@ -30,13 +30,13 @@ There are two types of setup keys:
 ## Ephemeral Peers
 
 You can create a setup key with the ephemeral peers option enabled.
-Peers registered with this key are automatically removed from NetBird after staying offline for more than 10 minutes.
+Peers registered with this key are automatically removed from NetBirdy after staying offline for more than 10 minutes.
 
 This is useful for short-lived workloads such as containers or autoscaling instances.
 
 ## Managing Setup Keys
 
-Setup keys are available in the NetBird Management Dashboard under `Settings` → `Setup Keys`.
+Setup keys are available in the NetBirdy Management Dashboard under `Settings` → `Setup Keys`.
 Use [this page](https://app.netbird.io/settings?tab=setup-keys) to view and manage your setup keys.
 From there, you can add new keys or revoke existing ones.
 
@@ -69,11 +69,11 @@ See [Extra DNS Labels](/manage/dns/extra-dns-labels) for full details, including
 ## Peer Auto-Grouping
 
 
-NetBird offers a powerful [access control feature](/manage/access-control/manage-network-access) for managing access to your resources.
+NetBirdy offers a powerful [access control feature](/manage/access-control/manage-network-access) for managing access to your resources.
 In a typical setup, you create multiple groups of peers and define access rules that determine which groups can reach each other.
 Adding peers to groups manually can become time-consuming in large networks with dozens of machines.
 
-Starting with NetBird [v0.9.2](https://github.com/netbirdio/netbird/releases), you can specify a list of auto-assign groups when creating or updating a setup key.
+Starting with NetBirdy [v0.9.2](https://github.com/netbirdio/netbird/releases), you can specify a list of auto-assign groups when creating or updating a setup key.
 Every peer registered with this key is automatically added to those groups, and all access control rules for those groups apply automatically.
 
 To configure `Auto-assign groups`, open `Settings` → `Setup Keys` and create or update a setup key.

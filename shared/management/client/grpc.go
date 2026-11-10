@@ -55,7 +55,7 @@ type ConnStateNotifier interface {
 }
 
 type GrpcClient struct {
-	serverName string
+	serverName            string
 	key                   wgtypes.Key
 	realClient            proto.ManagementServiceClient
 	ctx                   context.Context
@@ -152,9 +152,9 @@ func NewClient(ctx context.Context, addr string, ourPrivateKey wgtypes.Key, tlsE
 	}
 	if c.netMgr != nil {
 		extraOpts = append(extraOpts, nbgrpc.WithSweeper(c.netMgr))
-	if c.serverName != "" {
-		extraOpts = append(extraOpts, grpc.WithAuthority(c.serverName))
-	}
+		if c.serverName != "" {
+			extraOpts = append(extraOpts, grpc.WithAuthority(c.serverName))
+		}
 	}
 
 	var conn *grpc.ClientConn
@@ -595,7 +595,7 @@ func (c *GrpcClient) IsHealthy() bool {
 
 func (c *GrpcClient) login(req *proto.LoginRequest) (*proto.LoginResponse, error) {
 	if !c.ready() {
-		return nil, errors.New(errMsgNoMgmtConnection)
+		return nil, gstatus.Error(codes.Unavailable, errMsgNoMgmtConnection)
 	}
 
 	serverKey, err := c.getServerPublicKey()

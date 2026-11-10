@@ -9,8 +9,8 @@
 # NetBirdy
 
 NetBirdy is a self-hosted WireGuard mesh VPN. It is a fork of
-[NetBird](https://github.com/netbirdio/netbird) that uses the same protocol, so
-NetBird clients can connect to a NetBirdy server and an existing NetBird setup
+[NetBirdy](https://github.com/netbirdio/netbird) that uses the same protocol, so
+NetBirdy clients can connect to a NetBirdy server and an existing NetBirdy setup
 can be moved over without re-enrolling devices.
 
 [![CI](https://github.com/Quad4-Software/netbirdy/actions/workflows/golang-test-linux.yml/badge.svg)](https://github.com/Quad4-Software/netbirdy/actions/workflows/golang-test-linux.yml)
@@ -20,12 +20,12 @@ Website: <https://quad4-software.github.io/netbirdy/>
 > **Note:** LLMs were used to create and maintain this fork. It is a personal
 > fork for myself, friends and family only.
 
-## Differences from NetBird
+## Differences from NetBirdy
 
 - Dashboard with a black dark theme and a light theme, a command palette, and
   built-in documentation that works offline. Cloud-only and license-gated
   pages are removed.
-- Usage reports to the NetBird project are disabled and update checks are opt-in.
+- Usage reports to the NetBirdy project are disabled and update checks are opt-in.
 - Reverse proxy shield that detects scanners and crawlers by behavior and
   slows or blocks them. See [proxy/docs/shield.md](proxy/docs/shield.md).
 - HTTP/3, WebSocket, SSE and gRPC (unary) support in the reverse proxy.
@@ -83,7 +83,7 @@ sudo netbirdy up --management-url http://YOUR-SERVER:8081 --setup-key YOUR-KEY
 netbirdy status
 ```
 
-Installing the NetBirdy Linux package replaces the NetBird package and keeps
+Installing the NetBirdy Linux package replaces the NetBirdy package and keeps
 `/etc/netbird` and `/var/lib/netbird`. See
 [docs/migrating-from-netbird.md](docs/migrating-from-netbird.md).
 
@@ -96,18 +96,18 @@ These stay the same as upstream so existing setups keep working:
 | Go module path `github.com/netbirdio/netbird` | existing imports |
 | `NB_*` environment variables | existing configuration |
 | `/etc/netbird`, `/var/lib/netbird`, the `netbird` service and user | in-place upgrades |
-| Wire protocol, REST API, setup keys | interoperability with NetBird clients |
-| `X-NetBird-Fwd-*` headers | forwarded identity protocol |
+| Wire protocol, REST API, setup keys | interoperability with NetBirdy clients |
+| `X-NetBirdy-Fwd-*` headers | forwarded identity protocol |
 | Package `Provides`, `Replaces` and `Conflicts: netbird` | package migration |
 
-Known gaps: NetBirdy does not ship its own phone apps (use the NetBird apps),
+Known gaps: NetBirdy does not ship its own phone apps (use the NetBirdy apps),
 the desktop app is not code-signed, and there is no Windows MSI.
 
 ## Documentation
 
 | Document | Contents |
 | --- | --- |
-| [docs/migrating-from-netbird.md](docs/migrating-from-netbird.md) | Moving from NetBird |
+| [docs/migrating-from-netbird.md](docs/migrating-from-netbird.md) | Moving from NetBirdy |
 | [docs/offline-mode.md](docs/offline-mode.md) | Client offline mode and its limits |
 | [docs/security-monitoring.md](docs/security-monitoring.md) | Anomaly detection, audit log, syslog |
 | [docs/wazuh.md](docs/wazuh.md) | Wazuh integration |
@@ -152,7 +152,7 @@ so issues and pull requests may not get a quick answer.
 
 BSD-3-Clause, except `management/`, `signal/`, `relay/`, `combined/` and
 `dashboard/`, which are AGPL-3.0. See [NOTICE.md](NOTICE.md) and `LICENSES/` for
-the license texts, the list of changes from NetBird and the AGPL source offer.
+the license texts, the list of changes from NetBirdy and the AGPL source offer.
 
-NetBird is a trademark of its owner. NetBirdy is an independent fork and is not
+NetBirdy is a trademark of its owner. NetBirdy is an independent fork and is not
 affiliated with or endorsed by the upstream project.

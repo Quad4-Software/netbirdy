@@ -5,20 +5,20 @@ order: 111
 upstream: "manage/peers/approve-peers.mdx@2382247"
 ---
 
-> **Note** This page is adapted from the upstream NetBird documentation (BSD-3-Clause) and may describe features that NetBirdy does not include.
+> **Note** This page is adapted from the upstream NetBirdy documentation (BSD-3-Clause) and may describe features that NetBirdy does not include.
 
 # Approve peers
-The peer approval feature enhances network security by requiring manual administrator approval before a device can join the NetBird network.
+The peer approval feature enhances network security by requiring manual administrator approval before a device can join the NetBirdy network.
 This feature is handy when network administrators want to ensure access is restricted only to trusted, corporate-managed devices.
 
 When enabled, devices connect to the management service without network access to other resources.
 Administrators then can assess whether the peer is eligible to join the network.
 
-> **Note** This feature is available in [NetBird Cloud](https://app.netbird.io/) on the [Business plan](https://netbird.io/pricing) and in self-hosted deployments with an [Enterprise Commercial License](/selfhosted/enterprise). The open source Community Edition does not include it.
+> **Note** This feature is available in [NetBirdy Cloud](https://app.netbird.io/) on the [Business plan](https://netbird.io/pricing) and in self-hosted deployments with an [Enterprise Commercial License](/selfhosted/enterprise). The open source Community Edition does not include it.
 
 ## Related Video Content
 
-For details on the peer approval feature, part of our "Getting started with NetBird" video covers this topic:
+For details on the peer approval feature, part of our "Getting started with NetBirdy" video covers this topic:
 
 
 [Watch video](https://youtube.com/watch?v=JRCZy4rLi-c)
@@ -42,16 +42,16 @@ To approve a peer, navigate to the [Peers section](https://app.netbird.io/peers)
 </p>
 
 ## Automate peer approval with EDR integrations
-NetBird integrates with popular EDR solutions like [CrowdStrike](https://www.crowdstrike.com/) to automate peer approval
+NetBirdy integrates with popular EDR solutions like [CrowdStrike](https://www.crowdstrike.com/) to automate peer approval
 and allow only trusted devices to join the network.
 Check the [EDR integrations](/manage/access-control/endpoint-detection-and-response) guide for more information on how to enable this feature.
 
 ## Get started
 <div>
-     window.open("https://netbird.io/pricing")}>Use NetBird
+     window.open("https://netbird.io/pricing")}>Use NetBirdy
 </div>
 
 - Make sure to [star us on GitHub](https://github.com/netbirdio/netbird)
 - Follow us [on X](https://x.com/netbird)
 - Join our [Slack Channel](/slack-url)
-- NetBird [latest release](https://github.com/netbirdio/netbird/releases) on GitHub
+- NetBirdy [latest release](https://github.com/netbirdio/netbird/releases) on GitHub

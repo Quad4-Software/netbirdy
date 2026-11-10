@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>NetBirdy: self-hosted WireGuard mesh VPN, a NetBird fork</title>
-<meta name="description" content="NetBirdy is a self-hosted WireGuard mesh VPN. It is a fork of NetBird and works with NetBird clients.">
+<title>NetBirdy: self-hosted WireGuard mesh VPN, a NetBirdy fork</title>
+<meta name="description" content="NetBirdy is a self-hosted WireGuard mesh VPN. It is a fork of NetBirdy and works with NetBirdy clients.">
 <link rel="canonical" href="https://quad4-software.github.io/netbirdy/">
 <meta name="robots" content="index, follow, max-image-preview:large">
 <meta name="color-scheme" content="dark light">
@@ -14,16 +14,16 @@
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="NetBirdy">
 <meta property="og:locale" content="en_US">
-<meta property="og:title" content="NetBirdy: self-hosted WireGuard mesh VPN, a NetBird fork">
-<meta property="og:description" content="A fork of NetBird that works with NetBird clients.">
+<meta property="og:title" content="NetBirdy: self-hosted WireGuard mesh VPN, a NetBirdy fork">
+<meta property="og:description" content="A fork of NetBirdy that works with NetBirdy clients.">
 <meta property="og:url" content="https://quad4-software.github.io/netbirdy/">
 <meta property="og:image" content="https://quad4-software.github.io/netbirdy/assets/og-image.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="NetBirdy wordmark with the three-node mark on a black background">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="NetBirdy: self-hosted WireGuard mesh VPN, a NetBird fork">
-<meta name="twitter:description" content="A fork of NetBird that works with NetBird clients.">
+<meta name="twitter:title" content="NetBirdy: self-hosted WireGuard mesh VPN, a NetBirdy fork">
+<meta name="twitter:description" content="A fork of NetBirdy that works with NetBirdy clients.">
 <meta name="twitter:image" content="https://quad4-software.github.io/netbirdy/assets/og-image.png">
 <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
 <link rel="icon" href="assets/icon-192.png" sizes="192x192" type="image/png">
@@ -36,7 +36,7 @@
   "@context": "https://schema.org",
   "@type": "SoftwareApplication",
   "name": "NetBirdy",
-  "description": "A self-hosted WireGuard mesh VPN. A fork of NetBird.",
+  "description": "A self-hosted WireGuard mesh VPN. A fork of NetBirdy.",
   "url": "https://quad4-software.github.io/netbirdy/",
   "applicationCategory": "NetworkingApplication",
   "operatingSystem": "Linux, Windows, macOS",
@@ -69,10 +69,10 @@
     <div class="container hero__grid">
       <div>
         <h1>A self-hosted WireGuard mesh VPN</h1>
-        <p class="lead">A fork of NetBird that works with NetBird clients.</p>
+        <p class="lead">A fork of NetBirdy that works with NetBirdy clients.</p>
         <div class="hero__actions">
           <a class="btn" href="download/">Download</a>
-          <a class="btn btn--quiet" href="#compare">Compare with NetBird</a>
+          <a class="btn btn--quiet" href="#compare">Compare with NetBirdy</a>
         </div>
         <p class="fine">An independent fork built in the open.</p>
       </div>
@@ -128,7 +128,7 @@
     <div class="container">
       <div class="section__head">
         <h2>What is in the box</h2>
-        <p>Everything NetBird does, plus what the fork adds.</p>
+        <p>Everything NetBirdy does, plus what the fork adds.</p>
       </div>
       <ul class="rows">
         <li><h3>Mesh VPN</h3><p>Devices talk directly to each other over encrypted WireGuard tunnels. No concentrator in the data path.</p></li>
@@ -145,7 +145,7 @@
         <li><h3>Offline reconnect</h3><p>Clients reconnect to peers after a restart while the server is down.</p></li>
         <li><h3>Updates</h3><p>Releases are signed. The server can cache client updates and update itself with backup and rollback.</p></li>
         <li><h3>Sandboxing</h3><p>Server and client restrict their own file access with Landlock on Linux.</p></li>
-        <li><h3>Self-hosted</h3><p>One Podman stack with optional Pocket ID and Quad4 ID profiles. Desktop app for Linux, Windows and macOS. No usage reports are sent to NetBird. Crash reports go to the project's own tracker and can be disabled.</p></li>
+        <li><h3>Self-hosted</h3><p>One Podman stack with optional Pocket ID and Quad4 ID profiles. Desktop app for Linux, Windows and macOS. No usage reports are sent to NetBirdy. Crash reports go to the project's own tracker and can be disabled.</p></li>
       </ul>
     </div>
   </section>
@@ -153,31 +153,31 @@
   <section class="section section--band" id="compare">
     <div class="container">
       <div class="section__head">
-        <h2>NetBirdy and NetBird</h2>
+        <h2>NetBirdy and NetBirdy</h2>
         <p>Same protocol and clients.</p>
       </div>
       <div class="table-wrap">
         <table class="compare">
-          <caption>Self-hosted editions, NetBird 0.81.</caption>
+          <caption>Self-hosted editions, NetBirdy 0.81.</caption>
           <thead>
-            <tr><th scope="col">Feature</th><th scope="col" class="us">NetBirdy</th><th scope="col">NetBird</th></tr>
+            <tr><th scope="col">Feature</th><th scope="col" class="us">NetBirdy</th><th scope="col">NetBirdy</th></tr>
           </thead>
           <tbody>
-            <tr><th scope="row">Usage reports to the project</th><td class="us yes" data-label="NetBirdy">Crash reports only, can be disabled</td><td data-label="NetBird">On unless disabled</td></tr>
-            <tr><th scope="row">Built-in help in the dashboard</th><td class="us yes" data-label="NetBirdy">Yes, works offline</td><td class="no" data-label="NetBird">Hosted docs site</td></tr>
-            <tr><th scope="row">Reverse proxy shield for scanners and crawlers</th><td class="us yes" data-label="NetBirdy">Yes</td><td class="no" data-label="NetBird">Not included</td></tr>
-            <tr><th scope="row">HTTP/3 on the reverse proxy</th><td class="us yes" data-label="NetBirdy">Yes</td><td class="no" data-label="NetBird">Not included</td></tr>
-            <tr><th scope="row">Sign-in and key anomaly detection</th><td class="us yes" data-label="NetBirdy">Watch or prevent</td><td class="no" data-label="NetBird">Not included</td></tr>
-            <tr><th scope="row">Clients reconnect while the server is down</th><td class="us yes" data-label="NetBirdy">Yes, with limits</td><td class="no" data-label="NetBird">No</td></tr>
-            <tr><th scope="row">Client updates cached on your server</th><td class="us yes" data-label="NetBirdy">Yes, signed</td><td class="no" data-label="NetBird">No</td></tr>
-            <tr><th scope="row">Server updates itself with backup and rollback</th><td class="us yes" data-label="NetBirdy">Optional helper</td><td class="no" data-label="NetBird">Manual</td></tr>
-            <tr><th scope="row">Hosted cloud service</th><td class="us no" data-label="NetBirdy">No</td><td class="yes" data-label="NetBird">Yes</td></tr>
-            <tr><th scope="row">Desktop and phone apps</th><td class="us no" data-label="NetBirdy">Desktop app, NetBird phone apps</td><td class="yes" data-label="NetBird">Yes</td></tr>
-            <tr><th scope="row">Commercial support</th><td class="us no" data-label="NetBirdy">Community only</td><td class="yes" data-label="NetBird">Yes</td></tr>
+            <tr><th scope="row">Usage reports to the project</th><td class="us yes" data-label="NetBirdy">Crash reports only, can be disabled</td><td data-label="NetBirdy">On unless disabled</td></tr>
+            <tr><th scope="row">Built-in help in the dashboard</th><td class="us yes" data-label="NetBirdy">Yes, works offline</td><td class="no" data-label="NetBirdy">Hosted docs site</td></tr>
+            <tr><th scope="row">Reverse proxy shield for scanners and crawlers</th><td class="us yes" data-label="NetBirdy">Yes</td><td class="no" data-label="NetBirdy">Not included</td></tr>
+            <tr><th scope="row">HTTP/3 on the reverse proxy</th><td class="us yes" data-label="NetBirdy">Yes</td><td class="no" data-label="NetBirdy">Not included</td></tr>
+            <tr><th scope="row">Sign-in and key anomaly detection</th><td class="us yes" data-label="NetBirdy">Watch or prevent</td><td class="no" data-label="NetBirdy">Not included</td></tr>
+            <tr><th scope="row">Clients reconnect while the server is down</th><td class="us yes" data-label="NetBirdy">Yes, with limits</td><td class="no" data-label="NetBirdy">No</td></tr>
+            <tr><th scope="row">Client updates cached on your server</th><td class="us yes" data-label="NetBirdy">Yes, signed</td><td class="no" data-label="NetBirdy">No</td></tr>
+            <tr><th scope="row">Server updates itself with backup and rollback</th><td class="us yes" data-label="NetBirdy">Optional helper</td><td class="no" data-label="NetBirdy">Manual</td></tr>
+            <tr><th scope="row">Hosted cloud service</th><td class="us no" data-label="NetBirdy">No</td><td class="yes" data-label="NetBirdy">Yes</td></tr>
+            <tr><th scope="row">Desktop and phone apps</th><td class="us no" data-label="NetBirdy">Desktop app, NetBirdy phone apps</td><td class="yes" data-label="NetBirdy">Yes</td></tr>
+            <tr><th scope="row">Commercial support</th><td class="us no" data-label="NetBirdy">Community only</td><td class="yes" data-label="NetBirdy">Yes</td></tr>
           </tbody>
         </table>
       </div>
-      <p class="note">NetBird may add features later. NetBirdy is an independent fork and is not affiliated with the NetBird company.</p>
+      <p class="note">NetBirdy may add features later. NetBirdy is an independent fork and is not affiliated with the NetBirdy company.</p>
     </div>
   </section>
 
@@ -217,7 +217,7 @@ netbirdy status</code></pre></div>
         <svg viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="M8.5 22.5 14.2 9.4 23.5 22.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="8.5" cy="23.5" r="4.4" fill="currentColor"/><circle cx="14.6" cy="8" r="4.4" fill="currentColor"/><circle cx="23.5" cy="23.5" r="4.4" fill="currentColor"/></svg>
         NetBirdy
       </span>
-      <p class="footer__fine">An independent fork of NetBird. BSD-3-Clause, with the server and dashboard under AGPL-3.0.</p>
+      <p class="footer__fine">An independent fork of NetBirdy. BSD-3-Clause, with the server and dashboard under AGPL-3.0.</p>
     </div>
     <nav class="footer__nav" aria-label="Footer">
       <div>
@@ -233,7 +233,7 @@ netbirdy status</code></pre></div>
         <h2 class="footer__title">Learn</h2>
         <ul>
           <li><a href="https://github.com/Quad4-Software/netbirdy/tree/main/docs">Documentation</a></li>
-          <li><a href="https://github.com/Quad4-Software/netbirdy/blob/main/docs/migrating-from-netbird.md">Move from NetBird</a></li>
+          <li><a href="https://github.com/Quad4-Software/netbirdy/blob/main/docs/migrating-from-netbird.md">Move from NetBirdy</a></li>
           <li><a href="https://github.com/Quad4-Software/netbirdy/blob/main/SECURITY.md">Security policy</a></li>
         </ul>
       </div>
@@ -241,7 +241,7 @@ netbirdy status</code></pre></div>
         <h2 class="footer__title">Legal</h2>
         <ul>
           <li><a href="https://github.com/Quad4-Software/netbirdy/blob/main/NOTICE.md">Licenses</a></li>
-          <li><a href="https://github.com/netbirdio/netbird">NetBird upstream</a></li>
+          <li><a href="https://github.com/netbirdio/netbird">NetBirdy upstream</a></li>
         </ul>
       </div>
     </nav>

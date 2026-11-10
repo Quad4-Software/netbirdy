@@ -18,7 +18,7 @@ restrict_env_file() {
     return 0
 }
 
-# Remove a legacy NetBird service before installing ours. Config and state in
+# Remove a legacy NetBirdy service before installing ours. Config and state in
 # /etc/netbird and /var/lib/netbird stay untouched. Idempotent.
 migrate_netbird_service() {
     if [ "${use_systemctl}" = "True" ]; then

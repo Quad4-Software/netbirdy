@@ -5,11 +5,11 @@ order: 118
 upstream: "manage/activity/traffic-events-logging.mdx@2382247"
 ---
 
-> **Note** This page is adapted from the upstream NetBird documentation (BSD-3-Clause) and may describe features that NetBirdy does not include.
+> **Note** This page is adapted from the upstream NetBirdy documentation (BSD-3-Clause) and may describe features that NetBirdy does not include.
 
-> **Note** This feature is available in NetBird Cloud under the [Business plan](https://www.netbird.io/pricing?utm_source=docs&utm_content=traffic-events) and in licensed self-hosted Enterprise deployments with traffic flow enabled.
+> **Note** This feature is available in NetBirdy Cloud under the [Business plan](https://www.netbird.io/pricing?utm_source=docs&utm_content=traffic-events) and in licensed self-hosted Enterprise deployments with traffic flow enabled.
 > This feature is in Beta and may change over time — including how data is collected and reported.
-> To use this feature, make sure you're running NetBird client version 0.39 or higher.
+> To use this feature, make sure you're running NetBirdy client version 0.39 or higher.
 
 
 
@@ -23,19 +23,19 @@ you to better manage and secure your environment.
 
 ## How Traffic Events Logging Works
 
-NetBird offers flexibility as a peer-to-peer (p2p) overlay network and a remote network access solution. You can use NetBird to connect
-machines directly (p2p) when running the NetBird client on each machine. You can also use NetBird to organize remote employee access
-to internal networks like VPCs, office networks, and internal services without running the NetBird client on the remote resources using the [NetBird Networks](/manage/networks) feature.
-The way you use NetBird influences the way traffic events are captured and logged. Below are the two main scenarios for traffic events logging
-that describe how NetBird logs traffic events for different types of connections.
+NetBirdy offers flexibility as a peer-to-peer (p2p) overlay network and a remote network access solution. You can use NetBirdy to connect
+machines directly (p2p) when running the NetBirdy client on each machine. You can also use NetBirdy to organize remote employee access
+to internal networks like VPCs, office networks, and internal services without running the NetBirdy client on the remote resources using the [NetBirdy Networks](/manage/networks) feature.
+The way you use NetBirdy influences the way traffic events are captured and logged. Below are the two main scenarios for traffic events logging
+that describe how NetBirdy logs traffic events for different types of connections.
 
 ### Peer-to-Peer Connections
 
-When two peers are connected directly (p2p), NetBird captures and logs the traffic events for that connection on both peers.
-For example, if a user accessed an internal CRM server from their laptop via a browser and port 443, NetBird would log the traffic events for that
+When two peers are connected directly (p2p), NetBirdy captures and logs the traffic events for that connection on both peers.
+For example, if a user accessed an internal CRM server from their laptop via a browser and port 443, NetBirdy would log the traffic events for that
 connection on both the user's machine and the CRM server. If the connection was blocked, such as when there is a
 [policy](/manage/access-control/manage-network-access#managing-policies) that restricts access to the CRM server,
-NetBird would log the blocked event on the peer that refused the connection.
+NetBirdy would log the blocked event on the peer that refused the connection.
 
 <p>
     <img src="/docs-img/docs-static-img-manage-activity-traffic-events-logging-p2p-traffic-events.png" alt="traffic-events-p2p-diagram" className="imagewrapper-big"/>
@@ -43,7 +43,7 @@ NetBird would log the blocked event on the peer that refused the connection.
 
 #### Successful P2P Connection Events
 
-NetBird helps you better understand connection flows by aggregating related events and presenting them in a clear, organized manner.
+NetBirdy helps you better understand connection flows by aggregating related events and presenting them in a clear, organized manner.
 
 For example, in a successful peer-to-peer connection scenario, a user initiates a connection from the peer `Alice` to the peer `server`.
 This is illustrated in the screenshot below.
@@ -61,7 +61,7 @@ The record from `server` represents the receiver's perspective. Because `server`
 
 #### Blocked P2P Connections Events
 
-If a connection is refused, NetBird logs the blocked event on the peer that denies the connection, in this case, `server`.
+If a connection is refused, NetBirdy logs the blocked event on the peer that denies the connection, in this case, `server`.
 The initiating peer `Alice` will still report the connection attempt but won't be aware that it was blocked.
 
 In this scenario, the `IT Admins to Servers` policy is configured to allow only ping requests (`ICMP`),
@@ -72,14 +72,14 @@ meaning all `HTTP` requests are intentionally not allowed. The screenshot below 
 
 ### Peer-to-Network Resource Connections
 
-When a peer connects to a [network resource](/manage/networks#resources), NetBird captures and logs the traffic
+When a peer connects to a [network resource](/manage/networks#resources), NetBirdy captures and logs the traffic
 events for that connection on the peer that initiated the connection, and on the [routing peer](/manage/networks#routing-peers) that connects the peer to
 the internal network resource.
 
-A slightly modified example of the CRM server connection scenario would be if instead of running the NetBird client on the CRM server,
-you used the [NetBird Networks feature](/manage/networks) and created a network resource for the CRM server. In this case, if a user accessed an internal CRM from their laptop via a browser
-and port 443, NetBird would log the traffic events for that connection on the user's machine and the routing peer that
-routed the connection to the CRM server. If the connection was blocked, NetBird would log the blocked event on the routing peer.
+A slightly modified example of the CRM server connection scenario would be if instead of running the NetBirdy client on the CRM server,
+you used the [NetBirdy Networks feature](/manage/networks) and created a network resource for the CRM server. In this case, if a user accessed an internal CRM from their laptop via a browser
+and port 443, NetBirdy would log the traffic events for that connection on the user's machine and the routing peer that
+routed the connection to the CRM server. If the connection was blocked, NetBirdy would log the blocked event on the routing peer.
 
 <p>
     <img src="" alt="traffic-events-routed-diagram" className="imagewrapper-big"/>
@@ -88,7 +88,7 @@ routed the connection to the CRM server. If the connection was blocked, NetBird 
 #### Successful Peer-to-Network Resource Events
 
 The screenshot below illustrates a successful connection from `Alice` to the network resource `CRM` running in the AWS VPC.
-The traffic is routed through a routing peer, which logs the connection event and reports it to the NetBird servers.
+The traffic is routed through a routing peer, which logs the connection event and reports it to the NetBirdy servers.
 The access is permitted by the policy `IT Admins to AWS Servers`, which allows connections over the `TCP` protocol on port `443`.
 Note the `ROUTER` column in the table, which identifies the routing peer responsible for routing to the internal network resource.
 
@@ -116,7 +116,7 @@ The routing peer's aggregate shows the number of dropped attempts, so repeated a
 
 ## Event Aggregation
 
-Starting with v0.75, clients aggregate related traffic events before reporting them. For a given source address and direction, a group is identified by protocol, destination address, destination port for TCP or UDP, and ICMP type for ICMP traffic. Source port and ICMP code do not split aggregates. During each reporting window, NetBird accumulates:
+Starting with v0.75, clients aggregate related traffic events before reporting them. For a given source address and direction, a group is identified by protocol, destination address, destination port for TCP or UDP, and ICMP type for ICMP traffic. Source port and ICMP code do not split aggregates. During each reporting window, NetBirdy accumulates:
 
 * connection start, end, and drop counts;
 * transmitted and received packet totals;
@@ -127,14 +127,14 @@ The Dashboard and API therefore present one flow record with counters for activi
 
 ## Enabling Traffic Events Logging
 
-Traffic events logging feature is disabled by default. To enable it on the NetBird dashboard, navigate to `Settings > Networks`.
+Traffic events logging feature is disabled by default. To enable it on the NetBirdy dashboard, navigate to `Settings > Networks`.
 Under the Experimental section, you'll find the `Enable Traffic Events` option. Toggle the switch to enable traffic event logging.
 
 By default, traffic reporting in userspace is always enabled, providing basic logging of network interactions.
 However, packet size reporting at the kernel level is disabled by default to minimize CPU usage.
 
 > **Note** You can optionally enable `Traffic Reporting (Kernel)` to capture additional details, such as network packet sizes,
-> at the kernel level. Be aware that enabling this option may lead to higher CPU usage on the NetBird client.
+> at the kernel level. Be aware that enabling this option may lead to higher CPU usage on the NetBirdy client.
 
 
 
@@ -155,7 +155,7 @@ choose the groups you want to include, and click `Save Groups`.
     <img src="" alt="traffic-events-groups-logging-settings" className="imagewrapper-big"/>
 </p>
 
-Changes to these settings, including the group scope, are pushed to connected peers and take effect without restarting the NetBird client. Every change is also recorded in the [audit events log](/manage/activity).
+Changes to these settings, including the group scope, are pushed to connected peers and take effect without restarting the NetBirdy client. Every change is also recorded in the [audit events log](/manage/activity).
 
 ## Log Retention
 
@@ -170,8 +170,8 @@ Aggregated flows might take up to **ten minutes** to become available through th
 
 ## Enable Traffic Events Streaming to SIEM Systems
 
-NetBird allows you to stream traffic events directly to your Security Information and Event Management (SIEM) system in real time.
-By enabling this feature, you can seamlessly monitor and analyze NetBird network flow events within your existing SIEM infrastructure,
+NetBirdy allows you to stream traffic events directly to your Security Information and Event Management (SIEM) system in real time.
+By enabling this feature, you can seamlessly monitor and analyze NetBirdy network flow events within your existing SIEM infrastructure,
 enhancing your ability to detect and respond to security events.
 
 For detailed instructions on supported integrations and how to set them up, refer to the [integrations guide](/manage/activity/event-streaming).
@@ -185,13 +185,13 @@ A streamed traffic event uses the same envelope as a streamed audit event: an ev
 * **Source and destination**: `source_id`, `source_name`, `source_addr`, `source_dns_label`, `source_connection_ip`, `source_geo_city`, and `source_geo_country`, with the same set of `destination_*` fields.
 * **Volume**: `rx_bytes`, `rx_packets`, `tx_bytes`, and `tx_packets`.
 * **Counts**: `num_of_starts`, `num_of_ends`, and `num_of_drops`.
-* **Timing**: `received_timestamp`, the time the event reached the NetBird servers.
+* **Timing**: `received_timestamp`, the time the event reached the NetBirdy servers.
 
 Compared with API responses, streamed events do not include the user's name or email, the aggregation window start and end, or the operating system of the source and destination. `user_id` is empty when the source peer has no associated user, such as a peer registered with a [setup key](/manage/peers/register-machines-using-setup-keys), and when the source is not a peer.
 
 ### Streaming delivery
 
-Each traffic event is saved to the traffic events store before it is streamed, so an event that fails to stream is still visible in the Dashboard and API. The NetBird client resends each event until the NetBird servers acknowledge it. Once an event reaches the servers, every step up to saving it is retried: the servers acknowledge an event only after queueing it, and remove it from the queue only after saving it. If server processing falls behind, events wait in the queue and arrive late rather than being dropped.
+Each traffic event is saved to the traffic events store before it is streamed, so an event that fails to stream is still visible in the Dashboard and API. The NetBirdy client resends each event until the NetBirdy servers acknowledge it. Once an event reaches the servers, every step up to saving it is retried: the servers acknowledge an event only after queueing it, and remove it from the queue only after saving it. If server processing falls behind, events wait in the queue and arrive late rather than being dropped.
 
 In rare cases, such as a server restart while an event is being processed, the same event can be streamed twice. Deduplicate on the event ID.
 
@@ -199,29 +199,29 @@ Changes to a stream destination take up to five minutes to apply, and what happe
 
 ## Traffic Events Data
 
-When enabled, a NetBird peer will record metadata for each network flow that it participates in. The data collected by peers includes:
+When enabled, a NetBirdy peer will record metadata for each network flow that it participates in. The data collected by peers includes:
 
 * **Window start and end**: The bounds of the aggregation window.
 * **Flow ID**: A unique identifier for the aggregated traffic flow.
 * **Event counts**: `num_of_starts`, `num_of_ends`, and `num_of_drops` for the group.
 * **Source and Destination IP Addresses**: The IP of the peer (source) and the IP of the remote endpoint (destination). For peer-to-peer traffic,
-these will be the NetBird network IPs (e.g. 100.x.x.x addresses of each peer). For traffic to an external resource (like a private server or subnet), the destination might be an IP in that remote network.
+these will be the NetBirdy network IPs (e.g. 100.x.x.x addresses of each peer). For traffic to an external resource (like a private server or subnet), the destination might be an IP in that remote network.
 * **Source and Destination Ports**: The network ports recorded for TCP/UDP flows. Destination port is part of the aggregation key; source port does not split aggregates.
 * **ICMP Type**: For ICMP traffic, the ICMP type used to group the flow. ICMP code does not split aggregates.
 * **Protocol**: The protocol of the traffic, such as TCP, UDP, or ICMP.
-* **Direction**: Whether the flow was inbound or outbound. This takes into consideration the perspective of the **peer reporting the traffic** and the NetBird interface.
+* **Direction**: Whether the flow was inbound or outbound. This takes into consideration the perspective of the **peer reporting the traffic** and the NetBirdy interface.
 * **Volume of Data**: Packet and byte totals sent and received during the aggregation window.
 * **Resource ID**: Network route or Networks resource ID that the flow is associated with. This is useful for identifying the routing configuration that allowed the flow. DNS route information is **available only** on the routing client.
 * **Rule ID**: The ID of the policy that allowed the flow. This is useful for identifying the access control policy that allowed the flow. This information is **available only** on the receiving side of the traffic.
 
-In addition to the data collected by the peers, the NetBird API provides additional context about the peers and resources involved in the traffic event. These details include:
+In addition to the data collected by the peers, the NetBirdy API provides additional context about the peers and resources involved in the traffic event. These details include:
 * **Peer Name**: The name of the peer.
 * **Peer ID**: The unique identifier of the peer.
 * **Resource name**: The name of the resource or network route.
 * **Policy Name**: The name of the policy that allowed the flow.
 * **User ID, name, and email**: The name and email of the user associated with the source peer. The API looks these up when you query it; [streamed events](#streamed-event-fields) carry the user ID only.
 * **Reporter ID**: The unique identifier of the peer that reported the traffic event.
-* **Received timestamp**: The timestamp when the event was received by the NetBird servers.
+* **Received timestamp**: The timestamp when the event was received by the NetBirdy servers.
 
 <details>
 <summary>API sample response</summary>
@@ -288,7 +288,7 @@ In addition to the data collected by the peers, the NetBird API provides additio
 </details>
 
 ## Viewing Traffic Events on the Dashboard
-There are two places where you can see the traffic events on the NetBird dashboard:
+There are two places where you can see the traffic events on the NetBirdy dashboard:
 1. **Traffic events**: Under Activity, you will find the Traffic events menu. This view shows the traffic events in a table format for all peers in your network.
 2. **Peer details**: When you click on a peer, you will see the traffic events for that peer in the Peer details view.
 
@@ -378,7 +378,7 @@ sudo netbird service reconfigure --service-env NB_WG_KERNEL_DISABLED=true,NB_FOR
 
 Some traffic never produces a traffic event, whatever the peer mode:
 
-* **DNS queries over UDP.** The NetBird client does not record UDP traffic to port `53`, or to ports `5353` and `22054`, which the NetBird DNS forwarder uses on routing peers. This also applies to other UDP traffic on these ports, such as mDNS. DNS over TCP is recorded as an ordinary flow.
+* **DNS queries over UDP.** The NetBirdy client does not record UDP traffic to port `53`, or to ports `5353` and `22054`, which the NetBirdy DNS forwarder uses on routing peers. This also applies to other UDP traffic on these ports, such as mDNS. DNS over TCP is recorded as an ordinary flow.
 * **Traffic through an exit node.** Flows matched to an exit node route (`0.0.0.0/0`) are not recorded, on the client or on the exit node. Traffic to a destination covered by a more specific route or Networks resource is still recorded.
 * **Access withdrawn by a failed posture check.** When a peer fails a [posture check](/manage/access-control/posture-checks), the policy stops applying and the connection between the peers is removed. No traffic reaches either peer's firewall, so there is nothing to record as allowed or blocked.
 

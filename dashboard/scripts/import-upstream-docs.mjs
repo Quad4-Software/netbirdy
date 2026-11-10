@@ -13,14 +13,14 @@ const OUT = path.join(DASH, "content", "docs", "upstream");
 const IMG_OUT = path.join(DASH, "public", "docs-img");
 const UPSTREAM_SHA = process.env.UPSTREAM_SHA || "2382247";
 const ADAPTED =
-  "> **Note** This page is adapted from the upstream NetBird documentation (BSD-3-Clause) and may describe features that NetBirdy does not include.\n\n";
+  "> **Note** This page is adapted from the upstream NetBirdy documentation (BSD-3-Clause) and may describe features that NetBirdy does not include.\n\n";
 
 // Ordered list of upstream pages (relative to src/pages) to import.
 const PAGES = (await fs.readFile(new URL("./upstream-pages.txt", import.meta.url), "utf8"))
   .split("\n").map((l) => l.trim()).filter((l) => l && !l.startsWith("#"));
 
 const TITLES = {
-  "how-netbird-works": "How NetBird Works",
+  "how-netbird-works": "How NetBirdy Works",
 };
 
 // slugify a filename or title
@@ -59,7 +59,7 @@ export function dropCloudSections(src) {
   const lines = src.split("\n");
   const out = [];
   let skipDepth = 0;
-  const re = /^(#{1,4})\s.*\b(Cloud|Enterprise|Billing|MSP|NetBird Cloud|Pricing)\b/i;
+  const re = /^(#{1,4})\s.*\b(Cloud|Enterprise|Billing|MSP|NetBirdy Cloud|Pricing)\b/i;
   for (const line of lines) {
     const h = /^(#{1,4})\s/.exec(line);
     if (h) {

@@ -5,70 +5,70 @@ order: 112
 upstream: "manage/peers/ssh.mdx@2382247"
 ---
 
-> **Note** This page is adapted from the upstream NetBird documentation (BSD-3-Clause) and may describe features that NetBirdy does not include.
+> **Note** This page is adapted from the upstream NetBirdy documentation (BSD-3-Clause) and may describe features that NetBirdy does not include.
 
 # SSH Access
 
-NetBird provides SSH access to peers through its built-in SSH server. Unlike traditional SSH setups that require exposing port 22 to the internet, NetBird SSH operates entirely over your private network. You can connect using either the `netbird ssh` command or native OpenSSH clients.
+NetBirdy provides SSH access to peers through its built-in SSH server. Unlike traditional SSH setups that require exposing port 22 to the internet, NetBirdy SSH operates entirely over your private network. You can connect using either the `netbird ssh` command or native OpenSSH clients.
 
-NetBird SSH supports fine-grained access control, allowing you to specify which NetBird users can access which local OS users on target machines.
+NetBirdy SSH supports fine-grained access control, allowing you to specify which NetBirdy users can access which local OS users on target machines.
 
 > **Note** SSH Access is disabled by default and must be enabled both on the target
->     peer and in the NetBird Dashboard.
+>     peer and in the NetBirdy Dashboard.
 
 
 ## Concepts
 
 ### SSH Server
 
-Each NetBird peer can run an embedded SSH server by enabling `--allow-server-ssh`. From the peer's perspective the session arrives on its normal port (TCP 22); internally it's re-routed to the NetBird client on port 22022. 
+Each NetBirdy peer can run an embedded SSH server by enabling `--allow-server-ssh`. From the peer's perspective the session arrives on its normal port (TCP 22); internally it's re-routed to the NetBirdy client on port 22022. 
 
-Management may automatically ensure the mesh access policy permits 22022 for a peer when the policy explicitly allows port 22 (or a range containing 22) and the peer advertises native SSH support (NetBird v0.60.0+). That access policy is distributed by the management plane; enforcement and forwarding are performed by the NetBird client on the peer.
+Management may automatically ensure the mesh access policy permits 22022 for a peer when the policy explicitly allows port 22 (or a range containing 22) and the peer advertises native SSH support (NetBirdy v0.60.0+). That access policy is distributed by the management plane; enforcement and forwarding are performed by the NetBirdy client on the peer.
 
 ### Authentication Methods
 
 - **JWT Authentication (default)**: Maps SSH sessions to user identities via your configured Identity Provider (OIDC). Each new session will require completing the OIDC flow to mint the JWT used for SSH authentication (unless JWT caching is enabled, in which case JWT tokens are cached for a configurable duration). Combined with fine-grained access control, this allows you to control exactly which authenticated users can access which local OS users on the target machine.
-- **Machine Identity (`--disable-ssh-auth`)**: When SSH auth is disabled, SSH access is governed by NetBird network ACLs (machine-level access) rather than per-user JWT identity.
+- **Machine Identity (`--disable-ssh-auth`)**: When SSH auth is disabled, SSH access is governed by NetBirdy network ACLs (machine-level access) rather than per-user JWT identity.
 
 ### OpenSSH Integration
 
-NetBird can provide configuration so the remote peer's OpenSSH clients behave transparently. The remote peer's NetBird client performs interception and JWT handling; NetBird may install OpenSSH configuration snippets on the client to simplify usage. The interception and forwarding logic lives in the remote peer's NetBird client, not the management server.
+NetBirdy can provide configuration so the remote peer's OpenSSH clients behave transparently. The remote peer's NetBirdy client performs interception and JWT handling; NetBirdy may install OpenSSH configuration snippets on the client to simplify usage. The interception and forwarding logic lives in the remote peer's NetBirdy client, not the management server.
 
 ### Port 22 Redirection
 
 The management server does not edit your host OS firewall or perform OS-level port redirects. The model is:
 
 - **22** - the standard SSH port used by SSH clients and the local SSH daemon.
-- **22022** - the NetBird-native endpoint used by the NetBird client on remote peers. When NetBird SSH is enabled for a peer, standard SSH traffic is redirected here. 
+- **22022** - the NetBirdy-native endpoint used by the NetBirdy client on remote peers. When NetBirdy SSH is enabled for a peer, standard SSH traffic is redirected here. 
 
 **Behavior:**
 
-- A modern NetBird client can intercept an `ssh user@remote` (which targets remote:22) and redirect the SSH stream to the NetBird client on port 22022. 
-- Management will auto-add a NetBird access-policy rule for 22022 when a policy allows 22 (or a range containing 22) and the peer supports native SSH (v0.60.0+) and SSH is enabled on the peer in the NetBird dashboard.
+- A modern NetBirdy client can intercept an `ssh user@remote` (which targets remote:22) and redirect the SSH stream to the NetBirdy client on port 22022. 
+- Management will auto-add a NetBirdy access-policy rule for 22022 when a policy allows 22 (or a range containing 22) and the peer supports native SSH (v0.60.0+) and SSH is enabled on the peer in the NetBirdy dashboard.
 
 ## Requirements
 
-To use SSH access through NetBird, you need:
+To use SSH access through NetBirdy, you need:
 
-1. **NetBird v0.61.0 or later** on all peers using SSH (both clients and servers). For fine-grained access control features, v0.61.0 is required.
+1. **NetBirdy v0.61.0 or later** on all peers using SSH (both clients and servers). For fine-grained access control features, v0.61.0 is required.
 2. **SSH enabled on target peer** - the peer must run with `--allow-server-ssh`.
-3. **Access Control Policy** - A `NetBird SSH` policy configured in the dashboard
-4. **(Optional)** For JWT authentication: an Identity Provider configured in NetBird.
+3. **Access Control Policy** - A `NetBirdy SSH` policy configured in the dashboard
+4. **(Optional)** For JWT authentication: an Identity Provider configured in NetBirdy.
 
-> **Note** Management distributes NetBird access-policy objects (FirewallRule) - it does
+> **Note** Management distributes NetBirdy access-policy objects (FirewallRule) - it does
 >     not directly open host OS ports or edit host-level firewalls. Enforcement and
->     forwarding are handled by the NetBird client running on each peer.
+>     forwarding are handled by the NetBirdy client running on each peer.
 
 
 ## Enabling SSH
 
 ### Step 1: Enable SSH Server on Target Peer
 
-On the machine you want to access via SSH, enable the NetBird SSH server.
+On the machine you want to access via SSH, enable the NetBirdy SSH server.
 
 **Using the GUI:**
 
-1. Open the NetBird desktop app.
+1. Open the NetBirdy desktop app.
 2. Go to **Settings → SSH**.
 3. Toggle **Enable SSH Server**. Configure local forwarding, remote forwarding, SFTP, or root access only when required.
 
@@ -90,14 +90,14 @@ On the machine you want to access via SSH, enable the NetBird SSH server.
 
 
 <p>
-    <img src="/docs-img/docs-static-img-manage-peers-ssh-ssh-client.png" alt="SSH server settings in the NetBird desktop app"
+    <img src="/docs-img/docs-static-img-manage-peers-ssh-ssh-client.png" alt="SSH server settings in the NetBirdy desktop app"
          className="imagewrapper"/>
 </p>
 
 **Using the CLI:**
 
 ```bash
-sudo netbird down  # if NetBird is already running
+sudo netbird down  # if NetBirdy is already running
 sudo netbird up --allow-server-ssh
 ```
 
@@ -134,22 +134,22 @@ sudo netbird up --allow-server-ssh \
 
 Create an ACL policy to allow SSH access:
 
-1. Log in to your NetBird Dashboard
+1. Log in to your NetBirdy Dashboard
 2. Navigate to **Access Control**
 3. Create a new policy:
 - **Source**: Select the peers or groups that will connect via SSH
 - **Destination**: Select the peers or groups running the SSH server
-- **Protocol**: Select `NetBird SSH` for SSH-specific policies with fine-grained access control, or use `TCP` with port 22 for basic network-level SSH access
-- **Authorized Groups** (when using NetBird SSH protocol): Configure which user groups can access which local OS users on the destination machines
+- **Protocol**: Select `NetBirdy SSH` for SSH-specific policies with fine-grained access control, or use `TCP` with port 22 for basic network-level SSH access
+- **Authorized Groups** (when using NetBirdy SSH protocol): Configure which user groups can access which local OS users on the destination machines
 4. Save the policy
 
 <p>
     <img src="/docs-img/docs-static-img-manage-peers-ssh-ssh-access-policy.png" alt="netbird ssh access policy" className="imagewrapper"/>
 </p>
 
-## Using NetBird SSH
+## Using NetBirdy SSH
 
-### NetBird CLI Client
+### NetBirdy CLI Client
 
 The simplest way to connect is using the `netbird ssh` command:
 
@@ -177,7 +177,7 @@ For detailed CLI usage, see the [CLI documentation](/get-started/cli#ssh).
 
 ### Native SSH Clients (OpenSSH)
 
-NetBird automatically configures OpenSSH through a drop-in configuration file.
+NetBirdy automatically configures OpenSSH through a drop-in configuration file.
 
 > **Note** Currently, only OpenSSH clients are supported. Other SSH clients (PuTTY,
 >     etc.) are not compatible.
@@ -185,8 +185,8 @@ NetBird automatically configures OpenSSH through a drop-in configuration file.
 
 **Prerequisites:**
 
-NetBird creates `/etc/ssh/ssh_config.d/99-netbird.conf` (or equivalent on your OS) which automatically:
-1. Detects if the target is a NetBird SSH server
+NetBirdy creates `/etc/ssh/ssh_config.d/99-netbird.conf` (or equivalent on your OS) which automatically:
+1. Detects if the target is a NetBirdy SSH server
 2. Handles JWT authentication transparently
 3. Handles server host key verification
 
@@ -210,9 +210,9 @@ scp file.txt user@100.119.230.104:/path/to/destination
 
 When you run `ssh user@<netbird-peer>`:
 
-1. OpenSSH reads the NetBird configuration from `99-netbird.conf`
-2. NetBird detects if the target is a NetBird SSH server
-3. If detected, NetBird handles JWT authentication automatically (OIDC flow if needed)
+1. OpenSSH reads the NetBirdy configuration from `99-netbird.conf`
+2. NetBirdy detects if the target is a NetBirdy SSH server
+3. If detected, NetBirdy handles JWT authentication automatically (OIDC flow if needed)
 4. The SSH connection is established with your user identity
 
 ### Browser Client
@@ -223,9 +223,9 @@ For SSH access directly from your web browser without installing any software, r
 
 ### JWT Authentication (Default)
 
-By default, NetBird SSH uses JWT-based authentication with the configured Identity Provider. This provides user identity verification instead of machine identity.
+By default, NetBirdy SSH uses JWT-based authentication with the configured Identity Provider. This provides user identity verification instead of machine identity.
 
-NetBird supports fine-grained user mapping, allowing you to specify which OIDC users or groups can connect to which local OS users on the target system. See [Fine-Grained Access Control](#fine-grained-access-control) for details.
+NetBirdy supports fine-grained user mapping, allowing you to specify which OIDC users or groups can connect to which local OS users on the target system. See [Fine-Grained Access Control](#fine-grained-access-control) for details.
 
 > **Note** **Time synchronization required**: The SSH server's system clock must be
 >     synchronized with the IdP for JWT validation. Clock skew can cause
@@ -234,11 +234,11 @@ NetBird supports fine-grained user mapping, allowing you to specify which OIDC u
 
 **How it works:**
 
-1. When you connect via SSH, the NetBird client requests a JWT token
+1. When you connect via SSH, the NetBirdy client requests a JWT token
 2. If no cached token exists or the token is expired:
-- NetBird initiates an OIDC flow
+- NetBirdy initiates an OIDC flow
 - A URL is displayed that you must open in your browser to authenticate with the IdP
-- After successful login, NetBird receives and caches the JWT token
+- After successful login, NetBirdy receives and caches the JWT token
 3. The client sends the JWT to the SSH server
 4. The server validates the JWT using the JWKS endpoint configured in the management server
 5. If valid, the SSH session is established with the user identity from the JWT
@@ -270,7 +270,7 @@ netbird up --ssh-jwt-cache-ttl 0
 **When caching is enabled:**
 - JWT tokens are cached on the client for the specified TTL in seconds
 - Reduces repeated authentication prompts
-- Cached tokens expire after the configured TTL or when the NetBird daemon is restarted
+- Cached tokens expire after the configured TTL or when the NetBirdy daemon is restarted
 
 ### Machine Identity (--disable-ssh-auth)
 
@@ -294,13 +294,13 @@ netbird up --allow-server-ssh --disable-ssh-auth
 
 ## Fine-Grained Access Control
 
-NetBird SSH allows you to configure granular access control that maps NetBird users to specific local OS users on target machines. This provides precise control over who can access what on your infrastructure.
+NetBirdy SSH allows you to configure granular access control that maps NetBirdy users to specific local OS users on target machines. This provides precise control over who can access what on your infrastructure.
 
 ### How It Works
 
-When you create an SSH policy with the `NetBird SSH` protocol, you can configure **Authorized Groups** that define:
+When you create an SSH policy with the `NetBirdy SSH` protocol, you can configure **Authorized Groups** that define:
 
-1. **Source User Groups**: Which NetBird user groups are allowed to connect
+1. **Source User Groups**: Which NetBirdy user groups are allowed to connect
 2. **Local User Mapping**: Which local OS users each group can access on the destination machines
 
 For example, you can configure:
@@ -313,7 +313,7 @@ For example, you can configure:
 When creating or editing an SSH policy in the Dashboard:
 
 1. Navigate to **Access Control** and click **Create Policy**
-2. Select **NetBird SSH** as the protocol
+2. Select **NetBirdy SSH** as the protocol
 3. Configure the **Source** - select the user groups that will connect via SSH
 4. Configure the **Destination** - select the peers or groups running the SSH server
 5. Under **SSH Access**, choose the access level:
@@ -345,8 +345,8 @@ When a user attempts to SSH into a peer:
 
 1. The user authenticates via OIDC to obtain a JWT token
 2. The JWT contains the user's identity (user ID from the `sub` claim by default)
-3. NetBird checks if the user's ID is in the list of authorized users for this peer
-4. NetBird verifies the user is allowed to access the requested local OS user based on the policy's authorized groups configuration
+3. NetBirdy checks if the user's ID is in the list of authorized users for this peer
+4. NetBirdy verifies the user is allowed to access the requested local OS user based on the policy's authorized groups configuration
 5. If authorized, the SSH session is established as the specified local user
 
 > **Note** Fine-grained access control requires JWT authentication to be enabled (the default). It is not available when using `--disable-ssh-auth`.
@@ -363,7 +363,7 @@ When a user attempts to SSH into a peer:
 
 ### Port Forwarding
 
-NetBird SSH supports both local and remote port forwarding, allowing you to create secure tunnels through the SSH connection.
+NetBirdy SSH supports both local and remote port forwarding, allowing you to create secure tunnels through the SSH connection.
 
 **Local Port Forwarding:**
 
@@ -434,7 +434,7 @@ netbird ssh user@100.119.230.104 "uptime"
 
 ### Supported Platforms
 
-NetBird SSH is supported on the following platforms:
+NetBirdy SSH is supported on the following platforms:
 
 - **Linux**: Full support (all features)
 - **macOS**: Full support (all features)
@@ -453,13 +453,13 @@ NetBird SSH is supported on the following platforms:
 
 - **User Switching**: Available when running as root
 - The SSH server can switch to any user when running with root privileges
-- Non-root NetBird (e.g., rootless containers) will run sessions under the given account
+- Non-root NetBirdy (e.g., rootless containers) will run sessions under the given account
 - **All features supported**: Full feature parity across these platforms
 
 #### Android
 
 - **Server-only**: SSH client functionality not available
-- **Server features**: Can run NetBird SSH server (configured via GUI)
+- **Server features**: Can run NetBirdy SSH server (configured via GUI)
 
 ## Known Limitations
 
@@ -472,15 +472,15 @@ Port forwarding has the following limitations:
 - This is a current implementation limitation
 - Use `netbird ssh -L` or `netbird ssh -R` instead of `ssh -L` or `ssh -R`
 - **Not supported on Windows servers**: SSH servers running on Windows cannot accept port forwarding requests
-- **No user switching with port forwarding**: Port forwarding only works when connecting as the user running the NetBird process
+- **No user switching with port forwarding**: Port forwarding only works when connecting as the user running the NetBirdy process
 
 ### User Mapping
 
-NetBird now supports fine-grained user mapping through the `NetBird SSH` protocol and Authorized Groups configuration. See [Fine-Grained Access Control](#fine-grained-access-control) for details.
+NetBirdy now supports fine-grained user mapping through the `NetBirdy SSH` protocol and Authorized Groups configuration. See [Fine-Grained Access Control](#fine-grained-access-control) for details.
 
 **Requirements for user switching:**
-- The NetBird SSH server must run with root/administrator privileges to switch between local users
-- Non-root NetBird installations (e.g., rootless containers) will run all sessions under the NetBird process account
+- The NetBirdy SSH server must run with root/administrator privileges to switch between local users
+- Non-root NetBirdy installations (e.g., rootless containers) will run all sessions under the NetBirdy process account
 - On Windows, sessions connect as Administrator-equivalent users
 
 ### Feature Availability
@@ -498,13 +498,13 @@ Some features require specific flags to be enabled on the SSH server:
 
 SSH access is controlled by multiple layers:
 
-1. **Network ACL policies**: Control which peers can access SSH with dedicated 'NetBird SSH' protocol policies
+1. **Network ACL policies**: Control which peers can access SSH with dedicated 'NetBirdy SSH' protocol policies
 2. **JWT authentication** (if enabled): User identity verification via IdP
-3. **Fine-grained access control** (when using NetBird SSH protocol): Controls which authenticated users can access which local OS users on the target machine
+3. **Fine-grained access control** (when using NetBirdy SSH protocol): Controls which authenticated users can access which local OS users on the target machine
 
 ## Disable SSH server
 
-To disable the Netbird SSH server run `netbird down && netbird up --allow-server-ssh=false`
+To disable the NetBirdy SSH server run `netbird down && netbird up --allow-server-ssh=false`
 
 ## Troubleshooting
 
@@ -520,7 +520,7 @@ To disable the Netbird SSH server run `netbird down && netbird up --allow-server
 
 - Complete the OIDC flow when prompted
 - Verify the IdP is properly configured
-- Check if your JWT token is expired (NetBird will request a new one)
+- Check if your JWT token is expired (NetBirdy will request a new one)
 - Ensure the SSH server's system clock is synchronized (time skew causes JWT validation failures)
 - For `--disable-ssh-auth`: Ensure ACL policy allows access
 
@@ -559,7 +559,7 @@ To disable the Netbird SSH server run `netbird down && netbird up --allow-server
 **"User is not authorized to access this peer"**
 
 - Verify the user's group is included in the SSH policy's source groups
-- Check that the policy uses the `NetBird SSH` protocol
+- Check that the policy uses the `NetBirdy SSH` protocol
 - Ensure the user has authenticated via OIDC
 
 **"User is not authorized to login as OS user"**
@@ -583,13 +583,13 @@ For complete CLI command reference, including all SSH-related commands and flags
 
 Version 0.61.0 introduces fine-grained SSH access control.
 
-> **Note** **Breaking change**: Management server v0.61.0 will break NetBird SSH for all peers running versions older than v0.61.0. You must update all peers that use SSH to v0.61.0 or later before upgrading the management server/dashboard.
+> **Note** **Breaking change**: Management server v0.61.0 will break NetBirdy SSH for all peers running versions older than v0.61.0. You must update all peers that use SSH to v0.61.0 or later before upgrading the management server/dashboard.
 
 
 #### New Capabilities
 
-- **NetBird SSH protocol**: New protocol type in policies specifically for SSH access control
-- **Fine-grained user mapping**: Map NetBird user groups to specific local OS users
+- **NetBirdy SSH protocol**: New protocol type in policies specifically for SSH access control
+- **Fine-grained user mapping**: Map NetBirdy user groups to specific local OS users
 - **Authorized Groups**: Configure which users can access which local accounts per policy
 - **Full Access vs Limited Access**: Choose between unrestricted local user access or granular per-group mappings
 - **Enhanced security**: Fail-closed authorization model with granular audit trail
@@ -608,10 +608,10 @@ Version 0.61.0 introduces fine-grained SSH access control.
 
 4. **Update the dashboard** to v0.61.0
 
-5. **Create NetBird SSH policy**:
+5. **Create NetBirdy SSH policy**:
    - Source: SSH client user groups
    - Destination: SSH server peers/groups
-   - Protocol: NetBird SSH
+   - Protocol: NetBirdy SSH
    - SSH Access: Full Access or Limited Access
    - If Limited Access: configure local user mappings per source group
 
@@ -619,9 +619,9 @@ Version 0.61.0 introduces fine-grained SSH access control.
 
 ### v0.60.0
 
-Version 0.60.0 is a complete rewrite of NetBird SSH with breaking changes.
+Version 0.60.0 is a complete rewrite of NetBirdy SSH with breaking changes.
 
-> **Note** This section is only relevant if you're upgrading from NetBird v0.59.x or earlier.
+> **Note** This section is only relevant if you're upgrading from NetBirdy v0.59.x or earlier.
 
 
 #### New Capabilities
@@ -637,7 +637,7 @@ Version 0.60.0 is a complete rewrite of NetBird SSH with breaking changes.
 
 - Server port changed from 44338 to 22 (22022 internally)
 - Authentication changed from machine public keys to JWT tokens (user identity)
-- Port 22 automatically redirects to 22022 for NetBird traffic
+- Port 22 automatically redirects to 22022 for NetBirdy traffic
 - Old implicit firewall rule removed - explicit ACL policy required for port 22
 - Client no longer requires `sudo` for authentication
 - **Not backward compatible**: v0.60.0+ clients cannot connect to older servers and vice versa
@@ -681,10 +681,10 @@ netbird up --ssh-jwt-cache-ttl 3600  # 1 hour
 ## Get started
 <div>
      window.open("https://netbird.io/pricing")}>Use
-        NetBird
+        NetBirdy
 </div>
 
 - Make sure to [star us on GitHub](https://github.com/netbirdio/netbird)
 - Follow us [on X](https://x.com/netbird)
 - Join our [Slack Channel](/slack-url)
-- NetBird [latest release](https://github.com/netbirdio/netbird/releases) on GitHub
+- NetBirdy [latest release](https://github.com/netbirdio/netbird/releases) on GitHub

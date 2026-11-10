@@ -37,7 +37,6 @@ import (
 	"github.com/netbirdio/netbird/client/internal/stdnet"
 	"github.com/netbirdio/netbird/client/internal/tunnelnotifier"
 	"github.com/netbirdio/netbird/client/internal/updater"
-	"github.com/netbirdio/netbird/shared/updater/installer"
 	nbnet "github.com/netbirdio/netbird/client/net"
 	"github.com/netbirdio/netbird/client/netevents"
 	cProto "github.com/netbirdio/netbird/client/proto"
@@ -49,6 +48,7 @@ import (
 	"github.com/netbirdio/netbird/shared/relay/auth/hmac"
 	relayClient "github.com/netbirdio/netbird/shared/relay/client"
 	signal "github.com/netbirdio/netbird/shared/signal/client"
+	"github.com/netbirdio/netbird/shared/updater/installer"
 	"github.com/netbirdio/netbird/util"
 	"github.com/netbirdio/netbird/version"
 )
@@ -100,10 +100,10 @@ func WithNetEvents(events *netevents.Manager) ConnectClientOption {
 	return func(c *ConnectClient) { c.netMgr = events }
 }
 
-// WithProfileOwner names the OS account the active profile belongs to, whose own
-// certificate store answers user certificate posture checks.
-func WithProfileOwner(username string) ConnectClientOption {
-	return func(c *ConnectClient) { c.profileOwner = username }
+// WithProfileOwner names the account the active profile belongs to, by uid or SID, whose
+// own certificate store answers user certificate posture checks.
+func WithProfileOwner(owner string) ConnectClientOption {
+	return func(c *ConnectClient) { c.profileOwner = owner }
 }
 
 // WithUnknownProfileOwner records that the active profile's owner could not be

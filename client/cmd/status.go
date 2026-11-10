@@ -15,6 +15,7 @@ import (
 	"github.com/netbirdio/netbird/client/proto"
 	nbstatus "github.com/netbirdio/netbird/client/status"
 	"github.com/netbirdio/netbird/util"
+	"github.com/netbirdio/netbird/version"
 )
 
 var (
@@ -35,8 +36,8 @@ var (
 
 var statusCmd = &cobra.Command{
 	Use:   "status",
-	Short: "Display NetBird client status",
-	Long:  "Display the current status of the NetBird client, including connection status, peer information, and network details.",
+	Short: "Display NetBirdy client status",
+	Long:  "Display the current status of the NetBirdy client, including connection status, peer information, and network details.",
 	RunE:  statusFunc,
 }
 
@@ -47,8 +48,8 @@ func init() {
 	statusCmd.PersistentFlags().BoolVarP(&tableFlag, "table", "t", false, "display peers in a table, supports the --filter-by-* flags")
 	statusCmd.PersistentFlags().BoolVarP(&jsonFlag, "json", "j", false, "display detailed status information in json format")
 	statusCmd.PersistentFlags().BoolVarP(&yamlFlag, "yaml", "y", false, "display detailed status information in yaml format")
-	statusCmd.PersistentFlags().BoolVarP(&ipv4Flag, "ipv4", "4", false, "display only NetBird IPv4 of this peer, e.g., --ipv4 will output 100.64.0.33")
-	statusCmd.PersistentFlags().BoolVarP(&ipv6Flag, "ipv6", "6", false, "display only NetBird IPv6 of this peer")
+	statusCmd.PersistentFlags().BoolVarP(&ipv4Flag, "ipv4", "4", false, "display only NetBirdy IPv4 of this peer, e.g., --ipv4 will output 100.64.0.33")
+	statusCmd.PersistentFlags().BoolVarP(&ipv6Flag, "ipv6", "6", false, "display only NetBirdy IPv6 of this peer")
 	statusCmd.MarkFlagsMutuallyExclusive("detail", "table", "json", "yaml", "ipv4", "ipv6")
 	statusCmd.PersistentFlags().StringSliceVarP(&ipsFilter, "filter-by-ips", "I", []string{}, "filters the detailed output by a list of one or more IPs (v4 or v6), e.g., --filter-by-ips 100.64.0.100,fd00::1")
 	statusCmd.PersistentFlags().StringSliceVarP(&prefixNamesFilter, "filter-by-names", "N", []string{}, "filters the detailed output by a list of one or more peer FQDN or hostnames, e.g., --filter-by-names peer-a,peer-b.netbird.cloud")
@@ -97,6 +98,34 @@ func statusFunc(cmd *cobra.Command, args []string) error {
 			"More info: https://docs.netbird.io/how-to/register-machines-using-setup-keys\n\n",
 			resp.GetStatus(),
 		)
+		return nil
+	}
+
+	if resp.GetFullStatus() == nil {
+		output := nbstatus.OutputOverview{
+			DaemonVersion: resp.GetDaemonVersion(),
+			CliVersion:    version.NetbirdVersion(),
+			DaemonStatus:  nbstatus.DaemonStatus(status),
+		}
+		var outputString string
+		var err error
+		switch {
+		case jsonFlag:
+			outputString, err = output.JSON()
+		case yamlFlag:
+			outputString, err = output.YAML()
+		default:
+			outputString = fmt.Sprintf("Daemon status: %s\n"+
+				"Daemon version: %s\nCLI version: %s\n\n"+
+				"Detailed status is unavailable: the connection belongs to another user.\n",
+				status, resp.GetDaemonVersion(), version.NetbirdVersion())
+		}
+
+		if err != nil {
+			return err
+		}
+
+		cmd.Print(outputString)
 		return nil
 	}
 
@@ -167,10 +196,7 @@ func statusFunc(cmd *cobra.Command, args []string) error {
 func getStatus(ctx context.Context, fullPeerStatus bool, shouldRunProbes bool) (*proto.StatusResponse, error) {
 	conn, err := DialClientGRPCServer(ctx, daemonAddr)
 	if err != nil {
-		//nolint
-		return nil, fmt.Errorf("failed to connect to daemon error: %v\n"+
-			"If the daemon is not running please run: "+
-			"\nnetbird service install \nnetbird service start\n", err)
+		return nil, daemonConnectError(err)
 	}
 	defer conn.Close()
 

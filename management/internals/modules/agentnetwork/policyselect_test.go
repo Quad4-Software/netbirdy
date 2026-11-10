@@ -6,9 +6,9 @@ import (
 	"testing"
 	"time"
 
-	"go.uber.org/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"go.uber.org/mock/gomock"
 
 	"github.com/netbirdio/netbird/management/internals/modules/agentnetwork/types"
 	"github.com/netbirdio/netbird/management/server/store"
@@ -597,6 +597,7 @@ func TestSelectPolicy_BudgetOnlyExhaustionDenies(t *testing.T) {
 	assert.Equal(t, denyCodeBudgetCapExceeded, res.DenyCode,
 		"deny code must be the budget code — token-only deny would silently regress the budget evaluation path")
 	assert.Contains(t, res.DenyReason, "budget", "deny reason names the budget cap kind for operator debugging")
+	assert.Equal(t, "pol-budget", res.SelectedPolicyID, "deny must name the policy whose cap blocked the request")
 }
 
 // TestSelectPolicy_BudgetTighterThanTokenWins is the dual-cap headroom

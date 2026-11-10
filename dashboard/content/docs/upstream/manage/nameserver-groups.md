@@ -1,11 +1,11 @@
 ---
 title: "Configuring Nameservers"
-description: "Configure DNS nameservers for your NetBird network"
+description: "Configure DNS nameservers for your NetBirdy network"
 order: 120
 upstream: "manage/dns/nameserver-groups.mdx@2382247"
 ---
 
-> **Note** This page is adapted from the upstream NetBird documentation (BSD-3-Clause) and may describe features that NetBirdy does not include.
+> **Note** This page is adapted from the upstream NetBirdy documentation (BSD-3-Clause) and may describe features that NetBirdy does not include.
 
 # Configuring Nameservers
 
