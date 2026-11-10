@@ -9,7 +9,7 @@ when:
 
 steps:
   - name: shell-syntax
-    image: alpine:3.21
+    image: alpine:3.24
     commands:
       - apk add --no-cache bash git
       - git config --global --add safe.directory '*'
@@ -26,12 +26,12 @@ steps:
         exit $rc
 
   - name: rebrand-check
-    image: alpine:3.21
+    image: alpine:3.24
     commands:
       - sh tools/rebrand/rebrand.sh --check
 
   - name: no-private-keys
-    image: alpine:3.21
+    image: alpine:3.24
     commands:
       - apk add --no-cache git
       - git config --global --add safe.directory '*'
@@ -40,7 +40,7 @@ steps:
         if [ -n "$found" ]; then printf '%s\n' "$found"; exit 1; fi
 
   - name: govulncheck
-    image: golang:1.27
+    image: golang:1.27.4
     commands:
-      - go run golang.org/x/vuln/cmd/govulncheck@v1.1.4 -format json ./... > vuln.json || true
+      - go run golang.org/x/vuln/cmd/govulncheck@v1.9.0 -format json ./... > vuln.json || true
       - sh scripts/govulncheck-filter.sh vuln.json

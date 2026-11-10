@@ -1,7 +1,7 @@
 # Multi-stage build of the NetBirdy combined server (netbirdy-server).
 # Build context is the repository root:
 #   podman build -f podman/Containerfile.server -t localhost/netbirdy-server .
-FROM docker.io/library/golang:1.27.2-bookworm AS builder
+FROM docker.io/library/golang:1.27.4-bookworm AS builder
 WORKDIR /app
 
 RUN apt-get update && apt-get install -y gcc libc6-dev git && rm -rf /var/lib/apt/lists/*

@@ -384,12 +384,12 @@ func TestSetConfig_MDMEmpty_NoEnforcement(t *testing.T) {
 }
 
 func TestSetConfig_MDMEnabledSSHProtectsManagementURL(t *testing.T) {
-	s, _, profName, username, _ := setupServerWithProfile(t)
+	s, _, profName, username, cfgPath := setupServerWithProfile(t)
 	withMDMPolicy(t, s, mdm.NewPolicy(map[string]any{
 		mdm.KeyAllowServerSSH: true,
 	}))
 
-	_, err := s.SetConfig(userCtx(), &proto.SetConfigRequest{
+	_, err := s.SetConfig(withTarget(userCtx(), cfgPath), &proto.SetConfigRequest{
 		ProfileName:   profName,
 		Username:      username,
 		ManagementUrl: "https://attacker.example.com:443",

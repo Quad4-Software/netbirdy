@@ -1,4 +1,4 @@
-FROM golang:1.27.2-alpine AS builder
+FROM golang:1.27.4-alpine AS builder
 WORKDIR /app
 
 RUN echo "netbirdy:x:1000:1000:netbirdy:/var/lib/netbird:/sbin/nologin" > /tmp/passwd && \

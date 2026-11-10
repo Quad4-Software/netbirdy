@@ -84,7 +84,7 @@ podman-test:
 		-v $(CURDIR):/src:ro,Z -w /src \
 		-v netbirdy-pnpm-store:/pnpm-store \
 		docker.io/library/node:24-bookworm \
-		sh -c "npm install -g pnpm@12.14.0 -q && pnpm config set store-dir /pnpm-store && pnpm install --frozen-lockfile --filter netbirdy-dashboard... && pnpm --filter netbirdy-dashboard lint || true; pnpm --filter netbirdy-dashboard exec tsc --noEmit --tsBuildInfoFile /tmp/tsconfig.tsbuildinfo && pnpm --filter netbirdy-dashboard test:unit"
+		sh -c "npm install -g pnpm@12.18.0 -q && pnpm config set store-dir /pnpm-store && pnpm install --frozen-lockfile --filter netbirdy-dashboard... && pnpm --filter netbirdy-dashboard lint || true; pnpm --filter netbirdy-dashboard exec tsc --noEmit --tsBuildInfoFile /tmp/tsconfig.tsbuildinfo && pnpm --filter netbirdy-dashboard test:unit"
 
 .PHONY: offline-e2e
 offline-e2e:

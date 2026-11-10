@@ -219,6 +219,40 @@ var notExposed = []struct {
 			"GET /api/events/proxy",
 		},
 	},
+	{
+		reason: "Event streaming integrations are not exposed yet, and their config carries sink credentials.",
+		operations: []string{
+			"GET /api/integrations/event-streaming",
+			"POST /api/integrations/event-streaming",
+			"PUT /api/integrations/event-streaming/{id}",
+			"DELETE /api/integrations/event-streaming/{id}",
+		},
+	},
+	{
+		reason: "Proxy Shield is not exposed yet.",
+		operations: []string{
+			"GET /api/proxy/shield",
+			"PUT /api/proxy/shield",
+			"POST /api/proxy/shield/unban",
+		},
+	},
+	{
+		reason: "The security engine is not exposed yet.",
+		operations: []string{
+			"GET /api/security/events",
+			"PUT /api/security/mode",
+			"GET /api/security/status",
+		},
+	},
+	{
+		reason: "Server backup configuration holds S3 credentials and is not exposed yet.",
+		operations: []string{
+			"GET /api/server/backup",
+			"PUT /api/server/backup",
+			"POST /api/server/backup/run",
+			"GET /api/server/backup/snapshots",
+		},
+	},
 }
 
 // httpMethods are the keys of an OpenAPI path item that hold an operation.

@@ -3,7 +3,7 @@
 # The image is built for platforms that assign an arbitrary UID at run time, so
 # it must not depend on a passwd entry and its state directory has to be
 # writable by the root group rather than by one named user.
-FROM alpine:3.22 AS build
+FROM alpine:3.24 AS build
 
 # Group 0 owns the state directory so a container started as any UID in that
 # group can still persist its identity. Mode 770 rather than g=u, because the

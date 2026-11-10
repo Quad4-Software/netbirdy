@@ -97,7 +97,7 @@ Auth0 so far is the only 3rd party dependency that can't be really self-hosted.
 
 1. Install [Node](https://nodejs.org/)
 2. Create and update the `.local-config.json` file. This file should contain values to be replaced from `config.json`
-3. Install dependencies from the repo root with `pnpm install --frozen-lockfile` (pnpm 12.14.0: `npm install -g pnpm@12.14.0` or corepack)
+3. Install dependencies from the repo root with `pnpm install --frozen-lockfile` (pnpm 12.18.0: `npm install -g pnpm@12.18.0` or corepack)
 4. Run `pnpm --filter netbirdy-dashboard dev` to start the development server
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.

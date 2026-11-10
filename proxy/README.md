@@ -82,8 +82,8 @@ When using ACME, the proxy server will store generated certificates in the speci
 
 The authentication UI is a Vite + React application located in the `web/` directory. It is embedded into the Go binary at build time.
 
-To build the UI (the workspace pins pnpm 12.14.0; install with
-`npm install -g pnpm@12.14.0` or corepack):
+To build the UI (the workspace pins pnpm 12.18.0; install with
+`npm install -g pnpm@12.18.0` or corepack):
 ```bash
 pnpm install --frozen-lockfile
 pnpm --filter web build
