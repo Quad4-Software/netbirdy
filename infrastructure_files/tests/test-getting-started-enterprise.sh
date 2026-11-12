@@ -109,13 +109,13 @@ assert_enterprise_appsec() {
   rendered=$(render_enterprise yes)
   traefik=$(printf '%s\n' "$rendered" | service_block traefik)
   dashboard=$(printf '%s\n' "$rendered" | service_block dashboard)
-  server=$(printf '%s\n' "$rendered" | service_block netbird-server)
+  server=$(printf '%s\n' "$rendered" | service_block netbirdy-server)
   crowdsec=$(printf '%s\n' "$rendered" | service_block crowdsec)
   if [[ "$traefik" == *$'\n\n'* ]]; then
     echo "AppSec: Traefik service contains a blank line" >&2
     exit 1
   fi
-  # netbird-server also waits on a healthy Postgres, so the dependency has to
+  # netbirdy-server also waits on a healthy Postgres, so the dependency has to
   # be found inside the Traefik block and name crowdsec.
   if [[ "$traefik" != *$'depends_on:\n      crowdsec:\n        condition: service_healthy'* ]]; then
     echo "AppSec: Traefik does not wait for CrowdSec" >&2
@@ -145,17 +145,17 @@ assert_enterprise_appsec() {
   fi
   # A missing AppSec middleware disables the protected routers. The backend
   # must not match API or OAuth2 requests while those routers are unavailable.
-  backend_rule=$(sed -n 's/^ *- traefik\.http\.routers\.netbird-backend\.rule=//p' <<< "$server")
+  backend_rule=$(sed -n 's/^ *- traefik\.http\.routers\.netbirdy-backend\.rule=//p' <<< "$server")
   if [[ "$backend_rule" != 'Host(`${NETBIRD_DOMAIN}`) && (PathPrefix(`/relay`) || PathPrefix(`/ws-proxy/`))' ]]; then
     echo "AppSec: backend router has an unexpected rule: $backend_rule" >&2
     exit 1
   fi
   for line in \
     'netbird-dashboard-api.middlewares=netbird-dashboard-crowdsec@docker,nb-security@docker' \
-    'netbird-dashboard-api.service=netbird-server' \
+    'netbird-dashboard-api.service=netbirdy-server' \
     'netbird-dashboard-api.priority=110'; do
     if ! grep -Fq "$line" <<< "$server"; then
-      echo "AppSec: netbird-server is missing '$line'" >&2
+      echo "AppSec: netbirdy-server is missing '$line'" >&2
       exit 1
     fi
   done
@@ -175,11 +175,11 @@ assert_enterprise_appsec() {
     echo "AppSec: API router includes relay" >&2
     exit 1
   fi
-  if grep -F 'netbird-grpc' <<< "$server" | grep -q 'crowdsec'; then
+  if grep -F 'netbirdy-grpc' <<< "$server" | grep -q 'crowdsec'; then
     echo "AppSec: gRPC router gained the AppSec middleware" >&2
     exit 1
   fi
-  if grep -F 'netbird-backend.middlewares' <<< "$server" | grep -q 'crowdsec'; then
+  if grep -F 'netbirdy-backend.middlewares' <<< "$server" | grep -q 'crowdsec'; then
     echo "AppSec: relay router gained the AppSec middleware" >&2
     exit 1
   fi
@@ -187,7 +187,7 @@ assert_enterprise_appsec() {
     echo "AppSec: proxy passthrough gained a middleware" >&2
     exit 1
   fi
-  if ! grep -Fq 'netbird-grpc.middlewares=nb-security@docker' <<< "$server"; then
+  if ! grep -Fq 'netbirdy-grpc.middlewares=nb-security@docker' <<< "$server"; then
     echo "AppSec: gRPC router lost nb-security" >&2
     exit 1
   fi
@@ -210,7 +210,7 @@ assert_enterprise_crowdsec_only() {
     exit 1
   fi
   local backend_rule
-  backend_rule=$(sed -n 's/^ *- traefik\.http\.routers\.netbird-backend\.rule=//p' <<< "$rendered")
+  backend_rule=$(sed -n 's/^ *- traefik\.http\.routers\.netbirdy-backend\.rule=//p' <<< "$rendered")
   if [[ "$backend_rule" != 'Host(`${NETBIRD_DOMAIN}`) && (PathPrefix(`/relay`) || PathPrefix(`/ws-proxy/`) || PathPrefix(`/api`) || PathPrefix(`/oauth2`))' ]]; then
     echo "AppSec off: backend router has an unexpected rule: $backend_rule" >&2
     exit 1

@@ -78,7 +78,7 @@ podman-test:
 	podman run --rm \
 		-v $(CURDIR):/src:ro,Z -w /src \
 		-v netbirdy-go-mod:/go/pkg/mod -v netbirdy-go-build:/root/.cache/go-build \
-		docker.io/library/golang:1.27.2-bookworm \
+		docker.io/library/golang:1.27.4-bookworm \
 		sh -c "apt-get update -qq && apt-get install -y -qq gcc libc6-dev >/dev/null && go build ./combined/... ./client/cmd/... && go test -tags devcert ./client/cmd/... ./combined/..."
 	podman run --rm \
 		-v $(CURDIR):/src:ro,Z -w /src \

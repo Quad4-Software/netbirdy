@@ -25,7 +25,7 @@ import (
 // (.github/workflows/golang-test-linux.yml, test_client_on_docker).
 const (
 	containerImage = "golang"
-	containerTag   = "1.27.2-alpine"
+	containerTag   = "1.27.4-alpine"
 )
 
 const (

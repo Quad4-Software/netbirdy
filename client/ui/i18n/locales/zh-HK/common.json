@@ -303,7 +303,7 @@
         "message": "載入中…",
         "description": "Generic loading indicator text. Ends with an ellipsis."
     },
-    "common.netbird": {
+    "common.netbirdy": {
         "message": "NetBirdy",
         "description": "The product name. Brand — do not translate."
     },

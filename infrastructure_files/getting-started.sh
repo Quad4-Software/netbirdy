@@ -1093,7 +1093,7 @@ EOF
       - traefik.http.routers.netbird-dashboard-api.entrypoints=websecure
       - traefik.http.routers.netbird-dashboard-api.tls=true
       - traefik.http.routers.netbird-dashboard-api.tls.certresolver=letsencrypt
-      - traefik.http.routers.netbird-dashboard-api.service=netbird-server
+      - traefik.http.routers.netbird-dashboard-api.service=netbirdy-server
       - traefik.http.routers.netbird-dashboard-api.middlewares=netbird-dashboard-crowdsec@docker
       - traefik.http.routers.netbird-dashboard-api.priority=110
 EOF

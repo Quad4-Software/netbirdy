@@ -31,7 +31,7 @@ bcrypt_hash() {
     else
         podman run --rm \
             -v "$REPO_ROOT:/src:ro,Z" -w /src \
-            docker.io/library/golang:1.27.2-bookworm \
+            docker.io/library/golang:1.27.4-bookworm \
             go run ./podman/genkey "$1"
     fi
 }

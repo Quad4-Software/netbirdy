@@ -159,7 +159,7 @@ assert_appsec_enabled() {
   local traefik dashboard server crowdsec
   traefik=$(service_block traefik < "$compose")
   dashboard=$(service_block dashboard < "$compose")
-  server=$(service_block netbird-server < "$compose")
+  server=$(service_block netbirdy-server < "$compose")
   crowdsec=$(service_block crowdsec < "$compose")
   if [[ "$traefik" != *$'depends_on:\n      crowdsec:\n        condition: service_healthy'* ]]; then
     echo "AppSec: Traefik does not wait for CrowdSec" >&2
@@ -198,24 +198,24 @@ assert_appsec_enabled() {
   fi
   # A missing AppSec middleware disables the protected routers. The backend
   # must not match API or OAuth2 requests while those routers are unavailable.
-  backend_rule=$(sed -n 's/^ *- traefik\.http\.routers\.netbird-backend\.rule=//p' <<< "$server")
+  backend_rule=$(sed -n 's/^ *- traefik\.http\.routers\.netbirdy-backend\.rule=//p' <<< "$server")
   if [[ "$backend_rule" != 'Host(`netbird.test`) && (PathPrefix(`/relay`) || PathPrefix(`/ws-proxy/`))' ]]; then
     echo "AppSec: backend router has an unexpected rule: $backend_rule" >&2
     exit 1
   fi
-  if ! grep -Fq 'netbird-dashboard-api.service=netbird-server' <<< "$server"; then
-    echo "AppSec: API router does not target netbird-server" >&2
+  if ! grep -Fq 'netbird-dashboard-api.service=netbirdy-server' <<< "$server"; then
+    echo "AppSec: API router does not target netbirdy-server" >&2
     exit 1
   fi
   if [[ "$server" == *'netbird-dashboard-api.rule='*'/relay'* ]]; then
     echo "AppSec: API router includes relay" >&2
     exit 1
   fi
-  if grep -F 'netbird-grpc' <<< "$server" | grep -q 'crowdsec'; then
+  if grep -F 'netbirdy-grpc' <<< "$server" | grep -q 'crowdsec'; then
     echo "AppSec: gRPC router gained the AppSec middleware" >&2
     exit 1
   fi
-  if grep -Fq 'netbird-backend.middlewares' "$compose" || grep -Fq 'proxy-passthrough.middlewares' "$compose"; then
+  if grep -Fq 'netbirdy-backend.middlewares' "$compose" || grep -Fq 'proxy-passthrough.middlewares' "$compose"; then
     echo "AppSec: middleware attached outside the dashboard and API routers" >&2
     exit 1
   fi
@@ -238,7 +238,7 @@ assert_appsec_disabled() {
     exit 1
   fi
   local backend_rule
-  backend_rule=$(sed -n 's/^ *- traefik\.http\.routers\.netbird-backend\.rule=//p' "$case_dir/docker-compose.yml")
+  backend_rule=$(sed -n 's/^ *- traefik\.http\.routers\.netbirdy-backend\.rule=//p' "$case_dir/docker-compose.yml")
   if [[ "$backend_rule" != 'Host(`netbird.test`) && (PathPrefix(`/relay`) || PathPrefix(`/ws-proxy/`) || PathPrefix(`/api`) || PathPrefix(`/oauth2`))' ]]; then
     echo "AppSec off: backend router has an unexpected rule: $backend_rule" >&2
     exit 1
