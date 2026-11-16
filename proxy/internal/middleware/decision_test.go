@@ -41,9 +41,16 @@ func TestRenderDeny_AnthropicSurfaceMirrorsVendorShape(t *testing.T) {
 	assert.Equal(t, "NetBirdy: LLM policy limit exceeded", errObj["message"],
 		"the vendor message names NetBirdy, so the client does not blame the provider")
 
+<<<<<<< HEAD
 	// The NetBirdy fields stay put so existing consumers keep working.
+=======
+	// The NetBirdy code stays put so existing consumers keep working. The
+	// top-level message carries the prefix too: Claude Code shows it in
+	// preference to the envelope's.
+>>>>>>> upstream/v0.83.1
 	assert.Equal(t, "llm_policy.budget_cap_exceeded", body["code"])
-	assert.Equal(t, "LLM policy limit exceeded", body["message"])
+	assert.Equal(t, "NetBirdy: LLM policy limit exceeded", body["message"],
+		"the message Claude Code shows names NetBirdy")
 	assert.Equal(t, "llm_limit_check", body["middleware"])
 }
 
@@ -61,9 +68,17 @@ func TestRenderDeny_OpenAISurfaceMirrorsVendorShape(t *testing.T) {
 	errObj, ok := body["error"].(map[string]any)
 	require.True(t, ok, "error must be an object")
 	assert.Equal(t, "invalid_request_error", errObj["type"])
+<<<<<<< HEAD
 	assert.Equal(t, "llm_policy.model_blocked", errObj["code"], "the NetBirdy code rides in the vendor code field")
 	assert.Equal(t, "NetBirdy: model is not in the policy allowlist", errObj["message"],
 		"the vendor message names NetBirdy, so the client does not blame the provider")
+=======
+	assert.Equal(t, "llm_policy.model_blocked", errObj["code"], "the NetBirdy code rides in the vendor code field")
+	assert.Equal(t, "NetBirdy: model is not in the policy allowlist", errObj["message"],
+		"the vendor message names NetBirdy, so the client does not blame the provider")
+	assert.Equal(t, "NetBirdy: model is not in the policy allowlist", body["message"],
+		"the top-level message matches the envelope's")
+>>>>>>> upstream/v0.83.1
 }
 
 // TestRenderDeny_RateLimitStatusMapsToVendorRateLimit pins the mapping a
@@ -91,4 +106,6 @@ func TestRenderDeny_NoSurfaceKeepsLegacyShape(t *testing.T) {
 	assert.NotContains(t, body, "type", "no surface means no vendor mirror")
 	assert.NotContains(t, body, "error", "no surface means no vendor mirror")
 	assert.Equal(t, "llm_policy.model_not_routable", body["code"])
+	assert.Equal(t, "no provider configured for model x", body["message"],
+		"without a vendor envelope the message keeps its legacy form")
 }
