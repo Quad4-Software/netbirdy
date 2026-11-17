@@ -53,6 +53,7 @@ import (
 	"github.com/netbirdio/netbird/management/server/types"
 	mgmtProto "github.com/netbirdio/netbird/shared/management/proto"
 	"github.com/netbirdio/netbird/shared/ratelimit"
+	"github.com/netbirdio/netbird/trustedproxy"
 	"github.com/netbirdio/netbird/util/crypt"
 )
 
@@ -268,7 +269,8 @@ func (s *BaseServer) Router() *mux.Router {
 	return Create(s, func() *mux.Router {
 		router := mux.NewRouter()
 		middleware.SetSecurityEngine(s.SecurityEngine())
-		chain := middleware.BuildMiddleware(s.RateLimiter(), s.AuthManager(), s.AccountManager(), s.Metrics())
+		chain := middleware.BuildMiddleware(s.RateLimiter(), s.AuthManager(), s.AccountManager(), s.Metrics(),
+			trustedproxy.FromPrefixes(s.Config.ReverseProxy.TrustedHTTPProxies))
 		if broker := s.MCPBroker(); broker != nil {
 			router.Use(broker.ChallengeMiddleware())
 			// BuildMiddleware ends with the auth middleware. The MCP server tests fail if that

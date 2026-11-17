@@ -59,7 +59,7 @@ assert_image() {
 
 # An empty override selects the default image.
 assert_image 0 "" ""
-for image in traefik:v3.7.13 traefik:3.7.13 traefik:v3.7.14 traefik:v3.8 \
+for image in traefik:v3.7.13 traefik:3.7.13 traefik:v3.7.14 traefik:v3.7.18 traefik:v3.8 \
   traefik:v4 traefik:v4.0.0 traefik:v03.07.013 traefik:v3.08.0 \
   registry.example:5000/team/traefik:3.7.13; do
   assert_image 0 "" "$image"

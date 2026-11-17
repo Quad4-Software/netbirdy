@@ -53,11 +53,18 @@ func resetSentryDSN(t *testing.T) {
 	serviceCmd.PersistentFlags().VisitAll(func(f *pflag.Flag) {
 		f.Changed = false
 	})
+	for _, cmd := range []*cobra.Command{runCmd, installCmd, reconfigureCmd} {
+		cmd.Flags().VisitAll(func(f *pflag.Flag) {
+			f.Changed = false
+		})
+	}
 }
 
 func TestSentryDSNFlagRegistered(t *testing.T) {
-	assert.NotNil(t, serviceCmd.PersistentFlags().Lookup("sentry-dsn"),
-		"--sentry-dsn must be a service flag so install persists it")
+	for _, cmd := range []*cobra.Command{runCmd, installCmd, reconfigureCmd} {
+		assert.NotNil(t, cmd.Flags().Lookup("sentry-dsn"),
+			"--sentry-dsn must be a daemon flag so install persists it and run consumes it")
+	}
 	assert.Equal(t, "NB_SENTRY_DSN", FlagNameToEnvVar("sentry-dsn", "NB_"))
 }
 
@@ -83,8 +90,10 @@ func TestApplyServiceParams_SentryDSN(t *testing.T) {
 	applyServiceParams(&cobra.Command{}, &serviceParams{SentryDSN: testSentryDSN})
 	assert.Equal(t, testSentryDSN, sentryDSN, "a saved DSN must be restored on install")
 
-	require.NoError(t, serviceCmd.PersistentFlags().Set("sentry-dsn", "https://explicit@example.com/2"))
-	applyServiceParams(&cobra.Command{}, &serviceParams{SentryDSN: testSentryDSN})
+	cmd := &cobra.Command{}
+	addDaemonFlags(cmd)
+	require.NoError(t, cmd.Flags().Set("sentry-dsn", "https://explicit@example.com/2"))
+	applyServiceParams(cmd, &serviceParams{SentryDSN: testSentryDSN})
 	assert.Equal(t, "https://explicit@example.com/2", sentryDSN, "an explicit flag wins over the saved value")
 }
 

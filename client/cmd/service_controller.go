@@ -26,8 +26,8 @@ import (
 	"github.com/netbirdio/netbird/version"
 )
 
-func validateJSONSocketFlags() error {
-	if serviceCmd.PersistentFlags().Changed("json-socket") && !enableJSONSocket {
+func validateJSONSocketFlags(cmd *cobra.Command) error {
+	if cmd.Flags().Changed("json-socket") && !enableJSONSocket {
 		return fmt.Errorf("--json-socket requires --enable-json-socket to configure the daemon JSON gateway")
 	}
 	return nil
@@ -71,10 +71,6 @@ func (p *program) Start(svc service.Service) error {
 		log.Warnf("failed to initialize sentry: %v", err)
 	}
 	p.sentryFlush = flushSentry
-
-	if err := validateJSONSocketFlags(); err != nil {
-		return err
-	}
 
 	if _, err := sandbox.ApplyClient(sandbox.ClientPolicy()); err != nil {
 		return fmt.Errorf("apply landlock sandbox: %w", err)
@@ -298,9 +294,6 @@ func (p *program) Stop(srv service.Service) error {
 
 // Common setup for service control commands
 func setupServiceControlCommand(cmd *cobra.Command, ctx context.Context, cancel context.CancelFunc, consoleLog bool) (service.Service, error) {
-	// rootCmd env vars are already applied by PersistentPreRunE.
-	SetFlagsFromEnvVars(serviceCmd)
-
 	cmd.SetOut(cmd.OutOrStdout())
 
 	if err := handleRebrand(cmd); err != nil {
@@ -345,7 +338,7 @@ var runCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		if err := validateJSONSocketFlags(); err != nil {
+		if err := validateJSONSocketFlags(cmd); err != nil {
 			return err
 		}
 
@@ -360,9 +353,6 @@ var startCmd = &cobra.Command{
 		ctx, cancel := context.WithCancel(cmd.Context())
 		s, err := setupServiceControlCommand(cmd, ctx, cancel, false)
 		if err != nil {
-			return err
-		}
-		if err := validateJSONSocketFlags(); err != nil {
 			return err
 		}
 
@@ -399,9 +389,6 @@ var restartCmd = &cobra.Command{
 		ctx, cancel := context.WithCancel(cmd.Context())
 		s, err := setupServiceControlCommand(cmd, ctx, cancel, false)
 		if err != nil {
-			return err
-		}
-		if err := validateJSONSocketFlags(); err != nil {
 			return err
 		}
 
