@@ -1,4 +1,12 @@
-FROM gcr.io/distroless/base:debug
+# Release image for the upload server. goreleaser packages the CGO-free binary
+# built on the host; see .goreleaser.yaml dockers_v2 and
+# upload-server/Dockerfile for the source-building variant.
+#
+# Base is Chainguard busybox, the equivalent of the old distroless base:debug.
+# Like the distroless image it replaces, this published image runs as root;
+# upload-server/Dockerfile documents the nonroot source-build variant instead.
+FROM cgr.dev/chainguard/busybox@sha256:63f6bae487adff606359bd82418ffe0564564a6b272cf52107306749a714afb2
+USER 0:0
 ENTRYPOINT [ "/go/bin/netbirdy-upload" ]
 ARG TARGETPLATFORM
 COPY ${TARGETPLATFORM}/netbirdy-upload /go/bin/netbirdy-upload

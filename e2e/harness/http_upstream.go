@@ -23,7 +23,7 @@ import (
 )
 
 const (
-	httpUpstreamImage   = "nginx:alpine"
+	httpUpstreamImage   = "cgr.dev/chainguard/nginx@sha256:9708b6c879cb97b0641ce48891a0ced73e09624b717a256564710e6864a42a5f"
 	httpUpstreamAlias   = "httpupstream"
 	httpUpstreamPort    = "8080/tcp"
 	httpUpstreamLogPath = "/tmp/e2e-access.log"
@@ -81,7 +81,13 @@ func StartHTTPUpstream(ctx context.Context, c *Combined) (*HTTPUpstream, error) 
 		ExposedPorts:   []string{httpUpstreamPort},
 		Networks:       []string{c.network.Name},
 		NetworkAliases: map[string][]string{c.network.Name: {httpUpstreamAlias}},
-		Cmd:            []string{"nginx", "-c", "/conf/nginx.conf", "-g", "daemon off;"},
+		// The Chainguard nginx entrypoint is the nginx binary itself, so Cmd
+		// carries only its flags. Root matches the nginx:alpine behavior this
+		// fixture replaces.
+		Cmd: []string{"-c", "/conf/nginx.conf", "-e", "/dev/stderr", "-g", "daemon off;"},
+		ConfigModifier: func(cfg *container.Config) {
+			cfg.User = "0:0"
+		},
 		HostConfigModifier: func(hc *container.HostConfig) {
 			hc.Binds = append(hc.Binds, workDir+":/conf:ro")
 		},

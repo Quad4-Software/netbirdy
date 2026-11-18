@@ -15,7 +15,7 @@ import (
 )
 
 const (
-	vllmImage = "nginx:alpine"
+	vllmImage = "cgr.dev/chainguard/nginx@sha256:9708b6c879cb97b0641ce48891a0ced73e09624b717a256564710e6864a42a5f"
 	vllmAlias = "vllm"
 	vllmPort  = "8000/tcp"
 	// vllmStreamPort serves the same wire shapes as an SSE stream. See the
@@ -187,7 +187,13 @@ func StartVLLM(ctx context.Context, c *Combined) (*VLLM, error) {
 		ExposedPorts:   []string{vllmPort, vllmStreamPort},
 		Networks:       []string{c.network.Name},
 		NetworkAliases: map[string][]string{c.network.Name: {vllmAlias}},
-		Cmd:            []string{"nginx", "-c", "/conf/nginx.conf", "-g", "daemon off;"},
+		// The Chainguard nginx entrypoint is the nginx binary itself, so Cmd
+		// carries only its flags. Root matches the nginx:alpine behavior this
+		// fixture replaces.
+		Cmd: []string{"-c", "/conf/nginx.conf", "-e", "/dev/stderr", "-g", "daemon off;"},
+		ConfigModifier: func(cfg *container.Config) {
+			cfg.User = "0:0"
+		},
 		HostConfigModifier: func(hc *container.HostConfig) {
 			hc.Binds = append(hc.Binds, workDir+":/conf:ro")
 		},

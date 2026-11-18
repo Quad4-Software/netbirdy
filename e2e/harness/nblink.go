@@ -47,8 +47,9 @@ const (
 	nblinkKeyPath    = nblinkSecretsDir + "/" + nblinkKeyFile
 	// keyWriterImage writes the key into its volume. The file is root-owned
 	// and readable by group 0 only, the ownership the README tells operators a
-	// key needs for UID 65532:0 to read it.
-	keyWriterImage = "alpine:3.22"
+	// key needs for UID 65532:0 to read it. Chainguard busybox defaults to
+	// uid 65532, so the container runs as root explicitly.
+	keyWriterImage = "cgr.dev/chainguard/busybox@sha256:63f6bae487adff606359bd82418ffe0564564a6b272cf52107306749a714afb2"
 
 	// nblinkStateDir is the state directory both images create, owned by
 	// 65532:0, so a volume mounted over it inherits that ownership.
@@ -433,7 +434,7 @@ func writeKeyVolume(ctx context.Context, volume, key string) error {
 		return fmt.Errorf("create key volume: %w: %s", err, out)
 	}
 	script := fmt.Sprintf("cat > /k/%[1]s && chown 0:0 /k/%[1]s && chmod 440 /k/%[1]s", nblinkKeyFile)
-	cmd := exec.CommandContext(ctx, "docker", "run", "--rm", "-i", "-v", volume+":/k", keyWriterImage, "sh", "-c", script)
+	cmd := exec.CommandContext(ctx, "docker", "run", "--rm", "-i", "--user", "0:0", "-v", volume+":/k", keyWriterImage, "sh", "-c", script)
 	cmd.Stdin = strings.NewReader(key + "\n")
 	if out, err := cmd.CombinedOutput(); err != nil {
 		_ = RemoveDockerVolume(context.Background(), volume)

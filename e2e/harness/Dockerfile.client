@@ -1,9 +1,9 @@
 # Multistage build for the NetBirdy client used in e2e tests. The repo has no
 # source-building client Dockerfile (client/Dockerfile packages a goreleaser
-# artifact), so this mirrors its alpine runtime + entrypoint while compiling the
+# artifact), so this mirrors its wolfi runtime + entrypoint while compiling the
 # CGO-free client inline. BuildKit cache mounts keep rebuilds incremental.
 
-FROM golang:1.27.4-bookworm AS builder
+FROM cgr.dev/chainguard/go@sha256:78352255a8760797dac56865a5b9af2881f245ef74c90199e4e15f52251c5357 AS builder
 WORKDIR /src
 COPY go.mod go.sum ./
 RUN --mount=type=cache,target=/go/pkg/mod go mod download
@@ -12,8 +12,8 @@ RUN --mount=type=cache,target=/go/pkg/mod \
     --mount=type=cache,target=/root/.cache/go-build \
     CGO_ENABLED=0 GOOS=linux go build -o /out/netbirdy ./client
 
-FROM alpine:3.24
-RUN apk add --no-cache bash ca-certificates ip6tables iproute2 iptables
+FROM cgr.dev/chainguard/wolfi-base@sha256:e9b8c3739e5fb5fc778843a2ce74f8620588c9ddc9c44918cead527abcb0b628
+RUN apk add --no-cache bash ca-certificates-bundle ip6tables iproute2 iptables
 ENV NETBIRD_BIN="/usr/local/bin/netbirdy" \
     NB_LOG_FILE="console,/var/log/netbird/client.log" \
     NB_DAEMON_ADDR="unix:///var/run/netbird.sock" \

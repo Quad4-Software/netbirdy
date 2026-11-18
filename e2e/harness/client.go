@@ -25,7 +25,7 @@ const (
 	// pulled as a published image; a bare tag is built under that name.
 	defaultClientImage = "netbird-client:e2e"
 	clientAlias        = "client"
-	curlImage          = "curlimages/curl:latest"
+	curlImage          = "cgr.dev/chainguard/curl@sha256:3d12694cf0c5bfcb36377802ba59c5f3eae9b7f50503280d88e9e3f964a4e2f2"
 )
 
 // Client is a running NetBirdy client container joined to the combined server.

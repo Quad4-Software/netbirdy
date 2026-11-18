@@ -16,14 +16,14 @@
 #   VARIANT=release|debug  debug swaps the base for Chainguard busybox (a shell)
 #   VERSION                stamped into the binary the same way goreleaser does
 #
-# Images are pinned by digest alone. The builder is golang:1.27.4-bookworm and
+# Images are pinned by digest alone. The builder is Chainguard's Go image and
 # the bases are Chainguard's :latest, the only free tag; bump them by hand with
 # docker buildx imagetools inspect <image:tag>.
 
 ARG VARIANT=release
 
 # Pure Go: cross-compile from the build host instead of emulating the target.
-FROM --platform=$BUILDPLATFORM golang@sha256:4fa7c968ba93f1635670522dbb01a2c78150443e1385746924566079f36570ea AS builder
+FROM --platform=$BUILDPLATFORM cgr.dev/chainguard/go@sha256:78352255a8760797dac56865a5b9af2881f245ef74c90199e4e15f52251c5357 AS builder
 WORKDIR /app
 
 COPY go.mod go.sum ./

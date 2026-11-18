@@ -1,4 +1,8 @@
-FROM registry.access.redhat.com/ubi9/ubi-minimal@sha256:7fbeae18dc9476399f565e68255f602a3374ea8614ba3d14843565131a13ff93
+# Wolfi base, pinned by digest, replaces alpine and ubi-minimal. apk provides
+# nginx-stable (the stable branch the UBI image used), bash, gettext and
+# tzdata. The image runs nginx as the arbitrary UID it is started with, so all
+# runtime state stays under /tmp/nginx, group-writable by the root group.
+FROM cgr.dev/chainguard/wolfi-base@sha256:e9b8c3739e5fb5fc778843a2ce74f8620588c9ddc9c44918cead527abcb0b628
 
 ARG VERSION=dev
 ARG RELEASE=0
@@ -11,12 +15,7 @@ LABEL name="netbird-dashboard" \
       summary="NetBirdy Dashboard" \
       description="Web UI for managing NetBirdy peers, users, and access policies."
 
-# Only nginx-core: the nginx metapackage pulls in a default web root and logos
-# that would clash with out/. Our nginx config lives outside the RPM-owned
-# /etc/nginx/nginx.conf so no packaged file is modified in a later layer.
-RUN microdnf module enable -y nginx:1.26 && \
-    microdnf install -y --nodocs bash gettext nginx-core tzdata && \
-    microdnf clean all && \
+RUN apk add --no-cache bash gettext nginx-stable tzdata && \
     mkdir -p /etc/nginx/http.d /tmp/nginx
 
 STOPSIGNAL SIGINT
@@ -44,4 +43,4 @@ RUN sed -i \
 
 USER 10001:0
 ENTRYPOINT ["/usr/local/init_react_envs.sh"]
-CMD ["/usr/sbin/nginx", "-c", "/etc/nginx/netbird.conf", "-e", "/dev/stderr", "-g", "pid /tmp/nginx.pid;"]
+CMD ["/usr/bin/nginx", "-c", "/etc/nginx/netbird.conf", "-e", "/dev/stderr", "-g", "pid /tmp/nginx.pid;"]

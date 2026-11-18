@@ -567,7 +567,7 @@ data_dir_state() {
     out=$(ls -A "$src" 2>/dev/null) || return 2
   else
     docker volume inspect "$src" &> /dev/null || return 0
-    out=$(docker run --rm -v "${src}:/d:ro" busybox sh -c 'ls -A /d' 2>/dev/null) || return 2
+    out=$(docker run --rm -v "${src}:/d:ro" cgr.dev/chainguard/wolfi-base@sha256:e9b8c3739e5fb5fc778843a2ce74f8620588c9ddc9c44918cead527abcb0b628 sh -c 'ls -A /d' 2>/dev/null) || return 2
   fi
   [[ -z "$out" ]] && return 0
   return 1

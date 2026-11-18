@@ -78,13 +78,15 @@ podman-test:
 	podman run --rm \
 		-v $(CURDIR):/src:ro,Z -w /src \
 		-v netbirdy-go-mod:/go/pkg/mod -v netbirdy-go-build:/root/.cache/go-build \
-		docker.io/library/golang:1.27.4-bookworm \
-		sh -c "apt-get update -qq && apt-get install -y -qq gcc libc6-dev >/dev/null && go build ./combined/... ./client/cmd/... && go test -tags devcert ./client/cmd/... ./combined/..."
+		-e GOMODCACHE=/go/pkg/mod \
+		--entrypoint sh \
+		cgr.dev/chainguard/go@sha256:78352255a8760797dac56865a5b9af2881f245ef74c90199e4e15f52251c5357 \
+		-c "go build ./combined/... ./client/cmd/... && go test -tags devcert ./client/cmd/... ./combined/..."
 	podman run --rm \
 		-v $(CURDIR):/src:ro,Z -w /src \
 		-v netbirdy-pnpm-store:/pnpm-store \
-		docker.io/library/node:24-bookworm \
-		sh -c "npm install -g pnpm@12.19.0 -q && pnpm config set store-dir /pnpm-store && pnpm install --frozen-lockfile --filter netbirdy-dashboard... && pnpm --filter netbirdy-dashboard lint || true; pnpm --filter netbirdy-dashboard exec tsc --noEmit --tsBuildInfoFile /tmp/tsconfig.tsbuildinfo && pnpm --filter netbirdy-dashboard test:unit"
+		cgr.dev/chainguard/wolfi-base@sha256:e9b8c3739e5fb5fc778843a2ce74f8620588c9ddc9c44918cead527abcb0b628 \
+		sh -c "apk update -qq && apk add --no-cache -q nodejs-24 npm build-base python3 && npm install -g pnpm@12.19.0 -q && pnpm config set store-dir /pnpm-store && pnpm install --frozen-lockfile --filter netbirdy-dashboard... && pnpm --filter netbirdy-dashboard lint || true; pnpm --filter netbirdy-dashboard exec tsc --noEmit --tsBuildInfoFile /tmp/tsconfig.tsbuildinfo && pnpm --filter netbirdy-dashboard test:unit"
 
 .PHONY: offline-e2e
 offline-e2e:

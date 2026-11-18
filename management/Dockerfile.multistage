@@ -1,8 +1,10 @@
-FROM golang:1.27.4-bookworm AS builder
+# Multistage management image that builds netbirdy-mgmt from source.
+#
+# Builder is Chainguard's Go image: go1.27.x with gcc and git included, pinned
+# by digest. Its CGO build links musl, so the runtime is Chainguard wolfi-base,
+# which carries the same libc plus the CA certificate bundle and a shell.
+FROM cgr.dev/chainguard/go@sha256:78352255a8760797dac56865a5b9af2881f245ef74c90199e4e15f52251c5357 AS builder
 WORKDIR /app
-
-# Install build dependencies
-RUN apt-get update && apt-get install -y gcc libc6-dev && rm -rf /var/lib/apt/lists/*
 
 COPY go.mod go.sum ./
 RUN go mod download
@@ -10,8 +12,7 @@ RUN go mod download
 COPY . .
 RUN CGO_ENABLED=1 GOOS=linux go build -ldflags="-s -w" -o netbirdy-mgmt ./management
 
-FROM ubuntu:26.04
-RUN apt update && apt install -y ca-certificates && rm -fr /var/cache/apt
+FROM cgr.dev/chainguard/wolfi-base@sha256:e9b8c3739e5fb5fc778843a2ce74f8620588c9ddc9c44918cead527abcb0b628
 ENTRYPOINT [ "/go/bin/netbirdy-mgmt","management"]
 CMD ["--log-file", "console"]
 COPY --from=builder /app/netbirdy-mgmt /go/bin/netbirdy-mgmt

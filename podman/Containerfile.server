@@ -1,10 +1,12 @@
 # Multi-stage build of the NetBirdy combined server (netbirdy-server).
 # Build context is the repository root:
 #   podman build -f podman/Containerfile.server -t localhost/netbirdy-server .
-FROM docker.io/library/golang:1.27.4-bookworm AS builder
+#
+# Builder is Chainguard's Go image (go1.27.4, gcc and git included), pinned by
+# digest. Its CGO build links musl, so the runtime is Chainguard wolfi-base,
+# which carries the same libc plus apk for the curl package.
+FROM cgr.dev/chainguard/go@sha256:78352255a8760797dac56865a5b9af2881f245ef74c90199e4e15f52251c5357 AS builder
 WORKDIR /app
-
-RUN apt-get update && apt-get install -y gcc libc6-dev git && rm -rf /var/lib/apt/lists/*
 
 COPY go.mod go.sum ./
 RUN --mount=type=cache,target=/go/pkg/mod go mod download
@@ -21,8 +23,8 @@ RUN --mount=type=cache,target=/go/pkg/mod \
     -X main.builtBy=podman" \
     -o netbirdy-server ./combined
 
-FROM docker.io/library/ubuntu:24.04
-RUN apt-get update && apt-get install -y ca-certificates curl && rm -rf /var/lib/apt/lists/*
+FROM cgr.dev/chainguard/wolfi-base@sha256:e9b8c3739e5fb5fc778843a2ce74f8620588c9ddc9c44918cead527abcb0b628
+RUN apk add --no-cache curl
 ENTRYPOINT [ "/go/bin/netbirdy-server" ]
 CMD ["--config", "/etc/netbird/config.yaml"]
 COPY --from=builder /app/netbirdy-server /go/bin/netbirdy-server

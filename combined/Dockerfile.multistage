@@ -1,8 +1,10 @@
-FROM golang:1.27.4-bookworm AS builder
+# Multistage combined server image that builds netbirdy-server from source.
+#
+# Builder is Chainguard's Go image: go1.27.x with gcc and git included, pinned
+# by digest. Its CGO build links musl, so the runtime is Chainguard wolfi-base,
+# which carries the same libc plus the CA certificate bundle and a shell.
+FROM cgr.dev/chainguard/go@sha256:78352255a8760797dac56865a5b9af2881f245ef74c90199e4e15f52251c5357 AS builder
 WORKDIR /app
-
-# Install build dependencies
-RUN apt-get update && apt-get install -y gcc libc6-dev git && rm -rf /var/lib/apt/lists/*
 
 COPY go.mod go.sum ./
 RUN --mount=type=cache,target=/go/pkg/mod go mod download
@@ -22,8 +24,7 @@ RUN --mount=type=cache,target=/go/pkg/mod \
     -X main.builtBy=docker" \
     -o netbirdy-server ./combined
 
-FROM ubuntu:26.04
-RUN apt update && apt install -y ca-certificates && rm -fr /var/cache/apt
+FROM cgr.dev/chainguard/wolfi-base@sha256:e9b8c3739e5fb5fc778843a2ce74f8620588c9ddc9c44918cead527abcb0b628
 ENTRYPOINT [ "/go/bin/netbirdy-server" ]
 CMD ["--config", "/etc/netbird/config.yaml"]
 COPY --from=builder /app/netbirdy-server /go/bin/netbirdy-server

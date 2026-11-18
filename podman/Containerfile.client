@@ -1,12 +1,12 @@
-FROM docker.io/library/golang:1.27.4-bookworm AS builder
+FROM cgr.dev/chainguard/go@sha256:78352255a8760797dac56865a5b9af2881f245ef74c90199e4e15f52251c5357 AS builder
 WORKDIR /src
 COPY go.mod go.sum ./
 RUN go mod download
 COPY . .
 RUN CGO_ENABLED=0 GOOS=linux go build -ldflags "-s -w" -o /out/netbirdy ./client
 
-FROM docker.io/library/alpine:3.24
-RUN apk add --no-cache ca-certificates iptables ip6tables iproute2 bash
+FROM cgr.dev/chainguard/wolfi-base@sha256:e9b8c3739e5fb5fc778843a2ce74f8620588c9ddc9c44918cead527abcb0b628
+RUN apk add --no-cache ca-certificates-bundle iptables ip6tables iproute2 bash
 COPY --from=builder /out/netbirdy /usr/local/bin/netbirdy
 RUN chmod 755 /usr/local/bin/netbirdy
 RUN ln -sf netbirdy /usr/local/bin/netbird

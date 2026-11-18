@@ -1,13 +1,10 @@
 # Wails Server Mode Dockerfile
 # Multi-stage build for minimal image size
 
-# Build stage
-FROM golang:1.27.4-alpine AS builder
+# Build stage. Chainguard's Go image has git built in, pinned by digest.
+FROM cgr.dev/chainguard/go@sha256:78352255a8760797dac56865a5b9af2881f245ef74c90199e4e15f52251c5357 AS builder
 
 WORKDIR /app
-
-# Install build dependencies
-RUN apk add --no-cache git
 
 # Copy source code
 COPY . .
@@ -18,11 +15,14 @@ RUN sed -i '/^replace/d' go.mod || true
 # Download dependencies
 RUN go mod tidy
 
-# Build the server binary
-RUN go build -tags server -ldflags="-s -w" -o server .
+# Build the server binary. CGO_ENABLED=0 keeps it static for the
+# Chainguard static runtime below.
+RUN CGO_ENABLED=0 go build -tags server -ldflags="-s -w" -o server .
 
-# Runtime stage - minimal image
-FROM gcr.io/distroless/static-debian13
+# Runtime stage - Chainguard static, pinned by digest. The distroless image
+# this replaces ran as root, so the same is requested explicitly.
+FROM cgr.dev/chainguard/static@sha256:fc42af33e643f20d08baf03cddcc1c02ba57052dfb02edb0d79f3fc47bcea8d9
+USER 0:0
 
 # Copy the binary
 COPY --from=builder /app/server /server

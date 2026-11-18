@@ -1,5 +1,21 @@
-FROM registry.access.redhat.com/ubi9/ubi-minimal@sha256:2d4c4551af6831dcd26bbf86108c4385de5183ec8fe6b5868f6f9640fe47f4ed
+# Combined server image for arbitrary non-root UIDs (OpenShift, Podman). The
+# binary is built by goreleaser (CGO_ENABLED=1) and injected into the build
+# context; see .goreleaser.yaml dockers_v2.
+#
+# The cgo binary links glibc, so the runtime is Chainguard glibc-dynamic,
+# pinned by digest. It has no shell, so the data directories and licenses are
+# prepared in a wolfi-base stage and copied across with their ownership and
+# modes intact.
+FROM cgr.dev/chainguard/wolfi-base@sha256:e9b8c3739e5fb5fc778843a2ce74f8620588c9ddc9c44918cead527abcb0b628 AS fs
+COPY licenses/ /image/licenses/
+# Only the data directory shares the root group for arbitrary non-root UIDs.
+# Runtime-created keys and databases retain the application's restrictive modes.
+RUN mkdir -p /image/var/lib/netbird /image/etc/netbird && \
+    chown 1000:0 /image/var/lib/netbird && \
+    chmod 0770 /image/var/lib/netbird && \
+    chmod -R a+rX /image/licenses
 
+FROM cgr.dev/chainguard/glibc-dynamic@sha256:2c362104c7f7adc37e6bdc87451450ff3834871a6268d930815cbe561493f947
 ARG TARGETPLATFORM
 ARG VERSION=dev
 ARG RELEASE=1
@@ -13,13 +29,9 @@ LABEL name="netbirdy-server" \
       description="NetBirdy Server runs the Management, Signal, Relay and STUN services of a self-hosted NetBirdy deployment in a single process."
 
 COPY --chmod=0555 ${TARGETPLATFORM}/netbirdy-server /go/bin/netbirdy-server
-COPY licenses/ /licenses/
-# Only the data directory shares the root group for arbitrary non-root UIDs.
-# Runtime-created keys and databases retain the application's restrictive modes.
-RUN mkdir -p /var/lib/netbird /etc/netbird && \
-    chown 1000:0 /var/lib/netbird && \
-    chmod 0770 /var/lib/netbird && \
-    chmod -R a+rX /licenses
+COPY --from=fs /image/licenses /licenses
+COPY --from=fs --chown=1000:0 /image/var/lib /var/lib
+COPY --from=fs /image/etc/netbird /etc/netbird
 
 USER 1000:0
 ENV HOME=/var/lib/netbird

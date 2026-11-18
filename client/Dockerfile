@@ -4,11 +4,12 @@
 #   sudo podman build -t localhost/netbirdy:latest -f client/Dockerfile --ignorefile .dockerignore-client .
 #   sudo podman run --rm -it --cap-add={BPF,NET_ADMIN,NET_RAW} localhost/netbirdy:latest
 
-FROM alpine:3.24
-# iproute2: busybox doesn't display ip rules properly
+# Wolfi base, pinned by digest: it has apk, a shell and the CA certificate
+# bundle. iproute2 provides the ip tooling busybox lacks.
+FROM cgr.dev/chainguard/wolfi-base@sha256:e9b8c3739e5fb5fc778843a2ce74f8620588c9ddc9c44918cead527abcb0b628
 RUN apk add --no-cache \
     bash \
-    ca-certificates \
+    ca-certificates-bundle \
     ip6tables \
     iproute2 \
     iptables

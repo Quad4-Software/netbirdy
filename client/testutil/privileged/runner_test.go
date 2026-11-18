@@ -22,10 +22,12 @@ import (
 )
 
 // containerImage / containerTag match the image used by the CI privileged job
-// (.github/workflows/golang-test-linux.yml, test_client_on_docker).
+// (.github/workflows/golang-test-linux.yml, test_client_on_docker). dockertest
+// only accepts repository:tag references, so the Chainguard base is pulled by
+// its moving tag rather than a digest pin.
 const (
-	containerImage = "golang"
-	containerTag   = "1.27.4-alpine"
+	containerImage = "cgr.dev/chainguard/wolfi-base"
+	containerTag   = "latest"
 )
 
 const (
@@ -34,9 +36,10 @@ const (
 	containerGoModCache = "/go/pkg/mod"
 )
 
-// alpinePackages are the build/runtime deps the privileged tests need, mirroring
-// the CI container setup.
-const alpinePackages = "ca-certificates iptables ip6tables dbus dbus-dev libpcap-dev build-base"
+// wolfiPackages are the build/runtime deps the privileged tests need, mirroring
+// the CI container setup. go-1.27 supplies the toolchain the Alpine golang
+// image used to carry.
+const wolfiPackages = "go-1.27 git ca-certificates-bundle iptables ip6tables dbus dbus-dev libpcap-dev build-base"
 
 // privilegedTestPackages is the package list the suite runs, excluding the
 // server-side trees and UI/upload helpers, matching the CI Docker job's filter.
@@ -191,6 +194,6 @@ func buildTestScript() string {
 
 	return fmt.Sprintf(
 		"apk update >/dev/null && apk add --no-cache %s >/dev/null && %s go test -buildvcs=false -tags 'devcert privileged' %s-v -timeout 20m -p 1",
-		alpinePackages, pkgs, runFilter,
+		wolfiPackages, pkgs, runFilter,
 	)
 }

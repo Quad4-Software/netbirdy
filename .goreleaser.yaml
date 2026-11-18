@@ -43,7 +43,7 @@ builds:
 
   # deb and rpm packages target glibc distributions, so on amd64 and arm64, the only
   # architectures with a PKCS#11 driver, they carry the PKCS#11 store, which links libc.
-  # Tarballs, the Alpine-based images and the other architectures keep the static build.
+  # Tarballs, the container images and the other architectures keep the static build.
   - id: netbirdy-pkcs11
     dir: client
     binary: netbirdy

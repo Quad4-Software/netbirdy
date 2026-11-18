@@ -1,8 +1,11 @@
-FROM alpine:3.24
+# Wolfi base, pinned by digest, replaces alpine. apk provides nginx-stable
+# (the stable branch), bash, gettext and tzdata. The image runs nginx as the
+# arbitrary UID it is started with, so all runtime state stays under
+# /tmp/nginx, group-writable by the root group.
+FROM cgr.dev/chainguard/wolfi-base@sha256:e9b8c3739e5fb5fc778843a2ce74f8620588c9ddc9c44918cead527abcb0b628
 
-RUN apk add --no-cache bash ca-certificates gettext nginx tzdata && \
-    rm -rf /var/cache/apk/* && \
-    mkdir -p /tmp/nginx
+RUN apk add --no-cache bash ca-certificates-bundle gettext nginx-stable tzdata && \
+    mkdir -p /etc/nginx/http.d /tmp/nginx
 
 STOPSIGNAL SIGINT
 EXPOSE 8080
@@ -26,4 +29,4 @@ RUN sed -i \
 
 USER 10001:0
 ENTRYPOINT ["/usr/local/init_react_envs.sh"]
-CMD ["/usr/sbin/nginx", "-e", "/dev/stderr", "-g", "pid /tmp/nginx.pid;"]
+CMD ["/usr/bin/nginx", "-e", "/dev/stderr", "-g", "pid /tmp/nginx.pid;"]

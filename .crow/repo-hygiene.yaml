@@ -9,7 +9,7 @@ when:
 
 steps:
   - name: shell-syntax
-    image: alpine:3.24
+    image: cgr.dev/chainguard/wolfi-base@sha256:e9b8c3739e5fb5fc778843a2ce74f8620588c9ddc9c44918cead527abcb0b628
     commands:
       - apk add --no-cache bash git
       - git config --global --add safe.directory '*'
@@ -26,12 +26,12 @@ steps:
         exit $rc
 
   - name: rebrand-check
-    image: alpine:3.24
+    image: cgr.dev/chainguard/wolfi-base@sha256:e9b8c3739e5fb5fc778843a2ce74f8620588c9ddc9c44918cead527abcb0b628
     commands:
       - sh tools/rebrand/rebrand.sh --check
 
   - name: no-private-keys
-    image: alpine:3.24
+    image: cgr.dev/chainguard/wolfi-base@sha256:e9b8c3739e5fb5fc778843a2ce74f8620588c9ddc9c44918cead527abcb0b628
     commands:
       - apk add --no-cache git
       - git config --global --add safe.directory '*'
@@ -40,7 +40,10 @@ steps:
         if [ -n "$found" ]; then printf '%s\n' "$found"; exit 1; fi
 
   - name: govulncheck
-    image: golang:1.27.4
+    # Wolfi base: the govulncheck JSON filter needs python3, which the
+    # Chainguard Go image does not ship, so the toolchain is apk-installed.
+    image: cgr.dev/chainguard/wolfi-base@sha256:e9b8c3739e5fb5fc778843a2ce74f8620588c9ddc9c44918cead527abcb0b628
     commands:
+      - apk add --no-cache go-1.27 python3 git
       - go run golang.org/x/vuln/cmd/govulncheck@v1.9.0 -format json ./... > vuln.json || true
       - sh scripts/govulncheck-filter.sh vuln.json

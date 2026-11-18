@@ -12,8 +12,8 @@ fi
 # Request a certificate
 # this also updates the nginx config file with new SSL entries
 certbot -n --nginx --agree-tos --email ${LETSENCRYPT_EMAIL} -d ${LETSENCRYPT_DOMAIN} --https-port ${NGINX_SSL_PORT}
-# Add cron job file
-cat <<EOF >/etc/crontabs/root
+# Add cron job file (cronie spool path)
+cat <<EOF >/var/spool/cron/root
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 
 0 */12 * * * certbot -q renew --nginx --https-port ${NGINX_SSL_PORT}

@@ -15,7 +15,7 @@ import (
 )
 
 const (
-	fakeUpstreamImage = "nginx:alpine"
+	fakeUpstreamImage = "cgr.dev/chainguard/nginx@sha256:9708b6c879cb97b0641ce48891a0ced73e09624b717a256564710e6864a42a5f"
 	fakeUpstreamAlias = "fakeupstream"
 	fakeUpstreamPort  = "443/tcp"
 )
@@ -79,7 +79,13 @@ func StartFakeUpstream(ctx context.Context, c *Combined) (*FakeUpstream, error) 
 		ExposedPorts:   []string{fakeUpstreamPort},
 		Networks:       []string{c.network.Name},
 		NetworkAliases: map[string][]string{c.network.Name: {fakeUpstreamAlias}},
-		Cmd:            []string{"nginx", "-c", "/certs/nginx.conf", "-g", "daemon off;"},
+		// The Chainguard nginx entrypoint is the nginx binary itself, so Cmd
+		// carries only its flags. Root is required for the 443 listener and
+		// matches the nginx:alpine behavior this fixture replaces.
+		Cmd: []string{"-c", "/certs/nginx.conf", "-e", "/dev/stderr", "-g", "daemon off;"},
+		ConfigModifier: func(cfg *container.Config) {
+			cfg.User = "0:0"
+		},
 		HostConfigModifier: func(hc *container.HostConfig) {
 			hc.Binds = append(hc.Binds, workDir+":/certs:ro")
 		},

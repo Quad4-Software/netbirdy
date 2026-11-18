@@ -1,12 +1,16 @@
 # Multi-stage build of the NetBirdy dashboard.
-# Stage 1 builds the Next.js static export with Node 24.
+# Stage 1 builds the Next.js static export with Node 24 (Wolfi's nodejs-24).
 # Stage 2 reuses the nginx + supervisord runtime from dashboard/docker.
 # Build context is the repository root:
 #   podman build -f podman/Containerfile.dashboard -t localhost/netbirdy-dashboard .
-FROM docker.io/library/node:24-bookworm AS builder
+FROM cgr.dev/chainguard/wolfi-base@sha256:e9b8c3739e5fb5fc778843a2ce74f8620588c9ddc9c44918cead527abcb0b628 AS builder
 WORKDIR /app
 
-RUN npm install -g pnpm@12.18.0 && pnpm --version | grep -q "^12\.18\.0$"
+# build-base and python3 cover node-gyp for any native dependency, matching
+# what the Debian node image shipped.
+RUN apk add --no-cache nodejs-24 npm build-base python3
+
+RUN npm install -g pnpm@12.19.0 && pnpm --version | grep -q "^12\.19\.0$"
 
 COPY pnpm-workspace.yaml pnpm-lock.yaml package.json ./
 COPY dashboard/package.json dashboard/package.json
@@ -24,10 +28,19 @@ COPY proxy/README.md proxy/README.md
 COPY proxy/docs/shield.md proxy/docs/shield.md
 RUN pnpm --filter netbirdy-dashboard build
 
-FROM docker.io/library/alpine:3.24
-RUN apk add --no-cache bash curl less ca-certificates git tzdata zip gettext \
-    nginx supervisor certbot-nginx && \
-    rm -rf /var/cache/apk/* && mkdir -p /run/nginx
+# Wolfi base, pinned by digest. apk provides the runtime tools Alpine had;
+# nginx-stable matches the stable branch, and certbot has no Wolfi package so
+# it is installed with pip into the Wolfi Python.
+FROM cgr.dev/chainguard/wolfi-base@sha256:e9b8c3739e5fb5fc778843a2ce74f8620588c9ddc9c44918cead527abcb0b628
+
+RUN apk add --no-cache \
+      bash curl less ca-certificates-bundle git tzdata zip gettext \
+      nginx-stable cronie supervisor python3 py3-pip && \
+    pip3 install --no-cache-dir certbot==5.10.0 certbot-nginx==5.10.0 && \
+    addgroup -S nginx && \
+    adduser -D -S -h /var/lib/nginx -G nginx nginx && \
+    mkdir -p /run/nginx /etc/nginx/http.d /var/log/nginx /var/spool/cron && \
+    chown -R nginx:nginx /var/lib/nginx/tmp /var/lib/nginx/logs
 
 STOPSIGNAL SIGINT
 EXPOSE 80
@@ -39,7 +52,7 @@ COPY dashboard/docker/default.conf /etc/nginx/http.d/default.conf
 COPY dashboard/docker/nginx.conf /etc/nginx/nginx.conf
 COPY dashboard/docker/init_cert.sh /usr/local/init_cert.sh
 COPY dashboard/docker/init_react_envs.sh /usr/local/init_react_envs.sh
-RUN chmod +x /usr/local/init_cert.sh /usr/local/init_react_envs.sh && rm /etc/crontabs/root
+RUN chmod +x /usr/local/init_cert.sh /usr/local/init_react_envs.sh
 
 COPY dashboard/docker/supervisord.conf /etc/supervisord.conf
 COPY --from=builder /app/dashboard/out/ /usr/share/nginx/html/

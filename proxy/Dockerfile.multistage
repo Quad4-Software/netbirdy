@@ -1,4 +1,9 @@
-FROM golang:1.27.4-alpine AS builder
+# Multistage proxy image that builds netbirdy-proxy from source. Used for local
+# builds and tests; releases use proxy/Dockerfile with a goreleaser binary.
+#
+# Builder is Chainguard's Go image (go1.27.x, gcc and git included). Runtime is
+# Chainguard busybox, the equivalent of the old distroless base:debug.
+FROM cgr.dev/chainguard/go@sha256:78352255a8760797dac56865a5b9af2881f245ef74c90199e4e15f52251c5357 AS builder
 WORKDIR /app
 
 COPY go.mod go.sum ./
@@ -21,17 +26,17 @@ COPY util ./util
 COPY version ./version
 RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-s -w" -o netbirdy-proxy ./proxy/cmd/proxy
 
-RUN echo "netbirdy:x:1000:1000:netbirdy:/var/lib/netbird:/sbin/nologin" > /tmp/passwd && \
-    echo "netbirdy:x:1000:netbirdy" > /tmp/group && \
-    mkdir -p /tmp/var/lib/netbird && \
-    mkdir -p /tmp/certs
+FROM cgr.dev/chainguard/busybox@sha256:63f6bae487adff606359bd82418ffe0564564a6b272cf52107306749a714afb2
+# Chainguard busybox defaults to uid 65532; the chown below needs root.
+USER 0:0
 
-FROM gcr.io/distroless/base:debug
+RUN echo "netbirdy:x:1000:1000:netbirdy:/var/lib/netbird:/sbin/nologin" >> /etc/passwd && \
+    echo "netbirdy:x:1000:" >> /etc/group && \
+    mkdir -p /var/lib/netbird /certs && \
+    chown -R 1000:1000 /var/lib/netbird /certs && \
+    chmod 755 /certs
+
 COPY --from=builder /app/netbirdy-proxy /usr/bin/netbirdy-proxy
-COPY --from=builder /tmp/passwd /etc/passwd
-COPY --from=builder /tmp/group /etc/group
-COPY --from=builder --chown=1000:1000 /tmp/var/lib/netbird /var/lib/netbird
-COPY --from=builder --chown=1000:1000 --chmod=755 /tmp/certs /certs
 USER netbirdy:netbirdy
 ENV HOME=/var/lib/netbird
 ENV NB_PROXY_ADDRESS=":8443"

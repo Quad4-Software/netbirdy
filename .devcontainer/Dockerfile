@@ -1,13 +1,25 @@
-FROM golang:1.27.4-bookworm
+# Wolfi base, pinned by digest. apk provides the Go 1.27 toolchain plus the
+# X11/GL development headers the Debian xorg-dev/libgl1-mesa-dev packages
+# covered, and gopls is installed on top.
+FROM cgr.dev/chainguard/wolfi-base@sha256:e9b8c3739e5fb5fc778843a2ce74f8620588c9ddc9c44918cead527abcb0b628
 
-RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
-    && apt-get -y install --no-install-recommends\
-        gettext-base=0.21-12 \
-        iptables=1.8.9-2 \
-        libgl1-mesa-dev=22.3.6-1+deb12u1 \
-        xorg-dev=1:7.7+23 \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/* \
+RUN apk add --no-cache \
+        go-1.27 \
+        gcc \
+        git \
+        gettext \
+        iptables \
+        mesa \
+        libglvnd-dev \
+        libx11-dev \
+        libxext-dev \
+        libxrandr-dev \
+        libxfixes-dev \
+        libxi-dev \
+        libxrender-dev \
+        libxtst-dev \
+        libxcursor-dev \
+        libxinerama-dev \
     && go install -v golang.org/x/tools/gopls@latest
 
 

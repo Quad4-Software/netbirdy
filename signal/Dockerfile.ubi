@@ -1,4 +1,10 @@
-FROM registry.access.redhat.com/ubi9/ubi-minimal@sha256:2d4c4551af6831dcd26bbf86108c4385de5183ec8fe6b5868f6f9640fe47f4ed
+# Signal server image for arbitrary non-root UIDs (OpenShift, Podman). The
+# binary is built by goreleaser and injected into the build context; see
+# .goreleaser.yaml dockers_v2.
+#
+# Base is Chainguard wolfi-base, pinned by digest. It ships a shell, apk and
+# the CA certificate bundle, and runs the CGO-free binary unchanged.
+FROM cgr.dev/chainguard/wolfi-base@sha256:e9b8c3739e5fb5fc778843a2ce74f8620588c9ddc9c44918cead527abcb0b628
 
 ARG TARGETPLATFORM
 ARG VERSION=dev

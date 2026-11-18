@@ -1,4 +1,7 @@
-FROM registry.access.redhat.com/ubi9/ubi-minimal@sha256:2d4c4551af6831dcd26bbf86108c4385de5183ec8fe6b5868f6f9640fe47f4ed
+# Rootless client image for arbitrary non-root UIDs. Wolfi base, pinned by
+# digest, replaces ubi-minimal: apk provides bash and the CA certificate
+# bundle and the CGO-free binary runs unchanged.
+FROM cgr.dev/chainguard/wolfi-base@sha256:e9b8c3739e5fb5fc778843a2ce74f8620588c9ddc9c44918cead527abcb0b628
 
 ARG TARGETPLATFORM
 ARG NETBIRD_BINARY=$TARGETPLATFORM/netbirdy
@@ -13,7 +16,7 @@ LABEL name="netbirdy-rootless" \
       summary="NetBirdy Rootless Client" \
       description="NetBirdy connects devices through an encrypted overlay using userspace networking without a TUN device or network administration capabilities."
 
-RUN microdnf install -y bash ca-certificates && microdnf clean all
+RUN apk add --no-cache bash ca-certificates-bundle
 
 COPY --chmod=0555 client/netbirdy-entrypoint.sh /usr/local/bin/netbirdy-entrypoint.sh
 COPY --chmod=0555 ${NETBIRD_BINARY} /usr/local/bin/netbirdy

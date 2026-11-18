@@ -192,7 +192,7 @@ tasks:
     summary: Builds a Docker image for server mode deployment
     desc: |
       Creates a minimal Docker image containing the server mode binary.
-      The image is based on distroless for security and small size.
+      The image is based on Chainguard static for security and small size.
       Usage: task build:docker [TAG=myapp:latest]
     cmds:
       - docker build -t {{.TAG | default (printf "%s:latest" .APP_NAME)}} -f build/docker/Dockerfile.server .

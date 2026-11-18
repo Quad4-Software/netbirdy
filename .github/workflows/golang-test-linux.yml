@@ -287,7 +287,7 @@ jobs:
 
       - name: Run tests in container
         # Unlike the native job above, this one drops all of client/ui including
-        # the subpackages: the alpine container has no gtk4/webkitgtk, so the
+        # the subpackages: the Wolfi container has no gtk4/webkitgtk, so the
         # Wails application package they import would fail to link.
         env:
           HOST_GOCACHE: ${{ steps.go-env.outputs.cache_dir }}
@@ -311,10 +311,10 @@ jobs:
             -e GOCACHE=${CONTAINER_GOCACHE} \
             -e GOMODCACHE=${CONTAINER_GOMODCACHE} \
             -e CONTAINER=${CONTAINER} \
-            golang:1.27.4-alpine \
+            cgr.dev/chainguard/wolfi-base@sha256:e9b8c3739e5fb5fc778843a2ce74f8620588c9ddc9c44918cead527abcb0b628 \
             sh -c ' \
               apk update; apk add --no-cache \
-                ca-certificates iptables ip6tables dbus dbus-dev libpcap-dev build-base; \
+                go-1.27 git ca-certificates-bundle iptables ip6tables dbus dbus-dev libpcap-dev build-base; \
               go test -buildvcs=false -tags "devcert privileged" -v -timeout 10m -p 1 $(go list -e -buildvcs=false ./... | grep -v -e /management -e /signal -e /relay -e /proxy -e /combined -e /client/ui -e /upload-server -e /client/testutil/privileged)
             '
 
