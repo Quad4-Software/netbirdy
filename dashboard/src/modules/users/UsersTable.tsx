@@ -59,6 +59,7 @@ import UserRoleCell from "@/modules/users/table-cells/UserRoleCell";
 import UserStatusCell from "@/modules/users/table-cells/UserStatusCell";
 import UserInviteModal from "@/modules/users/UserInviteModal";
 import UserInvitesTable from "@/modules/users/UserInvitesTable";
+import { indexGroupsById } from "@/utils/entityIndex";
 
 export const UsersTableColumns: ColumnDef<User>[] = [
   {
@@ -216,10 +217,11 @@ export default function UsersTable({
 
   const usersWithGroupNames = useMemo(() => {
     if (!users) return undefined;
+    const groupById = indexGroupsById(groups);
     return users.map((u) => ({
       ...u,
       _group_names: (u.auto_groups ?? [])
-        .map((id) => groups?.find((g) => g.id === id)?.name)
+        .map((id) => groupById.get(id)?.name)
         .filter((n): n is string => !!n),
     }));
   }, [users, groups]);

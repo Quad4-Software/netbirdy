@@ -71,7 +71,7 @@ export default function ApplicationProvider({ children }: Props) {
 
   const toggleNavigation = useCallback(() => {
     setIsNavigationCollapsed((prev) => !prev);
-  }, []);
+  }, [setIsNavigationCollapsed]);
 
   useEffect(() => {
     if (!requestCalled.current) {
@@ -108,24 +108,37 @@ export default function ApplicationProvider({ children }: Props) {
   );
   const latestUrl = useMemo(() => latestRelease?.url, [latestRelease]);
 
-  const toggleMobileNav = () => {
-    setMobileNavOpen(!mobileNavOpen);
-  };
+  const toggleMobileNav = useCallback(() => {
+    setMobileNavOpen((prev) => !prev);
+  }, []);
+
+  const contextValue = useMemo(
+    () => ({
+      latestVersion,
+      toggleMobileNav,
+      latestUrl,
+      mobileNavOpen,
+      user,
+      globalApiParams,
+      setGlobalApiParams,
+      isNavigationCollapsed,
+      toggleNavigation,
+    }),
+    [
+      latestVersion,
+      toggleMobileNav,
+      latestUrl,
+      mobileNavOpen,
+      user,
+      globalApiParams,
+      setGlobalApiParams,
+      isNavigationCollapsed,
+      toggleNavigation,
+    ],
+  );
 
   return show ? (
-    <ApplicationContext.Provider
-      value={{
-        latestVersion,
-        toggleMobileNav,
-        latestUrl,
-        mobileNavOpen,
-        user,
-        globalApiParams,
-        setGlobalApiParams,
-        isNavigationCollapsed,
-        toggleNavigation,
-      }}
-    >
+    <ApplicationContext.Provider value={contextValue}>
       {children}
     </ApplicationContext.Provider>
   ) : (

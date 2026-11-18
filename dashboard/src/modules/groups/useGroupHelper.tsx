@@ -6,6 +6,7 @@ import { useGroups } from "@/contexts/GroupsProvider";
 import { usePeerGroups } from "@/contexts/PeerProvider";
 import { type Group, type GroupPeer } from "@/interfaces/Group";
 import { type Peer } from "@/interfaces/Peer";
+import { indexGroupsById } from "@/utils/entityIndex";
 
 type Props = {
   initial?: Group[] | string[];
@@ -21,10 +22,9 @@ export default function useGroupHelper({ initial = [], peer }: Props) {
     if (!initial) return [];
     const isArrayOfStrings = initial.every((item) => typeof item === "string");
     if (!isArrayOfStrings) return orderBy(initial as Group[], ["name"]);
+    const groupById = indexGroupsById(groups);
     const foundGroups = initial
-      .map((id) => {
-        return groups?.find((g) => g.id === id);
-      })
+      .map((id) => groupById.get(id))
       .filter((g) => g !== undefined) as Group[];
     return orderBy(foundGroups, ["name"]) ?? [];
   }, [groups, initial]);

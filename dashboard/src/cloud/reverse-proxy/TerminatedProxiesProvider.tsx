@@ -150,15 +150,23 @@ function TerminatedPortal({ proxyId }: { proxyId: string }) {
 
     apply();
 
+    // Debounce so a burst of DOM mutations runs the document scan once
+    // rather than once per record.
+    let timer: ReturnType<typeof setTimeout> | undefined;
     const observer = new MutationObserver(() => {
-      try {
-        apply();
-      } catch (e) {}
+      if (timer !== undefined) clearTimeout(timer);
+      timer = setTimeout(() => {
+        timer = undefined;
+        try {
+          apply();
+        } catch (e) {}
+      }, 50);
     });
 
     observer.observe(document.body, { childList: true, subtree: true });
 
     return () => {
+      if (timer !== undefined) clearTimeout(timer);
       observer.disconnect();
       for (const el of tracked) {
         try {

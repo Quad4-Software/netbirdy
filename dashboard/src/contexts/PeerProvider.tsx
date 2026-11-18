@@ -7,10 +7,11 @@ import { useDialog } from "@/contexts/DialogProvider";
 import { useGroups } from "@/contexts/GroupsProvider";
 import { usePermissions } from "@/contexts/PermissionsProvider";
 import { useUsers } from "@/contexts/UsersProvider";
-import { Group, GroupPeer } from "@/interfaces/Group";
+import { Group } from "@/interfaces/Group";
 import { Peer } from "@/interfaces/Peer";
 import { User } from "@/interfaces/User";
 import { PeerSSHInstructions } from "@/modules/peer/PeerSSHInstructions";
+import { indexPeersToGroups, indexUsersById } from "@/utils/entityIndex";
 
 type Props = {
   children: React.ReactNode;
@@ -166,15 +167,8 @@ export const usePeerGroups = (peer?: Peer) => {
   const { groups, isLoading } = useGroups();
 
   const peerGroups = useMemo(() => {
-    if (!peer) return [];
-    const peerGroups = groups?.filter((group) => {
-      const foundGroup = group.peers?.find((p) => {
-        const peerGroup = p as GroupPeer;
-        return peerGroup.id === peer.id;
-      });
-      return foundGroup !== undefined;
-    });
-    return peerGroups || [];
+    if (!peer?.id) return [];
+    return indexPeersToGroups(groups).get(peer.id) ?? [];
   }, [groups, peer]);
 
   return { peerGroups, isLoading };
@@ -188,7 +182,7 @@ export const usePeerUser = (peer: Peer) => {
   const { users, isLoading } = useUsers();
 
   const user = useMemo(() => {
-    return users?.find((u) => u.id === peer.user_id);
+    return peer.user_id ? indexUsersById(users).get(peer.user_id) : undefined;
   }, [users, peer]);
 
   return { user, isLoading };

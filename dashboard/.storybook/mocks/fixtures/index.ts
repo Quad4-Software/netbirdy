@@ -16,6 +16,12 @@ export const fixtures: Record<string, Handler> = {
   "GET /users/current": currentUser,
   "GET /accounts": [account],
   "GET /accounts/:id": account,
+  "GET /relay/status": {
+    enabled: true,
+    address: "rels://mgmt.example.com:443",
+    transports: ["websocket", "quic"],
+    connected_peers: 12,
+  },
   ...coreFixtures,
   ...networkFixtures,
   ...platformFixtures,

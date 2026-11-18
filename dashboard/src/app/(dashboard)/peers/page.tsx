@@ -1,12 +1,12 @@
 "use client";
 
-import * as bypass from "@utils/bypass";
 import Breadcrumbs from "@components/Breadcrumbs";
 import InlineLink from "@components/InlineLink";
 import Paragraph from "@components/Paragraph";
 import SkeletonTable from "@components/skeletons/SkeletonTable";
 import FullScreenLoading from "@components/ui/FullScreenLoading";
 import { usePortalElement } from "@hooks/usePortalElement";
+import * as bypass from "@utils/bypass";
 import { ExternalLinkIcon } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import React, { lazy, Suspense, useMemo } from "react";
@@ -15,9 +15,10 @@ import PeersProvider, { usePeers } from "@/contexts/PeersProvider";
 import { usePermissions } from "@/contexts/PermissionsProvider";
 import { useUsers } from "@/contexts/UsersProvider";
 import PageContainer from "@/layouts/PageContainer";
+import { docsLink } from "@/modules/docs/links";
 import type { PeersTableKind } from "@/modules/peers/PeersTable";
 import { SetupModalContent } from "@/modules/setup-netbirdy-modal/SetupModal";
-import { docsLink } from "@/modules/docs/links";
+import { indexUsersById } from "@/utils/entityIndex";
 
 const PeersTable = lazy(() => import("@/modules/peers/PeersTable"));
 
@@ -78,9 +79,10 @@ function PeersView() {
   const isLoading = isPeersLoading || isUsersLoading;
   const peersWithUser = useMemo(() => {
     if (!peers || !users) return undefined;
+    const userById = indexUsersById(users);
     return peers.map((peer) => ({
       ...peer,
-      user: users.find((u) => u.id === peer.user_id),
+      user: peer.user_id ? userById.get(peer.user_id) : undefined,
       force_approved: peer.id ? false : false,
     }));
   }, [peers, users]);

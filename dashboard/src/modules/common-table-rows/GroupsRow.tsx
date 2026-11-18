@@ -23,6 +23,7 @@ import { usePermissions } from "@/contexts/PermissionsProvider";
 import { Group } from "@/interfaces/Group";
 import { Peer } from "@/interfaces/Peer";
 import useGroupHelper from "@/modules/groups/useGroupHelper";
+import { indexGroupsById } from "@/utils/entityIndex";
 
 type Props = {
   groups: string[];
@@ -56,10 +57,9 @@ export default function GroupsRow({
 
   // Get the group by the id
   const foundGroups = useMemo(() => {
+    const groupById = indexGroupsById(allGroups);
     return groups
-      .map((group) => {
-        return allGroups?.find((g) => g.id == group);
-      })
+      .map((group) => groupById.get(group))
       .filter((g) => g !== undefined) as Group[];
   }, [groups, allGroups]);
 
@@ -93,15 +93,17 @@ export default function GroupsRow({
           </div>
         )}
       </ModalTrigger>
-      <EditGroupsModal
-        groups={foundGroups}
-        onSave={onSave}
-        label={label}
-        description={description}
-        peer={peer}
-        hideAllGroup={hideAllGroup}
-        disabled={disabled}
-      />
+      {modal && (
+        <EditGroupsModal
+          groups={foundGroups}
+          onSave={onSave}
+          label={label}
+          description={description}
+          peer={peer}
+          hideAllGroup={hideAllGroup}
+          disabled={disabled}
+        />
+      )}
     </Modal>
   );
 }

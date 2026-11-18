@@ -83,8 +83,9 @@ export function useLocalStorage<T>(
       // Save state
       setStoredValue(newValue);
 
-      // We dispatch a custom event so every useLocalStorage hook are notified
-      window.dispatchEvent(new Event("local-storage"));
+      // We dispatch a custom event so every useLocalStorage hook are notified.
+      // The key travels in detail so only hooks bound to this key react.
+      window.dispatchEvent(new CustomEvent("local-storage", { detail: key }));
     } catch (error) {
       console.warn(`Error setting localStorage key “${key}”:`, error);
     }
@@ -99,10 +100,16 @@ export function useLocalStorage<T>(
   const handleStorageChange = useCallback(
     (event: StorageEvent | CustomEvent) => {
       if (!enabled) return;
+      if (event.type === "local-storage" && (event as CustomEvent).detail !== key) {
+        return;
+      }
       if ((event as StorageEvent)?.key && (event as StorageEvent).key !== key) {
         return;
       }
-      setStoredValue(readValue());
+      const raw = window.localStorage.getItem(key);
+      // A re-parsed identical value is a new object identity; skip the update
+      // so writes to other keys cannot re-render this hook's consumers.
+      setStoredValue((prev) => (raw === JSON.stringify(prev) ? prev : readValue()));
     },
     [key, readValue],
   );

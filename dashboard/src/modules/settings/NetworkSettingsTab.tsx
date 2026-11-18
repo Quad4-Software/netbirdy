@@ -23,6 +23,7 @@ import { useGroups } from "@/contexts/GroupsProvider";
 import { usePermissions } from "@/contexts/PermissionsProvider";
 import { Account } from "@/interfaces/Account";
 import useGroupHelper from "@/modules/groups/useGroupHelper";
+import RelayStatus from "@/modules/settings/RelayStatus";
 
 type Props = {
   account: Account;
@@ -356,6 +357,7 @@ function NetworkSettingsTabContent({ account }: Readonly<Props>) {
             disabled={!permission.settings.update}
           />
           {account && <TrafficEventSetting account={account} />}
+          {!isNetBirdCloud() && <RelayStatus />}
         </div>
       </div>
     </Tabs.Content>

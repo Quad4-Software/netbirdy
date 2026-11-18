@@ -1,4 +1,3 @@
-import * as bypass from "@utils/bypass";
 import Button from "@components/Button";
 import ButtonGroup from "@components/ButtonGroup";
 import { Checkbox } from "@components/Checkbox";
@@ -38,6 +37,7 @@ import {
   RowSelectionState,
   SortingState,
 } from "@tanstack/react-table";
+import * as bypass from "@utils/bypass";
 import { removeAllSpaces } from "@utils/helpers";
 import { trim, uniqBy } from "lodash";
 import { AlertTriangle, MonitorDotIcon, ShieldCheck } from "lucide-react";
@@ -322,18 +322,25 @@ export default function PeersTable({
     [peers, kind],
   );
 
-  const pendingApprovalCount =
-    kindFilteredPeers?.filter((p) => p.approval_required).length || 0;
+  const pendingApprovalCount = useMemo(
+    () => kindFilteredPeers?.filter((p) => p.approval_required).length || 0,
+    [kindFilteredPeers],
+  );
 
   const bypassedCount = bypass.bypassedPeerIds.size;
 
   const { isAnyIntegrationEnabled } = useIntegrations();
 
-  const tableGroups =
-    (uniqBy(
-      kindFilteredPeers?.map((p) => p.groups?.map((g) => g)).flatMap((g) => g),
-      "name",
-    ) as Group[]) || ([] as Group[]);
+  const tableGroups = useMemo(
+    () =>
+      (uniqBy(
+        kindFilteredPeers?.map((p) => p.groups?.map((g) => g)).flatMap(
+          (g) => g,
+        ),
+        "name",
+      ) as Group[]) || ([] as Group[]),
+    [kindFilteredPeers],
+  );
 
   // Users derived from the current kind-filtered set, so the Users
   // filter offers only owners that actually appear in the table.
