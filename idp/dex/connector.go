@@ -27,7 +27,15 @@ type ConnectorConfig struct {
 	ClientSecret string
 	// RedirectURI is the OAuth2 redirect URI
 	RedirectURI string
+	// AccountID is the owning NetBird account, persisted inside the connector
+	// config so per-account management operations can enforce ownership.
+	AccountID string
 }
+
+// connectorAccountIDKey is the config-map key that carries the owning account.
+// Dex connector configs ignore unknown keys, so it travels inside Config
+// without disturbing the OIDC/OAuth2 settings.
+const connectorAccountIDKey = "nbAccountID"
 
 // CreateConnector creates a new connector in Dex storage.
 // It maps the connector config to the appropriate Dex connector type and configuration.
@@ -200,6 +208,13 @@ func (p *Provider) buildStorageConnector(cfg *ConnectorConfig) (storage.Connecto
 		return storage.Connector{}, err
 	}
 
+	if cfg.AccountID != "" {
+		configData, err = stampConnectorAccountID(configData, cfg.AccountID)
+		if err != nil {
+			return storage.Connector{}, fmt.Errorf("failed to stamp connector account: %w", err)
+		}
+	}
+
 	return storage.Connector{ID: cfg.ID, Type: dexType, Name: cfg.Name, Config: configData}, nil
 }
 
@@ -288,6 +303,9 @@ func (p *Provider) parseStorageConnector(conn storage.Connector) (*ConnectorConf
 	if v, ok := configMap["issuer"].(string); ok {
 		cfg.Issuer = v
 	}
+	if v, ok := configMap[connectorAccountIDKey].(string); ok {
+		cfg.AccountID = v
+	}
 
 	// Infer the original identity provider type from Dex connector type and ID
 	cfg.Type = inferIdentityProviderType(conn.Type, conn.ID, configMap)
@@ -313,6 +331,16 @@ func inferOIDCProviderType(connectorID string) string {
 		}
 	}
 	return "oidc"
+}
+
+// stampConnectorAccountID writes the owning account into the connector config.
+func stampConnectorAccountID(configData []byte, accountID string) ([]byte, error) {
+	var m map[string]interface{}
+	if err := decodeConnectorConfig(configData, &m); err != nil {
+		return nil, err
+	}
+	m[connectorAccountIDKey] = accountID
+	return encodeConnectorConfig(m)
 }
 
 // encodeConnectorConfig serializes connector config to JSON bytes.

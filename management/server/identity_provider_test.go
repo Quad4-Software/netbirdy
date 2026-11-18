@@ -15,6 +15,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"go.uber.org/mock/gomock"
 
+	dexconn "github.com/netbirdio/netbird/idp/dex"
 	"github.com/netbirdio/netbird/management/internals/controllers/network_map/controller"
 	"github.com/netbirdio/netbird/management/internals/controllers/network_map/update_channel"
 	"github.com/netbirdio/netbird/management/internals/controllers/peerliveness/peerlivenesstest"
@@ -398,4 +399,10 @@ func TestValidateOIDCIssuer_RejectsTrailingContent(t *testing.T) {
 	err := validateOIDCIssuer(context.Background(), srv.URL)
 	require.ErrorIs(t, err, types.ErrIdentityProviderIssuerUnreachable,
 		"Content after the first object is not a valid discovery document")
+}
+
+func TestConnectorOwnedBy(t *testing.T) {
+	assert.True(t, connectorOwnedBy(&dexconn.ConnectorConfig{AccountID: "a1"}, "a1"))
+	assert.False(t, connectorOwnedBy(&dexconn.ConnectorConfig{AccountID: "a1"}, "a2"))
+	assert.True(t, connectorOwnedBy(&dexconn.ConnectorConfig{}, "a2"), "unstamped connectors stay shared")
 }

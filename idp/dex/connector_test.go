@@ -203,3 +203,59 @@ func TestUpdateConnector_AllowsSameTypeUpdate(t *testing.T) {
 	require.NoError(t, json.Unmarshal(conn.Config, &m))
 	assert.Equal(t, "https://login.microsoftonline.com/new/v2.0", m["issuer"])
 }
+
+func TestConnectorAccountIDRoundTrip(t *testing.T) {
+	ctx := context.Background()
+	p, cleanup := newTestProvider(t)
+	defer cleanup()
+
+	created, err := p.CreateConnector(ctx, &ConnectorConfig{
+		ID:           "okta-acct",
+		Name:         "Okta",
+		Type:         "okta",
+		Issuer:       "https://idp.example.com",
+		ClientID:     "client-id",
+		ClientSecret: "secret",
+		AccountID:    "account-a",
+	})
+	require.NoError(t, err)
+	require.Equal(t, "account-a", created.AccountID)
+
+	got, err := p.GetConnector(ctx, "okta-acct")
+	require.NoError(t, err)
+	assert.Equal(t, "account-a", got.AccountID)
+
+	// An update must preserve ownership and must not be able to repoint it.
+	err = p.UpdateConnector(ctx, &ConnectorConfig{
+		ID:        "okta-acct",
+		Type:      "okta",
+		ClientID:  "new-client",
+		AccountID: "account-b",
+	})
+	require.NoError(t, err)
+
+	got, err = p.GetConnector(ctx, "okta-acct")
+	require.NoError(t, err)
+	assert.Equal(t, "account-a", got.AccountID, "ownership must not be rewritable via update")
+	assert.Equal(t, "new-client", got.ClientID)
+}
+
+func TestConnectorWithoutAccountIDStaysShared(t *testing.T) {
+	ctx := context.Background()
+	p, cleanup := newTestProvider(t)
+	defer cleanup()
+
+	_, err := p.CreateConnector(ctx, &ConnectorConfig{
+		ID:           "legacy-connector",
+		Name:         "OIDC",
+		Type:         "oidc",
+		Issuer:       "https://idp.example.com",
+		ClientID:     "client-id",
+		ClientSecret: "secret",
+	})
+	require.NoError(t, err)
+
+	got, err := p.GetConnector(ctx, "legacy-connector")
+	require.NoError(t, err)
+	assert.Empty(t, got.AccountID)
+}

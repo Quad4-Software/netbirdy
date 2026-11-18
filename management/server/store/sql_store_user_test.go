@@ -313,6 +313,29 @@ func TestSqlStore_DeleteUser(t *testing.T) {
 	require.Len(t, userPATs, 0)
 }
 
+// TestSqlStore_DeleteUser_CrossAccount verifies that deleting with a
+// mismatched account returns NotFound and does not wipe the target user's
+// PATs: the scoped user delete is a no-op, so the transaction must roll back.
+func TestSqlStore_DeleteUser_CrossAccount(t *testing.T) {
+	store, cleanup, err := NewTestStoreFromSQL(context.Background(), "../testdata/extended-store.sql", t.TempDir())
+	t.Cleanup(cleanup)
+	require.NoError(t, err)
+
+	foreignAccountID := "c3f5f5e2-1234-4bfa-9a2e-3f0f6d9e5f8a"
+	userID := "f4f6d672-63fb-11ec-90d6-0242ac120003"
+
+	err = store.DeleteUser(context.Background(), foreignAccountID, userID)
+	require.Error(t, err)
+
+	user, err := store.GetUserByUserID(context.Background(), LockingStrengthNone, userID)
+	require.NoError(t, err)
+	require.NotNil(t, user)
+
+	userPATs, err := store.GetUserPATs(context.Background(), LockingStrengthNone, userID)
+	require.NoError(t, err)
+	require.NotEmpty(t, userPATs, "PATs must survive a mismatched-account delete")
+}
+
 func TestSqlStore_SaveUsers_LargeBatch(t *testing.T) {
 	store, cleanup, err := NewTestStoreFromSQL(context.Background(), "../testdata/extended-store.sql", t.TempDir())
 	t.Cleanup(cleanup)

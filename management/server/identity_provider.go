@@ -116,6 +116,9 @@ func (am *DefaultAccountManager) GetIdentityProviders(ctx context.Context, accou
 
 	result := make([]*types.IdentityProvider, 0, len(connectors))
 	for _, conn := range connectors {
+		if !connectorOwnedBy(conn, accountID) {
+			continue
+		}
 		result = append(result, connectorConfigToIdentityProvider(conn, accountID))
 	}
 
@@ -143,6 +146,9 @@ func (am *DefaultAccountManager) GetIdentityProvider(ctx context.Context, accoun
 			return nil, status.Errorf(status.NotFound, "identity provider not found")
 		}
 		return nil, status.Errorf(status.Internal, "failed to get identity provider: %v", err)
+	}
+	if !connectorOwnedBy(conn, accountID) {
+		return nil, status.Errorf(status.NotFound, "identity provider not found")
 	}
 
 	return connectorConfigToIdentityProvider(conn, accountID), nil
@@ -204,6 +210,17 @@ func (am *DefaultAccountManager) UpdateIdentityProvider(ctx context.Context, acc
 		return nil, err
 	}
 
+	conn, err := embeddedManager.GetConnector(ctx, idpID)
+	if err != nil {
+		if errors.Is(err, storage.ErrNotFound) {
+			return nil, status.Errorf(status.NotFound, "identity provider not found")
+		}
+		return nil, status.Errorf(status.Internal, "failed to get identity provider: %v", err)
+	}
+	if !connectorOwnedBy(conn, accountID) {
+		return nil, status.Errorf(status.NotFound, "identity provider not found")
+	}
+
 	idpConfig.ID = idpID
 	idpConfig.AccountID = accountID
 
@@ -241,6 +258,9 @@ func (am *DefaultAccountManager) DeleteIdentityProvider(ctx context.Context, acc
 		}
 		return status.Errorf(status.Internal, "failed to get identity provider: %v", err)
 	}
+	if !connectorOwnedBy(conn, accountID) {
+		return status.Errorf(status.NotFound, "identity provider not found")
+	}
 	idpConfig := connectorConfigToIdentityProvider(conn, accountID)
 
 	if err := embeddedManager.DeleteConnector(ctx, idpID); err != nil {
@@ -255,8 +275,18 @@ func (am *DefaultAccountManager) DeleteIdentityProvider(ctx context.Context, acc
 	return nil
 }
 
+// connectorOwnedBy reports whether the connector belongs to the account.
+// Connectors created before ownership was stamped have no AccountID and
+// remain shared so existing deployments keep working.
+func connectorOwnedBy(conn *dex.ConnectorConfig, accountID string) bool {
+	return conn.AccountID == "" || conn.AccountID == accountID
+}
+
 // connectorConfigToIdentityProvider converts a dex.ConnectorConfig to types.IdentityProvider
 func connectorConfigToIdentityProvider(conn *dex.ConnectorConfig, accountID string) *types.IdentityProvider {
+	if conn.AccountID != "" {
+		accountID = conn.AccountID
+	}
 	return &types.IdentityProvider{
 		ID:           conn.ID,
 		AccountID:    accountID,
@@ -277,6 +307,7 @@ func identityProviderToConnectorConfig(idpConfig *types.IdentityProvider) *dex.C
 		Issuer:       idpConfig.Issuer,
 		ClientID:     idpConfig.ClientID,
 		ClientSecret: idpConfig.ClientSecret,
+		AccountID:    idpConfig.AccountID,
 	}
 }
 

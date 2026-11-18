@@ -114,9 +114,19 @@ func (s *SqlStore) DeleteUser(ctx context.Context, accountID, userID string) err
 			return result.Error
 		}
 
-		return tx.Delete(&types.User{}, accountAndIDQueryCondition, accountID, userID).Error
+		result = tx.Delete(&types.User{}, accountAndIDQueryCondition, accountID, userID)
+		if result.Error != nil {
+			return result.Error
+		}
+		if result.RowsAffected == 0 {
+			return status.NewUserNotFoundError(userID)
+		}
+		return nil
 	})
 	if err != nil {
+		if _, ok := status.FromError(err); ok {
+			return err
+		}
 		log.WithContext(ctx).Errorf("failed to delete user from the store: %s", err)
 		return status.Errorf(status.Internal, "failed to delete user from store")
 	}
