@@ -70,24 +70,24 @@ func NewTimeBasedAuthSecretsManager(updateManager network_map.PeersUpdateManager
 	}
 
 	if turnCfg != nil {
-		duration := turnCfg.CredentialsTTL.Duration
+		// Normalize into the stored config so refreshTURNTokens can never
+		// pass a non-positive interval to time.NewTicker.
 		if turnCfg.CredentialsTTL.Duration <= 0 {
 			log.Warnf("TURN credentials TTL is not set or invalid, using default value %s", defaultDuration)
-			duration = defaultDuration
+			turnCfg.CredentialsTTL.Duration = defaultDuration
 		}
-		mgr.turnHmacToken = auth.NewTimedHMAC(turnCfg.Secret, duration)
+		mgr.turnHmacToken = auth.NewTimedHMAC(turnCfg.Secret, turnCfg.CredentialsTTL.Duration)
 	}
 
 	if relayCfg != nil {
-		duration := relayCfg.CredentialsTTL.Duration
 		if relayCfg.CredentialsTTL.Duration <= 0 {
 			log.Warnf("Relay credentials TTL is not set or invalid, using default value %s", defaultDuration)
-			duration = defaultDuration
+			relayCfg.CredentialsTTL.Duration = defaultDuration
 		}
 
 		hashedSecret := sha256.Sum256([]byte(relayCfg.Secret))
 		var err error
-		if mgr.relayHmacToken, err = authv2.NewGenerator(authv2.AuthAlgoHMACSHA256, hashedSecret[:], duration); err != nil {
+		if mgr.relayHmacToken, err = authv2.NewGenerator(authv2.AuthAlgoHMACSHA256, hashedSecret[:], relayCfg.CredentialsTTL.Duration); err != nil {
 			log.Errorf("failed to create relay token generator: %s", err)
 		}
 	}

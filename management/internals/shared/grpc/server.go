@@ -60,6 +60,10 @@ const (
 	envConcurrentSyncs = "NB_MAX_CONCURRENT_SYNCS"
 
 	defaultSyncLim = 1000
+
+	// jobHandshakeTimeout bounds how long a Job stream may go without sending
+	// its first (hello) message.
+	jobHandshakeTimeout = 30 * time.Second
 )
 
 // Server an instance of a Management gRPC API server
@@ -226,7 +230,7 @@ func (s *Server) Job(srv proto.ManagementService_JobServer) error {
 	reqStart := time.Now()
 	ctx := srv.Context()
 
-	peerKey, err := s.handleHandshake(ctx, srv)
+	peerKey, err := s.handleHandshake(ctx, srv, jobHandshakeTimeout)
 	if err != nil {
 		return err
 	}
@@ -262,7 +266,6 @@ func (s *Server) Sync(req *proto.EncryptedMessage, srv proto.ManagementService_S
 	if s.syncLimEnabled && s.syncSem.Load() >= s.syncLim {
 		return status.Errorf(codes.ResourceExhausted, "too many concurrent sync requests, please try again later")
 	}
-	s.syncSem.Add(1)
 
 	reqStart := time.Now()
 	syncStart := reqStart.UTC()
@@ -272,7 +275,6 @@ func (s *Server) Sync(req *proto.EncryptedMessage, srv proto.ManagementService_S
 	syncReq := &proto.SyncRequest{}
 	peerKey, err := s.parseRequest(ctx, req, syncReq)
 	if err != nil {
-		s.syncSem.Add(-1)
 		return err
 	}
 	realIP := getRealIP(ctx)
@@ -289,7 +291,6 @@ func (s *Server) Sync(req *proto.EncryptedMessage, srv proto.ManagementService_S
 			log.WithContext(ctx).Tracef("peer %s with meta hash %d is blocked from syncing", peerKey.String(), metahashed)
 		}
 		if s.blockPeersWithSameConfig {
-			s.syncSem.Add(-1)
 			return mapError(ctx, internalStatus.ErrPeerAlreadyLoggedIn)
 		}
 	}
@@ -307,10 +308,8 @@ func (s *Server) Sync(req *proto.EncryptedMessage, srv proto.ManagementService_S
 		ctx = context.WithValue(ctx, nbContext.AccountIDKey, "UNKNOWN")
 		log.WithContext(ctx).Tracef("peer %s is not registered", peerKey.String())
 		if errStatus, ok := internalStatus.FromError(err); ok && errStatus.Type() == internalStatus.NotFound {
-			s.syncSem.Add(-1)
 			return status.Errorf(codes.PermissionDenied, "peer is not registered")
 		}
-		s.syncSem.Add(-1)
 		return err
 	}
 
@@ -319,12 +318,23 @@ func (s *Server) Sync(req *proto.EncryptedMessage, srv proto.ManagementService_S
 
 	start := time.Now()
 	unlock := s.acquirePeerLockByUID(ctx, peerKey.String())
+	if unlock == nil {
+		return status.FromContextError(ctx.Err()).Err()
+	}
 	defer func() {
 		if unlock != nil {
 			unlock()
 		}
 	}()
 	log.WithContext(ctx).Tracef("acquired peer lock for peer %s took %v", peerKey.String(), time.Since(start))
+
+	// Charge the global sync budget only after the per-peer lock is held.
+	// Streams parked on the peer lock must not consume slots, otherwise one
+	// peer opening many concurrent Sync streams would starve every other peer.
+	if s.syncLimEnabled && s.syncSem.Load() >= s.syncLim {
+		return status.Errorf(codes.ResourceExhausted, "too many concurrent sync requests, please try again later")
+	}
+	s.syncSem.Add(1)
 
 	log.WithContext(ctx).Debugf("Sync request from peer [%s] [%s]", req.WgPubKey, sRealIP)
 
@@ -407,19 +417,37 @@ func (s *Server) Sync(req *proto.EncryptedMessage, srv proto.ManagementService_S
 		WithMetrics(s.appMetrics).HandleUpdates(ctx)
 }
 
-func (s *Server) handleHandshake(ctx context.Context, srv proto.ManagementService_JobServer) (wgtypes.Key, error) {
-	hello, err := srv.Recv()
-	if err != nil {
-		return wgtypes.Key{}, status.Errorf(codes.InvalidArgument, "missing hello: %v", err)
+// handleHandshake reads the first job message. The Recv runs on a goroutine
+// with a deadline so a stream that never sends its hello cannot park a
+// handler goroutine forever; on timeout the handler returns, which tears the
+// stream down and lets the Recv goroutine exit.
+func (s *Server) handleHandshake(ctx context.Context, srv proto.ManagementService_JobServer, timeout time.Duration) (wgtypes.Key, error) {
+	type handshakeResult struct {
+		msg *proto.EncryptedMessage
+		err error
 	}
+	resCh := make(chan handshakeResult, 1)
+	go func() {
+		msg, err := srv.Recv()
+		resCh <- handshakeResult{msg, err}
+	}()
 
-	jobReq := &proto.JobRequest{}
-	peerKey, err := s.parseRequest(ctx, hello, jobReq)
-	if err != nil {
-		return wgtypes.Key{}, err
+	select {
+	case res := <-resCh:
+		if res.err != nil {
+			return wgtypes.Key{}, status.Errorf(codes.InvalidArgument, "missing hello: %v", res.err)
+		}
+		jobReq := &proto.JobRequest{}
+		peerKey, err := s.parseRequest(ctx, res.msg, jobReq)
+		if err != nil {
+			return wgtypes.Key{}, err
+		}
+		return peerKey, nil
+	case <-time.After(timeout):
+		return wgtypes.Key{}, status.Error(codes.DeadlineExceeded, "job handshake timed out")
+	case <-ctx.Done():
+		return wgtypes.Key{}, ctx.Err()
 	}
-
-	return peerKey, nil
 }
 
 func (s *Server) startResponseReceiver(ctx context.Context, srv proto.ManagementService_JobServer) {
@@ -500,6 +528,11 @@ func (s *Server) sendJob(ctx context.Context, peerKey wgtypes.Key, job *job.Even
 func (s *Server) cancelPeerRoutines(ctx context.Context, accountID string, peer *nbpeer.Peer, streamStartTime time.Time, session chan *network_map.UpdateMessage) {
 	uncanceledCTX := context.WithoutCancel(ctx)
 	unlock := s.acquirePeerLockByUID(uncanceledCTX, peer.Key)
+	if unlock == nil {
+		log.WithContext(ctx).Errorf("failed to acquire peer lock for %s on teardown", peer.Key)
+		s.cancelPeerRoutinesWithoutLock(uncanceledCTX, accountID, peer, streamStartTime, session)
+		return
+	}
 	defer unlock()
 
 	s.cancelPeerRoutinesWithoutLock(uncanceledCTX, accountID, peer, streamStartTime, session)
@@ -575,18 +608,26 @@ func (s *Server) validateToken(ctx context.Context, peerKey, jwtToken string) (s
 	return userAuth.UserId, nil
 }
 
+// acquirePeerLockByUID serializes streams per peer. It returns a nil unlock
+// when ctx is done while waiting, so a queued stream exits with its client
+// disconnect instead of parking until the holder releases the lock.
 func (s *Server) acquirePeerLockByUID(ctx context.Context, uniqueID string) (unlock func()) {
 	log.WithContext(ctx).Tracef("acquiring peer lock for ID %s", uniqueID)
 
 	start := time.Now()
-	value, _ := s.peerLocks.LoadOrStore(uniqueID, &sync.RWMutex{})
-	mtx := value.(*sync.RWMutex)
-	mtx.Lock()
+	value, _ := s.peerLocks.LoadOrStore(uniqueID, make(chan struct{}, 1))
+	lock := value.(chan struct{})
+	select {
+	case lock <- struct{}{}:
+	case <-ctx.Done():
+		log.WithContext(ctx).Tracef("abandoned peer lock for ID %s, ctx done", uniqueID)
+		return nil
+	}
 	log.WithContext(ctx).Tracef("acquired peer lock for ID %s in %v", uniqueID, time.Since(start))
 	start = time.Now()
 
 	unlock = func() {
-		mtx.Unlock()
+		<-lock
 		log.WithContext(ctx).Tracef("released peer lock for ID %s in %v", uniqueID, time.Since(start))
 	}
 

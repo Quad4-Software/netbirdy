@@ -53,12 +53,56 @@ func (p *PeersUpdateManager) SendUpdate(ctx context.Context, peerID string, upda
 		case channel <- update:
 			log.WithContext(ctx).Tracef("update was sent to channel for peer %s", peerID)
 		default:
-			dropped = true
-			log.WithContext(ctx).Warnf("channel for peer %s is %d full or closed", peerID, len(channel))
+			// A full channel must not silently discard the newest message:
+			// queued NetworkMap snapshots are superseded by newer state, so
+			// evicting the oldest snapshot keeps revocations and fresh maps
+			// flowing. Only drop when nothing droppable is queued.
+			if evictOldestNetworkMap(channel) {
+				select {
+				case channel <- update:
+					log.WithContext(ctx).Tracef("update was sent to channel for peer %s", peerID)
+				default:
+					dropped = true
+					log.WithContext(ctx).Warnf("channel for peer %s is %d full or closed", peerID, len(channel))
+				}
+			} else {
+				dropped = true
+				log.WithContext(ctx).Warnf("channel for peer %s is %d full or closed", peerID, len(channel))
+			}
 		}
 	} else {
 		log.WithContext(ctx).Debugf("peer %s has no channel", peerID)
 	}
+}
+
+// evictOldestNetworkMap removes the oldest queued MessageTypeNetworkMap from
+// channel to free one slot. Non-snapshot messages keep their order and are
+// never evicted. It reports whether a snapshot was evicted.
+func evictOldestNetworkMap(channel chan *network_map.UpdateMessage) bool {
+	var stash []*network_map.UpdateMessage
+	evicted := false
+
+drain:
+	for len(stash) < cap(channel) {
+		select {
+		case old := <-channel:
+			if old.MessageType == network_map.MessageTypeNetworkMap {
+				evicted = true
+				break drain
+			}
+			stash = append(stash, old)
+		default:
+			break drain
+		}
+	}
+
+	for _, m := range stash {
+		select {
+		case channel <- m:
+		default:
+		}
+	}
+	return evicted
 }
 
 // CreateChannel creates a go channel for a given peer used to deliver updates relevant to the peer.

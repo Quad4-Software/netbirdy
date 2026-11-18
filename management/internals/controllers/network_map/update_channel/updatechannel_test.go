@@ -62,17 +62,60 @@ func TestSendUpdate(t *testing.T) {
 
 	peersUpdater.SendUpdate(context.Background(), peer, update2)
 	timeout := time.After(5 * time.Second)
+	gotLatest := false
 	for range [channelBufferSize]int{} {
 		select {
 		case <-timeout:
 			t.Error("timed out reading previously sent updates")
 		case updateReader := <-peersUpdater.peerChannels[peer]:
 			if updateReader.Update.NetworkMap.Serial == update2.Update.NetworkMap.Serial {
-				t.Error("got the update that shouldn't have been sent")
+				gotLatest = true
 			}
 		}
 	}
+	if !gotLatest {
+		t.Error("the newest update must evict a stale snapshot, not be dropped")
+	}
 
+}
+
+// TestSendUpdateControlSurvivesFullChannel fills the channel with droppable
+// network map snapshots and asserts a control message is still delivered:
+// the oldest snapshot is evicted instead of dropping the control update.
+func TestSendUpdateControlSurvivesFullChannel(t *testing.T) {
+	peer := "test-control"
+	peersUpdater := NewPeersUpdateManager(nil)
+	_ = peersUpdater.CreateChannel(context.Background(), peer)
+
+	snapshot := &network_map.UpdateMessage{
+		Update:      &proto.SyncResponse{NetworkMap: &proto.NetworkMap{Serial: 1}},
+		MessageType: network_map.MessageTypeNetworkMap,
+	}
+	for range [channelBufferSize]int{} {
+		peersUpdater.SendUpdate(context.Background(), peer, snapshot)
+	}
+
+	control := &network_map.UpdateMessage{
+		Update:      &proto.SyncResponse{},
+		MessageType: network_map.MessageTypeControlConfig,
+	}
+	peersUpdater.SendUpdate(context.Background(), peer, control)
+
+	timeout := time.After(5 * time.Second)
+	gotControl := false
+	for range [channelBufferSize]int{} {
+		select {
+		case <-timeout:
+			t.Fatal("timed out reading updates")
+		case msg := <-peersUpdater.peerChannels[peer]:
+			if msg.MessageType == network_map.MessageTypeControlConfig {
+				gotControl = true
+			}
+		}
+	}
+	if !gotControl {
+		t.Error("control message was dropped on a full channel")
+	}
 }
 
 func TestCloseChannel(t *testing.T) {

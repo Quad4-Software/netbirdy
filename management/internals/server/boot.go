@@ -13,6 +13,7 @@ import (
 	"net/netip"
 	"os"
 	"slices"
+	"strconv"
 	"time"
 
 	"github.com/gorilla/mux"
@@ -75,6 +76,22 @@ var (
 		Timeout:               2 * time.Second,
 	}
 )
+
+// maxConcurrentStreamsFromEnv caps concurrent streams per connection.
+// NB_MAX_CONCURRENT_STREAMS overrides the default; 0 means unlimited.
+func maxConcurrentStreamsFromEnv() uint32 {
+	const defaultLimit uint32 = 1024
+	raw := os.Getenv("NB_MAX_CONCURRENT_STREAMS")
+	if raw == "" {
+		return defaultLimit
+	}
+	parsed, err := strconv.ParseUint(raw, 10, 32)
+	if err != nil {
+		log.Errorf("invalid NB_MAX_CONCURRENT_STREAMS %q: %v, using %d", raw, err, defaultLimit)
+		return defaultLimit
+	}
+	return uint32(parsed)
+}
 
 func (s *BaseServer) Metrics() telemetry.AppMetrics {
 	return Create(s, func() telemetry.AppMetrics {
@@ -316,6 +333,7 @@ func (s *BaseServer) GRPCServer() *grpc.Server {
 		gRPCOpts := []grpc.ServerOption{
 			grpc.KeepaliveEnforcementPolicy(kaep),
 			grpc.KeepaliveParams(kasp),
+			grpc.MaxConcurrentStreams(maxConcurrentStreamsFromEnv()),
 			grpc.ChainUnaryInterceptor(realip.UnaryServerInterceptorOpts(realipOpts...), unaryInterceptor, proxyUnary),
 			grpc.ChainStreamInterceptor(realip.StreamServerInterceptorOpts(realipOpts...), streamInterceptor, proxyStream),
 			// Stop waits for the sync handlers, but only up to grpcStopTimeout; a
