@@ -2,6 +2,7 @@ package ratelimit
 
 import (
 	"context"
+	"crypto/sha256"
 	"encoding/json"
 	"net"
 	"net/http"
@@ -102,10 +103,16 @@ type limiterEntry struct {
 	lastAccess time.Time
 }
 
+// maxLimiters bounds the number of per-key limiters kept in memory. The map
+// key derives from unauthenticated request input, so without a bound an
+// attacker rotating keys could grow it until the LimiterTTL sweep runs.
+const maxLimiters = 65536
+
 // APIRateLimiter manages rate limiting for API tokens
 type APIRateLimiter struct {
 	config   *RateLimiterConfig
 	limiters map[string]*limiterEntry
+	fallback *rate.Limiter
 	mu       sync.RWMutex
 	stopChan chan struct{}
 	enabled  atomic.Bool
@@ -120,6 +127,7 @@ func NewAPIRateLimiter(config *RateLimiterConfig) *APIRateLimiter {
 	rl := &APIRateLimiter{
 		config:   config,
 		limiters: make(map[string]*limiterEntry),
+		fallback: rate.NewLimiter(rate.Limit(config.RequestsPerMinute/60.0), config.Burst),
 		stopChan: make(chan struct{}),
 	}
 	rl.enabled.Store(true)
@@ -152,6 +160,8 @@ func (rl *APIRateLimiter) UpdateConfig(config *RateLimiterConfig) {
 	rl.mu.Lock()
 	rl.config.RequestsPerMinute = config.RequestsPerMinute
 	rl.config.Burst = newBurst
+	rl.fallback.SetLimit(newRPS)
+	rl.fallback.SetBurst(newBurst)
 	snapshot := make([]*rate.Limiter, 0, len(rl.limiters))
 	for _, entry := range rl.limiters {
 		snapshot = append(snapshot, entry.limiter)
@@ -162,6 +172,13 @@ func (rl *APIRateLimiter) UpdateConfig(config *RateLimiterConfig) {
 		l.SetLimit(newRPS)
 		l.SetBurst(newBurst)
 	}
+}
+
+// mapKey derives a fixed-length storage key from caller input. Hashing bounds
+// memory for arbitrarily long keys and avoids retaining raw tokens.
+func mapKey(key string) string {
+	sum := sha256.Sum256([]byte(key))
+	return string(sum[:])
 }
 
 // Allow checks if a request for the given key (token) is allowed
@@ -185,6 +202,8 @@ func (rl *APIRateLimiter) Wait(ctx context.Context, key string) error {
 
 // getLimiter retrieves or creates a rate limiter for the given key
 func (rl *APIRateLimiter) getLimiter(key string) *rate.Limiter {
+	key = mapKey(key)
+
 	rl.mu.RLock()
 	entry, exists := rl.limiters[key]
 	rl.mu.RUnlock()
@@ -202,6 +221,10 @@ func (rl *APIRateLimiter) getLimiter(key string) *rate.Limiter {
 	if entry, exists := rl.limiters[key]; exists {
 		entry.lastAccess = time.Now()
 		return entry.limiter
+	}
+
+	if len(rl.limiters) >= maxLimiters {
+		return rl.fallback
 	}
 
 	requestsPerSecond := rl.config.RequestsPerMinute / 60.0
@@ -251,7 +274,7 @@ func (rl *APIRateLimiter) Stop() {
 func (rl *APIRateLimiter) Reset(key string) {
 	rl.mu.Lock()
 	defer rl.mu.Unlock()
-	delete(rl.limiters, key)
+	delete(rl.limiters, mapKey(key))
 }
 
 // Middleware returns an HTTP middleware that rate limits requests by client IP.

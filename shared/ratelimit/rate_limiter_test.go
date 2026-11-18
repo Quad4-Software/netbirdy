@@ -376,3 +376,49 @@ func TestGetClientIP_TrustedProxies(t *testing.T) {
 		})
 	}
 }
+
+func TestAPIRateLimiter_MapBound(t *testing.T) {
+	rl := NewAPIRateLimiter(&RateLimiterConfig{
+		RequestsPerMinute: 6000,
+		Burst:             1,
+		CleanupInterval:   time.Hour,
+		LimiterTTL:        time.Hour,
+	})
+	defer rl.Stop()
+
+	// unique garbage keys beyond the bound must not grow the map past maxLimiters
+	for i := 0; i < maxLimiters+4096; i++ {
+		rl.Allow(fmt.Sprintf("garbage-token-%d", i))
+	}
+
+	rl.mu.RLock()
+	n := len(rl.limiters)
+	rl.mu.RUnlock()
+	assert.LessOrEqual(t, n, maxLimiters)
+
+	// keys beyond the bound share the fallback limiter, so they are still
+	// rate limited rather than unlimited
+	allowed := 0
+	for i := 0; i < 100; i++ {
+		if rl.Allow("late-key") {
+			allowed++
+		}
+	}
+	assert.Less(t, allowed, 10, "unknown keys at capacity should be throttled by the fallback limiter")
+}
+
+func TestAPIRateLimiter_KeyHashing(t *testing.T) {
+	rl := NewAPIRateLimiter(nil)
+	defer rl.Stop()
+
+	raw := "nbp_secret-token-value-that-must-not-be-stored"
+	rl.Allow(raw)
+
+	rl.mu.RLock()
+	_, stored := rl.limiters[raw]
+	for k := range rl.limiters {
+		assert.Len(t, k, 32, "map keys must be fixed-length hashes")
+	}
+	rl.mu.RUnlock()
+	assert.False(t, stored, "raw token must not be retained as a map key")
+}
