@@ -1,6 +1,10 @@
 package internal
 
 import (
+	"crypto/hmac"
+	"crypto/rand"
+	"crypto/sha256"
+	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -15,7 +19,18 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
-const offlineSnapshotVersion = 2
+// offlineSnapshotVersion is the only accepted envelope version. Version 3
+// adds the MAC field; older unauthenticated envelopes are rejected so a
+// forged file cannot bypass the signature check by claiming an old version.
+const offlineSnapshotVersion = 3
+
+// offlineSnapshotMaxBytes bounds the snapshot file. A SyncResponse for a
+// large deployment stays far below this; anything bigger is corrupt input,
+// not a map to load into memory and parse.
+const offlineSnapshotMaxBytes = 32 << 20
+
+// offlineSnapshotKeyLen is the HMAC-SHA256 key size stored in networkmap.key.
+const offlineSnapshotKeyLen = 32
 
 var (
 	errOfflineNoSnapshot = errors.New("offline snapshot not found")
@@ -37,11 +52,112 @@ type offlineSnapshot struct {
 	// reconnect loop can dial them directly when DNS no longer resolves the
 	// hostname (offline DNS interception or a dead upstream).
 	MgmtAddrs []string `json:"mgmt_addrs,omitempty"`
+
+	// MAC is the hex HMAC-SHA256 of the canonical JSON encoding of this
+	// envelope with MAC empty, keyed by networkmap.key next to the snapshot.
+	// It authenticates the cached map: an envelope that fails verification
+	// is never unmarshalled or applied.
+	MAC string `json:"mac"`
 }
 
 // offlineSnapshotPath returns the snapshot path for a given config path.
 func offlineSnapshotPath(configPath string) string {
 	return filepath.Join(filepath.Dir(configPath), "networkmap.bin")
+}
+
+// offlineSnapshotKeyPath returns the HMAC key path for a snapshot path.
+func offlineSnapshotKeyPath(snapshotPath string) string {
+	return filepath.Join(filepath.Dir(snapshotPath), "networkmap.key")
+}
+
+// writeFileDurable writes data to path through a sibling temp file: the temp
+// file is fsynced, then renamed over path, so a crash never leaves a partial
+// file for readers to pick up.
+func writeFileDurable(path string, data []byte, perm os.FileMode) error {
+	tmp := path + ".tmp"
+	f, err := os.OpenFile(tmp, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, perm)
+	if err != nil {
+		return fmt.Errorf("open %s: %w", tmp, err)
+	}
+	// OpenFile keeps the mode of an existing temp file; pin it explicitly.
+	_ = f.Chmod(perm)
+	if _, err = f.Write(data); err == nil {
+		err = f.Sync()
+	}
+	cerr := f.Close()
+	if err == nil {
+		err = cerr
+	}
+	if err != nil {
+		_ = os.Remove(tmp)
+		return fmt.Errorf("write %s: %w", tmp, err)
+	}
+	if err := os.Rename(tmp, path); err != nil {
+		return fmt.Errorf("rename %s: %w", tmp, err)
+	}
+	return nil
+}
+
+// readOfflineKey loads the snapshot signing key. It never creates one: a
+// missing or malformed key means no snapshot signed under it can verify.
+func readOfflineKey(snapshotPath string) ([]byte, error) {
+	bs, err := os.ReadFile(offlineSnapshotKeyPath(snapshotPath))
+	if err != nil {
+		return nil, err
+	}
+	if len(bs) != offlineSnapshotKeyLen {
+		return nil, fmt.Errorf("snapshot key has %d bytes, want %d", len(bs), offlineSnapshotKeyLen)
+	}
+	return bs, nil
+}
+
+// loadOrCreateOfflineKey returns the snapshot signing key, generating and
+// persisting a fresh one on first use. A malformed existing key is replaced;
+// snapshots signed with it then fail verification and are rejected, which is
+// the fail-closed direction.
+func loadOrCreateOfflineKey(snapshotPath string) ([]byte, error) {
+	key, err := readOfflineKey(snapshotPath)
+	if err == nil {
+		return key, nil
+	}
+	key = make([]byte, offlineSnapshotKeyLen)
+	if _, err := rand.Read(key); err != nil {
+		return nil, fmt.Errorf("generate snapshot key: %w", err)
+	}
+	if err := writeFileDurable(offlineSnapshotKeyPath(snapshotPath), key, 0o600); err != nil {
+		return nil, err
+	}
+	return key, nil
+}
+
+// signOfflineSnapshot computes the envelope MAC over its canonical JSON form
+// (struct field order and sorted map keys make json.Marshal deterministic).
+func signOfflineSnapshot(key []byte, env *offlineSnapshot) error {
+	env.MAC = ""
+	bs, err := json.Marshal(env)
+	if err != nil {
+		return fmt.Errorf("marshal envelope for signing: %w", err)
+	}
+	mac := hmac.New(sha256.New, key)
+	mac.Write(bs)
+	env.MAC = hex.EncodeToString(mac.Sum(nil))
+	return nil
+}
+
+// verifyOfflineSnapshot reports whether env carries a valid MAC for key.
+func verifyOfflineSnapshot(key []byte, env *offlineSnapshot) bool {
+	want, err := hex.DecodeString(env.MAC)
+	if err != nil || len(want) != sha256.Size {
+		return false
+	}
+	env.MAC = ""
+	bs, err := json.Marshal(env)
+	if err != nil {
+		return false
+	}
+	mac := hmac.New(sha256.New, key)
+	mac.Write(bs)
+	return hmac.Equal(mac.Sum(nil), want)
 }
 
 func saveOfflineSnapshot(path string, resp *mgmProto.SyncResponse, endpoints map[string]string, now time.Time) error {
@@ -57,74 +173,70 @@ func saveOfflineSnapshot(path string, resp *mgmProto.SyncResponse, endpoints map
 		if bs, rerr := os.ReadFile(path); rerr == nil {
 			var prev offlineSnapshot
 			if json.Unmarshal(bs, &prev) == nil {
-				mgmtAddrs = prev.MgmtAddrs
+				for _, a := range prev.MgmtAddrs {
+					if _, perr := netip.ParseAddr(a); perr == nil {
+						mgmtAddrs = append(mgmtAddrs, a)
+					}
+				}
 			}
 		}
 	}
-	env, err := json.Marshal(offlineSnapshot{Version: offlineSnapshotVersion, SavedAt: now, Sync: raw, Endpoints: endpoints, MgmtAddrs: mgmtAddrs})
-	if err != nil {
-		return fmt.Errorf("marshal envelope: %w", err)
-	}
+	env := offlineSnapshot{Version: offlineSnapshotVersion, SavedAt: now, Sync: raw, Endpoints: endpoints, MgmtAddrs: mgmtAddrs}
 	dir := filepath.Dir(path)
 	if err := os.MkdirAll(dir, 0o700); err != nil {
 		return fmt.Errorf("create snapshot dir: %w", err)
 	}
-	tmp := path + ".tmp"
-	f, err := os.OpenFile(tmp, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0o600)
+	key, err := loadOrCreateOfflineKey(path)
 	if err != nil {
-		return fmt.Errorf("open snapshot: %w", err)
+		return err
 	}
-	if _, err = f.Write(env); err == nil {
-		err = f.Sync()
+	if err := signOfflineSnapshot(key, &env); err != nil {
+		return err
 	}
-	cerr := f.Close()
-	if err == nil {
-		err = cerr
-	}
+	out, err := json.Marshal(env)
 	if err != nil {
-		_ = os.Remove(tmp)
+		return fmt.Errorf("marshal envelope: %w", err)
+	}
+	if err := writeFileDurable(path, out, 0o600); err != nil {
 		return fmt.Errorf("write snapshot: %w", err)
-	}
-	if err := os.Rename(tmp, path); err != nil {
-		return fmt.Errorf("rename snapshot: %w", err)
 	}
 	return nil
 }
 
 func loadOfflineSnapshot(path string, maxAge time.Duration, now time.Time) (*mgmProto.SyncResponse, time.Time, error) {
-	loaded = nil
-	resp2, t, err := loadSnapshotInner(path, maxAge, now)
-	lastEndpoints = loaded
-	return resp2, t, err
-}
-
-var (
-	loaded          map[string]string
-	lastEndpoints   map[string]string
-	lastMgmtAddrs   []string
-	lastMgmtAddrsMu sync.Mutex
-)
-
-func loadSnapshotInner(path string, maxAge time.Duration, now time.Time) (*mgmProto.SyncResponse, time.Time, error) {
 	if maxAge <= 0 {
 		return nil, time.Time{}, errOfflineDisabled
 	}
-	bs, err := os.ReadFile(path)
+	fi, err := os.Stat(path)
 	if err != nil {
 		if errors.Is(err, os.ErrNotExist) {
 			return nil, time.Time{}, errOfflineNoSnapshot
 		}
 		return nil, time.Time{}, err
 	}
+	if fi.Size() > offlineSnapshotMaxBytes {
+		return nil, time.Time{}, fmt.Errorf("%w: snapshot too large (%d bytes)", errOfflineCorrupt, fi.Size())
+	}
+	bs, err := os.ReadFile(path)
+	if err != nil {
+		return nil, time.Time{}, err
+	}
 	var env offlineSnapshot
 	if err := json.Unmarshal(bs, &env); err != nil {
 		return nil, time.Time{}, fmt.Errorf("%w: %v", errOfflineCorrupt, err)
 	}
-	if env.Version < 1 || env.Version > offlineSnapshotVersion {
+	if env.Version != offlineSnapshotVersion {
 		return nil, time.Time{}, errOfflineVersion
 	}
 	if now.Sub(env.SavedAt) > maxAge {
 		return nil, time.Time{}, errOfflineExpired
+	}
+	key, err := readOfflineKey(path)
+	if err != nil {
+		return nil, time.Time{}, fmt.Errorf("%w: snapshot key unreadable", errOfflineCorrupt)
+	}
+	if !verifyOfflineSnapshot(key, &env) {
+		return nil, time.Time{}, fmt.Errorf("%w: bad signature", errOfflineCorrupt)
 	}
 	resp := &mgmProto.SyncResponse{}
 	if err := proto.Unmarshal(env.Sync, resp); err != nil {
@@ -148,14 +260,17 @@ func loadSnapshotInner(path string, maxAge time.Duration, now time.Time) (*mgmPr
 			delete(env.Endpoints, k)
 		}
 	}
-	loaded = env.Endpoints
-	lastMgmtAddrsMu.Lock()
+	offlineStateMu.Lock()
+	lastEndpoints = env.Endpoints
 	lastMgmtAddrs = env.MgmtAddrs
-	lastMgmtAddrsMu.Unlock()
+	offlineStateMu.Unlock()
 	return resp, env.SavedAt, nil
 }
 
 func deleteOfflineSnapshot(path string) error {
+	// The key goes too: logout and auth-refusal paths mean "forget offline
+	// state", and a stale key only signs files that no longer exist.
+	_ = os.Remove(offlineSnapshotKeyPath(path))
 	if err := os.Remove(path); err != nil && !errors.Is(err, os.ErrNotExist) {
 		return err
 	}
@@ -229,20 +344,38 @@ func DeleteOfflineSnapshotFor(configPath string) error {
 	return deleteOfflineSnapshot(offlineSnapshotPath(configPath))
 }
 
-// LastEndpoints returns the validated peer endpoints from the most recent
-// successful loadOfflineSnapshot call.
-func LastEndpoints() map[string]string { return lastEndpoints }
+var (
+	lastEndpoints  map[string]string
+	lastMgmtAddrs  []string
+	offlineStateMu sync.Mutex
+)
+
+// LastEndpoints returns a copy of the validated peer endpoints from the most
+// recent successful loadOfflineSnapshot call.
+func LastEndpoints() map[string]string {
+	offlineStateMu.Lock()
+	defer offlineStateMu.Unlock()
+	if lastEndpoints == nil {
+		return nil
+	}
+	out := make(map[string]string, len(lastEndpoints))
+	for k, v := range lastEndpoints {
+		out[k] = v
+	}
+	return out
+}
 
 // LastMgmtAddrs returns the cached management IPs from the snapshot.
 func LastMgmtAddrs() []string {
-	lastMgmtAddrsMu.Lock()
-	defer lastMgmtAddrsMu.Unlock()
+	offlineStateMu.Lock()
+	defer offlineStateMu.Unlock()
 	return append([]string(nil), lastMgmtAddrs...)
 }
 
 // updateMgmtAddrs persists freshly resolved management IPs into an existing
 // snapshot envelope immediately, so a later debounced write cannot race the
-// capture. No-op when the snapshot does not exist yet.
+// capture. The MAC is recomputed over the edited envelope. No-op when the
+// snapshot does not exist yet.
 func updateMgmtAddrs(path string, addrs []string) {
 	if len(addrs) == 0 {
 		return
@@ -255,25 +388,36 @@ func updateMgmtAddrs(path string, addrs []string) {
 	if err := json.Unmarshal(bs, &env); err != nil {
 		return
 	}
+	key, err := readOfflineKey(path)
+	if err != nil {
+		return
+	}
+	// Re-signing a tampered envelope would bless it; only carry the address
+	// refresh into snapshots that still verify.
+	if !verifyOfflineSnapshot(key, &env) {
+		return
+	}
 	env.MgmtAddrs = addrs
+	if err := signOfflineSnapshot(key, &env); err != nil {
+		return
+	}
 	out, err := json.Marshal(env)
 	if err != nil {
 		return
 	}
-	tmp := path + ".tmp"
-	if err := os.WriteFile(tmp, out, 0o600); err == nil {
-		os.Rename(tmp, path)
-		lastMgmtAddrsMu.Lock()
-		lastMgmtAddrs = addrs
-		lastMgmtAddrsMu.Unlock()
+	if err := writeFileDurable(path, out, 0o600); err != nil {
+		return
 	}
+	offlineStateMu.Lock()
+	lastMgmtAddrs = addrs
+	offlineStateMu.Unlock()
 }
 
 // SetMgmtAddrs records freshly resolved management IPs for the snapshot.
 func SetMgmtAddrs(addrs []string) {
-	lastMgmtAddrsMu.Lock()
+	offlineStateMu.Lock()
 	lastMgmtAddrs = addrs
-	lastMgmtAddrsMu.Unlock()
+	offlineStateMu.Unlock()
 }
 
 // mergeEndpoints keeps endpoints for peers that exist in the current map:

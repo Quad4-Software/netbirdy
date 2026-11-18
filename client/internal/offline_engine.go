@@ -21,6 +21,12 @@ import (
 
 var errOfflineUnavailable = errors.New("control plane unreachable: engine in offline mode")
 
+// offlineSignalRetryInterval is how long the offline engine waits before
+// re-entering the signal receive loop after the broker's own retry budget is
+// exhausted. The signal client already retries internally for ~30 minutes;
+// this only covers outages longer than that.
+const offlineSignalRetryInterval = 30 * time.Second
+
 // offlineMgmClient satisfies the management client interface while the engine
 // runs from a cached network map. Every call reports an unavailable error so
 // nothing can silently depend on a live control plane.
@@ -85,9 +91,12 @@ func (e *Engine) SetOffline(offline bool) {
 }
 
 // StartOffline boots the engine and applies the cached sync response through
-// the same handleSync path a live map would take.
-func (e *Engine) StartOffline(netbirdConfig *mgmProto.NetbirdConfig, mgmtURL *url.URL, snapshot *mgmProto.SyncResponse) error {
+// the same handleSync path a live map would take. savedAt is the snapshot's
+// original write time; re-saves while offline keep it so NB_OFFLINE_MAX_AGE
+// still bounds how stale the applied map may be.
+func (e *Engine) StartOffline(netbirdConfig *mgmProto.NetbirdConfig, mgmtURL *url.URL, snapshot *mgmProto.SyncResponse, savedAt time.Time) error {
 	e.SetOffline(true)
+	e.offlineSnapshotSavedAt = savedAt
 	e.offlineProtectedHosts = protectedOfflineHosts(netbirdConfig, mgmtURL)
 	if err := e.Start(netbirdConfig, mgmtURL); err != nil {
 		return err

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/netbirdio/netbird/client/ssh"
 	mgm "github.com/netbirdio/netbird/shared/management/client"
+	signal "github.com/netbirdio/netbird/shared/signal/client"
 	log "github.com/sirupsen/logrus"
 	"time"
 
@@ -38,7 +39,9 @@ func waitOfflineDelay(ctx context.Context) bool {
 
 // runOffline starts the engine from a cached sync response and blocks until
 // the engine context ends, mirroring the connected branch of the run loop.
-func (c *ConnectClient) runOffline(engineCtx context.Context, cancel context.CancelFunc, snapshot *mgmProto.SyncResponse, runningChan chan struct{}, mobileDependency MobileDependency, logPath string, path string) error {
+// savedAt is the snapshot's original write time, carried into the engine so
+// re-saves do not refresh the staleness clock.
+func (c *ConnectClient) runOffline(engineCtx context.Context, cancel context.CancelFunc, snapshot *mgmProto.SyncResponse, savedAt time.Time, runningChan chan struct{}, mobileDependency MobileDependency, logPath string, path string) error {
 	defer cancel()
 
 	myPrivateKey, err := wgtypes.ParseKey(c.config.PrivateKey)
@@ -46,7 +49,17 @@ func (c *ConnectClient) runOffline(engineCtx context.Context, cancel context.Can
 		return fmt.Errorf("offline mode requires the private key: %w", err)
 	}
 
-	engineConfig, err := createEngineConfig(myPrivateKey, c.config, snapshot.GetNetworkMap().GetPeerConfig(), logPath)
+	// Envelope-format sync responses carry PeerConfig at the top level;
+	// legacy NetworkMap syncs carry it under NetworkMap.PeerConfig. Mirror
+	// handleSync's fallback so both snapshot shapes boot.
+	peerConfig := snapshot.GetPeerConfig()
+	if peerConfig == nil {
+		peerConfig = snapshot.GetNetworkMap().GetPeerConfig()
+	}
+	if peerConfig == nil {
+		return errors.New("offline snapshot carries no peer config")
+	}
+	engineConfig, err := createEngineConfig(myPrivateKey, c.config, peerConfig, logPath)
 	if err != nil {
 		return fmt.Errorf("offline engine config: %w", err)
 	}
@@ -61,9 +74,20 @@ func (c *ConnectClient) runOffline(engineCtx context.Context, cancel context.Can
 		relayClient.WithNetEvents(c.netMgr))
 	c.statusRecorder.SetRelayMgr(relayManager)
 
+	// Signal is best-effort in cached-map mode: the broker authenticates with
+	// the WireGuard key alone, so it works while management is down. When it
+	// is unreachable too, the engine falls back to the no-op stub and peers
+	// rely on cached endpoints and relay credentials.
+	signalClient := c.connectOfflineSignal(engineCtx, snapshot, myPrivateKey)
+	defer func() {
+		if err := signalClient.Close(); err != nil {
+			log.Warnf("failed to close offline signal client: %v", err)
+		}
+	}()
+
 	c.engineMutex.Lock()
 	engine := NewEngine(engineCtx, cancel, engineConfig, EngineServices{
-		SignalClient:   offlineSignalClient{},
+		SignalClient:   signalClient,
 		MgmClient:      offlineMgmClient{},
 		RelayManager:   relayManager,
 		StatusRecorder: c.statusRecorder,
@@ -82,7 +106,7 @@ func (c *ConnectClient) runOffline(engineCtx context.Context, cancel context.Can
 	c.engineMutex.Unlock()
 
 	mgmtURL := c.config.ManagementURL
-	if err := engine.StartOffline(snapshot.GetNetbirdConfig(), mgmtURL, snapshot); err != nil {
+	if err := engine.StartOffline(snapshot.GetNetbirdConfig(), mgmtURL, snapshot, savedAt); err != nil {
 		log.Errorf("offline engine start failed: %s", err)
 		return CtxGetState(c.ctx).Wrap(err)
 	}
@@ -108,6 +132,22 @@ func (c *ConnectClient) runOffline(engineCtx context.Context, cancel context.Can
 		c.managementReconnectLoop(engineCtx)
 	}()
 
+	// The cached session cannot be refreshed while management is down, so its
+	// expiry is a hard deadline: past it the peer must not keep running on
+	// the stale map. Leaving offline re-enters the normal path, which deletes
+	// the snapshot once the expired session is confirmed.
+	var deadlineCh <-chan time.Time
+	if deadline := offlineSessionDeadline(snapshot); !deadline.IsZero() {
+		timer := time.NewTimer(time.Until(deadline))
+		defer timer.Stop()
+		deadlineCh = timer.C
+	}
+	select {
+	case <-engineCtx.Done():
+	case <-deadlineCh:
+		log.Warnf("offline session expired, leaving cached mode")
+		c.stopOfflineEngine()
+	}
 	<-engineCtx.Done()
 	<-loopDone
 
@@ -204,22 +244,37 @@ func (c *ConnectClient) managementReconnectLoopWith(ctx context.Context, attempt
 	}
 }
 
+// connectOfflineSignal dials the signal broker from the cached config. The
+// signal service authenticates peers with their WireGuard key alone, so it
+// stays usable while management is down and keeps ICE negotiation alive for
+// the cached map. Any failure degrades to the no-op stub: the dial is bounded
+// by the client's own ~10s connect backoff.
+func (c *ConnectClient) connectOfflineSignal(ctx context.Context, snapshot *mgmProto.SyncResponse, key wgtypes.Key) signal.Client {
+	cfg := snapshot.GetNetbirdConfig()
+	if cfg == nil || cfg.GetSignal() == nil || cfg.GetSignal().GetUri() == "" {
+		return offlineSignalClient{}
+	}
+	client, err := connectToSignal(ctx, cfg, key, c.netMgr)
+	if err != nil {
+		log.Warnf("offline mode: signal broker unreachable, continuing without ICE negotiation: %v", err)
+		return offlineSignalClient{}
+	}
+	client.SetConnStateListener(statusRecorderToSignalConnStateNotifier(c.statusRecorder))
+	log.Infof("offline mode: signal broker reachable, ICE negotiation stays available")
+	return client
+}
+
 // maybeStartOffline classifies a management login failure and, when allowed,
 // switches the run loop to a cached network map. Returns true when the
 // caller's operation should exit (offline engine ran to completion or the
 // failure was already handled).
 func (c *ConnectClient) maybeStartOffline(engineCtx context.Context, cancel context.CancelFunc, loginErr error, runningChan chan struct{}, mobileDependency MobileDependency, logPath string, path string) bool {
 	snapPath := offlineSnapshotPath(path)
-	resp, _, snapErr := loadOfflineSnapshot(snapPath, OfflineMaxAge(), time.Now())
+	resp, savedAt, snapErr := loadOfflineSnapshot(snapPath, OfflineMaxAge(), time.Now())
+	deadline := offlineSessionDeadline(resp)
 	var sessExpires *time.Time
-	if resp != nil {
-		if t := resp.GetSessionExpiresAt(); t != nil {
-			// A zero-valued Timestamp is the wire encoding for "no
-			// deadline"; it is non-nil but decodes to the Unix epoch.
-			if ts := t.AsTime(); ts.Unix() > 0 {
-				sessExpires = &ts
-			}
-		}
+	if !deadline.IsZero() {
+		sessExpires = &deadline
 	}
 	c.offlineSnapshotPath = snapPath
 	d, _ := shouldStartOffline(loginErr, snapErr, time.Now(), sessExpires)
@@ -229,7 +284,7 @@ func (c *ConnectClient) maybeStartOffline(engineCtx context.Context, cancel cont
 		if !waitOfflineDelay(engineCtx) {
 			return false
 		}
-		if err := c.runOffline(engineCtx, cancel, resp, runningChan, mobileDependency, logPath, path); err != nil {
+		if err := c.runOffline(engineCtx, cancel, resp, savedAt, runningChan, mobileDependency, logPath, path); err != nil {
 			log.Errorf("offline mode failed: %v", err)
 			return false
 		}

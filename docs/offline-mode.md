@@ -20,16 +20,26 @@ the last sync. The daemon keeps probing management with a jittered backoff
 and returns to normal operation automatically when the server comes back.
 A short tunnel flap is expected on reconnect.
 
+The cached session cannot be refreshed while management is down, so its
+expiry is a hard deadline: when `session_expires_at` passes, the client
+leaves offline mode and the normal reconnect path takes over (the expired
+snapshot is then deleted as usual).
+
 ## What keeps working
 
 - Established peer connections whose endpoints are still reachable.
 - DNS resolution for peers, routes, firewall rules, SSH config.
+- Signal-driven ICE renegotiation and relay credentials, as long as the
+  signal and relay services stay reachable (they authenticate with the
+  peer's WireGuard key, not the management session). When the signal broker
+  is unreachable too, the engine stays on the cached map and keeps
+  retrying the broker in the background; peers rely on their cached
+  endpoints and any still-valid relay credentials.
 
 ## What does not
 
 - New peers, policy changes, new routes: the map is frozen.
 - Relay-only peers once relay credentials expire.
-- Anything that needs the signal service (new ICE negotiation).
 - New logins or session changes.
 
 ## Security notes
@@ -40,7 +50,12 @@ A short tunnel flap is expected on reconnect.
   session expiry, and on any authentication rejection observed while
   offline.
 - The file is written `0600` next to `config.json`, same trust boundary as
-  the WireGuard private key.
+  the WireGuard private key. Writes go through a temp file plus rename, so
+  a crash cannot leave a half-written map.
+- The envelope carries an HMAC-SHA256 signature keyed by
+  `networkmap.key` (also `0600`, generated on first save). A snapshot whose
+  contents were edited, truncated, or copied from another install fails
+  verification and is treated as corrupt: offline mode never applies it.
 
 ## Configuration
 

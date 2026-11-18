@@ -335,6 +335,11 @@ type Engine struct {
 	// one per 5s); nil until the engine starts.
 	offlineDebouncer *offlineDebouncer
 	offlineLogGate   atomic.Int64
+	// offlineSnapshotSavedAt is the original write time of the snapshot the
+	// offline engine loaded. Re-saves while offline (endpoint updates, the
+	// initial cached-map apply) keep it so NB_OFFLINE_MAX_AGE still bounds how
+	// stale the applied map may be instead of refreshing on every write.
+	offlineSnapshotSavedAt time.Time
 
 	flowManager nftypes.FlowManager
 
@@ -762,9 +767,20 @@ func (e *Engine) Start(netbirdConfig *mgmProto.NetbirdConfig, mgmtURL *url.URL) 
 	e.srWatcher = guard.NewSRWatcher(e.signal, e.relayManager, e.mobileDep.IFaceDiscover, iceCfg)
 
 	if e.offline {
-		// Cached-map mode: signal and management are unreachable by
-		// definition, so the ICE watcher and the event receivers stay off.
+		// Cached-map mode: management stays unreachable by definition, so its
+		// event receivers stay off. Signal and relay are best-effort: when the
+		// broker is reachable, ICE negotiation keeps working on the cached map.
 		log.Warnf("engine running offline from a cached network map")
+		e.srWatcher.Start(peer.IsForceRelayed())
+		if _, stub := e.signal.(offlineSignalClient); !stub {
+			e.shutdownWg.Add(1)
+			go func() {
+				defer e.shutdownWg.Done()
+				if err := e.receiveSignalEvents(); err != nil && e.ctx.Err() == nil {
+					log.Warnf("offline signal receiver stopped: %v", err)
+				}
+			}()
+		}
 	} else {
 		e.srWatcher.Start(peer.IsForceRelayed())
 
@@ -2109,7 +2125,7 @@ func (e *Engine) receiveSignalEvents() error {
 	go func() {
 		defer e.shutdownWg.Done()
 		// connect to a stream of messages coming from the signal server
-		err := e.signal.Receive(e.ctx, func(msg *sProto.Message) error {
+		handler := func(msg *sProto.Message) error {
 			start := time.Now()
 			e.syncMsgMux.Lock()
 			defer e.syncMsgMux.Unlock()
@@ -2165,8 +2181,32 @@ func (e *Engine) receiveSignalEvents() error {
 			}
 
 			return nil
-		})
+		}
+		var err error
+		for {
+			err = e.signal.Receive(e.ctx, handler)
+			// Offline mode treats the broker as best-effort: its own retry
+			// loop covers short outages, and when it finally gives up the
+			// cached map keeps running while we try again later.
+			if err == nil || e.ctx.Err() != nil || !e.offline {
+				break
+			}
+			log.Warnf("offline mode: signal stream ended (%v), retrying in %s", err, offlineSignalRetryInterval)
+			timer := time.NewTimer(offlineSignalRetryInterval)
+			select {
+			case <-e.ctx.Done():
+				timer.Stop()
+				return
+			case <-timer.C:
+			}
+		}
 		if err != nil {
+			if e.offline {
+				// The broker is optional in cached-map mode: keep the
+				// engine and the cached tunnels instead of resetting.
+				log.Warnf("offline mode: signal stream stopped, staying on the cached network map: %v", err)
+				return
+			}
 			// happens if signal is unavailable for a long time.
 			// We want to cancel the operation of the whole client
 			_ = CtxGetState(e.ctx).Wrap(ErrResetConnection)
@@ -2623,7 +2663,11 @@ func (e *Engine) scheduleOfflineSnapshot(update *mgmProto.SyncResponse) {
 			}
 			e.offlinePeerEndpointsMu.Unlock()
 			merged := mergeEndpoints(LastEndpoints(), endpoints, peerKeys)
-			return saveOfflineSnapshot(path, update, merged, time.Now())
+			savedAt := time.Now()
+			if e.offline && !e.offlineSnapshotSavedAt.IsZero() {
+				savedAt = e.offlineSnapshotSavedAt
+			}
+			return saveOfflineSnapshot(path, update, merged, savedAt)
 		}, func(err error) {
 			if now := time.Now().UnixNano(); now-e.offlineLogGate.Load() > int64(time.Minute) {
 				if e.offlineLogGate.CompareAndSwap(e.offlineLogGate.Load(), now) {

@@ -12,6 +12,7 @@ import (
 	"time"
 
 	mgmProto "github.com/netbirdio/netbird/shared/management/proto"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 func sampleSyncResponse() *mgmProto.SyncResponse {
@@ -255,5 +256,179 @@ func TestOfflineSnapshotV2Endpoints(t *testing.T) {
 	}
 	if len(got) != 1 {
 		t.Fatalf("invalid endpoints not dropped: %v", got)
+	}
+}
+
+func TestOfflineSnapshotIntegrity(t *testing.T) {
+	now := time.Unix(1_700_000_000, 0).UTC()
+	age := 24 * time.Hour
+
+	t.Run("tampered payload rejected", func(t *testing.T) {
+		dir := t.TempDir()
+		p := filepath.Join(dir, "networkmap.bin")
+		if err := saveOfflineSnapshot(p, sampleSyncResponse(), nil, now); err != nil {
+			t.Fatalf("save: %v", err)
+		}
+		bs, err := os.ReadFile(p)
+		if err != nil {
+			t.Fatal(err)
+		}
+		var env offlineSnapshot
+		if err := json.Unmarshal(bs, &env); err != nil {
+			t.Fatal(err)
+		}
+		// Forge a different map but keep the original MAC.
+		env.Sync = []byte("forged")
+		out, err := json.Marshal(env)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if err := os.WriteFile(p, out, 0o600); err != nil {
+			t.Fatal(err)
+		}
+		if _, _, err := loadOfflineSnapshot(p, age, now.Add(time.Hour)); !errors.Is(err, errOfflineCorrupt) {
+			t.Fatalf("err = %v, want errOfflineCorrupt", err)
+		}
+	})
+
+	t.Run("stripped mac rejected", func(t *testing.T) {
+		dir := t.TempDir()
+		p := filepath.Join(dir, "networkmap.bin")
+		if err := saveOfflineSnapshot(p, sampleSyncResponse(), nil, now); err != nil {
+			t.Fatalf("save: %v", err)
+		}
+		bs, err := os.ReadFile(p)
+		if err != nil {
+			t.Fatal(err)
+		}
+		var env map[string]json.RawMessage
+		if err := json.Unmarshal(bs, &env); err != nil {
+			t.Fatal(err)
+		}
+		delete(env, "mac")
+		out, err := json.Marshal(env)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if err := os.WriteFile(p, out, 0o600); err != nil {
+			t.Fatal(err)
+		}
+		if _, _, err := loadOfflineSnapshot(p, age, now.Add(time.Hour)); !errors.Is(err, errOfflineCorrupt) {
+			t.Fatalf("err = %v, want errOfflineCorrupt", err)
+		}
+	})
+
+	t.Run("missing key rejected", func(t *testing.T) {
+		dir := t.TempDir()
+		p := filepath.Join(dir, "networkmap.bin")
+		if err := saveOfflineSnapshot(p, sampleSyncResponse(), nil, now); err != nil {
+			t.Fatalf("save: %v", err)
+		}
+		if err := os.Remove(offlineSnapshotKeyPath(p)); err != nil {
+			t.Fatal(err)
+		}
+		if _, _, err := loadOfflineSnapshot(p, age, now.Add(time.Hour)); !errors.Is(err, errOfflineCorrupt) {
+			t.Fatalf("err = %v, want errOfflineCorrupt", err)
+		}
+	})
+
+	t.Run("legacy unsigned envelope rejected", func(t *testing.T) {
+		dir := t.TempDir()
+		p := filepath.Join(dir, "networkmap.bin")
+		// A pre-v3 envelope: plausible content, no MAC, old version.
+		env := map[string]any{
+			"version":  2,
+			"saved_at": now.Format(time.RFC3339Nano),
+			"sync":     "AAAA",
+		}
+		out, err := json.Marshal(env)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if err := os.WriteFile(p, out, 0o600); err != nil {
+			t.Fatal(err)
+		}
+		if _, _, err := loadOfflineSnapshot(p, age, now.Add(time.Hour)); !errors.Is(err, errOfflineVersion) {
+			t.Fatalf("err = %v, want errOfflineVersion", err)
+		}
+	})
+
+	t.Run("oversized file rejected", func(t *testing.T) {
+		dir := t.TempDir()
+		p := filepath.Join(dir, "networkmap.bin")
+		if err := os.WriteFile(p, make([]byte, offlineSnapshotMaxBytes+1), 0o600); err != nil {
+			t.Fatal(err)
+		}
+		if _, _, err := loadOfflineSnapshot(p, age, now); !errors.Is(err, errOfflineCorrupt) {
+			t.Fatalf("err = %v, want errOfflineCorrupt", err)
+		}
+	})
+
+	t.Run("key file perms", func(t *testing.T) {
+		if runtime.GOOS == "windows" {
+			t.Skip("unix perm bits")
+		}
+		dir := t.TempDir()
+		p := filepath.Join(dir, "networkmap.bin")
+		if err := saveOfflineSnapshot(p, sampleSyncResponse(), nil, now); err != nil {
+			t.Fatalf("save: %v", err)
+		}
+		fi, err := os.Stat(offlineSnapshotKeyPath(p))
+		if err != nil {
+			t.Fatalf("stat key: %v", err)
+		}
+		if got := fi.Mode().Perm(); got != 0o600 {
+			t.Fatalf("key mode = %o, want 0600", got)
+		}
+	})
+
+	t.Run("delete removes key", func(t *testing.T) {
+		dir := t.TempDir()
+		p := filepath.Join(dir, "networkmap.bin")
+		if err := saveOfflineSnapshot(p, sampleSyncResponse(), nil, now); err != nil {
+			t.Fatalf("save: %v", err)
+		}
+		if err := deleteOfflineSnapshot(p); err != nil {
+			t.Fatalf("delete: %v", err)
+		}
+		if _, err := os.Stat(offlineSnapshotKeyPath(p)); !errors.Is(err, os.ErrNotExist) {
+			t.Fatal("key file survived snapshot delete")
+		}
+	})
+
+	t.Run("mgmt addrs round trip and validation", func(t *testing.T) {
+		dir := t.TempDir()
+		p := filepath.Join(dir, "networkmap.bin")
+		SetMgmtAddrs([]string{"203.0.113.10", "2001:db8::1"})
+		defer SetMgmtAddrs(nil)
+		if err := saveOfflineSnapshot(p, sampleSyncResponse(), nil, now); err != nil {
+			t.Fatalf("save: %v", err)
+		}
+		if _, _, err := loadOfflineSnapshot(p, age, now.Add(time.Hour)); err != nil {
+			t.Fatalf("load: %v", err)
+		}
+		got := LastMgmtAddrs()
+		if len(got) != 2 || got[0] != "203.0.113.10" || got[1] != "2001:db8::1" {
+			t.Fatalf("mgmt addrs = %v", got)
+		}
+	})
+}
+
+func TestOfflineSessionDeadline(t *testing.T) {
+	now := time.Now()
+	if got := offlineSessionDeadline(&mgmProto.SyncResponse{}); !got.IsZero() {
+		t.Fatalf("nil timestamp gave %v", got)
+	}
+	if got := offlineSessionDeadline(&mgmProto.SyncResponse{
+		SessionExpiresAt: &timestamppb.Timestamp{},
+	}); !got.IsZero() {
+		t.Fatalf("zero timestamp gave %v", got)
+	}
+	want := now.Add(time.Hour).UTC().Truncate(time.Second)
+	got := offlineSessionDeadline(&mgmProto.SyncResponse{
+		SessionExpiresAt: timestamppb.New(want),
+	})
+	if !got.Equal(want) {
+		t.Fatalf("got %v want %v", got, want)
 	}
 }

@@ -6,6 +6,7 @@ import (
 	"os"
 	"time"
 
+	mgmProto "github.com/netbirdio/netbird/shared/management/proto"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -74,6 +75,22 @@ func IsTransportErr(err error) bool {
 	// delivered) count as transport failures: server refusals always carry a
 	// status code, which the switch above already handled.
 	return true
+}
+
+// offlineSessionDeadline extracts the session expiry from a snapshot sync
+// response, applying the same zero-value rules as maybeStartOffline: a nil
+// timestamp or the explicit zero value means "no deadline".
+func offlineSessionDeadline(resp *mgmProto.SyncResponse) time.Time {
+	t := resp.GetSessionExpiresAt()
+	if t == nil {
+		return time.Time{}
+	}
+	// A zero-valued Timestamp is the wire encoding for "no deadline"; it is
+	// non-nil but decodes to the Unix epoch.
+	if ts := t.AsTime(); ts.Unix() > 0 {
+		return ts
+	}
+	return time.Time{}
 }
 
 // OfflineStartDelay reads NB_OFFLINE_START_DELAY (Go duration). Default 10s;
