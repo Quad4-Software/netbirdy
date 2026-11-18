@@ -34,16 +34,24 @@ type WGWatcher struct {
 	// initialHandshake is not thread-safe; never call PrepareInitialHandshake and EnableWgWatcher concurrently.
 	initialHandshake time.Time
 
+	// handshakeOvertime and checkPeriod snapshot the package-level test
+	// tunables at construction so a running watcher never reads them while a
+	// test mutates them.
+	handshakeOvertime time.Duration
+	checkPeriod       time.Duration
+
 	resetCh chan struct{}
 }
 
 func NewWGWatcher(log *log.Entry, wgIfaceStater WGInterfaceStater, peerKey string, stateDump *stateDump) *WGWatcher {
 	return &WGWatcher{
-		log:           log,
-		wgIfaceStater: wgIfaceStater,
-		peerKey:       peerKey,
-		stateDump:     stateDump,
-		resetCh:       make(chan struct{}, 1),
+		log:               log,
+		wgIfaceStater:     wgIfaceStater,
+		peerKey:           peerKey,
+		stateDump:         stateDump,
+		handshakeOvertime: wgHandshakeOvertime,
+		checkPeriod:       checkPeriod,
+		resetCh:           make(chan struct{}, 1),
 	}
 }
 
@@ -79,7 +87,7 @@ func (w *WGWatcher) Reset() {
 func (w *WGWatcher) periodicHandshakeCheck(ctx context.Context, onDisconnectedFn func(), onHandshakeSuccessFn func(when time.Time), onCheckSuccessFn func(), enabledTime time.Time, initialHandshake time.Time) {
 	w.log.Infof("WireGuard watcher started")
 
-	timer := time.NewTimer(wgHandshakeOvertime)
+	timer := time.NewTimer(w.handshakeOvertime)
 	defer timer.Stop()
 
 	lastHandshake := initialHandshake
@@ -110,7 +118,7 @@ func (w *WGWatcher) periodicHandshakeCheck(ctx context.Context, onDisconnectedFn
 
 			lastHandshake = *handshake
 
-			resetTime := time.Until(handshake.Add(checkPeriod))
+			resetTime := time.Until(handshake.Add(w.checkPeriod))
 			timer.Reset(resetTime)
 			w.stateDump.WGcheckSuccess()
 
@@ -120,7 +128,7 @@ func (w *WGWatcher) periodicHandshakeCheck(ctx context.Context, onDisconnectedFn
 			lastHandshake = time.Time{}
 			enabledTime = time.Now()
 			timer.Stop()
-			timer.Reset(wgHandshakeOvertime)
+			timer.Reset(w.handshakeOvertime)
 		case <-ctx.Done():
 			w.log.Infof("WireGuard watcher stopped")
 			return
@@ -145,7 +153,7 @@ func (w *WGWatcher) handshakeCheck(lastHandshake time.Time) (*time.Time, bool) {
 	}
 
 	// in case if the machine is suspended, the handshake time will be in the past
-	if handshake.Add(checkPeriod).Before(time.Now()) {
+	if handshake.Add(w.checkPeriod).Before(time.Now()) {
 		w.log.Warnf("WireGuard handshake timed out: %v", handshake)
 		return nil, false
 	}
