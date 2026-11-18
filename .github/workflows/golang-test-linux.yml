@@ -297,6 +297,10 @@ jobs:
           CONTAINER_GOCACHE="/root/.cache/go-build"
           CONTAINER_GOMODCACHE="/go/pkg/mod"
 
+          # golang:alpine stays for this privileged netfilter suite: the tests
+          # depend on kernel iptables/ip6tables behavior the Wolfi base provides
+          # differently (legacy vs nft tables), which broke engine and firewall
+          # tests. Chainguard bases remain for all shipped images.
           docker run --rm \
             --cap-add=NET_ADMIN \
             --privileged \
@@ -311,11 +315,6 @@ jobs:
             -e GOCACHE=${CONTAINER_GOCACHE} \
             -e GOMODCACHE=${CONTAINER_GOMODCACHE} \
             -e CONTAINER=${CONTAINER} \
-            # golang:alpine stays for this privileged netfilter suite: the
-            # tests depend on kernel iptables/ip6tables behavior the Wolfi
-            # base provides differently (legacy vs nft tables), which broke
-            # engine and firewall tests. Chainguard bases remain everywhere
-            # else; revisit when the tests run backend-agnostic.
             golang:1.27.4-alpine \
             sh -c ' \
               apk update; apk add --no-cache \
