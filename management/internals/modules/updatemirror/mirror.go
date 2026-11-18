@@ -194,7 +194,7 @@ func (m *Mirror) loadIndex() error {
 func (m *Mirror) saveIndexLocked() {
 	b, _ := json.Marshal(m.index)
 	tmp := fmt.Sprintf("%s.tmp-%d", m.indexFile(), time.Now().UnixNano())
-	if err := os.WriteFile(tmp, b, 0o640); err == nil {
+	if err := os.WriteFile(tmp, b, 0o600); err == nil {
 		_ = os.Rename(tmp, m.indexFile())
 	}
 }

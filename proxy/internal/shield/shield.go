@@ -149,9 +149,7 @@ func New(cfg Config, opts ...Option) (*Shield, error) {
 	if err := cfg.validate(); err != nil {
 		return nil, err
 	}
-	if cfg.HMACKey != "" {
-		// hex or raw
-	}
+	// HMACKey is consumed raw by sign/verify; no normalization needed here.
 	s := &Shield{
 		log:    log.NewEntry(log.StandardLogger()),
 		stopCh: make(chan struct{}), closed: make(chan struct{}),

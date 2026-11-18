@@ -122,9 +122,9 @@ func (l *DecisionLog) rotateIfNeeded(next int64) {
 		return
 	}
 	oldest := fmt.Sprintf("%s.%d", l.path, l.backups)
-	os.Remove(oldest)
+	_ = os.Remove(oldest)
 	for i := l.backups - 1; i >= 1; i-- {
-		os.Rename(fmt.Sprintf("%s.%d", l.path, i), fmt.Sprintf("%s.%d", l.path, i+1))
+		_ = os.Rename(fmt.Sprintf("%s.%d", l.path, i), fmt.Sprintf("%s.%d", l.path, i+1))
 	}
-	os.Rename(l.path, l.path+".1")
+	_ = os.Rename(l.path, l.path+".1")
 }

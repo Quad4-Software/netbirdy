@@ -35,15 +35,15 @@ func (s *Server) Handler() http.Handler {
 	mux.HandleFunc("GET /healthz", func(w http.ResponseWriter, r *http.Request) { w.WriteHeader(200) })
 	mux.HandleFunc("GET /v1/status", func(w http.ResponseWriter, r *http.Request) {
 		if !s.auth(r) {
-			http.Error(w, "unauthorized", 401)
+			http.Error(w, "unauthorized", http.StatusUnauthorized)
 			return
 		}
 		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(s.store.get())
+		_ = json.NewEncoder(w).Encode(s.store.get())
 	})
 	mux.HandleFunc("POST /v1/update", func(w http.ResponseWriter, r *http.Request) {
 		if !s.auth(r) {
-			http.Error(w, "unauthorized", 401)
+			http.Error(w, "unauthorized", http.StatusUnauthorized)
 			return
 		}
 		body, err := io.ReadAll(io.LimitReader(r.Body, 4096))
@@ -61,7 +61,7 @@ func (s *Server) Handler() http.Handler {
 		s.mu.Lock()
 		if s.store.get().State == "running" {
 			s.mu.Unlock()
-			http.Error(w, "update in progress", 409)
+			http.Error(w, "update in progress", http.StatusConflict)
 			return
 		}
 		s.store.set(Status{State: "running", Step: "queued", Version: req.Version, Started: time.Now()})

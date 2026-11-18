@@ -1173,13 +1173,11 @@ func (e *Engine) handleSync(update *mgmProto.SyncResponse) error {
 	// Keep a local copy of the applied sync so a restart with an
 	// unreachable management server can re-apply it. Keepalive-style
 	// responses carry no network map and must not clobber the snapshot.
-	if nm != nil {
-		e.scheduleOfflineSnapshot(update)
-		if nm.GetRemotePeersIsEmpty() {
-			// Peer list was emptied by the server: this peer is gone, the
-			// cached map would resurrect deleted peers.
-			_ = deleteOfflineSnapshot(e.offlineSnapshotFile())
-		}
+	e.scheduleOfflineSnapshot(update)
+	if nm.GetRemotePeersIsEmpty() {
+		// Peer list was emptied by the server: this peer is gone, the
+		// cached map would resurrect deleted peers.
+		_ = deleteOfflineSnapshot(e.offlineSnapshotFile())
 	}
 
 	e.statusRecorder.PublishEvent(cProto.SystemEvent_INFO, cProto.SystemEvent_SYSTEM, "Network map updated", "", nil)

@@ -81,7 +81,7 @@ func verifyManifest(dir string) error {
 			return err
 		}
 		h := sha256.New()
-		io.Copy(h, f)
+		_, _ = io.Copy(h, f)
 		f.Close()
 		if hex.EncodeToString(h.Sum(nil)) != want {
 			return fmt.Errorf("backup manifest mismatch %s", rel)

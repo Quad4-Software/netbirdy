@@ -303,9 +303,7 @@ func (d *offlineDebouncer) Save() bool {
 		// update) still lands in the snapshot.
 		if d.pending.CompareAndSwap(false, true) {
 			go func() {
-				select {
-				case <-time.After(d.interval - time.Duration(since)):
-				}
+				time.Sleep(d.interval - time.Duration(since))
 				d.pending.Store(false)
 				d.Save()
 			}()

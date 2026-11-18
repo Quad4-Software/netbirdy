@@ -41,7 +41,7 @@ func (s *Shield) serveChallenge(w http.ResponseWriter, r *http.Request, ip netip
 	sig := s.sign(payload)
 	bits := s.cfg().ChallengeDifficulty
 	nonce := fmt.Sprintf("%x", sha256.Sum256([]byte(payload+sig)))
-	diff := "0000" // hex prefix target derived from bits
+	var diff string // hex prefix target derived from bits
 	// bits -> hex digits of leading zeros
 	zeros := bits / 4
 	if zeros < 1 {
@@ -136,13 +136,6 @@ func (s *Shield) hasValidPass(r *http.Request, ip netip.Addr) bool {
 	host := strings.SplitN(r.Host, ":", 2)[0]
 	want := s.sign(ip.String() + "|" + r.UserAgent() + "|" + host + "|" + parts[0] + "|pass")
 	return hmac.Equal([]byte(parts[1]), []byte(want))
-}
-
-func min(a, b int) int {
-	if a < b {
-		return a
-	}
-	return b
 }
 
 func challengePage(nonce, diff, back, exp, host string) string {

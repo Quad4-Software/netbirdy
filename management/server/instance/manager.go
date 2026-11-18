@@ -5,10 +5,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io"
 	"net/http"
 	"net/mail"
-	"strings"
 	"sync"
 	"time"
 
@@ -350,32 +348,6 @@ func isNewerVersion(currentVersion, latestVersion string) bool {
 	}
 
 	return latest.GreaterThan(current)
-}
-
-func (m *DefaultManager) fetchPlainTextVersion(ctx context.Context, url string) (string, error) {
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
-	if err != nil {
-		return "", fmt.Errorf("create request: %w", err)
-	}
-
-	req.Header.Set("User-Agent", "NetBirdy-Management/"+version.NetbirdVersion())
-
-	resp, err := m.httpClient.Do(req)
-	if err != nil {
-		return "", fmt.Errorf("execute request: %w", err)
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		return "", fmt.Errorf("unexpected status code: %d", resp.StatusCode)
-	}
-
-	body, err := io.ReadAll(io.LimitReader(resp.Body, 100))
-	if err != nil {
-		return "", fmt.Errorf("read response: %w", err)
-	}
-
-	return strings.TrimSpace(string(body)), nil
 }
 
 func (m *DefaultManager) fetchGitHubRelease(ctx context.Context, url string) (string, error) {

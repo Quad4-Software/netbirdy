@@ -77,9 +77,9 @@ func (f *FileSink) rotateIfNeeded(next int64) {
 	}
 	// shift backups: .3 <- .2 <- .1 <- current
 	oldest := fmt.Sprintf("%s.%d", f.path, f.backups)
-	os.Remove(oldest)
+	_ = os.Remove(oldest)
 	for i := f.backups - 1; i >= 1; i-- {
-		os.Rename(fmt.Sprintf("%s.%d", f.path, i), fmt.Sprintf("%s.%d", f.path, i+1))
+		_ = os.Rename(fmt.Sprintf("%s.%d", f.path, i), fmt.Sprintf("%s.%d", f.path, i+1))
 	}
-	os.Rename(f.path, f.path+".1")
+	_ = os.Rename(f.path, f.path+".1")
 }

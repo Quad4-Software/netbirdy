@@ -113,7 +113,7 @@ func (s *SyslogSink) pump() {
 				select {
 				case ev := <-s.q:
 					if conn != nil {
-						s.writeFrame(conn, ev)
+						_ = s.writeFrame(conn, ev)
 					}
 				default:
 					s.dropLog()
@@ -210,7 +210,7 @@ func (s *SyslogSink) writeFrame(conn net.Conn, ev Event) error {
 	} else {
 		frame = []byte(payload + "\n")
 	}
-	conn.SetWriteDeadline(time.Now().Add(2 * time.Second))
+	_ = conn.SetWriteDeadline(time.Now().Add(2 * time.Second))
 	_, err := conn.Write(frame)
 	return err
 }

@@ -3,7 +3,6 @@ package server
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"net"
 	"net/netip"
@@ -76,20 +75,6 @@ func (a activitySinkAdapter) Emit(ev security.Event) {
 		target = ev.UserID
 	}
 	a.storeEvent(context.Background(), securityInitiator, target, ev.AccountID, act, meta)
-}
-
-// noopActions is the v1 prevention placeholder: actions land as errors the
-// engine logs; nothing is fatal. Used only for tests that must not act.
-type noopActions struct{}
-
-func (noopActions) RequireApproval(ctx context.Context, accountID, peerID string) error {
-	return errors.New("prevention not enabled yet")
-}
-func (noopActions) ExpireLogin(ctx context.Context, accountID, peerID string) error {
-	return errors.New("prevention not enabled yet")
-}
-func (noopActions) BlockPeer(ctx context.Context, accountID, peerID string) error {
-	return errors.New("prevention not enabled yet")
 }
 
 // managementActions implements security.Actions over the account manager.

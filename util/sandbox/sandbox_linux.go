@@ -34,11 +34,7 @@ func apply(p Policy, mode Mode, restrictReads bool) (Status, error) {
 	if restrictReads {
 		handled |= rightsRead | rightsExec
 	}
-	cfg, err := landlock.NewConfig(handled)
-	if err != nil {
-		return Status{Mode: mode, ABI: abi}, err
-	}
-	c := *cfg
+	c := landlock.Config{HandledAccessFS: handled}
 	if mode != ModeStrict {
 		c = c.BestEffort()
 	}

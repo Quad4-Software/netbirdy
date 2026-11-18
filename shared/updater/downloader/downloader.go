@@ -297,7 +297,7 @@ func DownloadToFileResume(ctx context.Context, url, dstFile string, opt ResumeOp
 		}
 	}
 	if e := resp.Header.Get("ETag"); e != "" {
-		os.WriteFile(dstFile+".meta", []byte(e+"\n"+resp.Header.Get("Last-Modified")), 0o600)
+		_ = os.WriteFile(dstFile+".meta", []byte(e+"\n"+resp.Header.Get("Last-Modified")), 0o600)
 	}
 	return nil
 }

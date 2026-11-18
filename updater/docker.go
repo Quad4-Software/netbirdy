@@ -23,15 +23,16 @@ type DockerEngine struct {
 func NewDockerEngine(sock string) (*DockerEngine, error) {
 	tr := &http.Transport{}
 	base := "http://localhost"
-	if strings.HasPrefix(sock, "unix://") {
+	switch {
+	case strings.HasPrefix(sock, "unix://"):
 		socketPath := strings.TrimPrefix(sock, "unix://")
 		tr.DialContext = func(ctx context.Context, _, _ string) (net.Conn, error) {
 			var d net.Dialer
 			return d.DialContext(ctx, "unix", socketPath)
 		}
-	} else if strings.HasPrefix(sock, "http://") {
+	case strings.HasPrefix(sock, "http://"):
 		base = sock
-	} else {
+	default:
 		return nil, fmt.Errorf("unsupported socket %q", sock)
 	}
 	return &DockerEngine{c: &http.Client{Transport: tr, Timeout: 30 * time.Second}, base: base + "/v1.41"}, nil

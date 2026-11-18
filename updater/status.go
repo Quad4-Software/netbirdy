@@ -46,10 +46,11 @@ func (s *statusStore) set(st Status) {
 	s.mu.Lock()
 	s.cur = st
 	b, _ := json.Marshal(st)
-	os.MkdirAll(filepath.Dir(s.path), 0o750)
-	tmp := s.path + ".tmp"
-	if os.WriteFile(tmp, b, 0o600) == nil {
-		os.Rename(tmp, s.path)
+	if err := os.MkdirAll(filepath.Dir(s.path), 0o750); err == nil {
+		tmp := s.path + ".tmp"
+		if os.WriteFile(tmp, b, 0o600) == nil {
+			_ = os.Rename(tmp, s.path)
+		}
 	}
 	s.mu.Unlock()
 }

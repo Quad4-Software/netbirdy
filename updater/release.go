@@ -25,7 +25,7 @@ func clientFor(base string) *http.Client {
 	}
 }
 
-func getFile(ctx context.Context, c *http.Client, raw string, cap int64) ([]byte, error) {
+func getFile(ctx context.Context, c *http.Client, raw string, limit int64) ([]byte, error) {
 	u, err := url.Parse(raw)
 	if err != nil {
 		return nil, err
@@ -46,7 +46,7 @@ func getFile(ctx context.Context, c *http.Client, raw string, cap int64) ([]byte
 	if resp.StatusCode != 200 {
 		return nil, fmt.Errorf("%s: %d", raw, resp.StatusCode)
 	}
-	return io.ReadAll(io.LimitReader(resp.Body, cap))
+	return io.ReadAll(io.LimitReader(resp.Body, limit))
 }
 
 // fetchSignedImages downloads and verifies the signed images list.

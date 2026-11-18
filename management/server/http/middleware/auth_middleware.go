@@ -146,8 +146,6 @@ func (m *AuthMiddleware) engine() *security.Engine {
 	return packageSecurity
 }
 
-func _unused() {}
-
 // Handler method of the middleware which authenticates a user either by JWT claims or by PAT
 func (m *AuthMiddleware) Handler(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

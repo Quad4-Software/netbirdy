@@ -359,10 +359,14 @@ func formatChain(conn *nftables.Conn, table *nftables.Table, chain *nftables.Cha
 		if chain.Policy != nil {
 			policy = fmt.Sprintf("; policy %s", formatPolicy(*chain.Policy))
 		}
-		builder.WriteString(fmt.Sprintf("\t\ttype %s hook %s priority %d%s\n",
+		var priority string
+		if chain.Priority != nil {
+			priority = fmt.Sprintf("%d", *chain.Priority)
+		}
+		builder.WriteString(fmt.Sprintf("\t\ttype %s hook %s priority %s%s\n",
 			formatChainType(chain.Type),
 			formatChainHook(chain.Hooknum),
-			chain.Priority,
+			priority,
 			policy))
 	}
 

@@ -169,13 +169,13 @@ func (s *baselineStore) key(obs PeerObservation) string {
 	return obs.AccountID + "/" + obs.PeerID
 }
 
-func (s *baselineStore) peer(obs PeerObservation, now time.Time, max int) *peerBaseline {
+func (s *baselineStore) peer(obs PeerObservation, now time.Time, limit int) *peerBaseline {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	k := s.key(obs)
 	b, ok := s.peers[k]
 	if !ok {
-		if len(s.peers) >= max {
+		if len(s.peers) >= limit {
 			// evict the coldest baseline
 			var oldest string
 			var ts time.Time
