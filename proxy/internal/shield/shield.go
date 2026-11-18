@@ -204,8 +204,7 @@ func (s *Shield) Observe(ip netip.Addr, ev Event) {
 	if !ip.IsValid() || s.cfg().Mode == ModeOff || s.cfg().allowIP(ip) {
 		return
 	}
-	_, st := s.store.get(ip)
-	s.store.decay(st)
+	sh, st := s.store.get(ip)
 	var w float64
 	var reason string
 	switch ev.Kind {
@@ -214,8 +213,17 @@ func (s *Shield) Observe(ip netip.Addr, ev Event) {
 	case EventAuthFailure:
 		w, reason = s.cfg().WeightAuthFailure, "auth-failure"
 	}
+	var ttl time.Duration
+	sh.mu.Lock()
+	s.store.decay(st)
 	st.score += w
-	s.maybeBan(st, reason)
+	if st.score >= s.cfg().BanAt {
+		ttl = s.store.ban(st)
+	}
+	sh.mu.Unlock()
+	if ttl > 0 {
+		s.log.Infof("shield: banned for %s (%s)", ttl, reason)
+	}
 }
 
 // Stats returns counters.
@@ -262,16 +270,6 @@ func (s *Shield) Unban(ip netip.Addr) bool {
 	st.banUntil = time.Time{}
 	st.banCount = 0
 	return true
-}
-
-func (s *Shield) maybeBan(st *sourceState, reason string) {
-	if st.score >= s.cfg().BanAt {
-		sh := s.store.shards[st.key.As16()[0]&byte(shards-1)]
-		sh.mu.Lock()
-		ttl := s.store.ban(st)
-		sh.mu.Unlock()
-		s.log.Infof("shield: banned for %s (%s)", ttl, reason)
-	}
 }
 
 // cfg returns the active configuration. The pointer is swapped atomically

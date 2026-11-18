@@ -18,8 +18,8 @@ type Event struct {
 }
 
 // Scanner reads SSE events from an underlying byte stream. Events are
-// delimited by a blank line ("\n\n"). CRLF line endings are normalized to LF
-// transparently so fixtures captured from live servers can be replayed.
+// delimited by a blank line. LF, CRLF, and bare CR line endings are all
+// accepted per the SSE spec.
 //
 // Scanner is not safe for concurrent use.
 type Scanner struct {
@@ -86,24 +86,34 @@ func (s *Scanner) Next() (Event, error) {
 	}
 }
 
+// readLine returns the next line without its terminator. LF, CRLF, and
+// bare CR all terminate a line per the SSE spec; a bare CR inside a line
+// previously leaked into field values.
 func (s *Scanner) readLine() (string, error) {
-	line, err := s.r.ReadString('\n')
-	if err != nil {
-		if errors.Is(err, io.EOF) && line != "" {
-			return trimEOL(line), nil
+	var sb strings.Builder
+	for {
+		c, err := s.r.ReadByte()
+		if err != nil {
+			if errors.Is(err, io.EOF) && sb.Len() > 0 {
+				return sb.String(), nil
+			}
+			return "", err
 		}
-		return "", err
+		switch c {
+		case '\n':
+			return sb.String(), nil
+		case '\r':
+			// Swallow a following LF so CRLF terminates a single line.
+			if b, err := s.r.ReadByte(); err == nil && b != '\n' {
+				_ = s.r.UnreadByte()
+			}
+			return sb.String(), nil
+		}
+		sb.WriteByte(c)
+		if sb.Len() > s.maxLine {
+			return "", fmt.Errorf("sse line exceeds %d bytes", s.maxLine)
+		}
 	}
-	if len(line) > s.maxLine {
-		return "", fmt.Errorf("sse line exceeds %d bytes", s.maxLine)
-	}
-	return trimEOL(line), nil
-}
-
-func trimEOL(line string) string {
-	line = strings.TrimRight(line, "\n")
-	line = strings.TrimRight(line, "\r")
-	return line
 }
 
 func splitField(line string) (string, string) {

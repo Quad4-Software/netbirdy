@@ -187,6 +187,11 @@ func (r *Relay) getObserver() SessionObserver {
 	return r.observer
 }
 
+// errSessionDialPending marks a source whose backend dial is running in
+// the background; the packet that triggered it is delivered by the dial
+// goroutine once the session exists.
+var errSessionDialPending = errors.New("session dial in progress")
+
 // Serve starts the relay loop. It blocks until the context is canceled
 // or the listener is closed.
 func (r *Relay) Serve() {
@@ -207,10 +212,12 @@ func (r *Relay) Serve() {
 		}
 
 		data := buf[:n]
-		sess, err := r.getOrCreateSession(addr)
+		sess, err := r.getOrCreateSession(addr, data)
 		if err != nil {
 			r.bufPool.Put(bufp)
-			r.logger.Debugf("create UDP session for %s: %v", addr, err)
+			if !errors.Is(err, errSessionDialPending) {
+				r.logger.Debugf("create UDP session for %s: %v", addr, err)
+			}
 			continue
 		}
 
@@ -234,8 +241,11 @@ func (r *Relay) Serve() {
 	}
 }
 
-// getOrCreateSession returns an existing session or creates a new one.
-func (r *Relay) getOrCreateSession(addr net.Addr) (*session, error) {
+// getOrCreateSession returns an existing session or starts creating a new
+// one. New sessions are dialed on a background goroutine so a slow backend
+// cannot stall the read loop for every other source; the triggering packet
+// is handed to that goroutine and delivered once the session exists.
+func (r *Relay) getOrCreateSession(addr net.Addr, firstPacket []byte) (*session, error) {
 	key := clientAddr(addr.String())
 
 	r.mu.RLock()
@@ -243,6 +253,9 @@ func (r *Relay) getOrCreateSession(addr net.Addr) (*session, error) {
 	r.mu.RUnlock()
 	if ok && sess != nil {
 		return sess, nil
+	}
+	if ok {
+		return nil, errSessionDialPending
 	}
 
 	// Check before taking the write lock: if the relay is shutting down,
@@ -258,14 +271,22 @@ func (r *Relay) getOrCreateSession(addr net.Addr) (*session, error) {
 
 	r.mu.Lock()
 
+	// Re-check under the write lock: Close may have run between the fast
+	// check above and here, and spawning after sessWg.Wait has begun would
+	// leave the dial goroutine unaccounted for.
+	if err := r.ctx.Err(); err != nil {
+		r.mu.Unlock()
+		return nil, err
+	}
+
 	if sess, ok = r.sessions[key]; ok && sess != nil {
 		r.mu.Unlock()
 		return sess, nil
 	}
 	if ok {
-		// Another goroutine is dialing for this key, skip.
+		// Another packet for this key already started a dial.
 		r.mu.Unlock()
-		return nil, fmt.Errorf("session dial in progress for %s", key)
+		return nil, errSessionDialPending
 	}
 
 	if len(r.sessions) >= r.maxSessions {
@@ -284,26 +305,48 @@ func (r *Relay) getOrCreateSession(addr net.Addr) (*session, error) {
 		return nil, fmt.Errorf("session creation rate limited")
 	}
 
-	// Reserve the slot with a nil session so concurrent callers for the same
-	// key see it exists and wait. Release the lock before dialing.
+	// Reserve the slot with a nil session so concurrent packets for the
+	// same key see the dial as in progress. The goroutine is spawned under
+	// the same lock so sessWg is incremented before Close can pass its
+	// map sweep and enter Wait.
+	pkt := append([]byte(nil), firstPacket...)
 	r.sessions[key] = nil
+	r.sessWg.Go(func() {
+		r.createSession(key, addr, pkt)
+	})
 	r.mu.Unlock()
+
+	return nil, errSessionDialPending
+}
+
+// createSession dials the backend, publishes the session, and delivers the
+// packet that triggered it. Any failure removes the reserved slot so later
+// packets can retry.
+func (r *Relay) createSession(key clientAddr, addr net.Addr, firstPacket []byte) {
+	removeSlot := func() {
+		r.mu.Lock()
+		if r.sessions[key] == nil {
+			delete(r.sessions, key)
+		}
+		r.mu.Unlock()
+	}
 
 	dialCtx, dialCancel := context.WithTimeout(r.ctx, r.dialTimeout)
 	backend, err := r.dialFunc(dialCtx, "udp", r.target)
 	dialCancel()
 	if err != nil {
-		r.mu.Lock()
-		delete(r.sessions, key)
-		r.mu.Unlock()
+		removeSlot()
 		if obs := r.getObserver(); obs != nil {
 			obs.UDPSessionDialError(r.accountID)
 		}
-		return nil, fmt.Errorf("dial backend %s: %w", r.target, err)
+		if r.ctx.Err() == nil {
+			r.logger.Debugf("dial backend %s: %v", r.target, err)
+		}
+		return
 	}
 
 	sessCtx, sessCancel := context.WithCancel(r.ctx)
-	sess = &session{
+	sess := &session{
 		backend:   backend,
 		addr:      addr,
 		createdAt: time.Now(),
@@ -311,20 +354,56 @@ func (r *Relay) getOrCreateSession(addr net.Addr) (*session, error) {
 	}
 	sess.updateLastSeen()
 
+	// Deliver the triggering packet before publishing so later packets
+	// from this source cannot overtake it.
+	nw, err := backend.Write(firstPacket)
+	if err != nil {
+		sessCancel()
+		_ = backend.Close()
+		removeSlot()
+		if obs := r.getObserver(); obs != nil {
+			obs.UDPSessionDialError(r.accountID)
+		}
+		if !netutil.IsExpectedError(err) {
+			r.logger.Debugf("UDP write to backend for %s: %v", addr, err)
+		}
+		return
+	}
+	sess.bytesIn.Add(int64(nw))
+	if obs := r.getObserver(); obs != nil {
+		obs.UDPPacketRelayed(types.RelayDirectionClientToBackend, nw)
+	}
+
 	r.mu.Lock()
+	if r.ctx.Err() != nil {
+		// The relay is closing; Close already swept or is about to sweep
+		// the placeholder. Do not publish: spawning the reader here could
+		// race sessWg.Wait and outlive Close.
+		r.mu.Unlock()
+		sessCancel()
+		_ = backend.Close()
+		return
+	}
+	if cur, ok := r.sessions[key]; ok && cur != nil {
+		// Another dial already published a session for this key (our
+		// placeholder was swept and re-reserved). Close the duplicate
+		// without disturbing the live entry.
+		r.mu.Unlock()
+		sessCancel()
+		_ = backend.Close()
+		return
+	}
 	r.sessions[key] = sess
+	r.sessWg.Go(func() {
+		r.relayBackendToClient(sessCtx, sess)
+	})
 	r.mu.Unlock()
 
 	if obs := r.getObserver(); obs != nil {
 		obs.UDPSessionStarted(r.accountID)
 	}
 
-	r.sessWg.Go(func() {
-		r.relayBackendToClient(sessCtx, sess)
-	})
-
 	r.logger.Debugf("UDP session created for %s", addr)
-	return sess, nil
 }
 
 func (r *Relay) checkAccessRestrictions(addr net.Addr) error {

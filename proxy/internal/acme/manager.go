@@ -338,6 +338,16 @@ func (mgr *Manager) AddDomain(d domain.Domain, accountID types.AccountID, servic
 	}
 
 	mgr.mu.Lock()
+	// Skip re-registration for the same account/service: the prefetch
+	// goroutine or a finished certificate already covers this domain, and
+	// restarting the work would re-notify and clobber a ready state.
+	if existing, ok := mgr.domains[d]; ok &&
+		existing.accountID == accountID &&
+		existing.serviceID == serviceID &&
+		existing.state != domainFailed {
+		mgr.mu.Unlock()
+		return false
+	}
 	mgr.domains[d] = &domainInfo{
 		accountID: accountID,
 		serviceID: serviceID,
@@ -514,6 +524,9 @@ func (mgr *Manager) checkExpiry(ctx context.Context, now time.Time) {
 	mgr.mu.RUnlock()
 
 	for _, d := range domains {
+		if ctx.Err() != nil {
+			return
+		}
 		name := d.PunycodeString()
 		if mgr.findWildcardEntry(name) != nil {
 			continue

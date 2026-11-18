@@ -210,45 +210,46 @@ func (r *replayReadCloser) Close() error {
 
 // ScanRoutingFields recovers the LLM routing fields ("model" and
 // "stream") from a request whose normal capture was bypassed or
-// truncated for size. It reads up to maxScan bytes of r.Body to locate
-// the top-level keys — clients (e.g. Claude Code) may place `model`
-// after a multi-MB `messages` array — then restores r.Body so the
-// upstream still receives the full, untouched stream. Only the small
-// routing fields are extracted; the prompt is never buffered for
-// capture, keeping memory bounded. Returns ok=false when the body isn't
-// a JSON object, the model field isn't found within maxScan, or on a
+// truncated for size. It decodes the top-level JSON object directly off
+// r.Body (clients like Claude Code may place `model` after a multi-MB
+// `messages` array), teeing every consumed byte into a bounded buffer
+// that then prefixes the restored r.Body, so the upstream still receives
+// the full, untouched stream. Only the small routing fields are
+// extracted; the prompt is never buffered for capture. The retained
+// buffer is charged to b for the life of the request: the returned
+// release must be invoked once the request finishes (it is always
+// non-nil and safe to defer). Returns ok=false when the body isn't a
+// JSON object, the model field isn't found within maxScan, or on a
 // read error.
-func ScanRoutingFields(r *http.Request, maxScan int64) (model string, stream bool, ok bool) {
+func ScanRoutingFields(r *http.Request, maxScan int64, b Budget) (model string, stream bool, ok bool, release func()) {
+	release = func() {}
 	if r == nil || r.Body == nil || r.Body == http.NoBody || maxScan <= 0 {
-		return "", false, false
+		return "", false, false, release
 	}
-	limited := io.LimitReader(r.Body, maxScan+1)
-	buf, readErr := io.ReadAll(limited)
-	if readErr != nil && !errors.Is(readErr, io.EOF) {
-		// Mid-stream read error (e.g. client disconnect): restore the bytes
-		// read so far plus the untouched tail and abort, rather than
-		// forwarding only the partial prefix as if it were the whole body.
-		r.Body = &replayReadCloser{replay: bytes.NewReader(append([]byte(nil), buf...)), tail: r.Body}
-		return "", false, false
+	var seen bytes.Buffer
+	tee := io.TeeReader(io.LimitReader(r.Body, maxScan), &seen)
+	model, stream, ok = scanTopLevelModelStream(tee)
+	kept := seen.Bytes()
+	if b != nil && !b.Acquire(int64(len(kept))) {
+		r.Body = &replayReadCloser{replay: bytes.NewReader(kept), tail: r.Body}
+		return "", false, false, release
 	}
-	if int64(len(buf)) > maxScan {
-		// Body exceeds the scan ceiling: restore the read prefix plus the
-		// untouched tail so the upstream still gets every byte.
-		r.Body = &replayReadCloser{replay: bytes.NewReader(append([]byte(nil), buf...)), tail: r.Body}
-	} else {
-		_ = r.Body.Close()
-		r.Body = io.NopCloser(bytes.NewReader(buf))
+	if b != nil {
+		acquired := int64(len(kept))
+		var once sync.Once
+		release = func() { once.Do(func() { b.Release(acquired) }) }
 	}
-	return scanTopLevelModelStream(buf)
+	r.Body = &replayReadCloser{replay: bytes.NewReader(kept), tail: r.Body}
+	return model, stream, ok, release
 }
 
 // scanTopLevelModelStream walks the top level of a JSON object via a
 // streaming token reader, extracting the "model" string and "stream"
 // bool without materialising large values (each non-target value is
-// skipped as a RawMessage). Tolerant of truncation: returns whatever was
-// found before a malformed/short tail.
-func scanTopLevelModelStream(body []byte) (model string, stream bool, ok bool) {
-	dec := json.NewDecoder(bytes.NewReader(body))
+// skipped token by token). Tolerant of truncation: returns whatever was
+// found before a malformed or short tail.
+func scanTopLevelModelStream(rd io.Reader) (model string, stream bool, ok bool) {
+	dec := json.NewDecoder(rd)
 	tok, err := dec.Token()
 	if err != nil {
 		return "", false, false

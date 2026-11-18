@@ -25,8 +25,20 @@ func (e *credentialLimitError) Error() string {
 	return "too many authentication attempts"
 }
 
+// maxCredentialFormBytes bounds the body credentialFormValue is willing to
+// parse. Login forms are tiny; anything larger yields no credential.
+const maxCredentialFormBytes = 16 << 10
+
 func credentialFormValue(r *http.Request, field string) string {
 	if r.Method != http.MethodPost {
+		return ""
+	}
+	// PostFormValue parses the whole body (multipart included, which can
+	// spill to temp files) before any credential is validated, so an
+	// unbounded pre-auth body would burn memory and disk. Only parse when
+	// the declared length is known and small; a chunked or oversized body
+	// yields no credential and the caller falls back to the login page.
+	if r.ContentLength <= 0 || r.ContentLength > maxCredentialFormBytes {
 		return ""
 	}
 	return r.PostFormValue(field)

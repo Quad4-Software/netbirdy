@@ -72,18 +72,23 @@ func NewDNSVerifierWithResolver(r Resolver) *DNSVerifier {
 // The first lookup resolves synchronously with a 2s timeout; results are
 // cached (6h positive, 10m negative) so repeats are free.
 func (v *DNSVerifier) Verify(ctx context.Context, ip netip.Addr, ua string) bool {
-	key := ip.String()
 	l := strings.ToLower(ua)
+	var token string
 	var suffixes []string
 	for tok, sf := range botSuffixes {
-		if strings.Contains(l, strings.ToLower(tok)) {
-			suffixes = sf
+		if strings.Contains(l, tok) {
+			token, suffixes = tok, sf
 			break
 		}
 	}
 	if len(suffixes) == 0 {
 		return false
 	}
+	// The verdict depends on which bot the UA claims, so the token must be
+	// part of the key: caching by IP alone would hand a googlebot verdict
+	// to a later bingbot claim from the same address (and vice versa).
+	key := token + "|" + ip.String()
+	ipStr := ip.String()
 	v.mu.Lock()
 	if e, ok := v.cache[key]; ok && e.expires.After(v.now()) {
 		v.mu.Unlock()
@@ -104,7 +109,7 @@ func (v *DNSVerifier) Verify(ctx context.Context, ip netip.Addr, ua string) bool
 	v.inflight[key] = ch
 	v.mu.Unlock()
 
-	ok := v.check(ctx, key, suffixes)
+	ok := v.check(ctx, ipStr, suffixes)
 
 	v.mu.Lock()
 	if len(v.cache) >= v.max {

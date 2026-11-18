@@ -273,7 +273,13 @@ func (p *ReverseProxy) captureRequestForChain(ctx context.Context, r *http.Reque
 	// and hand the request parser a minimal stub so routing succeeds; the
 	// prompt stays uncaptured and the upstream still gets the full body.
 	if pt.AgentNetwork && (truncated || capturedBody == nil) {
-		if model, stream, ok := bodytap.ScanRoutingFields(r, bodytap.MaxRoutingScanBytes); ok {
+		model, stream, ok, scanRelease := bodytap.ScanRoutingFields(r, bodytap.MaxRoutingScanBytes, p.middlewareManager.Budget())
+		prevRelease := releaseBudget
+		releaseBudget = func() {
+			scanRelease()
+			prevRelease()
+		}
+		if ok {
 			capturedBody = buildRoutingStub(model, stream)
 			truncated = false
 			p.logger.Debugf("agent-network routing recovery: extracted model=%s stream=%t from oversized request body (service=%s)", model, stream, result.serviceID)
@@ -764,16 +770,27 @@ func (p *ReverseProxy) setUntrustedForwardingHeaders(r *httputil.ProxyRequest, c
 }
 
 // stripSessionCookie removes the proxy's session cookie from the outgoing
-// request while preserving all other cookies.
+// request while preserving all other cookies byte-for-byte. Parsing via
+// Request.Cookies would silently drop pairs the stdlib considers malformed
+// (a bare flag, a value with spaces) that backends may still rely on, so
+// the raw header lines are filtered instead.
 func stripSessionCookie(r *httputil.ProxyRequest) {
-	if len(r.In.Header["Cookie"]) == 0 {
+	lines := r.In.Header["Cookie"]
+	if len(lines) == 0 {
 		return
 	}
-	cookies := r.In.Cookies()
 	r.Out.Header.Del("Cookie")
-	for _, c := range cookies {
-		if c.Name != auth.SessionCookieName {
-			r.Out.AddCookie(c)
+	for _, line := range lines {
+		var kept []string
+		for _, pair := range strings.Split(line, ";") {
+			name, _, _ := strings.Cut(strings.TrimSpace(pair), "=")
+			if name == auth.SessionCookieName {
+				continue
+			}
+			kept = append(kept, pair)
+		}
+		if len(kept) > 0 {
+			r.Out.Header.Add("Cookie", strings.Join(kept, ";"))
 		}
 	}
 }

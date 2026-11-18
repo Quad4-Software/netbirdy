@@ -1714,6 +1714,10 @@ func (s *Server) processMappingsGuarded(ctx context.Context, mappings []*proto.P
 func (s *Server) processMappings(ctx context.Context, mappings []*proto.ProxyMapping) {
 	debug := s.Logger != nil && s.Logger.IsLevelEnabled(log.DebugLevel)
 	for _, mapping := range mappings {
+		if err := ctx.Err(); err != nil {
+			s.Logger.WithError(err).Warn("aborting stale mapping batch after watchdog cancel")
+			return
+		}
 		if debug {
 			raw, err := mappingJSONMarshal.Marshal(redactMappingForLog(mapping))
 			if err != nil {

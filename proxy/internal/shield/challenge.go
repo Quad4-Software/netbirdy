@@ -52,7 +52,7 @@ func (s *Shield) serveChallenge(w http.ResponseWriter, r *http.Request, ip netip
 	}
 	diff = strings.Repeat("0", zeros)
 
-	page := challengePage(nonce, diff, r.URL.RequestURI(), r.URL.Query().Get("exp"), host)
+	page := challengePage(nonce, diff, r.URL.RequestURI(), strconv.FormatInt(exp.Unix(), 10), host)
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	w.Header().Set("Cache-Control", "no-store")
 	w.WriteHeader(http.StatusForbidden)

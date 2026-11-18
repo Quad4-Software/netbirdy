@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -100,6 +101,28 @@ func TestCloseAll(t *testing.T) {
 	// Double CloseAll is safe.
 	n = tracker.CloseAll()
 	assert.Equal(t, 0, n)
+}
+
+// TestAddAfterCloseAllClosesConn verifies a connection hijacked after
+// shutdown is closed on arrival instead of being tracked into a map that
+// nothing will ever drain.
+func TestAddAfterCloseAllClosesConn(t *testing.T) {
+	var tracker HijackTracker
+	tracker.CloseAll()
+
+	c1, c2 := net.Pipe()
+	defer c2.Close()
+	tc := &trackedConn{Conn: c1, tracker: &tracker, host: "late.example.com"}
+	tracker.add(tc)
+
+	tracker.mu.Lock()
+	assert.Empty(t, tracker.conns)
+	tracker.mu.Unlock()
+
+	// The late conn must have been closed: its peer sees EOF.
+	_ = c2.SetReadDeadline(time.Now().Add(2 * time.Second))
+	_, err := c2.Read(make([]byte, 1))
+	assert.Error(t, err, "a conn added after CloseAll must be closed")
 }
 
 func TestTrackedConn_AutoDeregister(t *testing.T) {

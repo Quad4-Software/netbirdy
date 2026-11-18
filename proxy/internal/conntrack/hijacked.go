@@ -15,8 +15,9 @@ import (
 // Use Middleware as the outermost HTTP middleware to ensure hijacked
 // connections are tracked and automatically deregistered when closed.
 type HijackTracker struct {
-	mu    sync.Mutex
-	conns map[*trackedConn]struct{}
+	mu     sync.Mutex
+	conns  map[*trackedConn]struct{}
+	closed bool
 }
 
 // Middleware returns an HTTP middleware that wraps the ResponseWriter so that
@@ -33,10 +34,13 @@ func (t *HijackTracker) Middleware(next http.Handler) http.Handler {
 }
 
 // CloseAll closes all tracked hijacked connections and returns the count.
+// After CloseAll, newly hijacked connections are closed on arrival instead
+// of being tracked, so they cannot leak past shutdown.
 func (t *HijackTracker) CloseAll() int {
 	t.mu.Lock()
 	conns := t.conns
 	t.conns = nil
+	t.closed = true
 	t.mu.Unlock()
 
 	for tc := range conns {
@@ -69,6 +73,11 @@ func (t *HijackTracker) CloseByHost(host string) int {
 
 func (t *HijackTracker) add(tc *trackedConn) {
 	t.mu.Lock()
+	if t.closed {
+		t.mu.Unlock()
+		_ = tc.Conn.Close()
+		return
+	}
 	if t.conns == nil {
 		t.conns = make(map[*trackedConn]struct{})
 	}

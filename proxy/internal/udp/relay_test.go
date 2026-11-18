@@ -482,7 +482,7 @@ func TestRelay_SessionRateLimit(t *testing.T) {
 	// synthetic addresses. This is faster than real UDP round-trips.
 	for i := range sessionCreateBurst + 20 {
 		addr := &net.UDPAddr{IP: net.IPv4(10, 0, byte(i/256), byte(i%256)), Port: 10000 + i}
-		_, _ = relay.getOrCreateSession(addr)
+		_, _ = relay.getOrCreateSession(addr, []byte("ping"))
 	}
 
 	obs.mu.Lock()

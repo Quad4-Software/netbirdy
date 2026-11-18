@@ -28,7 +28,8 @@ func TestScanRoutingFields_ModelAfterLargeMessages(t *testing.T) {
 	body := makeBigAnthropicBody(t, "claude-opus-4-8", true, 3<<20) // 3 MiB messages
 	req := httptest.NewRequest("POST", "https://x/v1/messages", strings.NewReader(body))
 
-	model, stream, ok := ScanRoutingFields(req, MaxRoutingScanBytes)
+	model, stream, ok, release := ScanRoutingFields(req, MaxRoutingScanBytes, NewBudget(0))
+	defer release()
 	require.True(t, ok, "model must be recovered even when it follows a multi-MB messages array")
 	assert.Equal(t, "claude-opus-4-8", model, "model field must be extracted")
 	assert.True(t, stream, "stream field must be extracted")
@@ -43,7 +44,8 @@ func TestScanRoutingFields_SmallBody(t *testing.T) {
 	body := `{"model":"claude-opus-4-8","stream":false,"messages":[]}`
 	req := httptest.NewRequest("POST", "https://x/v1/messages", strings.NewReader(body))
 
-	model, stream, ok := ScanRoutingFields(req, MaxRoutingScanBytes)
+	model, stream, ok, release := ScanRoutingFields(req, MaxRoutingScanBytes, NewBudget(0))
+	defer release()
 	require.True(t, ok)
 	assert.Equal(t, "claude-opus-4-8", model)
 	assert.False(t, stream)
@@ -56,7 +58,8 @@ func TestScanRoutingFields_NoModel(t *testing.T) {
 	body := `{"stream":true,"messages":[]}`
 	req := httptest.NewRequest("POST", "https://x/v1/messages", strings.NewReader(body))
 
-	_, _, ok := ScanRoutingFields(req, MaxRoutingScanBytes)
+	_, _, ok, release := ScanRoutingFields(req, MaxRoutingScanBytes, NewBudget(0))
+	defer release()
 	assert.False(t, ok, "ok must be false when no model field is present")
 
 	got, _ := io.ReadAll(req.Body)
@@ -67,7 +70,8 @@ func TestScanRoutingFields_NotJSON(t *testing.T) {
 	body := "this is not json at all"
 	req := httptest.NewRequest("POST", "https://x/v1/messages", strings.NewReader(body))
 
-	_, _, ok := ScanRoutingFields(req, MaxRoutingScanBytes)
+	_, _, ok, release := ScanRoutingFields(req, MaxRoutingScanBytes, NewBudget(0))
+	defer release()
 	assert.False(t, ok, "ok must be false for a non-JSON body")
 }
 
@@ -77,7 +81,8 @@ func TestScanRoutingFields_ModelBeyondScanCeiling(t *testing.T) {
 	body := makeBigAnthropicBody(t, "claude-opus-4-8", true, 4<<20)
 	req := httptest.NewRequest("POST", "https://x/v1/messages", strings.NewReader(body))
 
-	_, _, ok := ScanRoutingFields(req, 1<<20)
+	_, _, ok, release := ScanRoutingFields(req, 1<<20, NewBudget(0))
+	defer release()
 	assert.False(t, ok, "model beyond the scan ceiling is not recoverable")
 
 	got, err := io.ReadAll(req.Body)

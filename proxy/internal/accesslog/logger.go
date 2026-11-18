@@ -33,6 +33,11 @@ const (
 	// maxDenyBuckets caps tracked deny rate-limit entries to bound memory under DDoS.
 	maxDenyBuckets = 10000
 
+	// maxDomainUsageEntries caps per-domain usage counters. The map is keyed
+	// by the request Host header before authentication, so unbounded growth
+	// is a memory amplifier under arbitrary Host churn.
+	maxDomainUsageEntries = 10000
+
 	// maxLogWorkers caps concurrent gRPC send goroutines.
 	maxLogWorkers = 4096
 )
@@ -353,6 +358,9 @@ func (l *Logger) trackUsage(domain string, bytesTransferred int64) {
 	now := time.Now()
 	usage, exists := l.domainUsage[domain]
 	if !exists {
+		if len(l.domainUsage) >= maxDomainUsageEntries {
+			return
+		}
 		usage = &domainUsage{
 			requestStartTime: now,
 			bytesStartTime:   now,

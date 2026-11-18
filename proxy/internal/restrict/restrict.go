@@ -59,6 +59,11 @@ type Filter struct {
 	BlockedCountries []string
 	CrowdSec         CrowdSecChecker
 	CrowdSecMode     CrowdSecMode
+
+	// allowlistFailed marks a configured allowlist whose entries all failed
+	// to parse. Without it the allowlist check would be skipped entirely,
+	// silently degrading an intended restriction to allow-all.
+	allowlistFailed bool
 }
 
 // FilterConfig holds the raw configuration for building a Filter.
@@ -101,6 +106,10 @@ func ParseFilter(cfg FilterConfig) *Filter {
 			continue
 		}
 		f.AllowedCIDRs = append(f.AllowedCIDRs, prefix.Masked())
+	}
+	if len(cfg.AllowedCIDRs) > 0 && len(f.AllowedCIDRs) == 0 {
+		logger.Errorf("restrict: all %d configured allowed CIDRs failed to parse; failing closed", len(cfg.AllowedCIDRs))
+		f.allowlistFailed = true
 	}
 	for _, cidr := range cfg.BlockedCIDRs {
 		prefix, err := netip.ParsePrefix(cidr)
@@ -226,6 +235,9 @@ func (f *Filter) Check(addr netip.Addr, geo GeoResolver) Verdict {
 }
 
 func (f *Filter) checkCIDR(addr netip.Addr) Verdict {
+	if f.allowlistFailed {
+		return DenyCIDR
+	}
 	if len(f.AllowedCIDRs) > 0 {
 		allowed := false
 		for _, prefix := range f.AllowedCIDRs {
@@ -321,7 +333,7 @@ func (f *Filter) HasRestrictions() bool {
 	if f == nil {
 		return false
 	}
-	return len(f.AllowedCIDRs) > 0 || len(f.BlockedCIDRs) > 0 ||
+	return f.allowlistFailed || len(f.AllowedCIDRs) > 0 || len(f.BlockedCIDRs) > 0 ||
 		len(f.AllowedCountries) > 0 || len(f.BlockedCountries) > 0 ||
 		f.CrowdSecMode == CrowdSecEnforce || f.CrowdSecMode == CrowdSecObserve
 }
