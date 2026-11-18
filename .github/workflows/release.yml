@@ -11,7 +11,7 @@ on:
 
 env:
   SIGN_PIPE_VER: "v0.1.9"
-  GORELEASER_VER: "v2.16.0"
+  GORELEASER_VER: "v2.19.0"
   PRODUCT_NAME: "NetBirdy"
   COPYRIGHT: "NetBirdy GmbH"
   flags: ""
@@ -275,7 +275,7 @@ jobs:
         with:
           node-version: '22'
       - name: Install pnpm
-        run: npm install -g pnpm@12.18.0
+        run: npm install -g pnpm@12.19.0
       - name: Install proxy web dependencies for license collection
         # release_files/collect-licenses.sh -w reads the proxy UI's license terms from node_modules.
         run: pnpm install --frozen-lockfile --filter web --ignore-scripts
@@ -674,7 +674,7 @@ jobs:
           fi
 
       - name: Set up Go
-        uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 # v6.5.0
+        uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
         with:
           go-version-file: "go.mod"
           cache: false
@@ -726,7 +726,7 @@ jobs:
           go install github.com/wailsapp/wails/v3/cmd/wails3@$WAILS_VERSION
 
       - name: Run GoReleaser
-        uses: goreleaser/goreleaser-action@5daf1e915a5f0af01ddbcd89a43b8061ff4f1a89 # v7.2.2
+        uses: goreleaser/goreleaser-action@a4f02ab5355a589de60d917a659ce617ed19b3de # v7.3.0
         with:
           version: ${{ env.GORELEASER_VER }}
           args: release --config .goreleaser_ui_linux_arm64.yaml --clean ${{ env.flags }}

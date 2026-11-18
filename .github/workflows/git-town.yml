@@ -18,6 +18,6 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - uses: git-town/action@3d8b878379abb1ee393fb49865a28b4a6c2cd3b0 # v1.2.1
+      - uses: git-town/action@670e1f4feb81fdef4226fc09deefe09018eb20d1 # v1.3.3
         with:
           skip-single-stacks: true
