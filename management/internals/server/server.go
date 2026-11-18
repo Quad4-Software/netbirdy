@@ -100,6 +100,8 @@ type BaseServer struct {
 	wg     sync.WaitGroup
 	cancel context.CancelFunc
 
+	embeddedRelay *embeddedRelay
+
 	lifecycle.StopHandlers
 }
 
@@ -187,6 +189,10 @@ func (s *BaseServer) start(ctx context.Context) (err error) {
 
 	tlsEnabled, err := s.setupTLS(srvCtx)
 	if err != nil {
+		return err
+	}
+
+	if err := s.startEmbeddedRelay(srvCtx); err != nil {
 		return err
 	}
 

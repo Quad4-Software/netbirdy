@@ -206,3 +206,9 @@ func (r *Relay) Shutdown(ctx context.Context) {
 func (r *Relay) InstanceURL() url.URL {
 	return r.instanceURL
 }
+
+// ConnectedPeerCount returns the number of peers currently connected to the
+// relay.
+func (r *Relay) ConnectedPeerCount() int {
+	return len(r.store.Peers())
+}

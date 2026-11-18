@@ -81,6 +81,10 @@ type Config struct {
 	Relay      *Relay
 	Signal     *Host
 
+	// EmbeddedRelay runs the relay transport inside the management service so
+	// no external relay deployment is needed.
+	EmbeddedRelay *EmbeddedRelayConfig
+
 	Datadir                string
 	DataStoreEncryptionKey string
 
@@ -144,6 +148,21 @@ type Relay struct {
 	Addresses      []string
 	CredentialsTTL util.Duration
 	Secret         string
+}
+
+// EmbeddedRelayConfig configures the relay transport embedded in management.
+type EmbeddedRelayConfig struct {
+	// Enabled toggles the embedded relay explicitly. When unset it is enabled
+	// automatically whenever no external Relay addresses are configured and a
+	// public address can be resolved.
+	Enabled *bool
+	// Address is the externally reachable host[:port] advertised to peers as a
+	// relay URL. Defaults to the Let's Encrypt domain and the management port.
+	Address string
+	// QUICListenAddress is the UDP socket the QUIC transport binds. Defaults
+	// to the port in Address, or the management port. Set to "disabled" to run
+	// the WebSocket transport only.
+	QUICListenAddress string
 }
 
 // HttpServerConfig is a config of the HTTP Management service server
