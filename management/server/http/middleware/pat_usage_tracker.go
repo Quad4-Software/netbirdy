@@ -42,11 +42,22 @@ func NewPATUsageTracker(ctx context.Context, meter metric.Meter) (*PATUsageTrack
 	return tracker, nil
 }
 
-// IncrementUsage increments the usage counter for a given token
+// maxTrackedTokens bounds distinct token keys counted per minute. The key
+// comes from the unauthenticated Authorization header, so unbounded growth
+// is a pre-auth memory amplifier.
+const maxTrackedTokens = 65536
+
+// IncrementUsage increments the usage counter for a given token. Tokens are
+// hashed so the tracker never retains raw credential material.
 func (t *PATUsageTracker) IncrementUsage(token string) {
+	id := securityTokenID(token)
+
 	t.mu.Lock()
 	defer t.mu.Unlock()
-	t.usageCounters[token]++
+	if _, ok := t.usageCounters[id]; !ok && len(t.usageCounters) >= maxTrackedTokens {
+		return
+	}
+	t.usageCounters[id]++
 }
 
 // reportLoop reports the usage buckets every minute

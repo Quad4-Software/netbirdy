@@ -214,7 +214,7 @@ func (c *Auth0Credentials) requestJWTToken(ctx context.Context) (*http.Response,
 // parseRequestJWTResponse parses jwt raw response body and extracts token and expires in seconds
 func (c *Auth0Credentials) parseRequestJWTResponse(rawBody io.ReadCloser) (JWTToken, error) {
 	jwtToken := JWTToken{}
-	body, err := io.ReadAll(rawBody)
+	body, err := readBodyLimit(rawBody, maxIdPResponseBytes)
 	if err != nil {
 		return jwtToken, err
 	}
@@ -226,7 +226,11 @@ func (c *Auth0Credentials) parseRequestJWTResponse(rawBody io.ReadCloser) (JWTTo
 	if jwtToken.ExpiresIn == 0 && jwtToken.AccessToken == "" {
 		return jwtToken, fmt.Errorf("error while reading response body, expires_in: %d and access_token: %s", jwtToken.ExpiresIn, jwtToken.AccessToken)
 	}
-	data, err := base64.RawURLEncoding.DecodeString(strings.Split(jwtToken.AccessToken, ".")[1])
+	parts := strings.Split(jwtToken.AccessToken, ".")
+	if len(parts) != 3 {
+		return jwtToken, fmt.Errorf("access token is not a JWT")
+	}
+	data, err := base64.RawURLEncoding.DecodeString(parts[1])
 	if err != nil {
 		return jwtToken, err
 	}
@@ -333,13 +337,13 @@ func (am *Auth0Manager) GetAccount(ctx context.Context, accountID string) ([]*Us
 			am.appMetrics.IDPMetrics().CountGetAccount()
 		}
 
-		body, err := io.ReadAll(res.Body)
+		body, err := readBodyLimit(res.Body, maxIdPResponseBytes)
 		if err != nil {
 			return nil, err
 		}
 
 		if res.StatusCode != 200 {
-			return nil, fmt.Errorf("failed requesting user data from IdP %s", string(body))
+			return nil, fmt.Errorf("failed requesting user data from IdP, statusCode %d", res.StatusCode)
 		}
 
 		var batch []UserData
@@ -395,7 +399,7 @@ func (am *Auth0Manager) GetUserDataByID(ctx context.Context, userID string, appM
 		am.appMetrics.IDPMetrics().CountGetUserDataByID()
 	}
 
-	body, err := io.ReadAll(res.Body)
+	body, err := readBodyLimit(res.Body, maxIdPResponseBytes)
 	if err != nil {
 		return nil, err
 	}
@@ -590,7 +594,7 @@ func (am *Auth0Manager) GetAllAccounts(ctx context.Context) (map[string][]*UserD
 
 	var exportJobResp userExportJobResponse
 
-	body, err := io.ReadAll(jobResp.Body)
+	body, err := readBodyLimit(jobResp.Body, maxIdPResponseBytes)
 	if err != nil {
 		log.WithContext(ctx).Debugf("Couldn't read export job response; %v", err)
 		return nil, err
@@ -693,7 +697,7 @@ func (am *Auth0Manager) CreateUser(ctx context.Context, email, name, accountID, 
 
 	var createResp UserData
 
-	body, err := io.ReadAll(resp.Body)
+	body, err := readBodyLimit(resp.Body, maxIdPResponseBytes)
 	if err != nil {
 		log.WithContext(ctx).Debugf("Couldn't read export job response; %v", err)
 		return nil, err
@@ -823,7 +827,7 @@ func (am *Auth0Manager) GetAllConnections(ctx context.Context, strategy []string
 		return connections, fmt.Errorf("unable to get connections, statusCode %d", resp.StatusCode)
 	}
 
-	body, err := io.ReadAll(resp.Body)
+	body, err := readBodyLimit(resp.Body, maxIdPResponseBytes)
 	if err != nil {
 		log.WithContext(ctx).Debugf("Couldn't read get connections response; %v", err)
 		return connections, err
@@ -880,6 +884,11 @@ func (am *Auth0Manager) checkExportJobStatus(ctx context.Context, jobID string) 
 
 // downloadProfileExport downloads user profiles from auth0 batch job
 func (am *Auth0Manager) downloadProfileExport(ctx context.Context, location string) (map[string][]*UserData, error) {
+	locationURL, err := url.Parse(location)
+	if err != nil || locationURL.Scheme != "https" || locationURL.Host == "" {
+		return nil, fmt.Errorf("refusing export download from invalid location URL")
+	}
+
 	body, err := doGetReq(ctx, am.httpClient, location, "")
 	if err != nil {
 		return nil, err
@@ -892,7 +901,7 @@ func (am *Auth0Manager) downloadProfileExport(ctx context.Context, location stri
 		return nil, err
 	}
 
-	decoder := json.NewDecoder(gzipReader)
+	decoder := json.NewDecoder(io.LimitReader(gzipReader, maxExportPlaintextBytes))
 
 	res := make(map[string][]*UserData)
 	for decoder.More() {
@@ -943,7 +952,7 @@ func doGetReq(ctx context.Context, client ManagerHTTPClient, url, accessToken st
 			log.WithContext(ctx).Errorf("error while closing body for url %s: %v", url, err)
 		}
 	}()
-	body, err := io.ReadAll(res.Body)
+	body, err := readBodyLimit(res.Body, maxIdPResponseBytes)
 	if err != nil {
 		return nil, err
 	}

@@ -125,7 +125,7 @@ func (jm *JumpCloudManager) doRequest(ctx context.Context, method, path string, 
 		return nil, fmt.Errorf("JumpCloud API request %s %s failed with status %d", method, path, resp.StatusCode)
 	}
 
-	return io.ReadAll(resp.Body)
+	return readBodyLimit(resp.Body, maxIdPResponseBytes)
 }
 
 // UpdateUserAppMetadata updates user app metadata based on userID and metadata map.

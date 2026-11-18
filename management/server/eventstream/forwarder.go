@@ -102,8 +102,16 @@ type Forwarder struct {
 // NewForwarder creates a Forwarder reading integrations from manager.
 func NewForwarder(manager *Manager) *Forwarder {
 	return &Forwarder{
-		manager:    manager,
-		client:     &http.Client{Timeout: requestTimeout},
+		manager: manager,
+		client: &http.Client{
+			Timeout: requestTimeout,
+			// A 3xx is a delivery failure for a webhook POST; following it
+			// would resend the body and custom headers to a host the
+			// operator never configured.
+			CheckRedirect: func(_ *http.Request, _ []*http.Request) error {
+				return http.ErrUseLastResponse
+			},
+		},
 		queue:      make(chan queuedEvent, queueSize),
 		retryDelay: backoff,
 		attempts:   maxAttempts,
@@ -258,7 +266,7 @@ func (f *Forwarder) sendOnce(ctx context.Context, in *Integration, body []byte) 
 		return err
 	}
 	defer func() {
-		_, _ = io.Copy(io.Discard, resp.Body)
+		_, _ = io.Copy(io.Discard, io.LimitReader(resp.Body, 1<<20))
 		_ = resp.Body.Close()
 	}()
 

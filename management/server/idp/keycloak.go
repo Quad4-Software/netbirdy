@@ -139,7 +139,7 @@ func (kc *KeycloakCredentials) requestJWTToken(ctx context.Context) (*http.Respo
 // parseRequestJWTResponse parses jwt raw response body and extracts token and expires in seconds
 func (kc *KeycloakCredentials) parseRequestJWTResponse(rawBody io.ReadCloser) (JWTToken, error) {
 	jwtToken := JWTToken{}
-	body, err := io.ReadAll(rawBody)
+	body, err := readBodyLimit(rawBody, maxIdPResponseBytes)
 	if err != nil {
 		return jwtToken, err
 	}
@@ -153,7 +153,11 @@ func (kc *KeycloakCredentials) parseRequestJWTResponse(rawBody io.ReadCloser) (J
 		return jwtToken, fmt.Errorf("error while reading response body, expires_in: %d and access_token: %s", jwtToken.ExpiresIn, jwtToken.AccessToken)
 	}
 
-	data, err := base64.RawURLEncoding.DecodeString(strings.Split(jwtToken.AccessToken, ".")[1])
+	parts := strings.Split(jwtToken.AccessToken, ".")
+	if len(parts) != 3 {
+		return jwtToken, fmt.Errorf("access token is not a JWT")
+	}
+	data, err := base64.RawURLEncoding.DecodeString(parts[1])
 	if err != nil {
 		return jwtToken, err
 	}
@@ -405,7 +409,7 @@ func (km *KeycloakManager) get(ctx context.Context, resource string, q url.Value
 		return nil, fmt.Errorf("unable to get %s, statusCode %d", reqURL, resp.StatusCode)
 	}
 
-	return io.ReadAll(resp.Body)
+	return readBodyLimit(resp.Body, maxIdPResponseBytes)
 }
 
 // totalUsersCount returns the total count of all user created.

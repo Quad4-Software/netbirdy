@@ -149,7 +149,7 @@ func (ac *AzureCredentials) requestJWTToken(ctx context.Context) (*http.Response
 // parseRequestJWTResponse parses jwt raw response body and extracts token and expires in seconds
 func (ac *AzureCredentials) parseRequestJWTResponse(rawBody io.ReadCloser) (JWTToken, error) {
 	jwtToken := JWTToken{}
-	body, err := io.ReadAll(rawBody)
+	body, err := readBodyLimit(rawBody, maxIdPResponseBytes)
 	if err != nil {
 		return jwtToken, err
 	}
@@ -163,7 +163,11 @@ func (ac *AzureCredentials) parseRequestJWTResponse(rawBody io.ReadCloser) (JWTT
 		return jwtToken, fmt.Errorf("error while reading response body, expires_in: %d and access_token: %s", jwtToken.ExpiresIn, jwtToken.AccessToken)
 	}
 
-	data, err := base64.RawURLEncoding.DecodeString(strings.Split(jwtToken.AccessToken, ".")[1])
+	parts := strings.Split(jwtToken.AccessToken, ".")
+	if len(parts) != 3 {
+		return jwtToken, fmt.Errorf("access token is not a JWT")
+	}
+	data, err := base64.RawURLEncoding.DecodeString(parts[1])
 	if err != nil {
 		return jwtToken, err
 	}
@@ -361,7 +365,13 @@ func (am *AzureManager) getAllUsers(ctx context.Context) ([]*UserData, error) {
 	q.Add("$select", profileFields)
 	q.Add("$top", "500")
 
-	for nextLink := "users"; nextLink != ""; {
+	// maxGraphPages bounds pagination so a hostile or broken endpoint cannot
+	// keep the sync in an unbounded fetch loop. 500 users per page.
+	const maxGraphPages = 1000
+
+	pages := 0
+	for nextLink := "users"; nextLink != "" && pages < maxGraphPages; {
+		pages++
 		body, err := am.get(ctx, nextLink, q)
 		if err != nil {
 			return nil, err
@@ -395,7 +405,19 @@ func (am *AzureManager) get(ctx context.Context, resource string, q url.Values) 
 
 	var reqURL string
 	if strings.HasPrefix(resource, "https") {
-		// Already an absolute URL for paging
+		// Absolute paging URL: the bearer token is attached to this request,
+		// so it must target the configured Graph endpoint's host only.
+		resourceURL, err := url.Parse(resource)
+		if err != nil {
+			return nil, fmt.Errorf("invalid next page URL: %w", err)
+		}
+		endpointURL, err := url.Parse(am.GraphAPIEndpoint)
+		if err != nil {
+			return nil, fmt.Errorf("invalid GraphAPIEndpoint: %w", err)
+		}
+		if !strings.EqualFold(resourceURL.Host, endpointURL.Host) {
+			return nil, fmt.Errorf("refusing to follow paging URL to a different host")
+		}
 		reqURL = resource
 	} else {
 		reqURL = fmt.Sprintf("%s/%s?%s", am.GraphAPIEndpoint, resource, q.Encode())
@@ -426,7 +448,7 @@ func (am *AzureManager) get(ctx context.Context, resource string, q url.Values) 
 		return nil, fmt.Errorf("unable to get %s, statusCode %d", reqURL, resp.StatusCode)
 	}
 
-	return io.ReadAll(resp.Body)
+	return readBodyLimit(resp.Body, maxIdPResponseBytes)
 }
 
 // userData construct user data from keycloak profile.

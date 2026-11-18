@@ -126,6 +126,12 @@ func (f *AgentNetworkAccessLogFilter) ParseFromRequest(r *http.Request) error {
 	f.GroupIDs = splitMultiValue(q["group_id"])
 	f.ProviderIDs = splitMultiValue(q["provider_id"])
 	f.Models = splitMultiValue(q["model"])
+	// Bound the IN-list filters so a request cannot force a giant prepared
+	// statement or a driver parameter-count error.
+	const maxAccessLogFilterIDs = 1000
+	if len(f.GroupIDs) > maxAccessLogFilterIDs || len(f.ProviderIDs) > maxAccessLogFilterIDs || len(f.Models) > maxAccessLogFilterIDs {
+		return status.Errorf(status.InvalidArgument, "too many filter values: max %d per list", maxAccessLogFilterIDs)
+	}
 
 	var err error
 	if f.StartDate, err = parseAccessLogOptionalRFC3339(q.Get("start_date")); err != nil {

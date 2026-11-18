@@ -3,6 +3,7 @@ package idp
 import (
 	"encoding/json"
 	"errors"
+	"io"
 	"net/http"
 	"net/url"
 	"os"
@@ -112,4 +113,25 @@ func idpTimeout() time.Duration {
 		return defaultTimeout
 	}
 	return timeout
+}
+
+// Body bounds for IdP responses. A malfunctioning or hostile endpoint
+// otherwise buffers arbitrary payload into memory per request.
+const (
+	maxIdPResponseBytes     = 32 << 20
+	maxExportPlaintextBytes = 2 << 30
+	errBodyLimitExceeded    = "response body exceeds limit"
+)
+
+// readBodyLimit reads r fully, failing when more than limit bytes are present.
+func readBodyLimit(r io.Reader, limit int64) ([]byte, error) {
+	lr := io.LimitReader(r, limit+1)
+	b, err := io.ReadAll(lr)
+	if err != nil {
+		return nil, err
+	}
+	if int64(len(b)) > limit {
+		return nil, errors.New(errBodyLimitExceeded)
+	}
+	return b, nil
 }

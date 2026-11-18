@@ -3,8 +3,10 @@ package middleware
 import (
 	"context"
 	"fmt"
+	"io"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 	"time"
 
@@ -888,4 +890,36 @@ func TestBareAuthHeadersNoPanic(t *testing.T) {
 			t.Fatalf("%q: got %d", hv, rec.Code)
 		}
 	}
+}
+
+func TestPATUsageTracker_Bounded(t *testing.T) {
+	tracker := &PATUsageTracker{usageCounters: make(map[string]int64)}
+	for i := 0; i < maxTrackedTokens+1000; i++ {
+		tracker.IncrementUsage(fmt.Sprintf("nbp_garbage-%d", i))
+	}
+	assert.LessOrEqual(t, len(tracker.usageCounters), maxTrackedTokens)
+	for k := range tracker.usageCounters {
+		assert.NotContains(t, k, "nbp_garbage", "raw token must not be stored")
+	}
+}
+
+func TestBodyLimit(t *testing.T) {
+	h := bodyLimit(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		_, err := io.ReadAll(r.Body)
+		if err != nil {
+			w.WriteHeader(http.StatusRequestEntityTooLarge)
+			return
+		}
+		w.WriteHeader(http.StatusOK)
+	}))
+
+	small := httptest.NewRequest(http.MethodPost, "/", strings.NewReader("{}"))
+	smallRec := httptest.NewRecorder()
+	h.ServeHTTP(smallRec, small)
+	assert.Equal(t, http.StatusOK, smallRec.Code)
+
+	big := httptest.NewRequest(http.MethodPost, "/", strings.NewReader(strings.Repeat("a", maxAPIRequestBody+1)))
+	bigRec := httptest.NewRecorder()
+	h.ServeHTTP(bigRec, big)
+	assert.Equal(t, http.StatusRequestEntityTooLarge, bigRec.Code)
 }

@@ -296,6 +296,11 @@ func filtersFromQuery(v url.Values) (store.PeerFilters, error) {
 			return store.PeerFilters{}, fmt.Errorf("incompatible filters: kind == server and a non-empty user_id")
 		}
 	}
+	for _, param := range []string{"peer_ids", "group_ids", "os"} {
+		if len(v[param]) > maxPeerFilterIDs {
+			return store.PeerFilters{}, fmt.Errorf("too many %s values: max %d", param, maxPeerFilterIDs)
+		}
+	}
 	return store.PeerFilters{
 		UserId:           v.Get("user_id"),
 		GroupIds:         v["group_ids"],
@@ -324,6 +329,13 @@ func parseBool(maybeBool string) (*bool, error) {
 	return new(parsed), nil
 }
 
+// maxPeerPageSize bounds the page_size query parameter; a negative value is
+// a no-limit LIMIT and a huge value defeats pagination entirely.
+const maxPeerPageSize = 1000
+
+// maxPeerFilterIDs bounds repeated filter params that become SQL IN lists.
+const maxPeerFilterIDs = 1000
+
 func paginationFromQuery(v url.Values) (store.PaginationState, error) {
 	page, err := strconv.Atoi(v.Get("page"))
 	if err != nil {
@@ -333,6 +345,9 @@ func paginationFromQuery(v url.Values) (store.PaginationState, error) {
 	pageSize, err := strconv.Atoi(v.Get("page_size"))
 	if err != nil {
 		return store.PaginationState{}, err
+	}
+	if pageSize < 0 || pageSize > maxPeerPageSize {
+		return store.PaginationState{}, fmt.Errorf("page_size must be between 0 and %d", maxPeerPageSize)
 	}
 
 	return store.PaginationState{

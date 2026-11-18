@@ -3,7 +3,6 @@ package idp
 import (
 	"context"
 	"fmt"
-	"io"
 	"net/http"
 	"net/url"
 	"slices"
@@ -159,7 +158,7 @@ func (p *PocketIdManager) request(ctx context.Context, method, resource string, 
 		return nil, fmt.Errorf("received unexpected status code from %s API: %d", p.providerName, resp.StatusCode)
 	}
 
-	return io.ReadAll(resp.Body)
+	return readBodyLimit(resp.Body, maxIdPResponseBytes)
 }
 
 // getAllUsersPaginated fetches all users from PocketID API using pagination
@@ -269,15 +268,19 @@ func (p *PocketIdManager) GetAllAccounts(ctx context.Context) (map[string][]*Use
 }
 
 func (p *PocketIdManager) CreateUser(ctx context.Context, email, name, accountID, invitedByEmail string) (*UserData, error) {
-	firstLast := strings.Split(name, " ")
+	firstLast := strings.SplitN(name, " ", 2)
+	last := firstLast[0]
+	if len(firstLast) > 1 {
+		last = firstLast[1]
+	}
 
 	createUser := pocketIdUserCreateDto{
 		Disabled:    false,
 		DisplayName: name,
 		Email:       email,
 		FirstName:   firstLast[0],
-		LastName:    firstLast[1],
-		Username:    firstLast[0] + "." + firstLast[1],
+		LastName:    last,
+		Username:    firstLast[0] + "." + last,
 	}
 	payload, err := p.helper.Marshal(createUser)
 	if err != nil {

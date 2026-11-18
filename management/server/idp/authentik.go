@@ -145,7 +145,7 @@ func (ac *AuthentikCredentials) requestJWTToken(ctx context.Context) (*http.Resp
 // parseRequestJWTResponse parses jwt raw response body and extracts token and expires in seconds
 func (ac *AuthentikCredentials) parseRequestJWTResponse(rawBody io.ReadCloser) (JWTToken, error) {
 	jwtToken := JWTToken{}
-	body, err := io.ReadAll(rawBody)
+	body, err := readBodyLimit(rawBody, maxIdPResponseBytes)
 	if err != nil {
 		return jwtToken, err
 	}
@@ -159,7 +159,11 @@ func (ac *AuthentikCredentials) parseRequestJWTResponse(rawBody io.ReadCloser) (
 		return jwtToken, fmt.Errorf("error while reading response body, expires_in: %d and access_token: %s", jwtToken.ExpiresIn, jwtToken.AccessToken)
 	}
 
-	data, err := base64.RawURLEncoding.DecodeString(strings.Split(jwtToken.AccessToken, ".")[1])
+	parts := strings.Split(jwtToken.AccessToken, ".")
+	if len(parts) != 3 {
+		return jwtToken, fmt.Errorf("access token is not a JWT")
+	}
+	data, err := base64.RawURLEncoding.DecodeString(parts[1])
 	if err != nil {
 		return jwtToken, err
 	}

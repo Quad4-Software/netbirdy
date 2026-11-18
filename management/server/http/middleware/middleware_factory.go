@@ -16,6 +16,7 @@ func BuildMiddleware(rateLimiter *ratelimit.APIRateLimiter, authManager auth.Man
 
 	toret = append(toret, metrics.HTTPMiddleware().Handler)
 	toret = append(toret, cors.AllowAll().Handler)
+	toret = append(toret, bodyLimit)
 
 	if rateLimiter == nil {
 		log.Warn("NewAPIHandler: nil rate limiter, rate limiting disabled")
