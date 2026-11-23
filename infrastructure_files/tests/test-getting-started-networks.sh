@@ -24,7 +24,11 @@ generate_docker_compose_traefik
 EOF
 else
   TRAEFIK_IMAGE=traefik:v3.7.18
+<<<<<<< HEAD
   NETBIRD_DOMAIN=netbirdy.test
+=======
+  NETBIRD_DOMAIN=netbird.test
+>>>>>>> upstream/v0.83.2
   NETBIRD_AGENT_NETWORK=false
   initialize_default_values
   COMPOSE_PROJECT_NAME=render-only generate_configuration_files >/dev/null

@@ -827,7 +827,11 @@ services:
   # Traefik reverse proxy (automatic TLS via Let's Encrypt)
   traefik:
     image: traefik:v3.7.18
+<<<<<<< HEAD
     container_name: netbirdy-traefik
+=======
+    container_name: netbird-traefik
+>>>>>>> upstream/v0.83.2
     restart: unless-stopped
     networks:
       netbirdy:

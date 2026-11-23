@@ -54,7 +54,11 @@ func agentNetworkResolver(t *testing.T) *proxy.TargetResolver {
 
 // TestPrivateDenyLeavesAgentNetworkLog covers a caller the private gateway
 // refuses after matching it to an agent-network target, such as a client that
+<<<<<<< HEAD
 // is not connected to NetBirdy. The 403 is the proxy's own, and the request goes
+=======
+// is not connected to NetBirdy. The 403 is the proxy's own, and the request goes
+>>>>>>> upstream/v0.83.2
 // to the regular reverse-proxy log rather than an agent-network row with no
 // user, provider or model. The account's agent-network log collection setting
 // does not hide it, since the caller was never identified as one of its users.

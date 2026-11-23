@@ -191,9 +191,9 @@
             class="Machine"
             displayName="$(string.ExtraIFaceBlackList_Name)"
             explainText="$(string.ExtraIFaceBlackList_Help)"
-            key="Software\Policies\NetBird"
+            key="Software\Policies\NetBirdy"
             presentation="$(presentation.ExtraIFaceBlackList_Pres)">
-      <parentCategory ref="NetBird" />
+      <parentCategory ref="NetBirdy" />
       <supportedOn ref="SUPPORTED_NetBird_All" />
       <elements>
         <text id="ExtraIFaceBlackList_Text" valueName="ExtraIFaceBlackList" required="true" />

@@ -511,8 +511,13 @@ initialize_default_values() {
   # Docker images
   DASHBOARD_IMAGE=${DASHBOARD_IMAGE:-"ghcr.io/quad4-software/netbirdy-dashboard:latest"}
   # Combined server replaces separate signal, relay, and management containers
+<<<<<<< HEAD
   NETBIRD_SERVER_IMAGE=${NETBIRD_SERVER_IMAGE:-"ghcr.io/quad4-software/netbirdy-server:latest"}
   NETBIRD_PROXY_IMAGE=${NETBIRD_PROXY_IMAGE:-"ghcr.io/quad4-software/netbirdy-reverse-proxy:latest"}
+=======
+  NETBIRD_SERVER_IMAGE=${NETBIRD_SERVER_IMAGE:-"netbirdio/netbird-server:latest"}
+  NETBIRD_PROXY_IMAGE=${NETBIRD_PROXY_IMAGE:-"netbirdio/reverse-proxy:latest"}
+>>>>>>> upstream/v0.83.2
   TRAEFIK_IMAGE=${TRAEFIK_IMAGE:-"traefik:v3.7.18"}
   CROWDSEC_IMAGE=${CROWDSEC_IMAGE:-"crowdsecurity/crowdsec:v1.8.1"}
   # Reverse proxy configuration
