@@ -20,10 +20,9 @@
     "noUnusedParameters": false,
     "noImplicitAny": false,
     "noFallthroughCasesInSwitch": true,
-    "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"],
-      "@bindings/*": ["bindings/github.com/netbirdio/netbird/client/ui/*"]
+      "@/*": ["./src/*"],
+      "@bindings/*": ["./bindings/github.com/netbirdio/netbird/client/ui/*"]
     }
   },
   "include": ["src", "bindings"],

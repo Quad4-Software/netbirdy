@@ -29,12 +29,12 @@
     "@radix-ui/react-tabs": "^1.2.1",
     "@radix-ui/react-tooltip": "^1.4.1",
     "@radix-ui/react-visually-hidden": "^1.2.13",
-    "@sentry/browser": "^11.12.0",
+    "@sentry/browser": "^11.14.0",
     "@wailsio/runtime": "3.0.0-beta.34",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
-    "framer-motion": "^12.43.0",
+    "framer-motion": "^14.14.0",
     "i18next": "^26.7.2",
     "lucide-react": "^0.566.0",
     "react": "^18.3.1",
@@ -42,8 +42,8 @@
     "react-i18next": "^17.1.13",
     "react-loading-skeleton": "^3.5.0",
     "react-router-dom": "^7.18.5",
-    "react-virtuoso": "^4.18.21",
-    "tailwind-merge": "^2.6.0"
+    "react-virtuoso": "^4.18.23",
+    "tailwind-merge": "^3.7.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.5",
@@ -56,16 +56,16 @@
     "eslint-plugin-jsx-a11y": "^6.10.2",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^7.1.1",
-    "eslint-plugin-react-refresh": "^0.5.7",
+    "eslint-plugin-react-refresh": "^0.5.8",
     "globals": "^17.14.0",
-    "postcss": "^8.5.32",
-    "prettier": "^3.9.10",
+    "postcss": "^8.5.33",
+    "prettier": "^3.10.1",
     "prettier-plugin-tailwindcss": "^0.8.1",
     "tailwindcss": "^4.3.5",
     "tw-animate-css": "^1.4.0",
-    "typescript": "^5.9.3",
-    "typescript-eslint": "^8.72.2",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.73.0",
     "vite": "8.3.4"
   },
-  "packageManager": "pnpm@12.19.0+sha512.87327b6619853205834e4be59ba3a231e303d9f5e435912ede3312b7539b79af890942f6513b05a4690745666888045c09b33fc420c2cd2d3bd95c01ba21dbeb"
+  "packageManager": "pnpm@12.22.0+sha512.iUlAo9mlffpv03OZD7TkHgnC8tdtmC7R11J105Jn+Yj7Ti1AkAy+mSHGjZfGeqGhCW0nZjPbJI97NJJ6yd23pA=="
 }

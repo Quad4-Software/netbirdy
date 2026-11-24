@@ -10,7 +10,7 @@ WORKDIR /app
 # what the Debian node image shipped.
 RUN apk add --no-cache nodejs-24 npm build-base python3
 
-RUN npm install -g pnpm@12.19.0 && pnpm --version | grep -q "^12\.19\.0$"
+RUN npm install -g pnpm@12.22.0 && pnpm --version | grep -q "^12\.22\.0$"
 
 COPY pnpm-workspace.yaml pnpm-lock.yaml package.json ./
 COPY dashboard/package.json dashboard/package.json

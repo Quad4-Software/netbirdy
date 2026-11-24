@@ -112,7 +112,7 @@ jobs:
       matrix:
         include: ${{ fromJSON(needs.resolve.outputs.matrix) }}
     env:
-      PREFLIGHT_VERSION: "1.21.0"
+      PREFLIGHT_VERSION: "1.22.0"
       # sha256 of preflight-linux-amd64 from the 1.21.0 GitHub release.
       # Red Hat publishes no checksum file, so the value is pinned here.
       PREFLIGHT_SHA256: "5e653135503c72f8702bbe31d7643197d12937c68086879133dd6b9650a9a449"

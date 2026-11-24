@@ -27,20 +27,20 @@ jobs:
           persist-credentials: false
 
       - name: Set up Go
-        uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        uses: actions/setup-go@d8cbb8045d7f43706b9177cceb36c1f91a6644d5 # v7.1.0
         with:
           go-version-file: "go.mod"
 
       - name: Run govulncheck
         run: |
           set -e
-          go run golang.org/x/vuln/cmd/govulncheck@v1.9.0 -format json ./... > vuln.json || true
+          go run golang.org/x/vuln/cmd/govulncheck@v1.10.0 -format json ./... > vuln.json || true
           sh scripts/govulncheck-filter.sh vuln.json
 
       - name: Run govulncheck on the ingest module
         run: |
           set -e
-          go -C client/internal/metrics/infra/ingest run golang.org/x/vuln/cmd/govulncheck@v1.9.0 -format json ./... > vuln-ingest.json || true
+          go -C client/internal/metrics/infra/ingest run golang.org/x/vuln/cmd/govulncheck@v1.10.0 -format json ./... > vuln-ingest.json || true
           sh scripts/govulncheck-filter.sh vuln-ingest.json
 
   zizmor:

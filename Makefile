@@ -86,7 +86,7 @@ podman-test:
 		-v $(CURDIR):/src:ro,Z -w /src \
 		-v netbirdy-pnpm-store:/pnpm-store \
 		cgr.dev/chainguard/wolfi-base@sha256:e9b8c3739e5fb5fc778843a2ce74f8620588c9ddc9c44918cead527abcb0b628 \
-		sh -c "apk update -qq && apk add --no-cache -q nodejs-24 npm build-base python3 && npm install -g pnpm@12.19.0 -q && pnpm config set store-dir /pnpm-store && pnpm install --frozen-lockfile --filter netbirdy-dashboard... && pnpm --filter netbirdy-dashboard lint || true; pnpm --filter netbirdy-dashboard exec tsc --noEmit --tsBuildInfoFile /tmp/tsconfig.tsbuildinfo && pnpm --filter netbirdy-dashboard test:unit"
+		sh -c "apk update -qq && apk add --no-cache -q nodejs-24 npm build-base python3 && npm install -g pnpm@12.22.0 -q && pnpm config set store-dir /pnpm-store && pnpm install --frozen-lockfile --filter netbirdy-dashboard... && pnpm --filter netbirdy-dashboard lint || true; pnpm --filter netbirdy-dashboard exec tsc --noEmit --tsBuildInfoFile /tmp/tsconfig.tsbuildinfo && pnpm --filter netbirdy-dashboard test:unit"
 
 .PHONY: offline-e2e
 offline-e2e:
