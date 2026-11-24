@@ -83,6 +83,7 @@ func (offlineSignalClient) SendToStream(*sigProto.EncryptedMessage) error {
 func (offlineSignalClient) Send(*sigProto.Message) error                     { return nil }
 func (offlineSignalClient) SetOnReconnectedListener(func())                  {}
 func (offlineSignalClient) SetConnStateListener(sigClient.ConnStateNotifier) {}
+func (offlineSignalClient) UpdateAuthToken([]byte)                           {}
 
 // SetOffline puts the engine in cached-map mode: no Sync stream, no signal
 // negotiation, no relay credential refresh.

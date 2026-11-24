@@ -2,6 +2,7 @@ package internal
 
 import (
 	"context"
+	"crypto/ed25519"
 	"errors"
 	"fmt"
 	"net"
@@ -81,6 +82,9 @@ type ConnectClient struct {
 	// netMgr gates every reconnection loop on OS-reported network
 	// availability and sweeps connections on network change.
 	netMgr *netevents.Manager
+	// netMgrWhenUsed defers the decision to hand netMgr over until Run, once
+	// the routing mode is known; see NetEventsFor.
+	netMgrWhenUsed bool
 
 	profileOwner        string
 	profileOwnerUnknown bool
@@ -98,6 +102,15 @@ func WithInMemoryState() ConnectClientOption {
 // WithNetEvents injects the OS network event handling.
 func WithNetEvents(events *netevents.Manager) ConnectClientOption {
 	return func(c *ConnectClient) { c.netMgr = events }
+}
+
+// WithNetEventsWhenUsed injects events only if the desktop network change
+// handling will use them, decided when the client runs; see NetEventsFor.
+func WithNetEventsWhenUsed(events *netevents.Manager) ConnectClientOption {
+	return func(c *ConnectClient) {
+		c.netMgr = events
+		c.netMgrWhenUsed = true
+	}
 }
 
 // WithProfileOwner names the account the active profile belongs to, by uid or SID, whose
@@ -230,6 +243,9 @@ func (c *ConnectClient) run(mobileDependency MobileDependency, runningChan chan 
 	log.Infof("starting NetBirdy client version %s on %s/%s", version.NetbirdVersion(), runtime.GOOS, runtime.GOARCH)
 
 	nbnet.Init()
+	if c.netMgrWhenUsed {
+		c.netMgr = NetEventsFor(c.config, c.netMgr)
+	}
 
 	// Initialize metrics once at startup (always active for debug bundles)
 	if c.clientMetrics == nil {
@@ -353,7 +369,7 @@ func (c *ConnectClient) run(mobileDependency MobileDependency, runningChan chan 
 		// hostname may still be unresolvable.
 		var mgmClient *mgm.GrpcClient
 		for _, target := range mgmtDialTargets(c.config.ManagementURL.Host, LastMgmtAddrs()) {
-			dialOpts := []mgm.Option{mgm.WithNetEvents(c.netMgr)}
+			dialOpts := []mgm.Option{mgm.WithNetEvents(c.netMgr), c.config.ManagementAuthKeyOption()}
 			if target != c.config.ManagementURL.Host {
 				dialOpts = append(dialOpts, mgm.WithServerName(c.config.ManagementURL.Hostname()))
 			}
@@ -449,7 +465,7 @@ func (c *ConnectClient) run(mobileDependency MobileDependency, runningChan chan 
 		}()
 
 		// with the global NetBirdy config in hand connect (just a connection, no stream yet) Signal
-		signalClient, err := connectToSignal(engineCtx, loginResp.GetNetbirdConfig(), myPrivateKey, c.netMgr)
+		signalClient, err := connectToSignal(engineCtx, loginResp.GetNetbirdConfig(), myPrivateKey, c.authKey(), c.netMgr)
 		if err != nil {
 			log.Error(err)
 			return wrapErr(err)
@@ -488,10 +504,14 @@ func (c *ConnectClient) run(mobileDependency MobileDependency, runningChan chan 
 		}
 
 		relayManager := relayClient.NewManager(engineCtx, relayURLs, myPrivateKey.PublicKey().String(), engineConfig.MTU,
-			relayClient.WithNetEvents(c.netMgr))
+			relayClient.WithNetEvents(c.netMgr), relayClient.WithAuthKey(c.authKey()))
 		c.statusRecorder.SetRelayMgr(relayManager)
 		if len(relayURLs) > 0 {
-			if token != nil {
+			if authToken := loginResp.GetNetbirdConfig().GetAuthToken(); len(authToken) > 0 {
+				if err := relayManager.UpdateAuthToken(authToken); err != nil {
+					return wrapErr(err)
+				}
+			} else if token != nil {
 				if err := relayManager.UpdateToken(token); err != nil {
 					log.Errorf("failed to update token: %s", err)
 					return wrapErr(err)
@@ -602,6 +622,17 @@ func (c *ConnectClient) run(mobileDependency MobileDependency, runningChan chan 
 		return err
 	}
 	return nil
+}
+
+// authKey returns the key signing the Signal and Relay proofs, or nil when the profile has no
+// usable one, in which case Management sends no auth token either.
+func (c *ConnectClient) authKey() ed25519.PrivateKey {
+	key, err := c.config.AuthSigningKey()
+	if err != nil {
+		log.Debugf("no usable peer auth key: %v", err)
+		return nil
+	}
+	return key
 }
 
 func parseRelayInfo(loginResp *mgmProto.LoginResponse) ([]string, *hmac.Token) {
@@ -729,6 +760,8 @@ func createEngineConfig(key wgtypes.Key, config *profilemanager.Config, peerConf
 		RosenpassPermissive:           config.RosenpassPermissive,
 		ServerSSHAllowed:              util.ReturnBoolWithDefaultTrue(config.ServerSSHAllowed),
 		RemoteJobsAllowed:             util.ReturnBoolWithDefaultFalse(config.RemoteJobsAllowed),
+		ServerVNCAllowed:              config.ServerVNCAllowed != nil && *config.ServerVNCAllowed,
+		DisableVNCApproval:            config.DisableVNCApproval,
 		EnableSSHRoot:                 config.EnableSSHRoot,
 		EnableSSHSFTP:                 config.EnableSSHSFTP,
 		EnableSSHLocalPortForwarding:  config.EnableSSHLocalPortForwarding,
@@ -806,7 +839,7 @@ func selectMTU(localMTU uint16, peerMTU int32) uint16 {
 }
 
 // connectToSignal creates Signal Service client and established a connection
-func connectToSignal(ctx context.Context, wtConfig *mgmProto.NetbirdConfig, ourPrivateKey wgtypes.Key, netMgr *netevents.Manager) (*signal.GrpcClient, error) {
+func connectToSignal(ctx context.Context, wtConfig *mgmProto.NetbirdConfig, ourPrivateKey wgtypes.Key, authKey ed25519.PrivateKey, netMgr *netevents.Manager) (*signal.GrpcClient, error) {
 	var sigTLSEnabled bool
 	if wtConfig.Signal.Protocol == mgmProto.HostConfig_HTTPS {
 		sigTLSEnabled = true
@@ -815,11 +848,12 @@ func connectToSignal(ctx context.Context, wtConfig *mgmProto.NetbirdConfig, ourP
 	}
 
 	signalClient, err := signal.NewClient(ctx, wtConfig.Signal.Uri, ourPrivateKey, sigTLSEnabled,
-		signal.WithNetEvents(netMgr))
+		signal.WithNetEvents(netMgr), signal.WithAuthKey(authKey))
 	if err != nil {
 		log.Errorf("error while connecting to the Signal Exchange Service %s: %s", wtConfig.Signal.Uri, err)
 		return nil, gstatus.Errorf(codes.FailedPrecondition, "failed connecting to Signal Service : %s", err)
 	}
+	signalClient.UpdateAuthToken(wtConfig.GetAuthToken())
 
 	return signalClient, nil
 }
@@ -831,6 +865,7 @@ func loginToManagement(ctx context.Context, client mgm.Client, pubSSHKey []byte,
 		config.RosenpassEnabled,
 		config.RosenpassPermissive,
 		config.ServerSSHAllowed,
+		config.ServerVNCAllowed,
 		config.DisableClientRoutes,
 		config.DisableServerRoutes,
 		config.DisableDNS,

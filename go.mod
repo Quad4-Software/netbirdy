@@ -27,6 +27,7 @@ require (
 	github.com/eko/gocache/lib/v4 v4.4.0
 	github.com/eko/gocache/store/go_cache/v4 v4.2.10
 	github.com/eko/gocache/store/redis/v4 v4.2.13
+	github.com/flynn/noise v1.1.0
 	github.com/fsnotify/fsnotify v1.10.1
 	github.com/getsentry/sentry-go v0.50.0
 	github.com/gliderlabs/ssh v0.3.9-0.20250127223818-909fa952d4e4
@@ -53,7 +54,9 @@ require (
 	github.com/hashicorp/go-secure-stdlib/base62 v0.1.2
 	github.com/hashicorp/go-version v1.9.0
 	github.com/jackc/pgx/v5 v5.13.0
+	github.com/jezek/xgb v1.3.1
 	github.com/kardianos/service v1.3.0
+	github.com/kirides/go-d3d v1.0.1
 	github.com/landlock-lsm/go-landlock v0.11.2
 	github.com/libdns/route53 v1.6.3
 	github.com/libp2p/go-netroute v0.4.0
@@ -376,7 +379,7 @@ replace github.com/cloudflare/circl => codeberg.org/cunicu/circl v0.0.0-20230801
 
 replace github.com/mailru/easyjson => github.com/netbirdio/easyjson v0.9.0
 
-replace github.com/wailsapp/wails/v3 => github.com/netbirdio/wails/v3 v3.0.0-beta.3.0.20261009120932-4e087a8bfd6d
+replace github.com/wailsapp/wails/v3 => github.com/netbirdio/wails/v3 v3.0.0-beta.3.0.20261028091752-cfa103160796
 
 tool (
 	github.com/goreleaser/chglog/cmd/chglog

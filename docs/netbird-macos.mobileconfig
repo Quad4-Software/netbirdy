@@ -115,6 +115,10 @@
                                 <key>allowServerSSH</key>
                                 <true/>
                                 <!--
+                                <key>allowServerVNC</key>
+                                <true/>
+                                <key>disableVNCApproval</key>
+                                <false/>
                                 <key>rosenpassEnabled</key>
                                 <true/>
                                 <key>rosenpassPermissive</key>
@@ -142,7 +146,7 @@
                                 -->
 
                                 <!-- ===== Extra interface blacklist (array or comma-separated string)
-                                     Interface name prefixes whose local addresses NetBird never
+                                     Interface name prefixes whose local addresses NetBirdy never
                                      offers as peer connection candidates. Case-sensitive prefix,
                                      no wildcards: "bridge" also excludes bridge100. Added to the
                                      built-in list and to the device's own extra-iface-blacklist

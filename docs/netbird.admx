@@ -136,6 +136,30 @@
       <disabledValue><decimal value="0" /></disabledValue>
     </policy>
 
+    <policy name="AllowServerVNC"
+            class="Machine"
+            displayName="$(string.AllowServerVNC_Name)"
+            explainText="$(string.AllowServerVNC_Help)"
+            key="Software\Policies\NetBirdy"
+            valueName="AllowServerVNC">
+      <parentCategory ref="NetBirdy" />
+      <supportedOn ref="SUPPORTED_NetBird_All" />
+      <enabledValue><decimal value="1" /></enabledValue>
+      <disabledValue><decimal value="0" /></disabledValue>
+    </policy>
+
+    <policy name="DisableVNCApproval"
+            class="Machine"
+            displayName="$(string.DisableVNCApproval_Name)"
+            explainText="$(string.DisableVNCApproval_Help)"
+            key="Software\Policies\NetBirdy"
+            valueName="DisableVNCApproval">
+      <parentCategory ref="NetBirdy" />
+      <supportedOn ref="SUPPORTED_NetBird_All" />
+      <enabledValue><decimal value="1" /></enabledValue>
+      <disabledValue><decimal value="0" /></disabledValue>
+    </policy>
+
     <policy name="DebugBundleUploadURL"
             class="Machine"
             displayName="$(string.DebugBundleUploadURL_Name)"
@@ -191,9 +215,9 @@
             class="Machine"
             displayName="$(string.ExtraIFaceBlackList_Name)"
             explainText="$(string.ExtraIFaceBlackList_Help)"
-            key="Software\Policies\NetBird"
+            key="Software\Policies\NetBirdy"
             presentation="$(presentation.ExtraIFaceBlackList_Pres)">
-      <parentCategory ref="NetBird" />
+      <parentCategory ref="NetBirdy" />
       <supportedOn ref="SUPPORTED_NetBird_All" />
       <elements>
         <text id="ExtraIFaceBlackList_Text" valueName="ExtraIFaceBlackList" required="true" />

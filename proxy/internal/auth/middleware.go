@@ -57,7 +57,8 @@ type DomainConfig struct {
 	AccountID         types.AccountID
 	ServiceID         types.ServiceID
 	IPRestrictions    *restrict.Filter
-	// Private routes the domain through ValidateTunnelPeer; failure → 403.
+	// Private routes the domain through ValidateTunnelPeer; a refusal is
+	// 404, 403 or 401 as privateDenyStatus decides.
 	Private bool
 	// AllowedGroups holds the group ids that may reach the service through an
 	// OIDC identity. When non-empty, a session cookie is honoured only if its
@@ -143,7 +144,12 @@ func (mw *Middleware) Protect(next http.Handler) http.Handler {
 		// enforce account id for requests routed through the embedded client
 		capturedData := proxy.CapturedDataFromContext(r.Context())
 		if capturedData != nil && capturedData.GetAccountID() != "" && capturedData.GetAccountID() != config.AccountID {
-			denyForbidden(w, r, config)
+			if config.Private {
+				// Another account's peer: outside this service's network.
+				denyPrivate(w, r, http.StatusNotFound)
+				return
+			}
+			mw.denyForbidden(w, r, config)
 			return
 		}
 		// Set account and service IDs in captured data for access logging.
@@ -161,10 +167,10 @@ func (mw *Middleware) Protect(next http.Handler) http.Handler {
 
 		// Private services bypass operator schemes and gate on tunnel peer.
 		if config.Private {
-			if mw.forwardWithTunnelPeer(w, r, host, config, next) {
-				return
+			forwarded, status := mw.tryTunnelPeer(w, r, host, config, next)
+			if !forwarded {
+				denyPrivate(w, r, status)
 			}
-			denyPrivate(w, r)
 			return
 		}
 
@@ -214,7 +220,7 @@ func (mw *Middleware) handleTargetAccess(w http.ResponseWriter, r *http.Request,
 	case proxy.AccessActionBypass:
 		if config.Private {
 			mw.logger.Error("private domain reached a bypass target; denying")
-			denyPrivate(w, r)
+			denyPrivate(w, r, mw.privatePreAuthStatus(r))
 			return r, true
 		}
 		markAccessAction(r, action)
@@ -222,12 +228,12 @@ func (mw *Middleware) handleTargetAccess(w http.ResponseWriter, r *http.Request,
 	case proxy.AccessActionBlock:
 		markAccessAction(r, action)
 		w.Header().Set("Cache-Control", "no-store")
-		denyForbidden(w, r, config)
+		mw.denyForbidden(w, r, config)
 	default:
 		mw.logger.Errorf("resolved unknown access action %q; denying", action)
 		markAccessAction(r, action)
 		w.Header().Set("Cache-Control", "no-store")
-		denyForbidden(w, r, config)
+		mw.denyForbidden(w, r, config)
 	}
 	return r, true
 }
@@ -325,7 +331,7 @@ func (mw *Middleware) checkIPRestrictions(w http.ResponseWriter, r *http.Request
 	clientIP := mw.resolveClientIP(r)
 	if !clientIP.IsValid() {
 		mw.logger.Debugf("IP restriction: cannot resolve client address for %q, denying", r.RemoteAddr)
-		denyForbidden(w, r, config)
+		mw.denyForbidden(w, r, config)
 		return false
 	}
 
@@ -360,16 +366,16 @@ func (mw *Middleware) checkIPRestrictions(w http.ResponseWriter, r *http.Request
 
 	reason := verdict.String()
 	mw.blockIPRestriction(r, reason)
-	denyForbidden(w, r, config)
+	mw.denyForbidden(w, r, config)
 	return false
 }
 
 // denyForbidden renders the block page and marks the request as an auth
-// rejection for the access log, dropping the client connection
-// when the domain is private so a later retry cannot reuse it.
-func denyForbidden(w http.ResponseWriter, r *http.Request, config DomainConfig) {
+// rejection for the access log. A private domain refuses through denyPrivate
+// instead, with the status privatePreAuthStatus picks.
+func (mw *Middleware) denyForbidden(w http.ResponseWriter, r *http.Request, config DomainConfig) {
 	if config.Private {
-		denyPrivate(w, r)
+		denyPrivate(w, r, mw.privatePreAuthStatus(r))
 		return
 	}
 	markAuthRejected(r)
@@ -380,10 +386,12 @@ func denyForbidden(w http.ResponseWriter, r *http.Request, config DomainConfig) 
 	web.ServeAccessDeniedPage(w, r, http.StatusForbidden, "Access Denied", "Access to this service is denied.", requestID)
 }
 
-// denyPrivate writes a 403 and closes the connection, so a client refused
+// denyPrivate writes status and closes the connection, so a client refused
 // before joining the overlay cannot keep retrying on the same warm socket.
 // Go's HTTP/2 server turns the exact lowercase "close" token into a GOAWAY.
-func denyPrivate(w http.ResponseWriter, r *http.Request) {
+// A 404 renders the unknown-host error page, so the body does not reveal
+// that the service exists.
+func denyPrivate(w http.ResponseWriter, r *http.Request, status int) {
 	markAuthRejected(r)
 	h := w.Header()
 	h.Set("Connection", "close")
@@ -392,7 +400,51 @@ func denyPrivate(w http.ResponseWriter, r *http.Request) {
 	if cd := proxy.CapturedDataFromContext(r.Context()); cd != nil {
 		requestID = cd.GetRequestID()
 	}
-	web.ServeAccessDeniedPage(w, r, http.StatusForbidden, "Access Denied", "This service is only reachable through the private network.", requestID)
+	if status == http.StatusNotFound {
+		web.ServeErrorPage(w, r, status, proxy.ServiceNotFoundTitle, proxy.ServiceNotFoundMessage, requestID,
+			web.ErrorStatus{Proxy: true, Destination: false})
+		return
+	}
+	if status != http.StatusForbidden {
+		http.Error(w, http.StatusText(status), status)
+		return
+	}
+	web.ServeAccessDeniedPage(w, r, status, "Access Denied", "This service is only reachable through the private network.", requestID)
+}
+
+// privatePreAuthStatus is the status of a private-domain refusal made before
+// ValidateTunnelPeer runs (IP restriction, blocked path): 403 for a peer in
+// the account's roster, 404 for anyone outside the account's network.
+func (mw *Middleware) privatePreAuthStatus(r *http.Request) int {
+	lookup := TunnelLookupFromContext(r.Context())
+	if lookup == nil {
+		return http.StatusNotFound
+	}
+	clientIP := mw.resolveClientIP(r)
+	if !isTunnelSourceIP(clientIP) {
+		return http.StatusNotFound
+	}
+	if _, ok := lookup(clientIP); !ok {
+		return http.StatusNotFound
+	}
+	return http.StatusForbidden
+}
+
+// privateDenyStatus maps a ValidateTunnelPeer denial to the refusal status:
+// a peer outside the agent network's policies gets 401, a peer that reaches
+// another private service 403, and any other peer 404, so a private service
+// stays invisible to callers that cannot reach one.
+func privateDenyStatus(r *http.Request, resp *proto.ValidateTunnelPeerResponse) int {
+	if resp.GetDeniedReason() != "not_in_group" {
+		return http.StatusNotFound
+	}
+	if cd := proxy.CapturedDataFromContext(r.Context()); cd != nil && cd.GetAgentNetwork() {
+		return http.StatusUnauthorized
+	}
+	if resp.GetHasPrivateAccess() {
+		return http.StatusForbidden
+	}
+	return http.StatusNotFound
 }
 
 // markAuthRejected attributes the response to the proxy's access checks, so
@@ -528,12 +580,19 @@ func (mw *Middleware) forwardWithSessionCookie(w http.ResponseWriter, r *http.Re
 // management round-trip), a hit gates the cached ValidateTunnelPeer RPC
 // that mints the session JWT.
 func (mw *Middleware) forwardWithTunnelPeer(w http.ResponseWriter, r *http.Request, host string, config DomainConfig, next http.Handler) bool {
+	forwarded, _ := mw.tryTunnelPeer(w, r, host, config, next)
+	return forwarded
+}
+
+// tryTunnelPeer is forwardWithTunnelPeer that also returns, when it does not
+// forward, the status a private domain refuses the request with.
+func (mw *Middleware) tryTunnelPeer(w http.ResponseWriter, r *http.Request, host string, config DomainConfig, next http.Handler) (bool, int) {
 	if mw.sessionValidator == nil {
-		return false
+		return false, http.StatusNotFound
 	}
 	clientIP := mw.resolveClientIP(r)
 	if !clientIP.IsValid() {
-		return false
+		return false, http.StatusNotFound
 	}
 
 	// Anti-spoof: only honour the tunnel-peer fast-path on requests that
@@ -542,17 +601,17 @@ func (mw *Middleware) forwardWithTunnelPeer(w http.ResponseWriter, r *http.Reque
 	// source on the public listener and bypass operator auth.
 	lookup := TunnelLookupFromContext(r.Context())
 	if lookup == nil {
-		return false
+		return false, http.StatusNotFound
 	}
 	if !isTunnelSourceIP(clientIP) {
-		return false
+		return false, http.StatusNotFound
 	}
 	if _, ok := lookup(clientIP); !ok {
 		mw.logger.WithFields(log.Fields{
 			"host":   host,
 			"remote": clientIP,
 		}).Debug("local peerstore: tunnel IP not in account roster; denying without RPC")
-		return false
+		return false, http.StatusNotFound
 	}
 
 	resp, _, err := mw.tunnelCache.fetch(r.Context(), tunnelCacheKey{
@@ -562,10 +621,10 @@ func (mw *Middleware) forwardWithTunnelPeer(w http.ResponseWriter, r *http.Reque
 	}, mw.validateTunnelPeer)
 	if err != nil {
 		mw.logger.WithError(err).Debug("ValidateTunnelPeer failed; falling back to OIDC")
-		return false
+		return false, http.StatusServiceUnavailable
 	}
 	if !resp.GetValid() || resp.GetSessionToken() == "" {
-		return false
+		return false, privateDenyStatus(r, resp)
 	}
 
 	setSessionCookie(w, r, resp.GetSessionToken(), config.SessionExpiration)
@@ -578,7 +637,7 @@ func (mw *Middleware) forwardWithTunnelPeer(w http.ResponseWriter, r *http.Reque
 		cd.SetAuthMethod(auth.MethodOIDC.String())
 	}
 	next.ServeHTTP(w, r)
-	return true
+	return true, 0
 }
 
 // validateTunnelPeer adapts the SessionValidator interface to the cache's

@@ -21,6 +21,7 @@ import { Check as CheckIcon, ChevronDownIcon, Copy as CopyIcon } from "lucide-re
 import * as Popover from "@radix-ui/react-popover";
 import netbirdFullLogo from "@/assets/logos/netbirdy-full.svg";
 import netbirdFullLogoLight from "@/assets/logos/netbirdy-full-light.svg";
+import { ActiveSessionIndicator } from "@/modules/main/ActiveSessionIndicator.tsx";
 
 enum ConnectionState {
     Disconnected = "disconnected",
@@ -270,6 +271,9 @@ export const MainConnectionStatusSwitch = () => {
                     />
                 </CopyToClipboard>
                 <LocalIpLine ip={ip} ipv6={ipv6} show={show} />
+                {connState === ConnectionState.Connected && (
+                    <ActiveSessionIndicator className={"mt-3"} />
+                )}
             </div>
         </div>
     );

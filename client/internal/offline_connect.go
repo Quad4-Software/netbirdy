@@ -254,7 +254,7 @@ func (c *ConnectClient) connectOfflineSignal(ctx context.Context, snapshot *mgmP
 	if cfg == nil || cfg.GetSignal() == nil || cfg.GetSignal().GetUri() == "" {
 		return offlineSignalClient{}
 	}
-	client, err := connectToSignal(ctx, cfg, key, c.netMgr)
+	client, err := connectToSignal(ctx, cfg, key, c.authKey(), c.netMgr)
 	if err != nil {
 		log.Warnf("offline mode: signal broker unreachable, continuing without ICE negotiation: %v", err)
 		return offlineSignalClient{}
