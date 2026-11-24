@@ -385,3 +385,11 @@ tool (
 	github.com/goreleaser/chglog/cmd/chglog
 	go.uber.org/mock/mockgen
 )
+
+replace github.com/corazawaf/coraza/v3 => github.com/corazawaf/coraza/v3 v3.8.1
+
+replace github.com/google/cel-go => github.com/google/cel-go v0.29.0
+
+replace go.mongodb.org/mongo-driver => go.mongodb.org/mongo-driver v1.17.7
+
+replace github.com/containerd/containerd => github.com/containerd/containerd v1.7.36
