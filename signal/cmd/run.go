@@ -47,6 +47,9 @@ const (
 	// envSentryDSN enables panic and error reporting when set to a
 	// Sentry-compatible DSN.
 	envSentryDSN = "NB_SIGNAL_SENTRY_DSN"
+	// h2cMaxReadFrameSize lowers the advertised HTTP/2 max frame size from Go's
+	// 1 MiB default to 16 KiB. Go-based proxies size their per-stream buffer from it.
+	h2cMaxReadFrameSize = 16 << 10
 )
 
 var (
@@ -361,7 +364,7 @@ func serveHTTP(httpListener net.Listener, handler http.Handler) {
 		// Use h2c to support HTTP/2 without TLS (needed for gRPC)
 		h1s := &http.Server{
 			//nolint:staticcheck // h2c also handles the HTTP/1 Upgrade mechanism, which http.Server's UnencryptedHTTP2 does not
-			Handler: h2c.NewHandler(handler, &http2.Server{}),
+			Handler: h2c.NewHandler(handler, &http2.Server{MaxReadFrameSize: h2cMaxReadFrameSize}),
 		}
 		err := h1s.Serve(httpListener)
 		// Closing the listener on shutdown is not a failure.
