@@ -66,9 +66,16 @@ func NewPeerNamespace(t *testing.T) *PeerNamespace {
 	defer r.nsFile.Close()
 	t.Cleanup(func() { close(ns.jobs) })
 
+	// Host network services can assign a fresh random MAC to a new veth end. Pin both ends
+	// at creation: a neighbor entry learned before the firewall drops traffic must stay valid
+	// after it is removed.
 	require.NoError(t, netlink.LinkAdd(&netlink.Veth{
-		LinkAttrs: netlink.LinkAttrs{Name: ns.IfaceName},
-		PeerName:  peerName,
+		LinkAttrs: netlink.LinkAttrs{
+			Name:         ns.IfaceName,
+			HardwareAddr: net.HardwareAddr{0x02, 0x4e, 0x42, suffix[0], suffix[1], suffix[2]},
+		},
+		PeerName:         peerName,
+		PeerHardwareAddr: net.HardwareAddr{0x02, 0x4e, 0x50, suffix[0], suffix[1], suffix[2]},
 	}), "create veth pair")
 	t.Cleanup(func() {
 		if link, err := netlink.LinkByName(ns.IfaceName); err == nil {
@@ -76,16 +83,8 @@ func NewPeerNamespace(t *testing.T) *PeerNamespace {
 		}
 	})
 
-	// Host network services can assign a fresh random MAC to a new veth end. Pin both ends:
-	// a neighbor entry learned before the firewall drops traffic must stay valid after it is removed.
-	host, err := netlink.LinkByName(ns.IfaceName)
-	require.NoError(t, err, "find host end")
-	require.NoError(t, netlink.LinkSetHardwareAddr(host, net.HardwareAddr{0x02, 0x4e, 0x42, suffix[0], suffix[1], suffix[2]}), "set host MAC")
-
 	peer, err := netlink.LinkByName(peerName)
-	require.NoError(t, err, "find peer end before moving it")
-	require.NoError(t, netlink.LinkSetHardwareAddr(peer, net.HardwareAddr{0x02, 0x4e, 0x50, suffix[0], suffix[1], suffix[2]}), "set peer MAC")
-
+	require.NoError(t, err, "find peer end")
 	require.NoError(t, netlink.LinkSetNsFd(peer, int(r.nsFile.Fd())), "move peer end into the namespace")
 
 	require.NoError(t, configure(ns.IfaceName, ns.HostAddr), "configure host end")
