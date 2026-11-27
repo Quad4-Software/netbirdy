@@ -29,9 +29,8 @@ func (connTestIface) Address() wgaddr.Address {
 
 // TestFamilySetConnectionSeparateFromRuleConnection records that later
 // element updates still use a dedicated connection. Named-set creation
-// itself is queued on conn with the rule that looks it up; splitting only
-// the add/delete path does not fix ENOENT on that lookup (see
-// https://github.com/netbirdio/netbird/discussions/7446).
+// itself is queued on conn with the rule that looks it up. Splitting only
+// the add/delete path does not fix ENOENT on that lookup.
 func TestFamilySetConnectionSeparateFromRuleConnection(t *testing.T) {
 	for _, tc := range []struct {
 		name   string

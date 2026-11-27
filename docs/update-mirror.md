@@ -10,7 +10,7 @@ independently.
 ## Configuration
 
 `server.update_mirror` in the combined config, or `update_mirror:` in
-the management config. Disabled by default; upgrades change nothing.
+the management config. It is disabled by default, so upgrades change nothing.
 
 - enabled: false by default.
 - repository: defaults to `Quad4-Software/netbirdy`.
@@ -48,7 +48,7 @@ with `nosniff`. HTTPS only to github.com and githubusercontent hosts.
 
 ## Limits
 
-The mirror serves Windows and macOS installers only; Linux clients
+The mirror serves Windows and macOS installers only. Linux clients
 keep using distribution packages. Management is not a WireGuard peer,
 so peer-to-peer update relay over the tunnel is not part of this.
 Air-gapped clients use the mirror as a drop-in keys base URL.

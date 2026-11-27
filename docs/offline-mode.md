@@ -8,10 +8,10 @@ the control plane.
 
 Offline mode engages only when all of the following are true:
 
-- the management server cannot be reached (dial, DNS or TLS failures; never
-  on authentication or authorization rejections);
+- the management server cannot be reached (dial, DNS, or TLS failures, never
+  authentication or authorization rejections).
 - a snapshot (`networkmap.bin` next to `config.json`) exists, parses, has the
-  current schema version and is younger than the maximum age;
+  current schema version, and is younger than the maximum age.
 - the cached peer session has not expired.
 
 While offline, the engine applies the cached map: the WireGuard interface,
@@ -33,7 +33,7 @@ snapshot is then deleted as usual).
   signal and relay services stay reachable (they authenticate with the
   peer's WireGuard key, not the management session). When the signal broker
   is unreachable too, the engine stays on the cached map and keeps
-  retrying the broker in the background; peers rely on their cached
+  retrying the broker in the background. Peers rely on their cached
   endpoints and any still-valid relay credentials.
 
 ## What does not
@@ -61,13 +61,13 @@ snapshot is then deleted as usual).
 
 | Variable | Default | Effect |
 | --- | --- | --- |
-| `NB_OFFLINE_MAX_AGE` | `168h` | Snapshot validity window; `0` disables the feature entirely. |
-| `NB_OFFLINE_START_DELAY` | `10s` | Wait before entering offline mode; `0` starts offline immediately after the first failed connect. |
+| `NB_OFFLINE_MAX_AGE` | `168h` | Snapshot validity window. `0` disables the feature entirely. |
+| `NB_OFFLINE_START_DELAY` | `10s` | Wait before entering offline mode. `0` starts offline immediately after the first failed connect. |
 
 ## Checking the status
 
 `netbirdy status` reports `Offline` for the connection state while cached
-mode is active; the daemon logs enter and leave events at warn level.
+mode is active. The daemon logs enter and leave events at warn level.
 
 ## Testing with the podman stack
 
@@ -86,5 +86,5 @@ only): a fixed-subnet network, a combined server, and two clients.
 `up` builds the environment, `scenario <name>` runs one of running,
 restart-one, restart-both, ip-change, server-back or revoke, `down`
 removes everything it created. `make offline-e2e` runs the whole sweep.
-Requires podman and /dev/net/tun access; a full run takes about 10
+Requires podman and /dev/net/tun access. A full run takes about 10
 minutes. Logs land in /tmp/netbirdy-audit/offline/.

@@ -1,3 +1,5 @@
+# Custom domain validation
+
 A new custom domain name is converted to lowercase ASCII (punycode), with a
 trailing dot removed, before availability and DNS validation checks. Invalid
 names and wildcard registrations are rejected before storage.
@@ -30,4 +32,4 @@ an operator can identify and resolve those dependencies before cleanup.
 Manual deletion is also refused while any service uses the domain or a subdomain,
 including disabled services. Delete those services or move them to another domain
 before removing the registration. A refused deletion returns HTTP 412 and leaves
-the domain and its services unchanged; no deletion activity event is recorded.
+the domain and its services unchanged. No deletion activity event is recorded.

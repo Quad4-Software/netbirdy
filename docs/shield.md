@@ -29,7 +29,7 @@ pushes nothing and every proxy keeps the shield settings from its own flags
 and config file. Once a config is set over the API it is pushed on every
 sync message and proxies apply it at runtime, replacing the pushed subset
 of their local config. Proxies started with the shield disabled cannot be
-enabled remotely because their request chain has no shield middleware; they
+enabled remotely because their request chain has no shield middleware. They
 log and ignore the push.
 
 ## HTTP API

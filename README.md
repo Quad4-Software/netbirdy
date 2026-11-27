@@ -9,47 +9,43 @@
 # NetBirdy
 
 NetBirdy is a self-hosted WireGuard mesh VPN. It is a fork of
-[NetBirdy](https://github.com/netbirdio/netbird) that uses the same protocol, so
-NetBirdy clients can connect to a NetBirdy server and an existing NetBirdy setup
-can be moved over without re-enrolling devices.
+[NetBird](https://github.com/netbirdio/netbird) and keeps the same wire
+protocol, so existing clients and servers can be moved over without
+re-enrolling every device.
 
 [![CI](https://github.com/Quad4-Software/netbirdy/actions/workflows/golang-test-linux.yml/badge.svg)](https://github.com/Quad4-Software/netbirdy/actions/workflows/golang-test-linux.yml)
 
 Website: <https://quad4-software.github.io/netbirdy/>
 
-> **Note:** LLMs were used to create and maintain this fork. It is a personal
-> fork for myself, friends and family only.
+This is a personal fork for myself, friends, and family. LLMs were used while
+building and maintaining it.
 
-## Differences from NetBirdy
+## What is different
 
-- Dashboard with a black dark theme and a light theme, a command palette, and
-  built-in documentation that works offline. Cloud-only and license-gated
-  pages are removed.
-- Usage reports to the NetBirdy project are disabled and update checks are opt-in.
-- Reverse proxy shield that detects scanners and crawlers by behavior and
-  slows or blocks them. See [proxy/docs/shield.md](proxy/docs/shield.md).
-- HTTP/3, WebSocket, SSE and gRPC (unary) support in the reverse proxy.
-- Clients cache the network map and management addresses so they can reconnect
-  to peers after a restart while the server is unreachable. See
-  [docs/offline-mode.md](docs/offline-mode.md).
-- Anomaly detection for peer IP changes, concurrent connections, failed logins
-  and setup key misuse, with off, observe and prevent modes. See
+- The dashboard has dark and light themes, a command palette, and offline
+  documentation. Cloud-only pages are removed.
+- Usage reporting is disabled. Update checks are opt in.
+- The reverse proxy can slow or block scanners and crawlers. See
+  [proxy/docs/shield.md](proxy/docs/shield.md).
+- The reverse proxy supports HTTP/3, WebSocket, SSE, and gRPC.
+- Clients can start from a cached network map while the management server is
+  unreachable. See [docs/offline-mode.md](docs/offline-mode.md).
+- Management can watch for suspicious peer IP changes, concurrent sessions,
+  failed logins, and setup key misuse. See
   [docs/security-monitoring.md](docs/security-monitoring.md).
-- JSON audit and security logs, an optional syslog sink, and a Wazuh 4.x rule
-  pack. See [docs/wazuh.md](docs/wazuh.md).
-- Pocket ID and Quad4 ID setup helpers in the dashboard, compose profiles
-  and scripts. See [docs/pocket-id.md](docs/pocket-id.md) and
-  [docs/quad4-id.md](docs/quad4-id.md).
-- Signed releases, a server-side cache for client updates, and an optional
-  updater container that backs up and rolls back. See
-  [docs/updating.md](docs/updating.md) and [docs/update-mirror.md](docs/update-mirror.md).
-- Landlock sandbox: server processes limit themselves to the paths they need.
-  See [docs/landlock.md](docs/landlock.md).
-- Podman stack for local use and testing.
+- Security events can be written as JSON lines, forwarded to syslog, or sent
+  to Wazuh. See [docs/wazuh.md](docs/wazuh.md).
+- Pocket ID and Quad4 ID have setup helpers in the dashboard and Podman stack.
+- Releases are signed. The server can cache signed client updates for clients
+  without direct access to GitHub. See [docs/updating.md](docs/updating.md)
+  and [docs/update-mirror.md](docs/update-mirror.md).
+- Linux, macOS, Windows, and FreeBSD client builds are published.
+- Server processes can sandbox file system access with Landlock on Linux.
+- A Podman stack is included for local use and testing.
 
 ## Quick start
 
-The local stack needs Podman and make.
+You need Podman and make.
 
 ```sh
 git clone https://github.com/Quad4-Software/netbirdy.git
@@ -58,100 +54,96 @@ make podman-build
 make podman-up
 ```
 
-The dashboard is at <http://localhost:8080> and the server at
-<http://localhost:8081>. The owner email and password are written to
-`podman/.env`. Other targets:
+The dashboard is at <http://localhost:8080>. The server is at
+<http://localhost:8081>. The generated owner email and password are in
+`podman/.env`.
+
+Useful commands:
 
 ```sh
 make podman-logs    # follow logs
 make podman-down    # stop the stack
-make podman-clean   # stop and remove containers, volumes and images
+make podman-clean   # remove containers, volumes, and images
 ```
 
-See [podman/README.md](podman/README.md) for ports, resetting and tests.
+See [podman/README.md](podman/README.md) for ports and test commands.
 
-## Install the client
+## Install a client
 
-Packages and installers are published on the
-[releases page](https://github.com/Quad4-Software/netbirdy/releases). The binary is
-named `netbirdy`.
-
-Create a setup key in the dashboard, then on the device:
+Download a package or installer from the
+[releases page](https://github.com/Quad4-Software/netbirdy/releases). Create a
+setup key in the dashboard, then run:
 
 ```sh
 sudo netbirdy up --management-url http://YOUR-SERVER:8081 --setup-key YOUR-KEY
 netbirdy status
 ```
 
-Installing the NetBirdy Linux package replaces the NetBirdy package and keeps
+On Linux, the NetBirdy package replaces the NetBird package and keeps
 `/etc/netbird` and `/var/lib/netbird`. See
 [docs/migrating-from-netbird.md](docs/migrating-from-netbird.md).
 
 ## Compatibility
 
-These stay the same as upstream so existing setups keep working:
+These names and formats intentionally stay compatible with NetBird:
 
-| Item | Reason |
+| Item | Why |
 | --- | --- |
 | Go module path `github.com/netbirdio/netbird` | existing imports |
-| `NB_*` environment variables | existing configuration |
+| `NB_*` and `NETBIRD_*` environment variables | existing configuration |
 | `/etc/netbird`, `/var/lib/netbird`, the `netbird` service and user | in-place upgrades |
-| Wire protocol, REST API, setup keys | interoperability with NetBirdy clients |
-| `X-NetBirdy-Fwd-*` headers | forwarded identity protocol |
-| Package `Provides`, `Replaces` and `Conflicts: netbird` | package migration |
+| Wire protocol, REST API, and setup keys | client and server interoperability |
+| `X-Netbird-Fwd-*` headers | forwarded identity protocol |
+| Package `Provides`, `Replaces`, and `Conflicts: netbird` | package migration |
 
-Known gaps: NetBirdy does not ship its own phone apps (use the NetBirdy apps),
-the desktop app is not code-signed, and there is no Windows MSI.
+Known gaps: NetBirdy does not publish phone apps, the desktop app is not
+code-signed, and there is no Windows MSI. FreeBSD uses the userspace WireGuard
+implementation and has no desktop app.
 
 ## Documentation
 
-| Document | Contents |
-| --- | --- |
-| [docs/migrating-from-netbird.md](docs/migrating-from-netbird.md) | Moving from NetBirdy |
-| [docs/offline-mode.md](docs/offline-mode.md) | Client offline mode and its limits |
-| [docs/security-monitoring.md](docs/security-monitoring.md) | Anomaly detection, audit log, syslog |
-| [docs/wazuh.md](docs/wazuh.md) | Wazuh integration |
-| [docs/pocket-id.md](docs/pocket-id.md) | Pocket ID sign-in |
-| [docs/quad4-id.md](docs/quad4-id.md) | Quad4 ID sign-in |
-| [docs/updating.md](docs/updating.md) | Updating servers, packages and clients |
-| [docs/update-mirror.md](docs/update-mirror.md) | Client update cache on the server |
-| [docs/landlock.md](docs/landlock.md) | Landlock sandbox for server processes |
-| [proxy/docs/](proxy/docs/) | Reverse proxy, shield, protocol support |
-| [docs/custom-domain-validation.md](docs/custom-domain-validation.md) | Custom domains |
-| [docs/maintaining.md](docs/maintaining.md) | Releases and fork maintenance |
+Start with these pages:
+
+- [Migration from NetBird](docs/migrating-from-netbird.md)
+- [Offline mode](docs/offline-mode.md)
+- [Security monitoring](docs/security-monitoring.md)
+- [Wazuh integration](docs/wazuh.md)
+- [Updating](docs/updating.md)
+- [Reverse proxy and shield](proxy/docs/)
+- [Custom domains](docs/custom-domain-validation.md)
+- [Fork maintenance](docs/maintaining.md)
 
 The full index is [docs/README.md](docs/README.md).
 
 ## Repository layout
 
-```
-client/         agent (netbirdy) and desktop UI sources
-management/     control plane, REST and gRPC APIs
-signal/         peer signaling
-relay/          traffic relay
-combined/       all-in-one server binary
-dashboard/      web dashboard (Next.js)
-proxy/          reverse proxy and shield
-idp/            embedded identity provider (Dex)
-updater/        optional server updater
-shared/         shared API types and update verification
-podman/         local stack
-integrations/   Wazuh pack
-site/           project website (GitHub Pages)
+```text
+client/        agent and desktop UI
+management/    control plane and APIs
+signal/        peer signaling
+relay/         traffic relay
+combined/      all-in-one server
+dashboard/     web dashboard
+proxy/         reverse proxy and shield
+idp/           embedded identity provider
+updater/       optional server updater
+shared/        shared API types and update verification
+podman/        local stack
+integrations/  Wazuh pack
+site/          project website
 ```
 
 ## Development
 
 Run `tools/rebrand/rebrand.sh --check` after naming changes and
 `docs/brand/generate.sh --check` after brand asset changes. Report security
-problems as described in [SECURITY.md](SECURITY.md). This is a personal project,
-so issues and pull requests may not get a quick answer.
+problems as described in [SECURITY.md](SECURITY.md).
 
 ## License
 
-BSD-3-Clause, except `management/`, `signal/`, `relay/`, `combined/` and
-`dashboard/`, which are AGPL-3.0. See [NOTICE.md](NOTICE.md) and `LICENSES/` for
-the license texts, the list of changes from NetBirdy and the AGPL source offer.
+Most of the repository is BSD-3-Clause. `management/`, `signal/`, `relay/`,
+`combined/`, and `dashboard/` are AGPL-3.0. See [NOTICE.md](NOTICE.md) and
+`LICENSES/`.
 
-NetBirdy is a trademark of its owner. NetBirdy is an independent fork and is not
-affiliated with or endorsed by the upstream project.
+NetBird is a trademark of its owner. NetBirdy is an independent fork and is
+not affiliated with or endorsed by the NetBird project.

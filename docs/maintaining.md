@@ -1,84 +1,65 @@
 # Maintaining NetBirdy
 
-NetBirdy is a fork of github.com/netbirdio/netbird with the dashboard vendored
-as a subtree under dashboard/.
+NetBirdy is a fork of `github.com/netbirdio/netbird`. The dashboard is
+vendored as a subtree under `dashboard/`.
 
-## Syncing upstream
+## Syncing with NetBird
 
-scripts/sync-upstream.sh <tag> fetches the upstream tag, creates
-sync/<tag>, merges it, re-applies the rebrand via tools/rebrand/rebrand.sh,
-and runs the rebrand --check plus build and client tests. Merge conflicts are
-printed for manual resolution. The dashboard subtree is updated separately:
+Run:
 
-  git subtree pull --prefix dashboard \
-      https://github.com/netbirdio/netbird-dashboard.git <tag> --squash
+```sh
+scripts/sync-upstream.sh <tag>
+```
 
-The weekly upstream-sync workflow opens a sync/<tag> PR when upstream cuts a
-new release.
+The script fetches the upstream tag, creates `sync/<tag>`, merges it, applies
+the rebrand, and runs the rebrand check plus build and client tests. Resolve
+printed conflicts by hand.
+
+Update the dashboard subtree separately:
+
+```sh
+git subtree pull --prefix dashboard \
+  https://github.com/netbirdio/netbird-dashboard.git <tag> --squash
+```
+
+The weekly `upstream-sync` workflow can prepare the same branch when NetBird
+publishes a new tag.
 
 ## Rebrand rules
 
-tools/rebrand/rebrand.sh holds the keep list: module path, imports, NB_* and
-NETBIRD_* env vars, /etc/netbird, /var/lib/netbird, wt0, protocol identifiers,
-io.netbird.* ids, upstream docs URLs, LICENSE and AUTHORS. Re-run it after any
-upstream merge and keep --check green.
+`tools/rebrand/rebrand.sh` contains the keep list: the module path, imports,
+`NB_*` and `NETBIRD_*` variables, `/etc/netbird`, `/var/lib/netbird`, `wt0`,
+protocol identifiers, `io.netbird.*` identifiers, documentation URLs, license
+files, and author files. Run the script after every upstream merge and keep
+`--check` green.
 
 ## Releases
 
-Tagging vX.Y.Z or vX.Y.Z-nbyN (fork patch release) triggers
-release-fork.yml: goreleaser builds assets and publishes the GitHub release,
-and multi-arch images are pushed to ghcr.io/quad4-software/netbirdy-*. NetBirdy
-versions mirror the upstream base and add -nbyN patch suffixes; docker tags
-use the same string.
+A `vX.Y.Z` tag builds a normal release. A `vX.Y.Z-nbyN` tag builds a fork
+patch release. Both trigger `.github/workflows/release-fork.yml`.
 
-## Local preview
+The workflow builds client archives and packages, server images, desktop
+packages, the Windows installer, and macOS packages. It signs the assets,
+publishes signatures and attestations, and pushes multi-architecture images
+to `ghcr.io/quad4-software`.
 
-podman/setup.sh generates podman/.env and podman/config.yaml.
-make podman-build builds both images, make podman-up starts the stack:
-dashboard on :8080, combined server on :8081.
+A manual workflow dispatch is a dry run. It builds and signs the release but
+publishes nothing. The output is uploaded as the `release-assets` workflow
+artifact.
 
-## Published image flag
+Important release details:
 
-`test-docker-compose` in test-infrastructure-files.yml pulls the published
-`ghcr.io/quad4-software/netbirdy-*` images. The job is gated behind the repository
-variable `NETBIRDY_PUBLISHED_IMAGES=true`; set it after the first image
-release so the job runs again.
+- Container tags do not have a leading `v`.
+- Prerelease tags never move the `latest` image tag.
+- Images use zstd compressed layers and OCI media types. Docker 23 or Podman
+  4 is the minimum practical client version.
+- No MSI is built.
+- The macOS app and package are not code-signed.
+- `NETBIRDY_ARTIFACT_KEY` must contain the artifact private key. The root
+  private key stays on the maintainer machine.
 
-## Release procedure
+## Published image checks
 
-Pushing a `v*` tag runs `.github/workflows/release-fork.yml` (fork only). The
-workflow_dispatch trigger is a dry run: it builds and signs everything, publishes
-nothing and uploads the result as the `release-assets` workflow artifact.
-
-Jobs:
-
-- goreleaser builds the archives, deb and rpm packages and the client, relay,
-  signal, management, upload and server images, and creates the GitHub release.
-- desktop-linux builds the desktop app with `.goreleaser_ui.yaml`: the Linux
-  deb, rpm and tar.gz packages (`netbirdy-ui`) and the Windows desktop binary.
-  It needs the wails3 CLI, Node 24 and pnpm to build the frontend.
-- windows-installer builds the daemon and CLI, adds the desktop binary and
-  packages everything as an NSIS installer named
-  `netbirdy_installer_<version>_windows_amd64.exe`. No MSI is built.
-- macos-pkg builds `NetBirdy.app` (daemon plus desktop app) for amd64 and arm64
-  and packages it as `netbirdy_<version>_darwin_<arch>.pkg` with the scripts in
-  `release_files/darwin_pkg`. The app and package are not code-signed.
-- images builds and pushes the dashboard and updater images and writes
-  `netbirdy_<version>_images.txt` (server, dashboard and updater by digest).
-- sign writes `netbirdy_<version>_checksums.txt`, signs every asset and the
-  checksums and image list with the artifact key and verifies each signature
-  against `publickeys/artifact-signatures/keys/artifact-key-pub.pem`.
-- publish uploads the signatures and extra assets to the release, signs the
-  checksums, image list and images with cosign, attests build provenance and
-  marks stable releases latest.
-
-Images are pushed with zstd compressed layers and OCI media types, which GHCR
-supports. Pulling them needs Docker 23 or newer, or Podman 4 or newer.
-
-Image tags have no leading v (`ghcr.io/quad4-software/netbirdy-server:1.2.3`).
-Prerelease tags (a hyphen in the version, for example `v1.0.0-rc.1`) stay
-GitHub prereleases and never move the `latest` image tag.
-
-Required secret: `NETBIRDY_ARTIFACT_KEY` (the artifact private key). The root
-private key never leaves `~/.config/netbirdy-signing/` on the maintainer
-machine.
+The `test-docker-compose` job in `test-infrastructure-files.yml` pulls the
+published images only when the repository variable
+`NETBIRDY_PUBLISHED_IMAGES` is `true`.

@@ -6,7 +6,7 @@ to an S3-compatible bucket (AWS S3, MinIO, Backblaze B2, Cloudflare R2).
 
 Supported store engine: SQLite only. Servers running Postgres (or any other
 engine) get a clear "not supported" error on every run instead of a fake
-success; back those stores up with the engine's own tooling (pg_dump, WAL-G).
+success. Back those stores up with the engine's own tooling, such as pg_dump or WAL-G.
 
 ## How it works
 
@@ -38,7 +38,7 @@ Everything is optional. The feature is off until a bucket is set.
 | `NB_BACKUP_INTERVAL`       | `interval`       | Go duration between scheduled runs, e.g. `24h`. Empty or `0` means manual runs only. |
 | `NB_BACKUP_ENCRYPTION_KEY` | `encryption_key` | age passphrase. Required before any run succeeds.   |
 
-Custom endpoints (MinIO, B2, R2) get path-style requests automatically; AWS
+Custom endpoints such as MinIO, B2, and R2 get path-style requests automatically. AWS
 endpoints keep virtual-host style. Use `http://` in the endpoint for
 plain-text object storage (local MinIO only, never for real data over a
 network).
@@ -132,15 +132,15 @@ All S3 flags fall back to the `NB_BACKUP_*` env vars and to `backup.json` in
   (interactive work factor). The same passphrase decrypts any snapshot: store
   it somewhere safe and independent of the bucket, because losing it makes
   every backup useless.
-- The bucket only ever sees ciphertext; the passphrase, S3 credentials and
+- The bucket only ever sees ciphertext. The passphrase, S3 credentials, and
   API responses never expose it (responses return `********`).
-- Rotating the passphrase only affects future snapshots; keep old passphrases
+- Rotating the passphrase only affects future snapshots. Keep old passphrases
   if you keep old snapshots.
 
 ## Limitations
 
 - SQLite store engine only.
-- No retention management: objects are never deleted; lifecycle rules on the
+- No retention management: objects are never deleted. Lifecycle rules on the
   bucket are the way to expire old snapshots.
 - Scheduled runs are serialized: a run longer than the interval pushes the
   next one back rather than overlapping.

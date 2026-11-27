@@ -175,7 +175,7 @@ jobs:
         uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v7.1.1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          slug: netbirdio/netbird
+          slug: Quad4-Software/netbirdy
           flags: unit,client
 
   test_client_ui:
@@ -382,7 +382,7 @@ jobs:
         uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v7.1.1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          slug: netbirdio/netbird
+          slug: Quad4-Software/netbirdy
           flags: unit,relay
 
   test_proxy:
@@ -439,7 +439,7 @@ jobs:
         uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v7.1.1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          slug: netbirdio/netbird
+          slug: Quad4-Software/netbirdy
           flags: unit,proxy
 
   test_signal:
@@ -498,7 +498,7 @@ jobs:
         uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v7.1.1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          slug: netbirdio/netbird
+          slug: Quad4-Software/netbirdy
           flags: unit,signal
 
   test_management:
@@ -543,20 +543,6 @@ jobs:
       - name: check git status
         run: git --no-pager diff --exit-code
 
-      - name: Login to Docker hub
-        if: github.repository == 'netbirdio/netbird' && (github.event.pull_request && github.event.pull_request.head.repo && github.event.pull_request.head.repo.full_name == '' || github.repository == github.event.pull_request.head.repo.full_name || !github.head_ref)
-        uses: docker/login-action@8aa5831fb8d48d8f76594c7ddde61ae58019f550 # v4.8.0
-        with:
-          username: ${{ secrets.DOCKER_USER }}
-          password: ${{ secrets.DOCKER_TOKEN }}
-
-      - name: docker login for root user
-        if: github.repository == 'netbirdio/netbird' && (github.event.pull_request && github.event.pull_request.head.repo && github.event.pull_request.head.repo.full_name == '' || github.repository == github.event.pull_request.head.repo.full_name || !github.head_ref)
-        env:
-          DOCKER_USER: ${{ secrets.DOCKER_USER }}
-          DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
-        run: echo "$DOCKER_TOKEN" | sudo docker login --username "$DOCKER_USER" --password-stdin
-
       # The -json stream goes through tools/gotestsummary so the log shows one
       # line per test, the output of failed tests, the head of a timeout panic
       # with the still-running tests, and the slowest tests per package.
@@ -589,7 +575,7 @@ jobs:
         uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v7.1.1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          slug: netbirdio/netbird
+          slug: Quad4-Software/netbirdy
           flags: unit,management
 
   benchmark:
@@ -661,20 +647,6 @@ jobs:
 
       - name: check git status
         run: git --no-pager diff --exit-code
-
-      - name: Login to Docker hub
-        if: github.repository == 'netbirdio/netbird' && (github.event.pull_request && github.event.pull_request.head.repo && github.event.pull_request.head.repo.full_name == '' || github.repository == github.event.pull_request.head.repo.full_name || !github.head_ref)
-        uses: docker/login-action@8aa5831fb8d48d8f76594c7ddde61ae58019f550 # v4.8.0
-        with:
-          username: ${{ secrets.DOCKER_USER }}
-          password: ${{ secrets.DOCKER_TOKEN }}
-
-      - name: docker login for root user
-        if: github.repository == 'netbirdio/netbird' && (github.event.pull_request && github.event.pull_request.head.repo && github.event.pull_request.head.repo.full_name == '' || github.repository == github.event.pull_request.head.repo.full_name || !github.head_ref)
-        env:
-          DOCKER_USER: ${{ secrets.DOCKER_USER }}
-          DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
-        run: echo "$DOCKER_TOKEN" | sudo docker login --username "$DOCKER_USER" --password-stdin
 
       - name: Test
         run: |
@@ -756,20 +728,6 @@ jobs:
 
       - name: check git status
         run: git --no-pager diff --exit-code
-
-      - name: Login to Docker hub
-        if: github.repository == 'netbirdio/netbird' && (github.event.pull_request && github.event.pull_request.head.repo && github.event.pull_request.head.repo.full_name == '' || github.repository == github.event.pull_request.head.repo.full_name || !github.head_ref)
-        uses: docker/login-action@8aa5831fb8d48d8f76594c7ddde61ae58019f550 # v4.8.0
-        with:
-          username: ${{ secrets.DOCKER_USER }}
-          password: ${{ secrets.DOCKER_TOKEN }}
-
-      - name: docker login for root user
-        if: github.repository == 'netbirdio/netbird' && (github.event.pull_request && github.event.pull_request.head.repo && github.event.pull_request.head.repo.full_name == '' || github.repository == github.event.pull_request.head.repo.full_name || !github.head_ref)
-        env:
-          DOCKER_USER: ${{ secrets.DOCKER_USER }}
-          DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
-        run: echo "$DOCKER_TOKEN" | sudo docker login --username "$DOCKER_USER" --password-stdin
 
       - name: Test
         run: |
@@ -859,5 +817,5 @@ jobs:
         uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v7.1.1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          slug: netbirdio/netbird
+          slug: Quad4-Software/netbirdy
           flags: integration,management

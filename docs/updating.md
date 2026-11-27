@@ -4,35 +4,34 @@
 
 ```sh
 git pull
-make podman-build   # rebuild images from current sources
+make podman-build
 make podman-down
-make podman-up      # config and data persist in the volume
+make podman-up
 ```
 
-## Installed packages
+Configuration and data remain in the Podman volumes.
 
-Upgrade with the system package manager (`apt`, `dnf`, `zypper`). The
-`netbirdy` packages declare `Replaces`/`Conflicts`/`Provides` on
-`netbird`, so upgrading in place over a NetBirdy install keeps the same
-config at `/etc/netbird`, the same `netbird` system user and the same
-service file. See docs/migrating-from-netbird.md for the full matrix.
+## Linux packages
 
-## Client auto-update
+Upgrade with the system package manager. The NetBirdy package replaces the
+NetBird package and keeps the same configuration, state directory, system
+user, and service compatibility names. See
+[migrating-from-netbird.md](migrating-from-netbird.md).
 
-The client checks the management server version at login; upgrading
-the server first is the recommended order. Auto-update of the client
-binary itself is a per-distribution package-manager concern.
+## Client updates
 
-## Release verification
+Update the server before updating clients. Clients check the server version
+when they log in. Package installation and update automation are handled by
+the operating system or by the update mirror described in
+[update-mirror.md](update-mirror.md).
 
-Release files ship with reposign signatures (`<file>.sig`) verified against the
-root key embedded in NetBirdy clients. The checksum manifest has a GitHub
-artifact attestation and a Cosign bundle. The source dependency inventory is
-published as SPDX JSON. Container images include BuildKit SBOM and provenance
-attestations, and each image digest is signed and attested by the release
-workflow.
+## Verifying release files
 
-Verify manually:
+Release files have reposign signatures in matching `.sig` files. The checksum
+manifest also has a GitHub artifact attestation and a Cosign bundle. Container
+images carry SBOM and provenance attestations.
+
+Verify a downloaded file:
 
 ```sh
 gh attestation verify <file> --repo Quad4-Software/netbirdy
@@ -43,8 +42,8 @@ cosign verify-blob --bundle netbirdy_<ver>_checksums.txt.cosign.bundle \
 ```
 
 `netbirdy_<ver>_images.txt` lists the legacy updater images.
-`netbirdy_<ver>_images_provenance.txt` records every published image variant.
-Verify an image signature before pulling its listed digest:
+`netbirdy_<ver>_images_provenance.txt` lists every published image variant.
+Verify an image before pulling its digest:
 
 ```sh
 cosign verify \
@@ -53,17 +52,20 @@ cosign verify \
   ghcr.io/quad4-software/netbirdy-server@sha256:<digest>
 ```
 
-The image SBOM is SPDX attached to the OCI index. Inspect it with
-`docker buildx imagetools inspect <image>@sha256:<digest>`.
-OpenVEX statements are published only after a product-specific vulnerability
-assessment supports the status claim.
+The image SBOM is attached to the OCI index. Inspect it with:
 
-### Key rotation and revocation
+```sh
+docker buildx imagetools inspect <image>@sha256:<digest>
+```
 
-Private keys live outside the repository in `~/.config/netbirdy-signing/`
-(root.key and artifact.key, mode 600). The root key must stay offline
-and backed up. The artifact key is also stored as the
-`NETBIRDY_ARTIFACT_KEY` repository secret for CI signing.
+OpenVEX statements are published only after a product-specific assessment
+supports the status claim.
+
+## Signing key rotation
+
+Private keys belong in `~/.config/netbirdy-signing/` with mode 600. The root
+key stays offline and backed up. The artifact key is also stored as the
+`NETBIRDY_ARTIFACT_KEY` repository secret for release signing.
 
 Rotate the artifact key yearly:
 
@@ -79,7 +81,7 @@ go run ./client/cmd/signer bundle-pub-keys \
   --bundle-pub-key-file publickeys/artifact-signatures/keys/artifact-key-pub.pem
 ```
 
-To revoke a key:
+Revoke a key:
 
 ```sh
 go run ./client/cmd/signer extend-revocation-list \
@@ -90,46 +92,34 @@ go run ./client/cmd/signer extend-revocation-list \
 
 ## Server updates from the dashboard
 
-The updater sidecar upgrades the Podman stack in place from the Settings
-Updates page or the management API.
+The optional updater sidecar can upgrade the Podman server stack from the
+Settings Updates page or the management API.
 
-### What it does
+The updater verifies the signed image list, pulls images by digest, backs up
+the data volume with a checksum manifest, recreates the server and dashboard
+containers, waits for health checks, and rolls back on failure. It does not
+update itself.
 
-verify the signed image list against the release root, pull each image
-by digest, stop the server and dashboard in reverse order, back up the
-data volume with a checksum manifest, recreate the containers from the
-new images keeping labels, env, command and healthcheck, wait for
-healthy, and on any failure roll back: remove the new containers,
-rename the previous ones back, restore the data volume, start the old
-set and mark the run rolled_back. The updater never updates itself.
+Enable it with the updater compose profile:
 
-### Enabling it
+```sh
+podman compose -f podman/compose.yaml --profile updater up -d
+```
 
-The updater ships as an optional compose profile:
+`podman/setup.sh` writes `NETBIRDY_UPDATER_TOKEN` to `podman/.env`. The
+management configuration can then use the commented `server.updater` block.
+The default socket is the rootless Podman socket at
+`${XDG_RUNTIME_DIR}/podman/podman.sock`.
 
-    podman compose -f podman/compose.yaml --profile updater up -d
-
-setup.sh generates NETBIRDY_UPDATER_TOKEN into podman/.env. The
-management config can point at it via the commented server.updater
-block (url http://netbirdy-updater:8089, token_env
-NETBIRDY_UPDATER_TOKEN). The default socket is the rootless Podman
-socket at ${XDG_RUNTIME_DIR}/podman/podman.sock; on a Docker host use
-the Docker socket path.
-
-### Security model
-
-The socket mount gives the updater host-root equivalent for the user,
-so treat the token as high value. The container publishes no ports and
-only serves the management host. Only images under the configured
-prefix and digests from the root signed list are applied. Backups live
-in the netbirdy-updater-backups volume, pruned to the newest 5, and can
-be restored by hand from the manifest. Status persists in
-backups/status.json.
+The socket mount gives the updater broad control over containers for that
+user. Treat the token as a high-value secret. The updater publishes no ports
+and only accepts images below the configured prefix with digests from the
+signed image list. Backups are stored in the `netbirdy-updater-backups`
+volume and pruned to the newest five.
 
 ## AppImage
 
-The desktop UI also ships as a thin AppImage for amd64. It needs the
-netbirdy daemon package installed and running, and host GTK4 and
-WebKitGTK 6.0 (Debian/Ubuntu: libgtk-4-1 libwebkitgtk-6.0-4, Fedora:
-gtk4 webkitgtk6.0). chmod +x and run it; on hosts without FUSE it
-runs with --appimage-extract-and-run.
+The desktop UI is also published as a thin amd64 AppImage. It requires the
+`netbirdy` daemon package, GTK4, and WebKitGTK 6.0 on the host. Make the file
+executable and run it. On hosts without FUSE, run it with
+`--appimage-extract-and-run`.

@@ -55,6 +55,26 @@ for (const file of files) {
   pages.push({ file, rel, section, slug, fields, body });
 }
 
+// Map repository files used as page sources to the dashboard page that embeds
+// them. Relative links inside those files can then point at the embedded copy
+// of the target instead of being resolved against the wrapper's section.
+const sourceRoutes = new Map();
+for (const p of pages) {
+  if (p.fields.source) {
+    sourceRoutes.set(path.resolve(DASH, p.fields.source), `${p.section}/${p.slug}`);
+  }
+}
+
+function rewriteSourcedMarkdownLinks(markdown, sourceFile) {
+  const sourceDir = path.dirname(sourceFile);
+  return markdown.replace(/\[([^\]]*)\]\(([^)\s]+\.mdx?)(#[^)]+)?\)/g, (match, label, href, hash = "") => {
+    if (/^(?:[a-z]+:)?\/\//i.test(href) || href.startsWith("/")) return match;
+    const route = sourceRoutes.get(path.resolve(sourceDir, href));
+    if (!route) return match;
+    return `[${label}](/docs/${route}${hash})`;
+  });
+}
+
 // Second pass: render, rewrite links, sanitize, index.
 let failures = 0;
 const out = [];
@@ -70,6 +90,7 @@ for (const p of pages) {
       } catch {
         // no front matter: use as is
       }
+      body = rewriteSourcedMarkdownLinks(body, src);
     } catch {
       console.error(`docs: ${p.rel}: source not found: ${p.fields.source}`);
       failures++;

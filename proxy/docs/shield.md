@@ -46,7 +46,7 @@ fine.
 The AI crawler token list ships from ai.robots.txt
 (proxy/internal/shield/data/ai-crawlers.txt, refreshed by
 scripts/update-shield-lists.sh). Default policy deny. Search engines are
-denied unless allow_search_engines is set; verification needs a resolver wired
+denied unless allow_search_engines is set. Verification needs a resolver wired
 in by the integrator, and a failed claim is a strong signal.
 
 ## Challenge
@@ -72,7 +72,7 @@ An optional state file persists active bans. Nothing leaves the proxy.
 
 Flags: --shield-mode, --shield-config, --shield-state-file,
 --shield-allow-cidrs, --shield-allow-search-engines, --shield-ai-crawlers
-(env NB_PROXY_SHIELD_*). `--shield-log-file` (`NB_PROXY_SHIELD_LOG_FILE`) writes non-pass decisions as jsonl lines (schema: ts, type=shield, severity, src_ip, host, method, path, user_agent, action, score, reasons, ban_until, mode, request_id) for SIEM ingestion; rotated at 10 MiB x 3, mode 0600. The chain order is hijack -> meter -> accessLog ->
+(env NB_PROXY_SHIELD_*). `--shield-log-file` (`NB_PROXY_SHIELD_LOG_FILE`) writes non-pass decisions as jsonl lines (schema: ts, type=shield, severity, src_ip, host, method, path, user_agent, action, score, reasons, ban_until, mode, request_id) for SIEM ingestion. The file rotates at 10 MiB times 3 and uses mode 0600. The chain order is hijack -> meter -> accessLog ->
 shield -> assets -> auth -> proxy, so the client IP comes from CapturedData.
 
 Search engine verification uses forward-confirmed reverse DNS (PTR suffix
@@ -82,9 +82,9 @@ googlebot.com/google.com (Google), search.msn.com (Bing), crawl.baidu.com
 applebot.apple.com (Apple). Cache 6h positive, 10m negative, 2s timeout.
 
 TLS signals (SNI missing, IP literal, unknown) are observed in
-GetCertificate; they never affect the handshake. With PROXY protocol
-enabled the connection remote address already carries the real client IP;
-without it, the load balancer address is observed instead.
+GetCertificate. They never affect the handshake. With PROXY protocol enabled,
+the connection remote address already carries the real client IP. Without it,
+the load balancer address is observed instead.
 
 Debug endpoints (with --debug-endpoint): GET /debug/shield/stats,
 GET /debug/shield/bans, POST path /debug/shield/unban?ip=...

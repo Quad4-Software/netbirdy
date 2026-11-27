@@ -25,7 +25,7 @@ PRIV_RUN=TestNftablesManager PRIV_PKGS=./client/firewall/nftables/... make test-
 ```
 
 `PRIV_RUN` adds a `-run` test-name filter and `PRIV_PKGS` overrides the package
-list; both are optional and default to the full privileged suite.
+list. Both are optional and default to the full privileged suite.
 
 `make test-privileged` invokes the `ory/dockertest` harness in
 `client/testutil/privileged/`. The harness:
@@ -55,11 +55,11 @@ constraint:
 package foo
 ```
 
-If a file mixes privileged and pure-logic tests, **split it**: keep the pure
-tests (and any shared data — type/var declarations, table-driven `testCases`,
-helper interfaces) in an untagged file, and move the privileged tests into a
-`*_privileged_test.go` file with the tag. Shared declarations must stay untagged,
-otherwise the unprivileged files in the package will not compile.
+If a file mixes privileged and pure-logic tests, split it. Keep the pure
+tests and shared data in an untagged file. Shared data includes type and variable
+declarations, table-driven `testCases`, and helper interfaces. Move the privileged
+tests into a `*_privileged_test.go` file with the tag. Shared declarations must
+stay untagged, otherwise the unprivileged files in the package will not compile.
 
 Always verify both build modes compile on every target platform:
 
@@ -70,8 +70,8 @@ go vet -tags 'devcert privileged' ./...
 
 ## CI
 
-- The `Client / Unit` job runs `go test -tags devcert` with **no** `sudo` — only
-  host-safe tests.
+- The `Client / Unit` job runs `go test -tags devcert` with **no** `sudo`, so it
+  only runs host-safe tests.
 - The `Client (Docker) / Unit` job runs `go test -tags 'devcert privileged'`
   inside a `--privileged --cap-add=NET_ADMIN` container, which is where the
   privileged tests actually execute.

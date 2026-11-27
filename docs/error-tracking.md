@@ -37,7 +37,7 @@ proxy --sentry-dsn "https://public@bugsink.example.com/2"
 ```
 
 A malformed DSN is logged as a warning at startup and reporting stays
-disabled; it does not stop the service.
+disabled. It does not stop the service.
 
 ## Agent daemon and desktop app
 

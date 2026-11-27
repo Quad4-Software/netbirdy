@@ -1,121 +1,113 @@
-# NetBirdy Reverse Proxy
+# NetBirdy reverse proxy
 
-The NetBirdy Reverse Proxy is a separate service that can act as a public entrypoint to certain resources within a NetBirdy network.
-At a high level, the way that it operates is:
-- Configured routes are communicated from the Management server to the proxy.
-- For each route the proxy creates a NetBirdy connection to the NetBirdy Peer that hosts the resource.
-- When traffic hits the proxy at the address and path configured for the proxied resource, the NetBirdy Proxy brings up a relevant authentication method for that resource.
-- On successful authentication the proxy will forward traffic onwards to the NetBirdy Peer.
+The reverse proxy is a public entry point for services inside a NetBirdy
+network. Management sends route configuration to the proxy. When a request
+arrives, the proxy authenticates the user if the service requires it, then
+forwards the traffic to the peer hosting the service.
 
-Proxy Authentication methods supported are:
-- No authentication
-- Oauth2/OIDC
-- Emailed Magic Link
-- Simple PIN
-- HTTP Basic Auth Username and Password
+Supported authentication methods are:
 
-## Management Connection and Authentication
+- none
+- OIDC
+- emailed magic link
+- PIN
+- HTTP basic authentication
 
-The Proxy communicates with the Management server over a gRPC connection.
-Proxies act as clients to the Management server, the following RPCs are used:
-- Server-side streaming for proxied service updates.
-- Client-side streaming for proxy logs.
+## Management connection
 
-To authenticate with the Management server, the proxy server uses Machine-to-Machine OAuth2.
-If you are using the embedded IdP //TODO: explain how to get credentials.
-Otherwise, create a new machine-to-machine profile in your IdP for proxy servers and set the relevant settings in the proxy's environment or flags (see below).
+The proxy connects to management over gRPC. It receives service updates on a
+server-side stream and sends access logs on a client-side stream.
 
-## User Authentication
+Machine-to-machine OAuth credentials authenticate the proxy to management.
+Create those credentials in the configured identity provider and pass them to
+the proxy with flags or environment variables.
 
-When a request hits the Proxy, it looks up the permitted authentication methods for the Host domain.
-If no authentication methods are registered for the Host domain, then no authentication will be applied (for fully public resources).
-If any authentication methods are registered for the Host domain, then the Proxy will first serve an authentication page allowing the user to select an authentication method (from the permitted methods) and enter the required information for that authentication method.
-If the user is successfully authenticated, their request will be forwarded through to the Proxy to be proxied to the relevant Peer.
-Successful authentication does not guarantee a successful forwarding of the request as there may be failures behind the Proxy, such as with Peer connectivity or the underlying resource.
+## Request handling
+
+The proxy selects a service from the request host. If the service has no
+authentication method, it is public. Otherwise the proxy presents the allowed
+sign-in methods. A successful sign-in does not guarantee that the backend is
+reachable. Peer connectivity and the service itself can still fail.
 
 ### Target access control
 
-HTTP targets have an optional `access_action` setting, configured under
-**Edit Target → Optional Settings → Access** in the dashboard:
+HTTP targets have an optional `access_action` setting under **Edit Target,
+Optional Settings, Access** in the dashboard.
 
 | Value | Behavior |
 | --- | --- |
-| `inherit` | Use the service's authentication settings. This is the default. A service without authentication remains public. |
-| `bypass` | Forward anonymously without prompting for service authentication. |
+| `inherit` | Use the service authentication setting. This is the default. |
+| `bypass` | Forward without prompting for service authentication. |
 | `block` | Return HTTP 403, including for authenticated users. |
 
-The longest matching Location prefix selects both the target and its access
-action. Prefixes are literal and case-sensitive: `/api` also matches `/apiv2`,
-while `/api/` only matches requests beginning with `/api/` and does not match
-`/api` itself. Wildcards and regular expressions are not supported. A blocked
-request or failed authentication never falls through to another target. Disabling
-or deleting a target removes its rule, so a less-specific target may then match.
+The longest matching location prefix selects the target. Prefixes are literal
+and case-sensitive. `/api` also matches `/apiv2`. `/api/` only matches paths
+beginning with `/api/` and does not match `/api` itself. Wildcards and regular
+expressions are not supported.
 
-Service IP, country, and reputation restrictions still apply to bypassed paths.
-Bypass is unavailable for private services and Agent Network targets. Bypassed
-requests have no NetBirdy user identity; configured header-auth credentials,
-NetBirdy session cookies, and client-supplied NetBirdy identity headers are still
-removed before forwarding. Custom upstream headers remain target settings, so
-consider their effect when making a target public.
+A blocked request or failed authentication never falls through to another
+target. Deleting or disabling a target removes its rule, so a less-specific
+target may then match.
 
-Services using target access overrides reject ambiguous request paths, including
-encoded separators and traversal segments, before forwarding. Path rewriting
-continues to use the selected Location prefix after access checks.
+Bypass does not disable service IP, country, or reputation restrictions. It is
+not available for private services or Agent Network targets. Bypassed requests
+have no NetBirdy user identity. Header-auth credentials, session cookies, and
+client-supplied identity headers are removed before forwarding.
+
+Services using target access overrides reject ambiguous paths, including
+encoded separators and traversal segments, before forwarding.
 
 Upgrade all proxies before using target access actions. Older proxies ignore
-these actions and continue applying the service's authentication settings.
-API updates that omit an existing Location's
-`access_action` preserve its setting; send `"access_action": "inherit"` explicitly
-to restore service authentication. Requests omitting all access actions cannot
-remove or rename a controlled Location; use an updated client and explicitly
-include the intended actions when changing those targets.
+these actions and continue applying the service authentication setting.
 
 ## TLS
 
-Due to the authentication provided, the Proxy uses HTTPS for its endpoint, even if the underlying service is HTTP.
-Certificate generation can either be via ACME (by default, using Let's Encrypt, but alternative ACME providers can be used) or through certificate files.
-When not using ACME, the proxy server attempts to load a certificate and key from the files `tls.crt` and `tls.key` in a specified certificate directory.
-When using ACME, the proxy server will store generated certificates in the specified certificate directory.
+The proxy serves HTTPS even when the backend service uses plain HTTP.
+Certificates can come from ACME or from `tls.crt` and `tls.key` files in the
+certificate directory. Let's Encrypt is the default ACME provider, but another
+ACME directory can be configured.
 
+## Authentication UI
 
-## Auth UI
+The authentication UI is a Vite and React application in `web/`. It is
+embedded in the Go binary.
 
-The authentication UI is a Vite + React application located in the `web/` directory. It is embedded into the Go binary at build time.
+Build it from the repository root:
 
-To build the UI (the workspace pins pnpm 12.22.0; install with
-`npm install -g pnpm@12.22.0` or corepack):
-```bash
+```sh
 pnpm install --frozen-lockfile
 pnpm --filter web build
 ```
 
-For UI development with hot reload (served at http://localhost:3031):
-```bash
+For development with hot reload:
+
+```sh
 pnpm --filter web dev
 ```
 
-The built assets in `web/dist/` are embedded via `//go:embed` and served by the `web.ServeHTTP` handler.
+The development server listens on <http://localhost:3031>.
 
 ## Configuration
 
-NetBirdy Proxy deployment configuration is via flags or environment variables, with flags taking precedence over the environment.
-The following deployment configuration is available:
+Flags override environment variables.
 
-| Flag             | Env                              | Purpose                                                                                                                            | Default                                            |
-|------------------|----------------------------------|------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------|
-| `-debug`         | `NB_PROXY_DEBUG_LOGS`            | Enable debug logging                                                                                                               | `false`                                            |
-| `-mgmt`          | `NB_PROXY_MANAGEMENT_ADDRESS`    | The address of the management server for the proxy to get configuration from.                                                      | `"https://api.netbird.io:443"`                     |
-| `-addr`          | `NB_PROXY_ADDRESS`               | The address that the reverse proxy will listen on.                                                                                 | `":443`                                            |
-| `-url`           | `NB_PROXY_URL`                   | The URL that the proxy will be reached at (where endpoints will be CNAMEd to). If unset, this will fall back to the proxy address. | `"proxy.netbird.io"`                               |
-| `-cert-dir`      | `NB_PROXY_CERTIFICATE_DIRECTORY` | The location that certificates are stored in.                                                                                      | `"./certs"`                                        |
-| `-acme-certs`    | `NB_PROXY_ACME_CERTIFICATES`     | Whether to use ACME to generate certificates.                                                                                      | `false`                                            |
-| `-acme-addr`     | `NB_PROXY_ACME_ADDRESS`          | The HTTP address the proxy will listen on to respond to HTTP-01 ACME challenges                                                    | `":80"`                                            |
-| `-acme-dir`      | `NB_PROXY_ACME_DIRECTORY`        | The directory URL of the ACME server to be used                                                                                    | `"https://acme-v02.api.letsencrypt.org/directory"` |
-| `-oidc-id`       | `NB_PROXY_OIDC_CLIENT_ID`        | The OAuth2 Client ID for OIDC User Authentication                                                                                  | `"netbirdy-proxy"`                                  |
-| `-oidc-secret`   | `NB_PROXY_OIDC_CLIENT_SECRET`    | The OAuth2 Client Secret for OIDC User Authentication                                                                              | `""`                                               |
-| `-oidc-endpoint` | `NB_PROXY_OIDC_ENDPOINT`         | The OAuth2 provider endpoint for OIDC User Authentication                                                                          | `"https://api.netbird.io/oauth2"`                  |
-| `-oidc-scopes`   | `NB_PROXY_OIDC_SCOPES`           | The OAuth2 scopes for OIDC User Authentication, comma separated                                                                    | `"openid,profile,email"`                           |
+| Flag | Environment variable | Purpose | Default |
+| --- | --- | --- | --- |
+| `-debug` | `NB_PROXY_DEBUG_LOGS` | enable debug logging | `false` |
+| `-mgmt` | `NB_PROXY_MANAGEMENT_ADDRESS` | management server address | `https://api.netbird.io:443` |
+| `-addr` | `NB_PROXY_ADDRESS` | reverse proxy listen address | `:443` |
+| `-url` | `NB_PROXY_URL` | public proxy URL | `proxy.netbird.io` |
+| `-cert-dir` | `NB_PROXY_CERTIFICATE_DIRECTORY` | certificate storage directory | `./certs` |
+| `-acme-certs` | `NB_PROXY_ACME_CERTIFICATES` | use ACME certificates | `false` |
+| `-acme-addr` | `NB_PROXY_ACME_ADDRESS` | HTTP-01 challenge listen address | `:80` |
+| `-acme-dir` | `NB_PROXY_ACME_DIRECTORY` | ACME directory URL | Let's Encrypt production |
+| `-oidc-id` | `NB_PROXY_OIDC_CLIENT_ID` | OIDC client id | `netbirdy-proxy` |
+| `-oidc-secret` | `NB_PROXY_OIDC_CLIENT_SECRET` | OIDC client secret | empty |
+| `-oidc-endpoint` | `NB_PROXY_OIDC_ENDPOINT` | OIDC provider endpoint | `https://api.netbird.io/oauth2` |
+| `-oidc-scopes` | `NB_PROXY_OIDC_SCOPES` | comma-separated OIDC scopes | `openid,profile,email` |
 
 ## Protocols
 
-Supports HTTP/1.1, HTTP/2, HTTP/3 (QUIC on the same port, `--http3`, default on for TLS), WebSocket (ws/wss), SSE, gRPC, and TCP/UDP passthrough; see docs/protocols.md. HTTP/3 needs UDP open on the main port in addition to TCP.
+The proxy supports HTTP/1.1, HTTP/2, HTTP/3, WebSocket, SSE, gRPC, and TCP or
+UDP passthrough. See [docs/protocols.md](docs/protocols.md). HTTP/3 uses UDP
+on the same port as TLS unless `--http3-port` overrides it.

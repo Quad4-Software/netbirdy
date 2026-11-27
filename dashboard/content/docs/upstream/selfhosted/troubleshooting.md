@@ -21,8 +21,10 @@ This page helps with issues when self-hosting NetBirdy. Collect the diagnostics 
 
 ## Getting Help
 
-If you're still experiencing issues, see [Report bugs and issues](/help/report-bug-issues) for the right channel:
+Collect diagnostics before changing the system:
 
-1. **Gather evidence first**: `docker compose logs` for all services, your configuration (without secrets), and the steps to reproduce.
-2. **Open source self-hosted and general questions** go to [Community Support](/help/community-support): the [Slack Channel](/slack-url) for quick questions, or [GitHub Discussions](https://github.com/netbirdio/netbird/discussions) for a written record.
-3. **Cloud customers and users, and commercial-license deployments** can reach the team through [NetBirdy Support](/help/netbird-support).
+1. Save `docker compose logs` for all services.
+2. Save a copy of the configuration with secrets removed.
+3. Write down the exact steps that reproduce the problem.
+
+Keep that information with the deployment's normal operational records.

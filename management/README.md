@@ -1,116 +1,35 @@
-# netbirdy Management Server
-netbirdy management server will control and synchronize peers configuration within your NetBirdy account and network.
+# NetBirdy management server
 
-## Command Options
-The CLI accepts the command **management** with the following options:
-```shell
-start NetBirdy Management Server
+The management server is the control plane. It stores accounts, peers, users,
+groups, policies, routes, DNS settings, and setup keys. Clients connect to it
+for network maps, and the dashboard uses its REST API.
 
-Usage:
-  netbirdy-mgmt management [flags]
+For normal use, run the combined server through the Podman stack or a release
+container rather than running this component by hand.
 
-Flags:
-      --cert-file string            Location of your SSL certificate. Can be used when you have an existing certificate and don't want a new certificate be generated automatically. If letsencrypt-domain is specified this property has no effect
-      --cert-key string             Location of your SSL certificate private key. Can be used when you have an existing certificate and don't want a new certificate be generated automatically. If letsencrypt-domain is specified this property has no effect
-      --datadir string              server data directory location
-  -h, --help                        help for management
-      --letsencrypt-domain string   a domain to issue Let's Encrypt certificate for. Enables TLS using Let's Encrypt. Will fetch and renew certificate, and run the server with TLS
-      --port int                    server port to listen on (default 33073)
+## Local build
 
-Global Flags:
-      --config string      NetBirdy config file location to write new config to (default "/etc/netbird")
-      --log-file string    sets NetBirdy log path. If console is specified the the log will be output to stdout (default "/var/log/netbird/management.log")
-      --log-level string    (default "info")
-```
-## Run Management service (Docker)
-
-You can run service in 2 modes - with TLS or without (not recommended).
-
-### Run with TLS (Let's Encrypt). 
-By specifying the **--letsencrypt-domain** the daemon will handle SSL certificate request and configuration.
-
-In the following example ```33073``` is the management service **default** port, and ```443``` will be used as port for Let's Encrypt challenge and HTTP API.
-> The server where you are running a container has to have a public IP (for Let's Encrypt certificate challenge).
-
-Replace <YOUR-DOMAIN> with your server's public domain (e.g. mydomain.com or subdomain sub.mydomain.com).
-
-```bash
-# create a volume
-docker volume create netbirdy-mgmt
-# run the docker container
-docker run -d --name netbirdy-management \
--p 33073:33073  \
--p 443:443  \
--v netbirdy-mgmt:/var/lib/netbird  \
--v ./config.json:/etc/netbird/config.json  \
-netbirdio/management:latest \
---letsencrypt-domain <YOUR-DOMAIN>
-```
-> An example of config.json can be found here [management.json](../infrastructure_files/management.json.tmpl)
-
-Trigger Let's encrypt certificate generation:
-```bash
-curl https://<YOUR-DOMAIN>
+```sh
+go build ./management
 ```
 
-The certificate will be persisted in the ```datadir/letsencrypt/``` folder (e.g. ```/var/lib/netbird/letsencrypt/```) inside the container.
+## Configuration
 
-Make sure that the ```datadir``` is mapped to some folder on a host machine. In case you used the volume command, you can run the following to retrieve the Mountpoint:
-```shell
-docker volume inspect netbirdy-mgmt
-[
-    {
-        "CreatedAt": "2021-07-25T20:45:28Z",
-        "Driver": "local",
-        "Labels": {},
-        "Mountpoint": "/var/lib/docker/volumes/mgmt/_data",
-        "Name": "netbirdy-mgmt",
-        "Options": {},
-        "Scope": "local"
-    }
-]
-```
-Consequent restarts of the container will pick up previously generated certificate so there is no need to trigger certificate generation with the ```curl``` command on every restart.
+The server reads `management.json`. A template is available at
+`infrastructure_files/management.json.tmpl`. Important settings include the
+data directory, listening addresses, identity provider configuration, signal
+and relay endpoints, and TLS settings.
 
-### Run without TLS.
+## Container
 
-```bash
-# create a volume
-docker volume create netbirdy-mgmt
-# run the docker container
-docker run -d --name netbirdy-management \
--p 33073:33073  \
--v netbirdy-mgmt:/var/lib/netbird  \
--v ./config.json:/etc/netbird/config.json  \
-netbirdio/management:latest
-```
-### Debug tag
-We also publish a docker image with the debug tag which has the log-level set to default, plus it uses a Chainguard base image that can be used with docker exec in order to run some commands in the Management container.
-```shell
-shell $ docker run -d --name netbirdy-management-debug \
--p 33073:33073  \
--v netbirdy-mgmt:/var/lib/netbird  \
--v ./config.json:/etc/netbird/config.json  \
-netbirdio/management:debug-latest
+The release image is `ghcr.io/quad4-software/netbirdy-management`, but most
+installations should use `ghcr.io/quad4-software/netbirdy-server`, which
+combines management, signal, and relay in one process.
 
-shell $ docker exec -ti netbirdy-management-debug /bin/sh
-container-shell $ 
-```
-## For development purposes:
+Persist the data directory, usually `/var/lib/netbird`, when running any
+server container.
 
-Install golang gRpc tools:
-```bash
-#!/bin/bash
-go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.26
-go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.1
-```
+## Development
 
-Generate gRpc code:
-
-```bash
-#!/bin/bash
-protoc -I proto/ proto/management.proto --go_out=. --go-grpc_out=.
-```
-
-
-
+Regenerate protobuf files with the scripts under `shared/management/proto/`
+and `client/proto/`. Do not edit generated files directly.

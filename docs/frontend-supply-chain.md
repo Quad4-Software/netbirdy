@@ -29,7 +29,7 @@ pnpm-workspace.yaml and apply to every package.
 ## Approving a build script
 
 Run `pnpm approve-builds`, pick the package, and pnpm writes it to
-`allowBuilds`. Review the install script first; approve only what the
+`allowBuilds`. Review the install script first. Approve only what the
 package genuinely needs to run.
 
 ## Urgent security patch
@@ -41,7 +41,7 @@ Exempt one exact version with `minimumReleaseAgeExclude`, for example
 
 Do not combine Dependabot `cooldown` with `minimumReleaseAge`. The
 resolver cooldown has no exception for Dependabot's own urgent PRs.
-Pick one control; this repo uses the resolver cooldown.
+Pick one control. This repo uses the resolver cooldown.
 
 ## Lockfile check
 

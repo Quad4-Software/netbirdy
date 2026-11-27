@@ -27,7 +27,7 @@ user and group sync through a Pocket ID API key.
 Dashboard: Settings > Identity Providers > Add > PocketID.
 
 - Issuer: your Pocket ID URL with no trailing slash
-  (for example `https://id.example.com`); it must be reachable from the
+  (for example `https://id.example.com`). It must be reachable from the
   management server and the `iss` claim must match.
 - Client ID / Client secret: from the OIDC client.
 - API key (optional): enables user and group sync.
@@ -37,7 +37,7 @@ creates the provider through the management API.
 
 ## 3. Group mapping
 
-Pocket ID group names map to NetBirdy groups one to one; users joining a
+Pocket ID group names map to NetBirdy groups one to one. Users joining a
 matching group name are placed automatically on next sync.
 
 ## Troubleshooting
@@ -47,12 +47,12 @@ matching group name are placed automatically on next sync.
 - Missing groups: enable the groups claim on the OIDC client and request
   the groups scope (the preset does).
 - Issuer unreachable/mismatch: the management server must resolve the
-  base URL; HTTPS is required outside localhost.
+  base URL. HTTPS is required outside localhost.
 - Clock skew between Pocket ID and management breaks token validation.
 
 ## Security notes
 
-- The client secret and API key are stored in the management config/store;
-  restrict API key scope to read-only user/group rights.
+- The client secret and API key are stored in the management config/store.
+  Restrict API key scope to read-only user/group rights.
 - Restrict which Pocket ID user groups may use NetBirdy in the Pocket ID
   client settings.

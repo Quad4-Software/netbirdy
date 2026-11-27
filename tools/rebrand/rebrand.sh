@@ -50,7 +50,6 @@ hits=$(grep -rn $EXCLUDE '\bNetBird\b\|\bNetbird\b' . \
     | grep -v 'dashboard/out/' \
     | grep -v 'content/docs/project' \
     | grep -v 'dashboard/.next' \
-    | grep -v 'import-upstream-docs' \
     | grep -v 'src/generated' \
     | grep -v 'testdata' \
     | grep -v 'io.netbird' \

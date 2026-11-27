@@ -121,7 +121,7 @@ The renewal flow follows one rule: re-authenticating never closes an active conn
 
 You can switch languages from the **Display Language** picker in **Settings → General**, and the change applies instantly. The desktop app is available in English, French, Galician, German, Hebrew, Hungarian, Italian, Japanese, Portuguese, Russian, Simplified Chinese, Spanish, and Ukrainian.
 
-Translations are a community effort on [Crowdin](https://crowdin.com/project/netbird). If your language is missing or a phrase reads incorrectly, join the project and translate there. Crowdin syncs finished translations into the NetBirdy repository, so please don't open pull requests that edit the translation files directly.
+Translation coverage varies by language. If a phrase is missing, the app falls back to English.
 
 ## Capturing a Debug Bundle
 

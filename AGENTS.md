@@ -27,21 +27,11 @@ in this file, not duplicated there.
 - [Comments](#comments)
 - [Testing](#testing)
 - [Pitfalls](#pitfalls)
-- [Commits, PRs, releases](#commits-prs-releases)
-- [After you push: CI and review bots](#after-you-push-ci-and-review-bots)
-- [Discussion and support](#discussion-and-support)
+- [Commits and releases](#commits-and-releases)
+- [CI checks](#ci-checks)
 
 ## STOP and ask the user before
 
-- **Opening a pull request for anything beyond a trivial fix, without an agreed
-  ticket.** Ask the user directly: *"Is there a discussion or issue for this
-  change?"* NetBirdy is discussion-first — community reports start in
-  [Discussions](https://github.com/netbirdio/netbird/discussions), DevRel
-  validates them, and only validated discussions become issues. A PR that
-  changes behavior with no linked issue may be closed on arrival. If there is no
-  ticket, offer to draft the discussion post **instead of** the PR, and wait for
-  the user's call. Only typos, broken links, documentation corrections, and
-  one-line fixes that already have an issue can skip this.
 - **Designing in any high-risk area** (see
   the high-risk areas listed in this file): public API and OpenAPI
   schema, gRPC protos, behavior existing deployments would notice after an
@@ -620,161 +610,33 @@ assert.Equal(t, expectedResult, result, "Result should match expected")
   (`npipe://netbirdy`) rather than loopback TCP. Loopback TCP carries no caller
   identity, so privileged operations are refused over it.
 
-## Commits, PRs, releases
+## Commits and releases
 
-- **PR titles must start with a bracketed tag.** Before you propose a title,
-  **read [`.github/workflows/pr-title-check.yml`](.github/workflows/pr-title-check.yml)
-  and take the allowed tags from the `allowedTags` array in that file.** It is
-  the only source of truth, it changes as components are added, and the check
-  runs on every title edit — a tag that is not in that array is a red build. Do
-  not rely on a list memorized from anywhere else, including this file.
+- Commit subjects use the `[scope] Subject` convention. Keep the subject
+  short. Use the body for why the change is needed, not a list of files.
+- Do not add `Co-Authored-By`, generated-by lines, or other tool attribution
+  trailers. The repository owner is accountable for every committed line.
+- Keep one change per commit where practical. Split refactors from behavior
+  changes when they can land separately.
+- Do not force-push `main` or rewrite pushed history. Do not bypass hooks
+  with `--no-verify`.
+- User-facing changes need matching documentation in this repository.
+- Tags use `vX.Y.Z` for normal releases and `vX.Y.Z-nbyN` for fork patch
+  releases. Pushing a tag runs `.github/workflows/release-fork.yml`.
 
-  ```text
-  [client] Authorize daemon IPC callers by their local identity
-  [management,client] Add MDM policy support
-  ```
+## CI checks
 
-  Multiple tags are comma-separated inside one pair of brackets. Match the tag
-  to the component you actually changed, not to the one you read the most.
+Before calling work finished, run the checks that match the change. At minimum,
+use `make lint` for Go changes. Run `make lint-all` before a large push.
 
-- **Write a clear PR description.** Instead of a template, give a summary: describe the change, link the issue,
-  tick the checklist honestly (including "ran locally" and "single purpose"),
-  and complete the documentation section. Do not tick a box you have not
-  verified, and do not delete rows that do not apply — the docs gate in CI reads
-  that section and fails when it is missing.
+The main checks are:
 
-- **Keep the PR description short.** Under 1000 words on top of the template's
-  own text, and usually far less — a few paragraphs. Reviewers read the diff;
-  the description exists to explain what the diff cannot say for itself. This is
-  well below what an agent will produce by default, so cut before you post.
+- `golang-test-linux.yml`, `golang-test-darwin.yml`, `golang-test-windows.yml`,
+  and `golang-test-freebsd.yml` for Go tests.
+- `golangci-lint.yml` for the full lint suite.
+- `dashboard.yml` and `frontend-ui.yml` for frontend checks.
+- `test-infrastructure-files.yml` for the container and compose templates.
+- `release-fork.yml` for tagged releases.
 
-- **Body: why before what.** Lead with the problem and the reason for this
-  approach, then the shape of the change. No bullet list of files changed, no
-  per-function walkthrough, no restating the diff in prose, no trailing summary
-  section, no self-congratulatory closing line.
-
-- **No `Co-Authored-By` or tool-attribution trailers in the PR description**,
-  and none in commits either. Contributors own their contributions. Whatever
-  tooling produced the diff, the person opening the PR is its author: they have
-  read every line, they can explain why it works, they can answer review
-  questions without going back to a model, and they are accountable for the
-  consequences of merging it. Do not add a trailer, footer, or description line
-  that spreads that ownership onto a tool.
-
-- **Commit subjects follow the same `[scope] Subject` convention.** Keep the
-  subject short, and use the body for why before what. No bullet lists of files
-  changed.
-
-- **Push review fixes as separate commits.** The PR is squashed on merge, so
-  there is no reason to rewrite history mid-review; many small commits make the
-  re-review readable.
-
-- **Do not force-push a branch that is under review.** A force-push detaches
-  existing review comments from the lines they were written against, destroys
-  the "changes since your last review" diff a reviewer relies on, and discards
-  the CI history that showed which commit broke what. Add commits instead —
-  including for fixups and reverts. Force-push only when there is no
-  alternative: a rebase to clear a genuine conflict, or removing a secret or a
-  large binary that was committed by mistake. When you must, ask the user first,
-  then say so in a PR comment so reviewers know their anchors moved. Never
-  force-push `main`, and never force-push a branch you do not own.
-
-- **One PR, one purpose.** Split refactors out of fixes and fixes out of
-  features.
-
-- **Keep the PR small.** Size is the single strongest predictor of how long a PR
-  waits. Aim for **under ~400 changed lines across under ~20 files**; past
-  roughly **1000 lines or 50 files** a community PR is likely to be sent back to
-  be split, or left unreviewed until it is. Large PRs from outside the core team
-  may be blocked outright when the size was never agreed in the ticket —
-  reviewing a sprawling change against a privileged networking daemon is a
-  security risk in itself, not just a time cost.
-
-  Judge the size by hand-written code: exclude generated output, `go.sum`,
-  vendored files, and test fixtures from the estimate, but do not use their
-  presence to argue a 3000-line PR is small.
-
-  When a change genuinely cannot be small — a protocol migration, a
-  cross-component rename — agree the split in the ticket **before** writing
-  code, and land it as a sequence of PRs that each build, test, and make sense
-  on their own. Propose that split to the user rather than opening one large PR
-  and hoping.
-
-  Prefer GitHub's stacked pull requests for such a sequence, rather than
-  hand-managing base branches: open each PR against the branch below it instead of
-  `main`, so every PR's diff shows only its own change. Merging a layer retargets
-  the PRs above it, and branch protections and required checks on the base branch
-  still apply to each one.
-
-- **User-facing changes need a docs PR** in
-  [netbirdio/docs](https://github.com/netbirdio/docs), linked from the PR
-  description.
-
-## After you push: CI and review bots
-
-Opening the PR is not the end of the task. Watch the run, read what the bots
-say, and drive the PR to green before you report the work as done.
-
-```bash
-gh pr checks <pr>            --watch    # all checks, live
-gh run view <run-id> --log-failed       # only the failing steps
-gh pr view <pr> --comments              # bot and human review comments
-```
-
-**Never report a change as finished while checks are pending or red**, and never
-describe a red PR as passing. If you ran out of turn before CI finished, say
-which checks were still running.
-
-### The checks
-
-- **Go tests** — `golang-test-{linux,darwin,windows,freebsd}.yml`, sharded per
-  component. A failure in a component you did not touch is usually a real
-  interaction, not noise; read the log before assuming flake.
-- **golangci-lint** — `golangci-lint.yml` runs the full repository, while
-  `make lint` only checks your diff. A clean local lint does not guarantee green
-  CI on a large change.
-- **PR Title Check** — `pr-title-check.yml`, see above.
-- **Codecov** — uploaded from the Linux test workflow with per-component flags
-  (`unit,client`, `unit,management`, `unit,relay`, `unit,proxy`, `unit,signal`,
-  `integration,management`). Coverage on new code should not go backwards. Add
-  tests for the paths you introduced; do not adjust thresholds or exclude files
-  to clear the report.
-- **CodeRabbit** — configured in [`.coderabbit.yaml`](.coderabbit.yaml): `chill`
-  profile, auto-review on every non-draft PR, TypeScript/JavaScript/SVG paths
-  filtered out. Chat auto-reply is on, so `@coderabbitai` in a comment reaches
-  it.
-- **SonarCloud** — project `netbirdio_netbird`, quality gate on new code (bugs,
-  vulnerabilities, code smells, duplication, coverage).
-- **Snyk** — dependency and code scanning.
-
-Sonar and Snyk report as GitHub App checks rather than workflows in this
-repository, so their detail lives on the PR check, not in the Actions logs.
-
-### Handling bot findings
-
-- **Read every comment and act on it.** Either fix it, or reply with the reason
-  it does not apply. Do not bulk-resolve threads to clear the count, and do not
-  silently ignore a finding because the check is advisory.
-- **Bots are frequently wrong here.** NetBirdy has privileged, platform-specific,
-  and concurrency-heavy code that static analysis reads poorly. A confident
-  CodeRabbit or Sonar comment can still be nonsense. Verify the claim against
-  the code before you change anything — never edit correct code just to silence
-  a bot.
-- **Security findings get the opposite default.** For a Snyk or Sonar
-  vulnerability, or a CodeRabbit comment about authentication, authorization,
-  certificate verification, or key handling, assume it is real until you have
-  disproved it. Surface it to the user rather than dismissing it yourself.
-- **A new vulnerable dependency is a stop.** Bumping or replacing dependencies
-  needs the user's decision, as above.
-- **Never change a workflow, threshold, lint exclusion, or bot config to make a
-  check pass.** If a check is genuinely wrong, say so and let the user decide.
-- **Do not paper over flakes with blind re-runs.** Identify the failure first. If
-  it is a known flake, name it; if you cannot tell, report it as unresolved
-  rather than re-running until it goes green.
-
-## Discussion and support
-
-- Discussions: <https://github.com/netbirdio/netbird/discussions>
-- Discord: <https://docs.netbird.io/discord-url>
-- Docs: <https://docs.netbird.io>
-- Security: <https://github.com/netbirdio/netbird/security/policy> — never in public
+Never weaken a workflow, threshold, lint rule, or test only to make a check
+pass. If a failure looks wrong, identify the cause and report it plainly.
