@@ -76,8 +76,16 @@ func NewPeerNamespace(t *testing.T) *PeerNamespace {
 		}
 	})
 
+	// Host network services can assign a fresh random MAC to a new veth end. Pin both ends:
+	// a neighbor entry learned before the firewall drops traffic must stay valid after it is removed.
+	host, err := netlink.LinkByName(ns.IfaceName)
+	require.NoError(t, err, "find host end")
+	require.NoError(t, netlink.LinkSetHardwareAddr(host, net.HardwareAddr{0x02, 0x4e, 0x42, suffix[0], suffix[1], suffix[2]}), "set host MAC")
+
 	peer, err := netlink.LinkByName(peerName)
-	require.NoError(t, err, "find peer end")
+	require.NoError(t, err, "find peer end before moving it")
+	require.NoError(t, netlink.LinkSetHardwareAddr(peer, net.HardwareAddr{0x02, 0x4e, 0x50, suffix[0], suffix[1], suffix[2]}), "set peer MAC")
+
 	require.NoError(t, netlink.LinkSetNsFd(peer, int(r.nsFile.Fd())), "move peer end into the namespace")
 
 	require.NoError(t, configure(ns.IfaceName, ns.HostAddr), "configure host end")
@@ -181,7 +189,15 @@ func (ns *PeerNamespace) DialControl(addr string, control func(network, address 
 // removed, the first attempts can fail while the neighbor entry settles.
 func (ns *PeerNamespace) WaitDial(t *testing.T, addr, msg string) {
 	t.Helper()
-	require.Eventually(t, func() bool { return ns.Dial(addr) == nil }, 10*time.Second, 200*time.Millisecond, msg)
+	deadline := time.Now().Add(10 * time.Second)
+	var err error
+	for time.Now().Before(deadline) {
+		if err = ns.Dial(addr); err == nil {
+			return
+		}
+		time.Sleep(200 * time.Millisecond)
+	}
+	t.Fatalf("%s: last dial error: %v", msg, err)
 }
 
 // ListenHost starts a TCP listener on the host end's address and returns its address.
