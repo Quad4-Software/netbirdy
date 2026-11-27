@@ -19,7 +19,11 @@ func TestNewGeolocationNoSourceNoFiles(t *testing.T) {
 	if err != nil {
 		t.Fatalf("NewGeolocation should not fail without sources: %v", err)
 	}
-	defer geo.Stop()
+	defer func() {
+		if err := geo.Stop(); err != nil {
+			t.Errorf("stop geolocation: %v", err)
+		}
+	}()
 
 	if _, err := geo.Lookup(net.ParseIP("1.2.3.4")); err != nil {
 		// disabled impl returns an empty record, no error

@@ -90,6 +90,10 @@ func init() {
 }
 
 func main() {
+	os.Exit(run())
+}
+
+func run() int {
 	// The one-shot that applies the settings the daemon restricts to
 	// root/administrator, which this binary runs itself as under the platform's
 	// elevation prompt. Handled before anything GUI so no window, tray or
@@ -234,8 +238,10 @@ func main() {
 	})
 
 	if err := app.Run(); err != nil {
-		log.Fatal(err)
+		log.Print(err)
+		return 1
 	}
+	return 0
 }
 
 // requestNotificationAuthorization prompts for macOS notification permission.

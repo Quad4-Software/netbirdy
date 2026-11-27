@@ -51,7 +51,9 @@ func TestDecisionLogTruncation(t *testing.T) {
 	l.write(r, Result{Action: ActionDrop}, netip.MustParseAddr("1.1.1.1"))
 	data, _ := os.ReadFile(dir + "/s.jsonl")
 	var ev DecisionEvent
-	json.Unmarshal(data[:len(data)-1], &ev)
+	if err := json.Unmarshal(data[:len(data)-1], &ev); err != nil {
+		t.Fatal(err)
+	}
 	if len(ev.Path) != 256 || len(ev.UserAgent) != 200 {
 		t.Fatalf("truncation: path=%d ua=%d", len(ev.Path), len(ev.UserAgent))
 	}

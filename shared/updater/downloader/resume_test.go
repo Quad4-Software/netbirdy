@@ -18,19 +18,17 @@ func TestResumeDownload(t *testing.T) {
 		rg := r.Header.Get("Range")
 		if rg == "" {
 			w.Header().Set("ETag", `"e1"`)
-			w.Write(full)
+			_, _ = w.Write(full)
 			return
 		}
 		var off int
-		fmt := "bytes=%d-"
-		if _, err := http.ParseCookie("x"); err == nil {
-			_ = fmt
+		if _, err := fmt.Sscanf(rg, "bytes=%d-", &off); err != nil {
+			http.Error(w, "bad range", http.StatusBadRequest)
+			return
 		}
-		n, _ := strconv.Atoi(rg[6 : len(rg)-1])
-		off = n
 		w.Header().Set("Content-Range", "bytes "+strconv.Itoa(off)+"-"+strconv.Itoa(len(full)-1)+"/"+strconv.Itoa(len(full)))
 		w.WriteHeader(http.StatusPartialContent)
-		w.Write(full[off:])
+		_, _ = w.Write(full[off:])
 	}))
 	defer srv.Close()
 
@@ -57,7 +55,7 @@ func TestResumeDownload(t *testing.T) {
 
 func TestRedirectToHTTPRejected(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		http.Redirect(w, r, "http://evil.example/x", 302)
+		http.Redirect(w, r, "http://evil.example/x", http.StatusFound)
 	}))
 	defer srv.Close()
 	if err := DownloadToFileResume(context.Background(), srv.URL+"/f", filepath.Join(t.TempDir(), "x"), ResumeOptions{}); err == nil {
@@ -78,20 +76,23 @@ func rangeServer(t *testing.T, full []byte, etag string, stall bool) *httptest.S
 				time.Sleep(60 * time.Second)
 				return
 			}
-			w.Write(full)
+			_, _ = w.Write(full)
 			return
 		}
 		var off int
-		fmt.Sscanf(rg, "bytes=%d-", &off)
+		if _, err := fmt.Sscanf(rg, "bytes=%d-", &off); err != nil {
+			http.Error(w, "bad range", http.StatusBadRequest)
+			return
+		}
 		if r.Header.Get("If-Range") != "" && r.Header.Get("If-Range") != etag && r.Header.Get("If-Range") != "Mon, 01 Jan 2024 00:00:00 GMT" {
 			// If-Range mismatch: 200 full
 			w.WriteHeader(200)
-			w.Write(full)
+			_, _ = w.Write(full)
 			return
 		}
 		w.Header().Set("Content-Range", "bytes "+strconv.Itoa(off)+"-"+strconv.Itoa(len(full)-1)+"/"+strconv.Itoa(len(full)))
 		w.WriteHeader(206)
-		w.Write(full[off:])
+		_, _ = w.Write(full[off:])
 	}))
 }
 
@@ -100,8 +101,12 @@ func TestRange200Restarts(t *testing.T) {
 	srv := rangeServer(t, full, `"e2"`, false)
 	defer srv.Close()
 	dst := filepath.Join(t.TempDir(), "f")
-	os.WriteFile(dst, full[:4], 0o600)
-	os.WriteFile(dst+".meta", []byte(`"other"`+"\n"), 0o600)
+	if err := os.WriteFile(dst, full[:4], 0o600); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(dst+".meta", []byte(`"other"`+"\n"), 0o600); err != nil {
+		t.Fatal(err)
+	}
 	if err := DownloadToFileResume(context.Background(), srv.URL, dst, ResumeOptions{}); err != nil {
 		t.Fatal(err)
 	}
@@ -144,7 +149,7 @@ func TestProgressMonotonic(t *testing.T) {
 // B5: redirect to plain http is refused.
 func TestRedirectHTTPRefused(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		http.Redirect(w, r, "http://127.0.0.1/x", 302)
+		http.Redirect(w, r, "http://127.0.0.1/x", http.StatusFound)
 	}))
 	defer srv.Close()
 	f, _ := os.Create(filepath.Join(t.TempDir(), "o"))
@@ -160,7 +165,7 @@ func TestSizeCapRefused(t *testing.T) {
 	maxDownloadBytes = 8
 	defer func() { maxDownloadBytes = old }()
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("0123456789abcdef"))
+		_, _ = w.Write([]byte("0123456789abcdef"))
 	}))
 	defer srv.Close()
 	f, _ := os.Create(filepath.Join(t.TempDir(), "o"))

@@ -19,7 +19,6 @@ import (
 	"testing"
 	"time"
 
-	golanghttp2 "golang.org/x/net/http2"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 	insecurecreds "google.golang.org/grpc/credentials/insecure"
@@ -65,7 +64,14 @@ func clientFor(t *testing.T, srv *httptest.Server, http2 bool) *http.Client {
 	return &http.Client{Transport: tr}
 }
 
-func doReq(t *testing.T, c *http.Client, method, url string, body io.Reader, hdr http.Header) (*http.Response, []byte) {
+type testResponse struct {
+	StatusCode int
+	Header     http.Header
+	Proto      string
+	ProtoMajor int
+}
+
+func doReq(t *testing.T, c *http.Client, method, url string, body io.Reader, hdr http.Header) (testResponse, []byte) {
 	t.Helper()
 	req, err := http.NewRequest(method, url, body)
 	if err != nil {
@@ -80,7 +86,12 @@ func doReq(t *testing.T, c *http.Client, method, url string, body io.Reader, hdr
 	}
 	defer resp.Body.Close()
 	bs, _ := io.ReadAll(resp.Body)
-	return resp, bs
+	return testResponse{
+		StatusCode: resp.StatusCode,
+		Header:     resp.Header,
+		Proto:      resp.Proto,
+		ProtoMajor: resp.ProtoMajor,
+	}, bs
 }
 
 func TestMatrix_BasicAndHeaders(t *testing.T) {
@@ -150,7 +161,7 @@ func TestMatrix_HeadRangeGzip(t *testing.T) {
 func TestMatrix_LargeUploadBounded(t *testing.T) {
 	var got int64
 	backend := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		io.Copy(io.Discard, r.Body)
+		_, _ = io.Copy(io.Discard, r.Body)
 		atomic.AddInt64(&got, 1)
 		w.WriteHeader(200)
 	}))
@@ -176,7 +187,7 @@ func TestMatrix_LargeUploadBounded(t *testing.T) {
 
 func TestMatrix_ExpectContinueTrailers(t *testing.T) {
 	backend := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		io.Copy(io.Discard, r.Body)
+		_, _ = io.Copy(io.Discard, r.Body)
 		w.WriteHeader(200)
 	}))
 	defer backend.Close()
@@ -288,10 +299,10 @@ func TestMatrix_RequestSmuggling(t *testing.T) {
 		t.Fatal(err)
 	}
 	raw := "POST /x HTTP/1.1\r\nHost: x\r\nContent-Length: 4\r\nTransfer-Encoding: chunked\r\n\r\n0\r\n\r\n"
-	conn.Write([]byte(raw))
+	_, _ = conn.Write([]byte(raw))
 	buf := make([]byte, 4096)
-	conn.SetReadDeadline(time.Now().Add(2 * time.Second))
-	conn.Read(buf)
+	_ = conn.SetReadDeadline(time.Now().Add(2 * time.Second))
+	_, _ = conn.Read(buf)
 	conn.Close()
 	// RFC 9112: TE wins over CL, so the declared request legitimately
 	// reaches the backend once; the invariant is that no second request is
@@ -336,15 +347,6 @@ func TestMatrix_CancelPropagates(t *testing.T) {
 	}
 }
 
-type http2Transport struct {
-	TLSClientConfig *tls.Config
-}
-
-func (h *http2Transport) RoundTrip(req *http.Request) (*http.Response, error) {
-	tr := &golanghttp2.Transport{TLSClientConfig: h.TLSClientConfig}
-	return tr.RoundTrip(req)
-}
-
 func healthServer(t *testing.T) http.Handler {
 	srv := grpc.NewServer()
 	grpc_health_v1.RegisterHealthServer(srv, &healthSvc{})
@@ -363,7 +365,7 @@ func grpcDial(t *testing.T, front *httptest.Server) *grpc.ClientConn {
 	t.Helper()
 	// grpc dial through the TLS front; target addr = front host
 	addr := strings.TrimPrefix(front.URL, "https://")
-	conn, err := grpc.Dial(addr,
+	conn, err := grpc.NewClient(addr,
 		grpc.WithTransportCredentials(credentials.NewTLS(&tls.Config{InsecureSkipVerify: true})),
 	)
 	if err != nil {
@@ -377,13 +379,6 @@ var _ = insecurecreds.NewCredentials
 type randReader struct{}
 
 func (r *randReader) Read(p []byte) (int, error) { return len(p), nil }
-
-func min(a, b int) int {
-	if a < b {
-		return a
-	}
-	return b
-}
 
 // ---- X1b additions ----
 
@@ -412,13 +407,13 @@ func wsEchoBackend(t *testing.T, tlsBackend bool) *httptest.Server {
 		length := int64(hdr[1] & 0x7f)
 		if length == 126 {
 			ext := make([]byte, 2)
-			io.ReadFull(conn, ext)
+			_, _ = io.ReadFull(conn, ext)
 			length = int64(ext[0])<<8 | int64(ext[1])
 		}
 		mask := make([]byte, 4)
-		io.ReadFull(conn, mask)
+		_, _ = io.ReadFull(conn, mask)
 		payload := make([]byte, length)
-		io.ReadFull(conn, payload)
+		_, _ = io.ReadFull(conn, payload)
 		for i := range payload {
 			payload[i] ^= mask[i%4]
 		}
@@ -427,11 +422,11 @@ func wsEchoBackend(t *testing.T, tlsBackend bool) *httptest.Server {
 			out = 0x8a // pong
 		}
 		if len(payload) < 126 {
-			conn.Write([]byte{out, byte(len(payload))})
+			_, _ = conn.Write([]byte{out, byte(len(payload))})
 		} else {
-			conn.Write([]byte{out, 126, byte(len(payload) >> 8), byte(len(payload))})
+			_, _ = conn.Write([]byte{out, 126, byte(len(payload) >> 8), byte(len(payload))})
 		}
-		conn.Write(payload)
+		_, _ = conn.Write(payload)
 	})
 	if tlsBackend {
 		s := httptest.NewTLSServer(h)
@@ -464,7 +459,7 @@ func wsRoundTrip(t *testing.T, front *httptest.Server, payload []byte) []byte {
 	if !ok {
 		t.Fatal("body not hijacked r/w")
 	}
-	defer nc.Close()
+	defer resp.Body.Close()
 	// send a masked text frame
 	frame := []byte{0x81}
 	n := len(payload)
@@ -480,7 +475,9 @@ func wsRoundTrip(t *testing.T, front *httptest.Server, payload []byte) []byte {
 		masked[i] = b ^ mask[i%4]
 	}
 	frame = append(frame, masked...)
-	nc.Write(frame)
+	if _, err := nc.Write(frame); err != nil {
+		t.Fatal(err)
+	}
 	// read echo
 	hdr := make([]byte, 2)
 	if _, err := io.ReadFull(nc, hdr); err != nil {
@@ -489,11 +486,15 @@ func wsRoundTrip(t *testing.T, front *httptest.Server, payload []byte) []byte {
 	l := int64(hdr[1] & 0x7f)
 	if l == 126 {
 		ext := make([]byte, 2)
-		io.ReadFull(nc, ext)
+		if _, err := io.ReadFull(nc, ext); err != nil {
+			t.Fatal(err)
+		}
 		l = int64(ext[0])<<8 | int64(ext[1])
 	}
 	got := make([]byte, l)
-	io.ReadFull(nc, got)
+	if _, err := io.ReadFull(nc, got); err != nil {
+		t.Fatal(err)
+	}
 	return got
 }
 
@@ -533,12 +534,12 @@ func TestMatrix_ChunkedBodies(t *testing.T) {
 	var sawTE string
 	backend := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		sawTE = r.TransferEncoding[0]
-		io.Copy(io.Discard, r.Body)
+		_, _ = io.Copy(io.Discard, r.Body)
 		w.Header().Set("Trailer", "X-Checksum")
 		w.WriteHeader(200)
-		w.Write([]byte("part1"))
+		_, _ = w.Write([]byte("part1"))
 		w.(http.Flusher).Flush()
-		w.Write([]byte("part2"))
+		_, _ = w.Write([]byte("part2"))
 	}))
 	defer backend.Close()
 	front := tlsFront(t, chainFor(t, backend, nil))
@@ -550,7 +551,7 @@ func TestMatrix_ChunkedBodies(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer resp.Body.Close()
-	io.Copy(io.Discard, resp.Body)
+	_, _ = io.Copy(io.Discard, resp.Body)
 	if sawTE != "chunked" {
 		t.Fatalf("request was not chunked: %q", sawTE)
 	}
@@ -563,7 +564,7 @@ func TestMatrix_ResponseTrailers(t *testing.T) {
 	backend := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Trailer", "X-Done")
 		w.WriteHeader(200)
-		w.Write([]byte("body"))
+		_, _ = w.Write([]byte("body"))
 		w.Header().Set(http.TrailerPrefix+"X-Done", "yes")
 	}))
 	defer backend.Close()
@@ -576,7 +577,7 @@ func TestMatrix_ResponseTrailers(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer resp.Body.Close()
-	io.Copy(io.Discard, resp.Body)
+	_, _ = io.Copy(io.Discard, resp.Body)
 	if got := resp.Trailer.Get("X-Done"); got != "yes" {
 		t.Fatalf("trailer lost: %q", got)
 	}
@@ -602,11 +603,13 @@ func TestMatrix_WS_IdleSurvives(t *testing.T) {
 		t.Fatalf("upgrade: %d", resp.StatusCode)
 	}
 	nc := resp.Body.(io.ReadWriteCloser)
-	defer nc.Close()
+	defer resp.Body.Close()
 	time.Sleep(150 * time.Millisecond)
 	// still alive: send a frame, expect echo
 	frame := []byte{0x81, 0x81, 1, 2, 3, 4, 'h' ^ 1}
-	nc.Write(frame)
+	if _, err := nc.Write(frame); err != nil {
+		t.Fatal(err)
+	}
 	hdr := make([]byte, 3)
 	if _, err := io.ReadFull(nc, hdr); err != nil {
 		t.Fatalf("idle ws killed: %v", err)
@@ -621,7 +624,7 @@ func TestMatrix_GRPC(t *testing.T) {
 	backend.StartTLS()
 	defer backend.Close()
 
-	tr := &http2Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
+	tr := &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}, ForceAttemptHTTP2: true} //nolint:gosec // test CA
 	front := tlsFront(t, chainFor(t, backend, tr))
 	defer front.Close()
 

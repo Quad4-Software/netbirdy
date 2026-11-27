@@ -17,7 +17,9 @@ func testEvent() Event {
 func readN(t *testing.T, c net.PacketConn, n int) []byte {
 	t.Helper()
 	buf := make([]byte, 8192)
-	c.SetReadDeadline(time.Now().Add(2 * time.Second))
+	if err := c.SetReadDeadline(time.Now().Add(2 * time.Second)); err != nil {
+		t.Fatal(err)
+	}
 	got := []byte{}
 	for n > 0 {
 		l, _, err := c.ReadFrom(buf)
@@ -64,10 +66,15 @@ func TestSyslogSinkTCPNewline(t *testing.T) {
 	}
 	s.now = func() time.Time { return time.Unix(1700000000, 0) }
 	s.Emit(testEvent())
-	conn, _ := ln.Accept()
+	conn, err := ln.Accept()
+	if err != nil {
+		t.Fatal(err)
+	}
 	defer conn.Close()
 	buf := make([]byte, 8192)
-	conn.SetReadDeadline(time.Now().Add(2 * time.Second))
+	if err := conn.SetReadDeadline(time.Now().Add(2 * time.Second)); err != nil {
+		t.Fatal(err)
+	}
 	n, err := conn.Read(buf)
 	if err != nil {
 		t.Fatal(err)

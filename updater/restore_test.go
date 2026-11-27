@@ -8,8 +8,12 @@ import (
 
 func TestRestoreDir(t *testing.T) {
 	src := t.TempDir()
-	os.WriteFile(filepath.Join(src, "a.txt"), []byte("a"), 0o644)
-	os.WriteFile(filepath.Join(src, "b.txt"), []byte("b"), 0o600)
+	if err := os.WriteFile(filepath.Join(src, "a.txt"), []byte("a"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(src, "b.txt"), []byte("b"), 0o600); err != nil {
+		t.Fatal(err)
+	}
 	bk := t.TempDir()
 	m, err := backupDir(src, bk)
 	if err != nil {
@@ -19,8 +23,12 @@ func TestRestoreDir(t *testing.T) {
 		t.Fatal(err)
 	}
 	dst := t.TempDir()
-	os.WriteFile(filepath.Join(dst, "a.txt"), []byte("old"), 0o644)
-	os.WriteFile(filepath.Join(dst, "extra.txt"), []byte("extra"), 0o644)
+	if err := os.WriteFile(filepath.Join(dst, "a.txt"), []byte("old"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(dst, "extra.txt"), []byte("extra"), 0o644); err != nil {
+		t.Fatal(err)
+	}
 	if err := restoreDir(bk, dst); err != nil {
 		t.Fatalf("restore: %v", err)
 	}
@@ -31,7 +39,9 @@ func TestRestoreDir(t *testing.T) {
 	if _, err := os.Stat(filepath.Join(dst, "extra.txt")); !os.IsNotExist(err) {
 		t.Fatal("extra not removed")
 	}
-	os.WriteFile(filepath.Join(bk, "a.txt"), []byte("tampered"), 0o644)
+	if err := os.WriteFile(filepath.Join(bk, "a.txt"), []byte("tampered"), 0o644); err != nil {
+		t.Fatal(err)
+	}
 	if err := restoreDir(bk, dst); err == nil {
 		t.Fatal("tampered backup restored")
 	}

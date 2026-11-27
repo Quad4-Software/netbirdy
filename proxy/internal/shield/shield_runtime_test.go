@@ -55,7 +55,7 @@ func TestSetModeTogglesShield(t *testing.T) {
 	if sh.Mode() != string(ModeOff) {
 		t.Fatalf("mode %q", sh.Mode())
 	}
-	rec, called := serve(sh)
+	_, called := serve(sh)
 	if !called {
 		t.Fatal("off mode still blocks")
 	}

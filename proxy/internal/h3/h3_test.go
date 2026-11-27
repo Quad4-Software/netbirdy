@@ -33,14 +33,16 @@ func TestH3_RequestOverQUIC(t *testing.T) {
 	tlsCfg := testTLSConfig(t)
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("X-Handler", "real")
-		io.WriteString(w, "h3 ok")
+		_, _ = io.WriteString(w, "h3 ok")
 	})
 	srv, err := New("127.0.0.1:0", handler, tlsCfg, 0)
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer srv.Close()
-	go srv.Serve()
+	go func() {
+		_ = srv.Serve()
+	}()
 
 	// wait for the UDP socket
 	time.Sleep(100 * time.Millisecond)
@@ -69,13 +71,15 @@ func TestH3_RequestOverQUIC(t *testing.T) {
 func TestH3_LargeBodyAndShutdown(t *testing.T) {
 	tlsCfg := testTLSConfig(t)
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		io.Copy(w, r.Body)
+		_, _ = io.Copy(w, r.Body)
 	})
 	srv, err := New("127.0.0.1:0", handler, tlsCfg, 0)
 	if err != nil {
 		t.Fatal(err)
 	}
-	go srv.Serve()
+	go func() {
+		_ = srv.Serve()
+	}()
 	time.Sleep(100 * time.Millisecond)
 	tr := h3Client(t)
 	defer tr.Close()

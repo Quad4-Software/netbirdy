@@ -119,7 +119,6 @@ the desktop app is not code-signed, and there is no Windows MSI.
 | [proxy/docs/](proxy/docs/) | Reverse proxy, shield, protocol support |
 | [docs/custom-domain-validation.md](docs/custom-domain-validation.md) | Custom domains |
 | [docs/maintaining.md](docs/maintaining.md) | Releases and fork maintenance |
-| [docs/ci-crow.md](docs/ci-crow.md) | Crow CI pipelines |
 
 The full index is [docs/README.md](docs/README.md).
 

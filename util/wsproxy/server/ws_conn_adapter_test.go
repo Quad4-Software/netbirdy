@@ -3,7 +3,6 @@ package server
 import (
 	"bytes"
 	"context"
-	"crypto/tls"
 	"io"
 	"math/rand/v2"
 	"net"
@@ -68,10 +67,12 @@ func TestAdapterHandlingConnectionClosures(t *testing.T) {
 			assert.NoError(t, err)
 
 			clientCtx, cancel := context.WithCancel(context.Background()) //nolint:govet
+			clientProtocols := new(http.Protocols)
+			clientProtocols.SetUnencryptedHTTP2(true)
 			h2client := &http.Client{
-				Transport: &http2.Transport{
-					AllowHTTP: true,
-					DialTLSContext: func(_ context.Context, _, _ string, _ *tls.Config) (net.Conn, error) {
+				Transport: &http.Transport{
+					Protocols: clientProtocols,
+					DialContext: func(_ context.Context, _, _ string) (net.Conn, error) {
 						return &wsConnAdapter{
 							prefix: "test-client",
 							ctx:    clientCtx,
@@ -143,10 +144,12 @@ func TestAdapterHandlingHttpConnection_NoHeadersSent(t *testing.T) {
 			}}})
 	assert.NoError(t, err)
 
+	clientProtocols := new(http.Protocols)
+	clientProtocols.SetUnencryptedHTTP2(true)
 	h2client := &http.Client{
-		Transport: &http2.Transport{
-			AllowHTTP: true,
-			DialTLSContext: func(_ context.Context, _, _ string, _ *tls.Config) (net.Conn, error) {
+		Transport: &http.Transport{
+			Protocols: clientProtocols,
+			DialContext: func(_ context.Context, _, _ string) (net.Conn, error) {
 				return &h2ConnectionSnooper{wrappedConn: &wsConnAdapter{
 					prefix: "test-client",
 					ctx:    context.Background(),

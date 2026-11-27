@@ -106,23 +106,11 @@ func WithConfigPath(path string) Option {
 	return func(s *Shield) { s.cfgPath = path }
 }
 
-type ctxKey struct{}
-
-type resultHolder struct{ r Result }
-
 // Result is what Wrap recorded for a request.
 type Result struct {
 	Score   float64
 	Action  Action
 	Reasons []string
-}
-
-// ResultFromContext returns the decision Wrap stored for this request.
-func ResultFromContext(ctx context.Context) Result {
-	if h, ok := ctx.Value(ctxKey{}).(*resultHolder); ok {
-		return h.r
-	}
-	return Result{Action: ActionPass}
 }
 
 // Shield is the defense engine.
@@ -370,17 +358,7 @@ func (s *Shield) Wrap(next http.Handler) http.Handler {
 
 func (s *Shield) serve(w http.ResponseWriter, r *http.Request, next http.Handler) {
 	res := Result{Action: ActionPass}
-	var h *resultHolder
-	install := func() {
-		if h == nil {
-			h = &resultHolder{}
-			*r = *r.WithContext(context.WithValue(r.Context(), ctxKey{}, h))
-		}
-	}
 	defer func() {
-		if h != nil {
-			h.r = res
-		}
 		if res.Action != ActionPass {
 			if cd := proxy.CapturedDataFromContext(r.Context()); cd != nil {
 				cd.SetMetadata("shield.action", string(res.Action))
@@ -409,7 +387,6 @@ func (s *Shield) serve(w http.ResponseWriter, r *http.Request, next http.Handler
 		sh.mu.Unlock()
 		res.Action = ActionBlock
 		res.Reasons = append(res.Reasons, "banned")
-		install()
 		s.emit(r, res)
 		s.block(w, r)
 		return
@@ -517,7 +494,6 @@ func (s *Shield) serve(w http.ResponseWriter, r *http.Request, next http.Handler
 	if ai && s.cfg().AICrawlers == AIDeny {
 		res.Action = ActionBlock
 		res.Reasons = append(res.Reasons, "ai-crawler")
-		install()
 		s.emit(r, res)
 		if s.cfg().Mode == ModeEnforce {
 			s.block(w, r)
@@ -527,7 +503,6 @@ func (s *Shield) serve(w http.ResponseWriter, r *http.Request, next http.Handler
 	if overRate {
 		res.Action = ActionBlock
 		res.Reasons = append(res.Reasons, "rate-limit")
-		install()
 		s.emit(r, res)
 		if s.cfg().Mode == ModeEnforce {
 			w.Header().Set("Retry-After", "5")
@@ -537,7 +512,6 @@ func (s *Shield) serve(w http.ResponseWriter, r *http.Request, next http.Handler
 	}
 	if banNow {
 		res.Action = ActionBlock
-		install()
 		s.emit(r, res)
 		if s.cfg().Mode == ModeEnforce {
 			s.block(w, r)
@@ -546,7 +520,6 @@ func (s *Shield) serve(w http.ResponseWriter, r *http.Request, next http.Handler
 	}
 	if score >= s.cfg().TarpitAt {
 		res.Action = ActionTarpit
-		install()
 		s.emit(r, res)
 		if s.cfg().Mode == ModeEnforce {
 			if !s.tarpit(w, r) {
@@ -557,7 +530,6 @@ func (s *Shield) serve(w http.ResponseWriter, r *http.Request, next http.Handler
 	}
 	if score >= s.cfg().ChallengeAt && s.canChallenge(r, browser) {
 		res.Action = ActionChallenge
-		install()
 		s.emit(r, res)
 		if s.cfg().Mode == ModeEnforce {
 			if s.serveChallenge(w, r, ip) {
@@ -565,10 +537,6 @@ func (s *Shield) serve(w http.ResponseWriter, r *http.Request, next http.Handler
 			}
 		}
 	}
-	if len(res.Reasons) > 0 || res.Action != ActionPass {
-		install()
-	}
-
 	// pass through, observe status for post-response signals
 	sw, _ := w.(*statusWriter)
 	if sw == nil {
@@ -621,7 +589,6 @@ func (s *Shield) serve(w http.ResponseWriter, r *http.Request, next http.Handler
 			ttl = s.store.ban(st)
 		}
 		sh.mu.Unlock()
-		install()
 		if ttl > 0 {
 			s.log.Infof("shield: banned for %s (%s)", ttl, banReason)
 		}

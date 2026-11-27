@@ -35,12 +35,21 @@ func TestPodmanEngine(t *testing.T) {
 	var out struct {
 		ID string `json:"Id"`
 	}
-	readJSON(resp.Body, &out)
+	if err := readJSON(resp.Body, &out); err != nil {
+		resp.Body.Close()
+		t.Fatal(err)
+	}
 	resp.Body.Close()
 	cid := out.ID
-	defer eng.Remove(ctx, cid)
-	defer eng.Remove(ctx, "new-"+name)
-	defer eng.Remove(ctx, name+"-prev")
+	defer func() {
+		_ = eng.Remove(ctx, cid)
+	}()
+	defer func() {
+		_ = eng.Remove(ctx, "new-"+name)
+	}()
+	defer func() {
+		_ = eng.Remove(ctx, name+"-prev")
+	}()
 
 	ci, err := eng.FindContainer(ctx, "uptest", "srv")
 	if err != nil || ci.Name != name {
@@ -50,7 +59,9 @@ func TestPodmanEngine(t *testing.T) {
 	if err != nil {
 		t.Fatalf("create like: %v", err)
 	}
-	defer eng.Remove(ctx, nid)
+	defer func() {
+		_ = eng.Remove(ctx, nid)
+	}()
 	if err := eng.Stop(ctx, cid); err != nil {
 		t.Fatal(err)
 	}
@@ -75,6 +86,8 @@ func TestPodmanEngine(t *testing.T) {
 	if ci2.Config["Image"] != img {
 		t.Fatalf("image %v", ci2.Config["Image"])
 	}
-	eng.Stop(ctx, nid)
+	if err := eng.Stop(ctx, nid); err != nil {
+		t.Fatal(err)
+	}
 	t.Logf("full cycle ok: find/createLike/stop/rename/start/healthy")
 }

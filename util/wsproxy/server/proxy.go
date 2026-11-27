@@ -1,12 +1,15 @@
 package server
 
 import (
+	"context"
+	"errors"
+	"net"
 	"net/http"
+	"sync"
 	"sync/atomic"
 
 	"github.com/coder/websocket"
 	log "github.com/sirupsen/logrus"
-	"golang.org/x/net/http2"
 
 	"github.com/netbirdio/netbird/util/wsproxy"
 )
@@ -56,6 +59,36 @@ type proxyHandler struct {
 	conn    atomic.Pointer[wsConnAdapter]
 }
 
+type singleConnListener struct {
+	conn      net.Conn
+	taken     atomic.Bool
+	closed    chan struct{}
+	closeOnce sync.Once
+}
+
+func newSingleConnListener(conn net.Conn) *singleConnListener {
+	return &singleConnListener{conn: conn, closed: make(chan struct{})}
+}
+
+func (l *singleConnListener) Accept() (net.Conn, error) {
+	if !l.taken.Swap(true) {
+		return l.conn, nil
+	}
+	<-l.closed
+	return nil, net.ErrClosed
+}
+
+func (l *singleConnListener) Close() error {
+	l.closeOnce.Do(func() {
+		close(l.closed)
+	})
+	return nil
+}
+
+func (l *singleConnListener) Addr() net.Addr {
+	return l.conn.LocalAddr()
+}
+
 func (ph *proxyHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
@@ -88,25 +121,32 @@ func (ph *proxyHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	log.Debugf("WebSocket proxy established: %s -> gRPC handler", r.RemoteAddr)
 
-	(&http2.Server{
-		// TODO (dmitri) we should limit the number of concurrent streams per connection (peer)
-		// and idle timeouts
-		// MaxConcurrentStreams: 20,
-		// IdleTimeout: 10 * time.Second,
-	}).ServeConn(serverConn, &http2.ServeConnOpts{
-		Context:    ctx,
-		Handler:    ph.handler,
-		BaseConfig: &http.Server{
-			// b/c we are wrapping a ws connection, read and write connection deadlines normally set
-			// via ReadTimeout and WriteTimeout http.Server fields aren't available to us. The ws
-			// library doesn't expose connection deadline timer config, and we ignore these calls in "wsConnAdapter".
-			//
-			// Another issue is that Server.ServeConn() call bypasses setting of connection deadlines altogether,
-			// ReadTimeout and Writetimeout set here would only apply to h2 streams, i.e. after a HEADERS frame
-			// arrival and processing, turning ReadTimeout into a request body read deadline, and WriteTimeout into
-			// a response deadline (the latter not useful for streaming requests).
+	listener := newSingleConnListener(serverConn)
+	protocols := new(http.Protocols)
+	protocols.SetUnencryptedHTTP2(true)
+	server := &http.Server{
+		Handler:   ph.handler,
+		Protocols: protocols,
+		BaseContext: func(net.Listener) context.Context {
+			return ctx
 		},
-	})
+		ConnState: func(_ net.Conn, state http.ConnState) {
+			if state == http.StateClosed || state == http.StateHijacked {
+				_ = listener.Close()
+			}
+		},
+		// b/c we are wrapping a ws connection, read and write connection deadlines normally set
+		// via ReadTimeout and WriteTimeout http.Server fields aren't available to us. The ws
+		// library doesn't expose connection deadline timer config, and we ignore these calls in "wsConnAdapter".
+		//
+		// Another issue is that serving a single connection bypasses setting of connection deadlines altogether,
+		// ReadTimeout and Writetimeout set here would only apply to h2 streams, i.e. after a HEADERS frame
+		// arrival and processing, turning ReadTimeout into a request body read deadline, and WriteTimeout into
+		// a response deadline (the latter not useful for streaming requests).
+	}
+	if err := server.Serve(listener); err != nil && !errors.Is(err, net.ErrClosed) {
+		log.Debugf("WebSocket proxy HTTP/2 server closed with error: %v", err)
+	}
 
 	log.Debugf("WebSocket proxy closing: %s -> gRPC handler", r.RemoteAddr)
 }

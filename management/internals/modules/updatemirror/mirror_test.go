@@ -37,17 +37,17 @@ func fakeGH(t *testing.T, files map[string][]byte, checksums string, keys map[st
 		assets += fmt.Sprintf(`{"name":"checksums.txt","browser_download_url":"%s/dl/checksums.txt","size":10}`, srv.URL)
 		fmt.Fprintf(w, `{"tag_name":"v9.9.9","assets":[%s]}`, assets)
 	})
-	mux.HandleFunc("/dl/checksums.txt", func(w http.ResponseWriter, r *http.Request) { io.WriteString(w, checksums) })
+	mux.HandleFunc("/dl/checksums.txt", func(w http.ResponseWriter, r *http.Request) { _, _ = io.WriteString(w, checksums) })
 	mux.HandleFunc("/dl/", func(w http.ResponseWriter, r *http.Request) {
 		if b, ok := files[r.URL.Path[len("/dl/"):]]; ok {
-			w.Write(b)
+			_, _ = w.Write(b)
 			return
 		}
 		http.NotFound(w, r)
 	})
 	mux.HandleFunc("/keys/", func(w http.ResponseWriter, r *http.Request) {
 		if b, ok := keys[r.URL.Path[len("/keys/"):]]; ok {
-			w.Write(b)
+			_, _ = w.Write(b)
 			return
 		}
 		http.NotFound(w, r)
@@ -245,7 +245,9 @@ func TestRangeAndIfRange(t *testing.T) {
 func TestRateLimit(t *testing.T) {
 	dir := t.TempDir()
 	m := New(Config{Enabled: true, CacheDir: dir, RatePerSecond: 1, MaxTransfers: 4}, nil, nil)
-	m.writeCache("files/"+msi, []byte("x"))
+	if err := m.writeCache("files/"+msi, []byte("x")); err != nil {
+		t.Fatal(err)
+	}
 	srv := httptest.NewServer(m.Handler())
 	defer srv.Close()
 	var codes []int
@@ -285,9 +287,13 @@ func TestETag304(t *testing.T) {
 func TestEvictKeepsTarget(t *testing.T) {
 	dir := t.TempDir()
 	m := New(Config{Enabled: true, CacheDir: dir, MaxCacheBytes: 100}, nil, nil)
-	m.writeCache("files/old", make([]byte, 90))
+	if err := m.writeCache("files/old", make([]byte, 90)); err != nil {
+		t.Fatal(err)
+	}
 	m.index.LastUsed["files/old"] = 1
-	m.writeCache("files/target", make([]byte, 90))
+	if err := m.writeCache("files/target", make([]byte, 90)); err != nil {
+		t.Fatal(err)
+	}
 	m.evict("files/target")
 	if _, ok := m.index.Files["files/target"]; !ok {
 		t.Fatal("target evicted")
@@ -296,16 +302,16 @@ func TestEvictKeepsTarget(t *testing.T) {
 
 func TestDisabledReturns404(t *testing.T) {
 	m := New(Config{Enabled: false}, nil, nil)
-	if m.Handler() != nil {
-		// handler exists but the file path 404s when nothing cached
-	}
-	srv := httptest.NewServer(http.NotFoundHandler())
+	srv := httptest.NewServer(m.Handler())
 	defer srv.Close()
-	r, _ := http.Get(srv.URL + "/x")
-	if r.StatusCode != 404 {
-		t.Fatal("expected 404")
+	r, err := http.Get(srv.URL + "/files/v9.9.9/missing")
+	if err != nil {
+		t.Fatal(err)
 	}
-	r.Body.Close()
+	defer r.Body.Close()
+	if r.StatusCode != 404 {
+		t.Fatalf("expected 404, got %d", r.StatusCode)
+	}
 }
 
 func TestUnchainedKeyRejected(t *testing.T) {
@@ -403,7 +409,9 @@ func TestCorruptedCacheNotServed(t *testing.T) {
 	}
 	// corrupt the file on disk
 	p := filepath.Join(dir, "files", msi)
-	os.WriteFile(p, []byte("badbytes!"), 0o640)
+	if err := os.WriteFile(p, []byte("badbytes!"), 0o640); err != nil {
+		t.Fatal(err)
+	}
 	srv := httptest.NewServer(m.Handler())
 	defer srv.Close()
 	r, err := http.Get(srv.URL + "/files/v9.9.9/" + msi)
@@ -419,7 +427,9 @@ func TestCorruptedCacheNotServed(t *testing.T) {
 func TestTransferCap429(t *testing.T) {
 	dir := t.TempDir()
 	m := New(Config{Enabled: true, CacheDir: dir, RatePerSecond: 1000, MaxTransfers: 1}, nil, nil)
-	m.writeCache("files/"+msi, []byte("x"))
+	if err := m.writeCache("files/"+msi, []byte("x")); err != nil {
+		t.Fatal(err)
+	}
 	m.transferCh <- struct{}{} // occupy the single slot
 	srv := httptest.NewServer(m.Handler())
 	defer srv.Close()

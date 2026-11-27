@@ -103,7 +103,9 @@ func deps(cfg Config, eng *recEngine, imgs map[string]string) Deps {
 func setup(t *testing.T) (Config, *recEngine, *statusStore) {
 	data := t.TempDir()
 	bk := t.TempDir()
-	os.WriteFile(filepath.Join(data, "state.db"), []byte("v1"), 0o600)
+	if err := os.WriteFile(filepath.Join(data, "state.db"), []byte("v1"), 0o600); err != nil {
+		t.Fatal(err)
+	}
 	cfg := Config{DataDir: data, BackupDir: bk, Services: []string{"server", "dashboard"}, Project: "p", HealthTimeout: time.Second, BackupsKeep: 3}
 	return cfg, &recEngine{failOn: map[string]error{}}, newStatusStore(bk)
 }

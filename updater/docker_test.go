@@ -12,19 +12,19 @@ import (
 
 func fakeDocker(t *testing.T) (*httptest.Server, *DockerEngine) {
 	mux := http.NewServeMux()
-	mux.HandleFunc("/v1.41/images/img@sha256:a/json", func(w http.ResponseWriter, r *http.Request) { w.Write([]byte(`{"Id":"i1"}`)) })
+	mux.HandleFunc("/v1.41/images/img@sha256:a/json", func(w http.ResponseWriter, r *http.Request) { _, _ = w.Write([]byte(`{"Id":"i1"}`)) })
 	mux.HandleFunc("/v1.41/images/missing@sha256:b/json", func(w http.ResponseWriter, r *http.Request) { w.WriteHeader(404) })
 	mux.HandleFunc("/v1.41/images/create", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte(`{"status":"done"}` + "\n"))
+		_, _ = w.Write([]byte(`{"status":"done"}` + "\n"))
 	})
 	mux.HandleFunc("/v1.41/containers/json", func(w http.ResponseWriter, r *http.Request) {
 		if !strings.Contains(r.URL.Query().Get("filters"), "com.docker.compose.project") {
 			t.Error("label filter missing")
 		}
-		w.Write([]byte(`[{"Id":"c1"}]`))
+		_, _ = w.Write([]byte(`[{"Id":"c1"}]`))
 	})
 	mux.HandleFunc("/v1.41/containers/c1/json", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte(`{"Id":"c1","Name":"/netbirdy-server","Config":{"Image":"old","Env":["A=1"],"Labels":{"l":"v"},"Healthcheck":{"Test":["curl"]}},"State":{"Status":"running","Health":{"Status":"healthy"}},"HostConfig":{"Binds":["x"]},"NetworkSettings":{"Networks":{"net":{"Aliases":["s"]}}}}`))
+		_, _ = w.Write([]byte(`{"Id":"c1","Name":"/netbirdy-server","Config":{"Image":"old","Env":["A=1"],"Labels":{"l":"v"},"Healthcheck":{"Test":["curl"]}},"State":{"Status":"running","Health":{"Status":"healthy"}},"HostConfig":{"Binds":["x"]},"NetworkSettings":{"Networks":{"net":{"Aliases":["s"]}}}}`))
 	})
 	mux.HandleFunc("/v1.41/containers/c1/stop", func(w http.ResponseWriter, r *http.Request) { w.WriteHeader(204) })
 	mux.HandleFunc("/v1.41/containers/c1", func(w http.ResponseWriter, r *http.Request) { w.WriteHeader(204) })
@@ -33,7 +33,7 @@ func fakeDocker(t *testing.T) (*httptest.Server, *DockerEngine) {
 	mux.HandleFunc("/v1.41/containers/new-c1/stop", func(w http.ResponseWriter, r *http.Request) { w.WriteHeader(204) })
 	mux.HandleFunc("/v1.41/containers/c1/start", func(w http.ResponseWriter, r *http.Request) { w.WriteHeader(204) })
 	mux.HandleFunc("/v1.41/containers/new-c1/json", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte(`{"Config":{},"HostConfig":{},"NetworkSettings":{},"State":{"Status":"running","Health":{"Status":"healthy"}}}`))
+		_, _ = w.Write([]byte(`{"Config":{},"HostConfig":{},"NetworkSettings":{},"State":{"Status":"running","Health":{"Status":"healthy"}}}`))
 	})
 	mux.HandleFunc("/v1.41/containers/create", func(w http.ResponseWriter, r *http.Request) {
 		b, _ := io.ReadAll(r.Body)
@@ -41,7 +41,7 @@ func fakeDocker(t *testing.T) (*httptest.Server, *DockerEngine) {
 			t.Errorf("create body %s", b)
 		}
 		w.WriteHeader(201)
-		w.Write([]byte(`{"Id":"new-c1"}`))
+		_, _ = w.Write([]byte(`{"Id":"new-c1"}`))
 	})
 	srv := httptest.NewServer(mux)
 	eng, _ := NewDockerEngine(srv.URL)
