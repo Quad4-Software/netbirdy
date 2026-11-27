@@ -34,7 +34,7 @@ func TestTransportRoundTrip(t *testing.T) {
 	}
 	for _, payload := range payloads {
 		id := HashID("peer")
-		msg, err := MarshalTransportMsg(id, payload)
+		msg, err := MarshalTransportMsg(CurrentProtocolVersion, id, payload)
 		if err != nil {
 			t.Fatalf("marshal: %v", err)
 		}
