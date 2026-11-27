@@ -462,6 +462,13 @@ if type uname >/dev/null 2>&1; then
               PACKAGE_MANAGER="pkg"
             fi
 		;;
+        FreeBSD)
+            OS_NAME="freebsd"
+            OS_TYPE="freebsd"
+            INSTALL_DIR="/usr/local/bin"
+            PACKAGE_MANAGER="bin"
+            SKIP_UI_APP=true
+        ;;
 	esac
 fi
 

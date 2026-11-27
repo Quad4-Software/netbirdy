@@ -4,9 +4,7 @@ import (
 	"sync"
 	"time"
 
-	log "github.com/sirupsen/logrus"
 	"golang.org/x/sync/singleflight"
-	"golang.zx2c4.com/wireguard/wgctrl"
 )
 
 // wgDetectorTTL bounds how long a cached answer is trusted. An interface rarely
@@ -24,9 +22,8 @@ type wgDetectorEntry struct {
 //
 // The question is asked once per interface for every ICE agent, and an agent is
 // created per peer connection attempt, so on a large network the uncached form runs
-// constantly. Answering it means opening a wgctrl client, which builds both a kernel
-// and a userspace client and resolves the netlink family, and then a round trip that
-// usually just reports the device does not exist.
+// constantly. Answering it means asking the operating system or the userspace
+// implementation, and the round trip usually just reports the device does not exist.
 //
 // A detector is safe for concurrent use and is meant to be shared by every agent.
 type WGDetector struct {
@@ -113,18 +110,4 @@ func (d *WGDetector) store(iFace string, isWireGuard bool) {
 
 func (d *WGDetector) isOwnInterface(iFace string) bool {
 	return d.ownIface != "" && iFace == d.ownIface
-}
-
-func probeWireGuard(iFace string) bool {
-	wg, err := wgctrl.New()
-	if err != nil {
-		log.Debugf("trying to create a wgctrl client failed with: %v", err)
-		return false
-	}
-	defer func() {
-		_ = wg.Close()
-	}()
-
-	_, err = wg.Device(iFace)
-	return err == nil
 }

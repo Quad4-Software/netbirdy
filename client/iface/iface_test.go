@@ -14,7 +14,6 @@ import (
 	"github.com/google/uuid"
 	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
-	"golang.zx2c4.com/wireguard/wgctrl"
 	"golang.zx2c4.com/wireguard/wgctrl/wgtypes"
 
 	"github.com/netbirdio/netbird/client/iface/device"
@@ -31,6 +30,11 @@ var (
 	key        string
 	peerPubKey string
 )
+
+type testWGClient interface {
+	Device(name string) (*wgtypes.Device, error)
+	Close() error
+}
 
 func init() {
 	log.SetLevel(log.DebugLevel)
@@ -155,7 +159,7 @@ func Test_CreateInterface(t *testing.T) {
 			t.Error(err)
 		}
 	}()
-	wg, err := wgctrl.New()
+	wg, err := newTestWGClient()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -190,7 +194,7 @@ func Test_Close(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	wg, err := wgctrl.New()
+	wg, err := newTestWGClient()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -242,7 +246,7 @@ func TestRecreation(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			wg, err := wgctrl.New()
+			wg, err := newTestWGClient()
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -312,7 +316,7 @@ func Test_ConfigureInterface(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	wg, err := wgctrl.New()
+	wg, err := newTestWGClient()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -594,7 +598,7 @@ func describePeer(ifaceName, peerPubKey string) string {
 }
 
 func getPeer(ifaceName, peerPubKey string) (wgtypes.Peer, error) {
-	wg, err := wgctrl.New()
+	wg, err := newTestWGClient()
 	if err != nil {
 		return wgtypes.Peer{}, err
 	}
