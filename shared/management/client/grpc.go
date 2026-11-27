@@ -160,9 +160,9 @@ func NewClient(ctx context.Context, addr string, ourPrivateKey wgtypes.Key, tlsE
 	}
 	if c.netMgr != nil {
 		extraOpts = append(extraOpts, nbgrpc.WithSweeper(c.netMgr))
-		if c.serverName != "" {
-			extraOpts = append(extraOpts, grpc.WithAuthority(c.serverName))
-		}
+	}
+	if c.serverName != "" {
+		extraOpts = append(extraOpts, grpc.WithAuthority(c.serverName))
 	}
 
 	var conn *grpc.ClientConn

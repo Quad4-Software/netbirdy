@@ -2,13 +2,17 @@ package client
 
 import (
 	"context"
+	"crypto/tls"
+	"errors"
 	"net"
 	"os"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"golang.zx2c4.com/wireguard/wgctrl/wgtypes"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/credentials/insecure"
@@ -40,6 +44,44 @@ func TestMaxRecvMsgSize(t *testing.T) {
 			}
 			assert.Equal(t, tt.expected, MaxRecvMsgSize())
 		})
+	}
+}
+
+// A cached management IP must still verify the certificate against the management hostname,
+// whether or not the platform has network event handling.
+func TestServerNameWithoutNetEvents(t *testing.T) {
+	lis, err := net.Listen("tcp", "127.0.0.1:0")
+	require.NoError(t, err)
+	t.Cleanup(func() { _ = lis.Close() })
+
+	sni := make(chan string, 1)
+	go func() {
+		conn, err := lis.Accept()
+		if err != nil {
+			return
+		}
+		defer conn.Close()
+
+		server := tls.Server(conn, &tls.Config{
+			GetCertificate: func(hello *tls.ClientHelloInfo) (*tls.Certificate, error) {
+				sni <- hello.ServerName
+				return nil, errors.New("stop after the client hello")
+			},
+		})
+		_ = server.Handshake()
+	}()
+
+	key, err := wgtypes.GenerateKey()
+	require.NoError(t, err)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+	_, _ = NewClient(ctx, lis.Addr().String(), key, true, WithServerName("management.test"))
+
+	select {
+	case got := <-sni:
+		assert.Equal(t, "management.test", got)
+	case <-time.After(2 * time.Second):
+		t.Fatal("no TLS client hello received")
 	}
 }
 
