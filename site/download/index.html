@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Download NetBirdy for Linux, Windows and macOS</title>
-<meta name="description" content="Download the NetBirdy client for Linux, Windows and macOS, and the server images. Every file is signed and linked from the GitHub releases page.">
+<title>Download NetBirdy for Linux, Windows, macOS and FreeBSD</title>
+<meta name="description" content="Download the NetBirdy client for Linux, Windows, macOS and FreeBSD, and the server images. Every file is signed and linked from the GitHub releases page.">
 <link rel="canonical" href="https://quad4-software.github.io/netbirdy/download/">
 <meta name="robots" content="index, follow, max-image-preview:large">
 <meta name="color-scheme" content="dark light">
@@ -13,7 +13,7 @@
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="NetBirdy">
 <meta property="og:locale" content="en_US">
-<meta property="og:title" content="Download NetBirdy for Linux, Windows and macOS">
+<meta property="og:title" content="Download NetBirdy for Linux, Windows, macOS and FreeBSD">
 <meta property="og:description" content="Signed client packages and server images for NetBirdy, a self-hosted WireGuard mesh network.">
 <meta property="og:url" content="https://quad4-software.github.io/netbirdy/download/">
 <meta property="og:image" content="https://quad4-software.github.io/netbirdy/assets/og-image.png">
@@ -21,7 +21,7 @@
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="NetBirdy wordmark with the three-node mark on a black background">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Download NetBirdy for Linux, Windows and macOS">
+<meta name="twitter:title" content="Download NetBirdy for Linux, Windows, macOS and FreeBSD">
 <meta name="twitter:description" content="Signed client packages and server images for NetBirdy, a self-hosted WireGuard mesh network.">
 <meta name="twitter:image" content="https://quad4-software.github.io/netbirdy/assets/og-image.png">
 <link rel="icon" href="../assets/icon.svg" type="image/svg+xml">
@@ -63,7 +63,7 @@
   <section class="page-head">
     <div class="container">
       <h1>Download NetBirdy</h1>
-      <p class="lead">Clients for Linux, Windows and macOS, and images for the server.</p>
+      <p class="lead">Clients for Linux, Windows, macOS and FreeBSD, and images for the server.</p>
       <p class="release" id="release" aria-live="polite">Files are listed on the <a href="https://github.com/Quad4-Software/netbirdy/releases">GitHub releases page</a>.</p>
     </div>
   </section>
@@ -102,6 +102,19 @@ sudo dnf install ./netbirdy_*_linux_amd64.rpm</code></pre></div>
       <div class="dl__body">
         <ul class="files" data-group="macos"><li><span class="files__empty"><a href="https://github.com/Quad4-Software/netbirdy/releases">Open the releases page</a> to get the package for your Mac.</span></li></ul>
         <div class="well ticks"><pre class="code" tabindex="0"><code>sudo installer -pkg netbirdy_*_darwin_arm64.pkg -target /</code></pre></div>
+      </div>
+    </div>
+
+    <div class="dl" id="freebsd">
+      <div>
+        <h2>FreeBSD</h2>
+        <p class="dl__note">Command-line client, tar.gz</p>
+      </div>
+      <div class="dl__body">
+        <ul class="files" data-group="freebsd"><li><span class="files__empty"><a href="https://github.com/Quad4-Software/netbirdy/releases">Open the releases page</a> to pick a build for your architecture.</span></li></ul>
+        <div class="well ticks"><pre class="code" tabindex="0"><code>tar -xzf netbirdy_*_freebsd_amd64.tar.gz
+doas install -m 0755 netbirdy /usr/local/bin/netbirdy</code></pre></div>
+        <p>FreeBSD uses the userspace WireGuard implementation. There is no FreeBSD desktop app.</p>
       </div>
     </div>
 
@@ -152,7 +165,7 @@ gh attestation verify FILE --repo Quad4-Software/netbirdy</code></pre></div>
         <svg viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="M8.5 22.5 14.2 9.4 23.5 22.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="8.5" cy="23.5" r="4.4" fill="currentColor"/><circle cx="14.6" cy="8" r="4.4" fill="currentColor"/><circle cx="23.5" cy="23.5" r="4.4" fill="currentColor"/></svg>
         NetBirdy
       </span>
-      <p class="footer__fine">An independent fork of NetBirdy. BSD-3-Clause, with the server and dashboard under AGPL-3.0.</p>
+      <p class="footer__fine">An independent fork of NetBird. BSD-3-Clause, with the server and dashboard under AGPL-3.0.</p>
     </div>
     <nav class="footer__nav" aria-label="Footer">
       <div>
@@ -176,7 +189,7 @@ gh attestation verify FILE --repo Quad4-Software/netbirdy</code></pre></div>
         <h2 class="footer__title">Legal</h2>
         <ul>
           <li><a href="https://github.com/Quad4-Software/netbirdy/blob/main/NOTICE.md">Licenses</a></li>
-          <li><a href="https://github.com/netbirdio/netbird">NetBirdy upstream</a></li>
+          <li><a href="https://github.com/netbirdio/netbird">NetBird upstream</a></li>
         </ul>
       </div>
     </nav>
@@ -201,7 +214,8 @@ gh attestation verify FILE --repo Quad4-Software/netbirdy</code></pre></div>
   });
 
   var groups = {
-    linux: /^netbirdy_.+_linux_(amd64|arm64|armv6|386)\.(deb|rpm|tar\.gz)$/,
+    linux: /^netbirdy_.+_linux_(amd64|arm64|armv6|386|mips64le_hardfloat|mips64le_softfloat|mipsle_hardfloat|mipsle_softfloat|riscv64)\.(deb|rpm|tar\.gz)$/,
+    freebsd: /^netbirdy_.+_freebsd_(amd64|arm64|armv6|386)\.tar\.gz$/,
     windows: /^netbirdy_installer_.+_windows_amd64\.exe$/,
     macos: /^netbirdy_.+_darwin_(amd64|arm64)\.pkg$/,
     desktop: /^netbirdy-ui.+\.(deb|rpm|tar\.gz|zip|exe|dmg|pkg|AppImage)$/,
